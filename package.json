@@ -3,7 +3,9 @@
   "scripts": {
     "serve": "http-server -p 8081",
     "postinstall": "jspm install",
-    "build": "jspm bundle-sfx app/main bundle.src.js --skip-source-maps",
+    "build": "npm run build-src && npm run build-min",
+    "build-src": "jspm bundle-sfx app/main bundle.src.js --skip-source-maps",
+    "build-min": "jspm bundle-sfx app/main bundle.min.js --skip-source-maps --minify",
     "prepublish": "npm run build"
   },
   "devDependencies": {
