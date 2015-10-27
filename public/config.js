@@ -11,6 +11,7 @@ System.config({
     "github:*": "jspm_packages/github/*",
     "npm:*": "jspm_packages/npm/*"
   },
+  globalEvaluationScope: false,
 
   map: {
     "babel": "npm:babel-core@5.8.29",
@@ -19,10 +20,12 @@ System.config({
     "core-js": "npm:core-js@1.2.3",
     "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",
     "css": "github:systemjs/plugin-css@0.1.19",
+    "font-awesome": "npm:font-awesome@4.4.0",
     "leaflet": "github:Leaflet/Leaflet@0.7.7",
     "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.16",
     "minified": "github:timjansen/minified.js@2015.1.1",
+    "sidebar-v2": "github:Turbo87/sidebar-v2@master",
     "traceur": "github:jmcriffey/bower-traceur@0.0.92",
     "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.92",
     "github:Reading-eScience-Centre/covjson-reader@master": {
@@ -150,6 +153,9 @@ System.config({
     },
     "npm:entities@1.1.1": {
       "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+    },
+    "npm:font-awesome@4.4.0": {
+      "css": "github:systemjs/plugin-css@0.1.19"
     },
     "npm:graceful-readlink@1.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2"

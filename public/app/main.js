@@ -4,6 +4,8 @@ import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 import {$} from 'minified'
 
+import './sidebar.js'
+
 import './style.css!'
 
 let map = L.map('map', {
@@ -20,3 +22,5 @@ let baseLayers = {
     })
 }
 baseLayers['OSM'].addTo(map)
+
+let sidebar = L.control.sidebar('sidebar').addTo(map)
