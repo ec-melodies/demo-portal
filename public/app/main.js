@@ -4,6 +4,8 @@ import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 import {$} from 'minified'
 
+import './style.css!'
+
 let map = L.map('map', {
   loadingControl: true,
   // initial center and zoom has to be set before layers can be added
