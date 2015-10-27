@@ -1,0 +1,5 @@
+/.project
+/node_modules/
+/public/jspm_packages/
+/.tern-project
+/bundle.src.js
