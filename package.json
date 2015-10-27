@@ -20,6 +20,7 @@
       "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",
       "css": "github:systemjs/plugin-css@^0.1.13",
       "font-awesome": "npm:font-awesome@^4.4.0",
+      "jsonld": "github:digitalbazaar/jsonld.js@^0.4.2",
       "leaflet": "github:Leaflet/Leaflet@^0.7.5",
       "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",
       "leaflet-loading": "github:ebrelsford/Leaflet.loading@^0.1.16",
