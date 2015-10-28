@@ -448,6 +448,126 @@
 
 (function(__global) {
   var loader = $__System;
+  var hasOwnProperty = Object.prototype.hasOwnProperty;
+  var indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++)
+      if (this[i] === item)
+        return i;
+    return -1;
+  }
+
+  function readMemberExpression(p, value) {
+    var pParts = p.split('.');
+    while (pParts.length)
+      value = value[pParts.shift()];
+    return value;
+  }
+
+  // bare minimum ignores for IE8
+  var ignoredGlobalProps = ['_g', 'sessionStorage', 'localStorage', 'clipboardData', 'frames', 'external', 'mozAnimationStartTime', 'webkitStorageInfo', 'webkitIndexedDB'];
+
+  var globalSnapshot;
+
+  function forEachGlobal(callback) {
+    if (Object.keys)
+      Object.keys(__global).forEach(callback);
+    else
+      for (var g in __global) {
+        if (!hasOwnProperty.call(__global, g))
+          continue;
+        callback(g);
+      }
+  }
+
+  function forEachGlobalValue(callback) {
+    forEachGlobal(function(globalName) {
+      if (indexOf.call(ignoredGlobalProps, globalName) != -1)
+        return;
+      try {
+        var value = __global[globalName];
+      }
+      catch (e) {
+        ignoredGlobalProps.push(globalName);
+      }
+      callback(globalName, value);
+    });
+  }
+
+  loader.set('@@global-helpers', loader.newModule({
+    prepareGlobal: function(moduleName, exportName, globals) {
+      // disable module detection
+      var curDefine = __global.define;
+       
+      __global.define = undefined;
+      __global.exports = undefined;
+      if (__global.module && __global.module.exports)
+        __global.module = undefined;
+
+      // set globals
+      var oldGlobals;
+      if (globals) {
+        oldGlobals = {};
+        for (var g in globals) {
+          oldGlobals[g] = globals[g];
+          __global[g] = globals[g];
+        }
+      }
+
+      // store a complete copy of the global object in order to detect changes
+      if (!exportName) {
+        globalSnapshot = {};
+
+        forEachGlobalValue(function(name, value) {
+          globalSnapshot[name] = value;
+        });
+      }
+
+      // return function to retrieve global
+      return function() {
+        var globalValue;
+
+        if (exportName) {
+          globalValue = readMemberExpression(exportName, __global);
+        }
+        else {
+          var singleGlobal;
+          var multipleExports;
+          var exports = {};
+
+          forEachGlobalValue(function(name, value) {
+            if (globalSnapshot[name] === value)
+              return;
+            if (typeof value == 'undefined')
+              return;
+            exports[name] = value;
+
+            if (typeof singleGlobal != 'undefined') {
+              if (!multipleExports && singleGlobal !== value)
+                multipleExports = true;
+            }
+            else {
+              singleGlobal = value;
+            }
+          });
+          globalValue = multipleExports ? exports : singleGlobal;
+        }
+
+        // revert globals
+        if (oldGlobals) {
+          for (var g in oldGlobals)
+            __global[g] = oldGlobals[g];
+        }
+        __global.define = curDefine;
+
+        return globalValue;
+      };
+    }
+  }));
+
+})(typeof self != 'undefined' ? self : global);
+
+(function(__global) {
+  var loader = $__System;
   var indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++)
       if (this[i] === item)
@@ -7411,6 +7531,5188 @@ _removeDefine();
 })();
 $__System.register("7", [], function() { return { setters: [], execute: function() {} } });
 
+$__System.register("8", [], function() { return { setters: [], execute: function() {} } });
+
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+(function() {
+  var _nodejs = (typeof process !== 'undefined' && process.versions && process.versions.node);
+  var _browser = !_nodejs && (typeof window !== 'undefined' || typeof self !== 'undefined');
+  if (_browser) {
+    if (typeof global === 'undefined') {
+      if (typeof window !== 'undefined') {
+        global = window;
+      } else if (typeof self !== 'undefined') {
+        global = self;
+      } else if (typeof $ !== 'undefined') {
+        global = $;
+      }
+    }
+  }
+  var wrapper = function(jsonld) {
+    jsonld.compact = function(input, ctx, options, callback) {
+      if (arguments.length < 2) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not compact, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (ctx === null) {
+        return jsonld.nextTick(function() {
+          callback(new JsonLdError('The compaction context must not be null.', 'jsonld.CompactError', {code: 'invalid local context'}));
+        });
+      }
+      if (input === null) {
+        return jsonld.nextTick(function() {
+          callback(null, null);
+        });
+      }
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('compactArrays' in options)) {
+        options.compactArrays = true;
+      }
+      if (!('graph' in options)) {
+        options.graph = false;
+      }
+      if (!('skipExpansion' in options)) {
+        options.skipExpansion = false;
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      if (!('link' in options)) {
+        options.link = false;
+      }
+      if (options.link) {
+        options.skipExpansion = true;
+      }
+      var expand = function(input, options, callback) {
+        jsonld.nextTick(function() {
+          if (options.skipExpansion) {
+            return callback(null, input);
+          }
+          jsonld.expand(input, options, callback);
+        });
+      };
+      expand(input, options, function(err, expanded) {
+        if (err) {
+          return callback(new JsonLdError('Could not expand input before compaction.', 'jsonld.CompactError', {cause: err}));
+        }
+        var activeCtx = _getInitialContext(options);
+        jsonld.processContext(activeCtx, ctx, options, function(err, activeCtx) {
+          if (err) {
+            return callback(new JsonLdError('Could not process context before compaction.', 'jsonld.CompactError', {cause: err}));
+          }
+          var compacted;
+          try {
+            compacted = new Processor().compact(activeCtx, null, expanded, options);
+          } catch (ex) {
+            return callback(ex);
+          }
+          cleanup(null, compacted, activeCtx, options);
+        });
+      });
+      function cleanup(err, compacted, activeCtx, options) {
+        if (err) {
+          return callback(err);
+        }
+        if (options.compactArrays && !options.graph && _isArray(compacted)) {
+          if (compacted.length === 1) {
+            compacted = compacted[0];
+          } else if (compacted.length === 0) {
+            compacted = {};
+          }
+        } else if (options.graph && _isObject(compacted)) {
+          compacted = [compacted];
+        }
+        if (_isObject(ctx) && '@context' in ctx) {
+          ctx = ctx['@context'];
+        }
+        ctx = _clone(ctx);
+        if (!_isArray(ctx)) {
+          ctx = [ctx];
+        }
+        var tmp = ctx;
+        ctx = [];
+        for (var i = 0; i < tmp.length; ++i) {
+          if (!_isObject(tmp[i]) || Object.keys(tmp[i]).length > 0) {
+            ctx.push(tmp[i]);
+          }
+        }
+        var hasContext = (ctx.length > 0);
+        if (ctx.length === 1) {
+          ctx = ctx[0];
+        }
+        if (_isArray(compacted)) {
+          var kwgraph = _compactIri(activeCtx, '@graph');
+          var graph = compacted;
+          compacted = {};
+          if (hasContext) {
+            compacted['@context'] = ctx;
+          }
+          compacted[kwgraph] = graph;
+        } else if (_isObject(compacted) && hasContext) {
+          var graph = compacted;
+          compacted = {'@context': ctx};
+          for (var key in graph) {
+            compacted[key] = graph[key];
+          }
+        }
+        callback(null, compacted, activeCtx);
+      }
+    };
+    jsonld.expand = function(input, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not expand, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      if (!('keepFreeFloatingNodes' in options)) {
+        options.keepFreeFloatingNodes = false;
+      }
+      jsonld.nextTick(function() {
+        if (typeof input === 'string') {
+          var done = function(err, remoteDoc) {
+            if (err) {
+              return callback(err);
+            }
+            try {
+              if (!remoteDoc.document) {
+                throw new JsonLdError('No remote document found at the given URL.', 'jsonld.NullRemoteDocument');
+              }
+              if (typeof remoteDoc.document === 'string') {
+                remoteDoc.document = JSON.parse(remoteDoc.document);
+              }
+            } catch (ex) {
+              return callback(new JsonLdError('Could not retrieve a JSON-LD document from the URL. URL ' + 'dereferencing not implemented.', 'jsonld.LoadDocumentError', {
+                code: 'loading document failed',
+                cause: ex,
+                remoteDoc: remoteDoc
+              }));
+            }
+            expand(remoteDoc);
+          };
+          var promise = options.documentLoader(input, done);
+          if (promise && 'then' in promise) {
+            promise.then(done.bind(null, null), done);
+          }
+          return;
+        }
+        expand({
+          contextUrl: null,
+          documentUrl: null,
+          document: input
+        });
+      });
+      function expand(remoteDoc) {
+        if (!('base' in options)) {
+          options.base = remoteDoc.documentUrl || '';
+        }
+        var input = {
+          document: _clone(remoteDoc.document),
+          remoteContext: {'@context': remoteDoc.contextUrl}
+        };
+        if ('expandContext' in options) {
+          var expandContext = _clone(options.expandContext);
+          if (typeof expandContext === 'object' && '@context' in expandContext) {
+            input.expandContext = expandContext;
+          } else {
+            input.expandContext = {'@context': expandContext};
+          }
+        }
+        _retrieveContextUrls(input, options, function(err, input) {
+          if (err) {
+            return callback(err);
+          }
+          var expanded;
+          try {
+            var processor = new Processor();
+            var activeCtx = _getInitialContext(options);
+            var document = input.document;
+            var remoteContext = input.remoteContext['@context'];
+            if (input.expandContext) {
+              activeCtx = processor.processContext(activeCtx, input.expandContext['@context'], options);
+            }
+            if (remoteContext) {
+              activeCtx = processor.processContext(activeCtx, remoteContext, options);
+            }
+            expanded = processor.expand(activeCtx, null, document, options, false);
+            if (_isObject(expanded) && ('@graph' in expanded) && Object.keys(expanded).length === 1) {
+              expanded = expanded['@graph'];
+            } else if (expanded === null) {
+              expanded = [];
+            }
+            if (!_isArray(expanded)) {
+              expanded = [expanded];
+            }
+          } catch (ex) {
+            return callback(ex);
+          }
+          callback(null, expanded);
+        });
+      }
+    };
+    jsonld.flatten = function(input, ctx, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not flatten, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      } else if (typeof ctx === 'function') {
+        callback = ctx;
+        ctx = null;
+        options = {};
+      }
+      options = options || {};
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      jsonld.expand(input, options, function(err, _input) {
+        if (err) {
+          return callback(new JsonLdError('Could not expand input before flattening.', 'jsonld.FlattenError', {cause: err}));
+        }
+        var flattened;
+        try {
+          flattened = new Processor().flatten(_input);
+        } catch (ex) {
+          return callback(ex);
+        }
+        if (ctx === null) {
+          return callback(null, flattened);
+        }
+        options.graph = true;
+        options.skipExpansion = true;
+        jsonld.compact(flattened, ctx, options, function(err, compacted) {
+          if (err) {
+            return callback(new JsonLdError('Could not compact flattened output.', 'jsonld.FlattenError', {cause: err}));
+          }
+          callback(null, compacted);
+        });
+      });
+    };
+    jsonld.frame = function(input, frame, options, callback) {
+      if (arguments.length < 2) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not frame, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      if (!('embed' in options)) {
+        options.embed = '@last';
+      }
+      options.explicit = options.explicit || false;
+      if (!('requireAll' in options)) {
+        options.requireAll = true;
+      }
+      options.omitDefault = options.omitDefault || false;
+      jsonld.nextTick(function() {
+        if (typeof frame === 'string') {
+          var done = function(err, remoteDoc) {
+            if (err) {
+              return callback(err);
+            }
+            try {
+              if (!remoteDoc.document) {
+                throw new JsonLdError('No remote document found at the given URL.', 'jsonld.NullRemoteDocument');
+              }
+              if (typeof remoteDoc.document === 'string') {
+                remoteDoc.document = JSON.parse(remoteDoc.document);
+              }
+            } catch (ex) {
+              return callback(new JsonLdError('Could not retrieve a JSON-LD document from the URL. URL ' + 'dereferencing not implemented.', 'jsonld.LoadDocumentError', {
+                code: 'loading document failed',
+                cause: ex,
+                remoteDoc: remoteDoc
+              }));
+            }
+            doFrame(remoteDoc);
+          };
+          var promise = options.documentLoader(frame, done);
+          if (promise && 'then' in promise) {
+            promise.then(done.bind(null, null), done);
+          }
+          return;
+        }
+        doFrame({
+          contextUrl: null,
+          documentUrl: null,
+          document: frame
+        });
+      });
+      function doFrame(remoteFrame) {
+        var frame = remoteFrame.document;
+        var ctx;
+        if (frame) {
+          ctx = frame['@context'];
+          if (remoteFrame.contextUrl) {
+            if (!ctx) {
+              ctx = remoteFrame.contextUrl;
+            } else if (_isArray(ctx)) {
+              ctx.push(remoteFrame.contextUrl);
+            } else {
+              ctx = [ctx, remoteFrame.contextUrl];
+            }
+            frame['@context'] = ctx;
+          } else {
+            ctx = ctx || {};
+          }
+        } else {
+          ctx = {};
+        }
+        jsonld.expand(input, options, function(err, expanded) {
+          if (err) {
+            return callback(new JsonLdError('Could not expand input before framing.', 'jsonld.FrameError', {cause: err}));
+          }
+          var opts = _clone(options);
+          opts.isFrame = true;
+          opts.keepFreeFloatingNodes = true;
+          jsonld.expand(frame, opts, function(err, expandedFrame) {
+            if (err) {
+              return callback(new JsonLdError('Could not expand frame before framing.', 'jsonld.FrameError', {cause: err}));
+            }
+            var framed;
+            try {
+              framed = new Processor().frame(expanded, expandedFrame, opts);
+            } catch (ex) {
+              return callback(ex);
+            }
+            opts.graph = true;
+            opts.skipExpansion = true;
+            opts.link = {};
+            jsonld.compact(framed, ctx, opts, function(err, compacted, ctx) {
+              if (err) {
+                return callback(new JsonLdError('Could not compact framed output.', 'jsonld.FrameError', {cause: err}));
+              }
+              var graph = _compactIri(ctx, '@graph');
+              opts.link = {};
+              compacted[graph] = _removePreserve(ctx, compacted[graph], opts);
+              callback(null, compacted);
+            });
+          });
+        });
+      }
+    };
+    jsonld.link = function(input, ctx, options, callback) {
+      var frame = {};
+      if (ctx) {
+        frame['@context'] = ctx;
+      }
+      frame['@embed'] = '@link';
+      jsonld.frame(input, frame, options, callback);
+    };
+    jsonld.objectify = function(input, ctx, options, callback) {
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      jsonld.expand(input, options, function(err, _input) {
+        if (err) {
+          return callback(new JsonLdError('Could not expand input before linking.', 'jsonld.LinkError', {cause: err}));
+        }
+        var flattened;
+        try {
+          flattened = new Processor().flatten(_input);
+        } catch (ex) {
+          return callback(ex);
+        }
+        options.graph = true;
+        options.skipExpansion = true;
+        jsonld.compact(flattened, ctx, options, function(err, compacted, ctx) {
+          if (err) {
+            return callback(new JsonLdError('Could not compact flattened output before linking.', 'jsonld.LinkError', {cause: err}));
+          }
+          var graph = _compactIri(ctx, '@graph');
+          var top = compacted[graph][0];
+          var recurse = function(subject) {
+            if (!_isObject(subject) && !_isArray(subject)) {
+              return;
+            }
+            if (_isObject(subject)) {
+              if (recurse.visited[subject['@id']]) {
+                return;
+              }
+              recurse.visited[subject['@id']] = true;
+            }
+            for (var k in subject) {
+              var obj = subject[k];
+              var isid = (jsonld.getContextValue(ctx, k, '@type') === '@id');
+              if (!_isArray(obj) && !_isObject(obj) && !isid) {
+                continue;
+              }
+              if (_isString(obj) && isid) {
+                subject[k] = obj = top[obj];
+                recurse(obj);
+              } else if (_isArray(obj)) {
+                for (var i = 0; i < obj.length; ++i) {
+                  if (_isString(obj[i]) && isid) {
+                    obj[i] = top[obj[i]];
+                  } else if (_isObject(obj[i]) && '@id' in obj[i]) {
+                    obj[i] = top[obj[i]['@id']];
+                  }
+                  recurse(obj[i]);
+                }
+              } else if (_isObject(obj)) {
+                var sid = obj['@id'];
+                subject[k] = obj = top[sid];
+                recurse(obj);
+              }
+            }
+          };
+          recurse.visited = {};
+          recurse(top);
+          compacted.of_type = {};
+          for (var s in top) {
+            if (!('@type' in top[s])) {
+              continue;
+            }
+            var types = top[s]['@type'];
+            if (!_isArray(types)) {
+              types = [types];
+            }
+            for (var t = 0; t < types.length; ++t) {
+              if (!(types[t] in compacted.of_type)) {
+                compacted.of_type[types[t]] = [];
+              }
+              compacted.of_type[types[t]].push(top[s]);
+            }
+          }
+          callback(null, compacted);
+        });
+      });
+    };
+    jsonld.normalize = function(input, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not normalize, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('algorithm' in options)) {
+        options.algorithm = 'URGNA2012';
+      }
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      if ('inputFormat' in options) {
+        if (options.inputFormat !== 'application/nquads') {
+          return callback(new JsonLdError('Unknown normalization input format.', 'jsonld.NormalizeError'));
+        }
+        var parsedInput = _parseNQuads(input);
+        new Processor().normalize(parsedInput, options, callback);
+      } else {
+        var opts = _clone(options);
+        delete opts.format;
+        opts.produceGeneralizedRdf = false;
+        jsonld.toRDF(input, opts, function(err, dataset) {
+          if (err) {
+            return callback(new JsonLdError('Could not convert input to RDF dataset before normalization.', 'jsonld.NormalizeError', {cause: err}));
+          }
+          new Processor().normalize(dataset, options, callback);
+        });
+      }
+    };
+    jsonld.fromRDF = function(dataset, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not convert from RDF, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('useRdfType' in options)) {
+        options.useRdfType = false;
+      }
+      if (!('useNativeTypes' in options)) {
+        options.useNativeTypes = false;
+      }
+      if (!('format' in options) && _isString(dataset)) {
+        if (!('format' in options)) {
+          options.format = 'application/nquads';
+        }
+      }
+      jsonld.nextTick(function() {
+        var rdfParser;
+        if (options.format) {
+          rdfParser = options.rdfParser || _rdfParsers[options.format];
+          if (!rdfParser) {
+            return callback(new JsonLdError('Unknown input format.', 'jsonld.UnknownFormat', {format: options.format}));
+          }
+        } else {
+          rdfParser = function() {
+            return dataset;
+          };
+        }
+        var callbackCalled = false;
+        try {
+          dataset = rdfParser(dataset, function(err, dataset) {
+            callbackCalled = true;
+            if (err) {
+              return callback(err);
+            }
+            fromRDF(dataset, options, callback);
+          });
+        } catch (e) {
+          if (!callbackCalled) {
+            return callback(e);
+          }
+          throw e;
+        }
+        if (dataset) {
+          if ('then' in dataset) {
+            return dataset.then(function(dataset) {
+              fromRDF(dataset, options, callback);
+            }, callback);
+          }
+          fromRDF(dataset, options, callback);
+        }
+        function fromRDF(dataset, options, callback) {
+          new Processor().fromRDF(dataset, options, callback);
+        }
+      });
+    };
+    jsonld.toRDF = function(input, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not convert to RDF, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      jsonld.expand(input, options, function(err, expanded) {
+        if (err) {
+          return callback(new JsonLdError('Could not expand input before serialization to RDF.', 'jsonld.RdfError', {cause: err}));
+        }
+        var dataset;
+        try {
+          dataset = Processor.prototype.toRDF(expanded, options);
+          if (options.format) {
+            if (options.format === 'application/nquads') {
+              return callback(null, _toNQuads(dataset));
+            }
+            throw new JsonLdError('Unknown output format.', 'jsonld.UnknownFormat', {format: options.format});
+          }
+        } catch (ex) {
+          return callback(ex);
+        }
+        callback(null, dataset);
+      });
+    };
+    jsonld.createNodeMap = function(input, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not create node map, too few arguments.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+      options = options || {};
+      if (!('base' in options)) {
+        options.base = (typeof input === 'string') ? input : '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      jsonld.expand(input, options, function(err, _input) {
+        if (err) {
+          return callback(new JsonLdError('Could not expand input before creating node map.', 'jsonld.CreateNodeMapError', {cause: err}));
+        }
+        var nodeMap;
+        try {
+          nodeMap = new Processor().createNodeMap(_input, options);
+        } catch (ex) {
+          return callback(ex);
+        }
+        callback(null, nodeMap);
+      });
+    };
+    jsonld.merge = function(docs, ctx, options, callback) {
+      if (arguments.length < 1) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not merge, too few arguments.'));
+        });
+      }
+      if (!_isArray(docs)) {
+        return jsonld.nextTick(function() {
+          callback(new TypeError('Could not merge, "docs" must be an array.'));
+        });
+      }
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      } else if (typeof ctx === 'function') {
+        callback = ctx;
+        ctx = null;
+        options = {};
+      }
+      options = options || {};
+      var expanded = [];
+      var error = null;
+      var count = docs.length;
+      for (var i = 0; i < docs.length; ++i) {
+        var opts = {};
+        for (var key in options) {
+          opts[key] = options[key];
+        }
+        jsonld.expand(docs[i], opts, expandComplete);
+      }
+      function expandComplete(err, _input) {
+        if (error) {
+          return;
+        }
+        if (err) {
+          error = err;
+          return callback(new JsonLdError('Could not expand input before flattening.', 'jsonld.FlattenError', {cause: err}));
+        }
+        expanded.push(_input);
+        if (--count === 0) {
+          merge(expanded);
+        }
+      }
+      function merge(expanded) {
+        var mergeNodes = true;
+        if ('mergeNodes' in options) {
+          mergeNodes = options.mergeNodes;
+        }
+        var issuer = options.namer || options.issuer || new IdentifierIssuer('_:b');
+        var graphs = {'@default': {}};
+        var defaultGraph;
+        try {
+          for (var i = 0; i < expanded.length; ++i) {
+            var doc = expanded[i];
+            doc = jsonld.relabelBlankNodes(doc, {issuer: new IdentifierIssuer('_:b' + i + '-')});
+            var _graphs = (mergeNodes || i === 0) ? graphs : {'@default': {}};
+            _createNodeMap(doc, _graphs, '@default', issuer);
+            if (_graphs !== graphs) {
+              for (var graphName in _graphs) {
+                var _nodeMap = _graphs[graphName];
+                if (!(graphName in graphs)) {
+                  graphs[graphName] = _nodeMap;
+                  continue;
+                }
+                var nodeMap = graphs[graphName];
+                for (var key in _nodeMap) {
+                  if (!(key in nodeMap)) {
+                    nodeMap[key] = _nodeMap[key];
+                  }
+                }
+              }
+            }
+          }
+          defaultGraph = _mergeNodeMaps(graphs);
+        } catch (ex) {
+          return callback(ex);
+        }
+        var flattened = [];
+        var keys = Object.keys(defaultGraph).sort();
+        for (var ki = 0; ki < keys.length; ++ki) {
+          var node = defaultGraph[keys[ki]];
+          if (!_isSubjectReference(node)) {
+            flattened.push(node);
+          }
+        }
+        if (ctx === null) {
+          return callback(null, flattened);
+        }
+        options.graph = true;
+        options.skipExpansion = true;
+        jsonld.compact(flattened, ctx, options, function(err, compacted) {
+          if (err) {
+            return callback(new JsonLdError('Could not compact merged output.', 'jsonld.MergeError', {cause: err}));
+          }
+          callback(null, compacted);
+        });
+      }
+    };
+    jsonld.relabelBlankNodes = function(input, options) {
+      options = options || {};
+      var issuer = options.namer || options.issuer || new IdentifierIssuer('_:b');
+      return _labelBlankNodes(issuer, input);
+    };
+    jsonld.prependBase = function(base, iri) {
+      return _prependBase(base, iri);
+    };
+    jsonld.documentLoader = function(url, callback) {
+      var err = new JsonLdError('Could not retrieve a JSON-LD document from the URL. URL ' + 'dereferencing not implemented.', 'jsonld.LoadDocumentError', {code: 'loading document failed'});
+      if (_nodejs) {
+        return callback(err, {
+          contextUrl: null,
+          documentUrl: url,
+          document: null
+        });
+      }
+      return jsonld.promisify(function(callback) {
+        callback(err);
+      });
+    };
+    jsonld.loadDocument = function(url, callback) {
+      var promise = jsonld.documentLoader(url, callback);
+      if (promise && 'then' in promise) {
+        promise.then(callback.bind(null, null), callback);
+      }
+    };
+    jsonld.promises = function(options) {
+      options = options || {};
+      var slice = Array.prototype.slice;
+      var promisify = jsonld.promisify;
+      var api = options.api || {};
+      var version = options.version || 'jsonld.js';
+      if (typeof options.api === 'string') {
+        if (!options.version) {
+          version = options.api;
+        }
+        api = {};
+      }
+      api.expand = function(input) {
+        if (arguments.length < 1) {
+          throw new TypeError('Could not expand, too few arguments.');
+        }
+        return promisify.apply(null, [jsonld.expand].concat(slice.call(arguments)));
+      };
+      api.compact = function(input, ctx) {
+        if (arguments.length < 2) {
+          throw new TypeError('Could not compact, too few arguments.');
+        }
+        var compact = function(input, ctx, options, callback) {
+          jsonld.compact(input, ctx, options, function(err, compacted) {
+            callback(err, compacted);
+          });
+        };
+        return promisify.apply(null, [compact].concat(slice.call(arguments)));
+      };
+      api.flatten = function(input) {
+        if (arguments.length < 1) {
+          throw new TypeError('Could not flatten, too few arguments.');
+        }
+        return promisify.apply(null, [jsonld.flatten].concat(slice.call(arguments)));
+      };
+      api.frame = function(input, frame) {
+        if (arguments.length < 2) {
+          throw new TypeError('Could not frame, too few arguments.');
+        }
+        return promisify.apply(null, [jsonld.frame].concat(slice.call(arguments)));
+      };
+      api.fromRDF = function(dataset) {
+        if (arguments.length < 1) {
+          throw new TypeError('Could not convert from RDF, too few arguments.');
+        }
+        return promisify.apply(null, [jsonld.fromRDF].concat(slice.call(arguments)));
+      };
+      api.toRDF = function(input) {
+        if (arguments.length < 1) {
+          throw new TypeError('Could not convert to RDF, too few arguments.');
+        }
+        return promisify.apply(null, [jsonld.toRDF].concat(slice.call(arguments)));
+      };
+      api.normalize = function(input) {
+        if (arguments.length < 1) {
+          throw new TypeError('Could not normalize, too few arguments.');
+        }
+        return promisify.apply(null, [jsonld.normalize].concat(slice.call(arguments)));
+      };
+      if (version === 'jsonld.js') {
+        api.link = function(input, ctx) {
+          if (arguments.length < 2) {
+            throw new TypeError('Could not link, too few arguments.');
+          }
+          return promisify.apply(null, [jsonld.link].concat(slice.call(arguments)));
+        };
+        api.objectify = function(input) {
+          return promisify.apply(null, [jsonld.objectify].concat(slice.call(arguments)));
+        };
+        api.createNodeMap = function(input) {
+          return promisify.apply(null, [jsonld.createNodeMap].concat(slice.call(arguments)));
+        };
+        api.merge = function(input) {
+          return promisify.apply(null, [jsonld.merge].concat(slice.call(arguments)));
+        };
+      }
+      try {
+        jsonld.Promise = global.Promise || require('es6-promise').Promise;
+      } catch (e) {
+        var f = function() {
+          throw new Error('Unable to find a Promise implementation.');
+        };
+        for (var method in api) {
+          api[method] = f;
+        }
+      }
+      return api;
+    };
+    jsonld.promisify = function(op) {
+      if (!jsonld.Promise) {
+        try {
+          jsonld.Promise = global.Promise || require('es6-promise').Promise;
+        } catch (e) {
+          throw new Error('Unable to find a Promise implementation.');
+        }
+      }
+      var args = Array.prototype.slice.call(arguments, 1);
+      return new jsonld.Promise(function(resolve, reject) {
+        op.apply(null, args.concat(function(err, value) {
+          if (!err) {
+            resolve(value);
+          } else {
+            reject(err);
+          }
+        }));
+      });
+    };
+    jsonld.promises({api: jsonld.promises});
+    function JsonLdProcessor() {}
+    JsonLdProcessor.prototype = jsonld.promises({version: 'json-ld-1.0'});
+    JsonLdProcessor.prototype.toString = function() {
+      if (this instanceof JsonLdProcessor) {
+        return '[object JsonLdProcessor]';
+      }
+      return '[object JsonLdProcessorPrototype]';
+    };
+    jsonld.JsonLdProcessor = JsonLdProcessor;
+    var canDefineProperty = !!Object.defineProperty;
+    if (canDefineProperty) {
+      try {
+        Object.defineProperty({}, 'x', {});
+      } catch (e) {
+        canDefineProperty = false;
+      }
+    }
+    if (canDefineProperty) {
+      Object.defineProperty(JsonLdProcessor, 'prototype', {
+        writable: false,
+        enumerable: false
+      });
+      Object.defineProperty(JsonLdProcessor.prototype, 'constructor', {
+        writable: true,
+        enumerable: false,
+        configurable: true,
+        value: JsonLdProcessor
+      });
+    }
+    if (_browser && typeof global.JsonLdProcessor === 'undefined') {
+      if (canDefineProperty) {
+        Object.defineProperty(global, 'JsonLdProcessor', {
+          writable: true,
+          enumerable: false,
+          configurable: true,
+          value: JsonLdProcessor
+        });
+      } else {
+        global.JsonLdProcessor = JsonLdProcessor;
+      }
+    }
+    var _setImmediate = typeof setImmediate === 'function' && setImmediate;
+    var _delay = _setImmediate ? function(fn) {
+      _setImmediate(fn);
+    } : function(fn) {
+      setTimeout(fn, 0);
+    };
+    if (typeof process === 'object' && typeof process.nextTick === 'function') {
+      jsonld.nextTick = process.nextTick;
+    } else {
+      jsonld.nextTick = _delay;
+    }
+    jsonld.setImmediate = _setImmediate ? _delay : jsonld.nextTick;
+    jsonld.parseLinkHeader = function(header) {
+      var rval = {};
+      var entries = header.match(/(?:<[^>]*?>|"[^"]*?"|[^,])+/g);
+      var rLinkHeader = /\s*<([^>]*?)>\s*(?:;\s*(.*))?/;
+      for (var i = 0; i < entries.length; ++i) {
+        var match = entries[i].match(rLinkHeader);
+        if (!match) {
+          continue;
+        }
+        var result = {target: match[1]};
+        var params = match[2];
+        var rParams = /(.*?)=(?:(?:"([^"]*?)")|([^"]*?))\s*(?:(?:;\s*)|$)/g;
+        while (match = rParams.exec(params)) {
+          result[match[1]] = (match[2] === undefined) ? match[3] : match[2];
+        }
+        var rel = result['rel'] || '';
+        if (_isArray(rval[rel])) {
+          rval[rel].push(result);
+        } else if (rel in rval) {
+          rval[rel] = [rval[rel], result];
+        } else {
+          rval[rel] = result;
+        }
+      }
+      return rval;
+    };
+    jsonld.RequestQueue = function() {
+      this._requests = {};
+    };
+    jsonld.RequestQueue.prototype.wrapLoader = function(loader) {
+      this._loader = loader;
+      this._usePromise = (loader.length === 1);
+      return this.add.bind(this);
+    };
+    jsonld.RequestQueue.prototype.add = function(url, callback) {
+      var self = this;
+      if (!callback && !self._usePromise) {
+        throw new Error('callback must be specified.');
+      }
+      if (self._usePromise) {
+        return new jsonld.Promise(function(resolve, reject) {
+          var load = self._requests[url];
+          if (!load) {
+            load = self._requests[url] = self._loader(url).then(function(remoteDoc) {
+              delete self._requests[url];
+              return remoteDoc;
+            }).catch(function(err) {
+              delete self._requests[url];
+              throw err;
+            });
+          }
+          load.then(function(remoteDoc) {
+            resolve(remoteDoc);
+          }).catch(function(err) {
+            reject(err);
+          });
+        });
+      }
+      if (url in self._requests) {
+        self._requests[url].push(callback);
+      } else {
+        self._requests[url] = [callback];
+        self._loader(url, function(err, remoteDoc) {
+          var callbacks = self._requests[url];
+          delete self._requests[url];
+          for (var i = 0; i < callbacks.length; ++i) {
+            callbacks[i](err, remoteDoc);
+          }
+        });
+      }
+    };
+    jsonld.DocumentCache = function(size) {
+      this.order = [];
+      this.cache = {};
+      this.size = size || 50;
+      this.expires = 30 * 1000;
+    };
+    jsonld.DocumentCache.prototype.get = function(url) {
+      if (url in this.cache) {
+        var entry = this.cache[url];
+        if (entry.expires >= +new Date()) {
+          return entry.ctx;
+        }
+        delete this.cache[url];
+        this.order.splice(this.order.indexOf(url), 1);
+      }
+      return null;
+    };
+    jsonld.DocumentCache.prototype.set = function(url, ctx) {
+      if (this.order.length === this.size) {
+        delete this.cache[this.order.shift()];
+      }
+      this.order.push(url);
+      this.cache[url] = {
+        ctx: ctx,
+        expires: (+new Date() + this.expires)
+      };
+    };
+    jsonld.ActiveContextCache = function(size) {
+      this.order = [];
+      this.cache = {};
+      this.size = size || 100;
+    };
+    jsonld.ActiveContextCache.prototype.get = function(activeCtx, localCtx) {
+      var key1 = JSON.stringify(activeCtx);
+      var key2 = JSON.stringify(localCtx);
+      var level1 = this.cache[key1];
+      if (level1 && key2 in level1) {
+        return level1[key2];
+      }
+      return null;
+    };
+    jsonld.ActiveContextCache.prototype.set = function(activeCtx, localCtx, result) {
+      if (this.order.length === this.size) {
+        var entry = this.order.shift();
+        delete this.cache[entry.activeCtx][entry.localCtx];
+      }
+      var key1 = JSON.stringify(activeCtx);
+      var key2 = JSON.stringify(localCtx);
+      this.order.push({
+        activeCtx: key1,
+        localCtx: key2
+      });
+      if (!(key1 in this.cache)) {
+        this.cache[key1] = {};
+      }
+      this.cache[key1][key2] = _clone(result);
+    };
+    jsonld.cache = {activeCtx: new jsonld.ActiveContextCache()};
+    jsonld.documentLoaders = {};
+    jsonld.documentLoaders.jquery = function($, options) {
+      options = options || {};
+      var queue = new jsonld.RequestQueue();
+      var usePromise = ('usePromise' in options ? options.usePromise : (typeof Promise !== 'undefined'));
+      if (usePromise) {
+        return queue.wrapLoader(function(url) {
+          return jsonld.promisify(loader, url);
+        });
+      }
+      return queue.wrapLoader(loader);
+      function loader(url, callback) {
+        if (url.indexOf('http:') !== 0 && url.indexOf('https:') !== 0) {
+          return callback(new JsonLdError('URL could not be dereferenced; only "http" and "https" URLs are ' + 'supported.', 'jsonld.InvalidUrl', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        }
+        if (options.secure && url.indexOf('https') !== 0) {
+          return callback(new JsonLdError('URL could not be dereferenced; secure mode is enabled and ' + 'the URL\'s scheme is not "https".', 'jsonld.InvalidUrl', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        }
+        $.ajax({
+          url: url,
+          accepts: {json: 'application/ld+json, application/json'},
+          headers: {'Accept': 'application/ld+json, application/json'},
+          dataType: 'json',
+          crossDomain: true,
+          success: function(data, textStatus, jqXHR) {
+            var doc = {
+              contextUrl: null,
+              documentUrl: url,
+              document: data
+            };
+            var contentType = jqXHR.getResponseHeader('Content-Type');
+            var linkHeader = jqXHR.getResponseHeader('Link');
+            if (linkHeader && contentType !== 'application/ld+json') {
+              linkHeader = jsonld.parseLinkHeader(linkHeader)[LINK_HEADER_REL];
+              if (_isArray(linkHeader)) {
+                return callback(new JsonLdError('URL could not be dereferenced, it has more than one ' + 'associated HTTP Link Header.', 'jsonld.InvalidUrl', {
+                  code: 'multiple context link headers',
+                  url: url
+                }), doc);
+              }
+              if (linkHeader) {
+                doc.contextUrl = linkHeader.target;
+              }
+            }
+            callback(null, doc);
+          },
+          error: function(jqXHR, textStatus, err) {
+            callback(new JsonLdError('URL could not be dereferenced, an error occurred.', 'jsonld.LoadDocumentError', {
+              code: 'loading document failed',
+              url: url,
+              cause: err
+            }), {
+              contextUrl: null,
+              documentUrl: url,
+              document: null
+            });
+          }
+        });
+      }
+    };
+    jsonld.documentLoaders.node = function(options) {
+      options = options || {};
+      var strictSSL = ('strictSSL' in options) ? options.strictSSL : true;
+      var maxRedirects = ('maxRedirects' in options) ? options.maxRedirects : -1;
+      var request = require('request');
+      var http = require('http');
+      var cache = new jsonld.DocumentCache();
+      var queue = new jsonld.RequestQueue();
+      if (options.usePromise) {
+        return queue.wrapLoader(function(url) {
+          return jsonld.promisify(loadDocument, url, []);
+        });
+      }
+      return queue.wrapLoader(function(url, callback) {
+        loadDocument(url, [], callback);
+      });
+      function loadDocument(url, redirects, callback) {
+        if (url.indexOf('http:') !== 0 && url.indexOf('https:') !== 0) {
+          return callback(new JsonLdError('URL could not be dereferenced; only "http" and "https" URLs are ' + 'supported.', 'jsonld.InvalidUrl', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        }
+        if (options.secure && url.indexOf('https') !== 0) {
+          return callback(new JsonLdError('URL could not be dereferenced; secure mode is enabled and ' + 'the URL\'s scheme is not "https".', 'jsonld.InvalidUrl', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        }
+        var doc = cache.get(url);
+        if (doc !== null) {
+          return callback(null, doc);
+        }
+        request({
+          url: url,
+          headers: {'Accept': 'application/ld+json, application/json'},
+          strictSSL: strictSSL,
+          followRedirect: false
+        }, handleResponse);
+        function handleResponse(err, res, body) {
+          doc = {
+            contextUrl: null,
+            documentUrl: url,
+            document: body || null
+          };
+          if (err) {
+            return callback(new JsonLdError('URL could not be dereferenced, an error occurred.', 'jsonld.LoadDocumentError', {
+              code: 'loading document failed',
+              url: url,
+              cause: err
+            }), doc);
+          }
+          var statusText = http.STATUS_CODES[res.statusCode];
+          if (res.statusCode >= 400) {
+            return callback(new JsonLdError('URL could not be dereferenced: ' + statusText, 'jsonld.InvalidUrl', {
+              code: 'loading document failed',
+              url: url,
+              httpStatusCode: res.statusCode
+            }), doc);
+          }
+          if (res.headers.link && res.headers['content-type'] !== 'application/ld+json') {
+            var linkHeader = jsonld.parseLinkHeader(res.headers.link)[LINK_HEADER_REL];
+            if (_isArray(linkHeader)) {
+              return callback(new JsonLdError('URL could not be dereferenced, it has more than one associated ' + 'HTTP Link Header.', 'jsonld.InvalidUrl', {
+                code: 'multiple context link headers',
+                url: url
+              }), doc);
+            }
+            if (linkHeader) {
+              doc.contextUrl = linkHeader.target;
+            }
+          }
+          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            if (redirects.length === maxRedirects) {
+              return callback(new JsonLdError('URL could not be dereferenced; there were too many redirects.', 'jsonld.TooManyRedirects', {
+                code: 'loading document failed',
+                url: url,
+                httpStatusCode: res.statusCode,
+                redirects: redirects
+              }), doc);
+            }
+            if (redirects.indexOf(url) !== -1) {
+              return callback(new JsonLdError('URL could not be dereferenced; infinite redirection was detected.', 'jsonld.InfiniteRedirectDetected', {
+                code: 'recursive context inclusion',
+                url: url,
+                httpStatusCode: res.statusCode,
+                redirects: redirects
+              }), doc);
+            }
+            redirects.push(url);
+            return loadDocument(res.headers.location, redirects, callback);
+          }
+          redirects.push(url);
+          for (var i = 0; i < redirects.length; ++i) {
+            cache.set(redirects[i], {
+              contextUrl: null,
+              documentUrl: redirects[i],
+              document: body
+            });
+          }
+          callback(err, doc);
+        }
+      }
+    };
+    jsonld.documentLoaders.xhr = function(options) {
+      options = options || {};
+      var rlink = /(^|(\r\n))link:/i;
+      var queue = new jsonld.RequestQueue();
+      var usePromise = ('usePromise' in options ? options.usePromise : (typeof Promise !== 'undefined'));
+      if (usePromise) {
+        return queue.wrapLoader(function(url) {
+          return jsonld.promisify(loader, url);
+        });
+      }
+      return queue.wrapLoader(loader);
+      function loader(url, callback) {
+        if (url.indexOf('http:') !== 0 && url.indexOf('https:') !== 0) {
+          return callback(new JsonLdError('URL could not be dereferenced; only "http" and "https" URLs are ' + 'supported.', 'jsonld.InvalidUrl', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        }
+        if (options.secure && url.indexOf('https') !== 0) {
+          return callback(new JsonLdError('URL could not be dereferenced; secure mode is enabled and ' + 'the URL\'s scheme is not "https".', 'jsonld.InvalidUrl', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        }
+        var xhr = options.xhr || XMLHttpRequest;
+        var req = new xhr();
+        req.onload = function() {
+          if (req.status >= 400) {
+            return callback(new JsonLdError('URL could not be dereferenced: ' + req.statusText, 'jsonld.LoadDocumentError', {
+              code: 'loading document failed',
+              url: url,
+              httpStatusCode: req.status
+            }), {
+              contextUrl: null,
+              documentUrl: url,
+              document: null
+            });
+          }
+          var doc = {
+            contextUrl: null,
+            documentUrl: url,
+            document: req.response
+          };
+          var contentType = req.getResponseHeader('Content-Type');
+          var linkHeader;
+          if (rlink.test(req.getAllResponseHeaders())) {
+            linkHeader = req.getResponseHeader('Link');
+          }
+          if (linkHeader && contentType !== 'application/ld+json') {
+            linkHeader = jsonld.parseLinkHeader(linkHeader)[LINK_HEADER_REL];
+            if (_isArray(linkHeader)) {
+              return callback(new JsonLdError('URL could not be dereferenced, it has more than one ' + 'associated HTTP Link Header.', 'jsonld.InvalidUrl', {
+                code: 'multiple context link headers',
+                url: url
+              }), doc);
+            }
+            if (linkHeader) {
+              doc.contextUrl = linkHeader.target;
+            }
+          }
+          callback(null, doc);
+        };
+        req.onerror = function() {
+          callback(new JsonLdError('URL could not be dereferenced, an error occurred.', 'jsonld.LoadDocumentError', {
+            code: 'loading document failed',
+            url: url
+          }), {
+            contextUrl: null,
+            documentUrl: url,
+            document: null
+          });
+        };
+        req.open('GET', url, true);
+        req.setRequestHeader('Accept', 'application/ld+json, application/json');
+        req.send();
+      }
+    };
+    jsonld.useDocumentLoader = function(type) {
+      if (!(type in jsonld.documentLoaders)) {
+        throw new JsonLdError('Unknown document loader type: "' + type + '"', 'jsonld.UnknownDocumentLoader', {type: type});
+      }
+      jsonld.documentLoader = jsonld.documentLoaders[type].apply(jsonld, Array.prototype.slice.call(arguments, 1));
+    };
+    jsonld.processContext = function(activeCtx, localCtx) {
+      var options = {};
+      var callbackArg = 2;
+      if (arguments.length > 3) {
+        options = arguments[2] || {};
+        callbackArg += 1;
+      }
+      var callback = arguments[callbackArg];
+      if (!('base' in options)) {
+        options.base = '';
+      }
+      if (!('documentLoader' in options)) {
+        options.documentLoader = jsonld.loadDocument;
+      }
+      if (localCtx === null) {
+        return callback(null, _getInitialContext(options));
+      }
+      localCtx = _clone(localCtx);
+      if (!(_isObject(localCtx) && '@context' in localCtx)) {
+        localCtx = {'@context': localCtx};
+      }
+      _retrieveContextUrls(localCtx, options, function(err, ctx) {
+        if (err) {
+          return callback(err);
+        }
+        try {
+          ctx = new Processor().processContext(activeCtx, ctx, options);
+        } catch (ex) {
+          return callback(ex);
+        }
+        callback(null, ctx);
+      });
+    };
+    jsonld.hasProperty = function(subject, property) {
+      var rval = false;
+      if (property in subject) {
+        var value = subject[property];
+        rval = (!_isArray(value) || value.length > 0);
+      }
+      return rval;
+    };
+    jsonld.hasValue = function(subject, property, value) {
+      var rval = false;
+      if (jsonld.hasProperty(subject, property)) {
+        var val = subject[property];
+        var isList = _isList(val);
+        if (_isArray(val) || isList) {
+          if (isList) {
+            val = val['@list'];
+          }
+          for (var i = 0; i < val.length; ++i) {
+            if (jsonld.compareValues(value, val[i])) {
+              rval = true;
+              break;
+            }
+          }
+        } else if (!_isArray(value)) {
+          rval = jsonld.compareValues(value, val);
+        }
+      }
+      return rval;
+    };
+    jsonld.addValue = function(subject, property, value, options) {
+      options = options || {};
+      if (!('propertyIsArray' in options)) {
+        options.propertyIsArray = false;
+      }
+      if (!('allowDuplicate' in options)) {
+        options.allowDuplicate = true;
+      }
+      if (_isArray(value)) {
+        if (value.length === 0 && options.propertyIsArray && !(property in subject)) {
+          subject[property] = [];
+        }
+        for (var i = 0; i < value.length; ++i) {
+          jsonld.addValue(subject, property, value[i], options);
+        }
+      } else if (property in subject) {
+        var hasValue = (!options.allowDuplicate && jsonld.hasValue(subject, property, value));
+        if (!_isArray(subject[property]) && (!hasValue || options.propertyIsArray)) {
+          subject[property] = [subject[property]];
+        }
+        if (!hasValue) {
+          subject[property].push(value);
+        }
+      } else {
+        subject[property] = options.propertyIsArray ? [value] : value;
+      }
+    };
+    jsonld.getValues = function(subject, property) {
+      var rval = subject[property] || [];
+      if (!_isArray(rval)) {
+        rval = [rval];
+      }
+      return rval;
+    };
+    jsonld.removeProperty = function(subject, property) {
+      delete subject[property];
+    };
+    jsonld.removeValue = function(subject, property, value, options) {
+      options = options || {};
+      if (!('propertyIsArray' in options)) {
+        options.propertyIsArray = false;
+      }
+      var values = jsonld.getValues(subject, property).filter(function(e) {
+        return !jsonld.compareValues(e, value);
+      });
+      if (values.length === 0) {
+        jsonld.removeProperty(subject, property);
+      } else if (values.length === 1 && !options.propertyIsArray) {
+        subject[property] = values[0];
+      } else {
+        subject[property] = values;
+      }
+    };
+    jsonld.compareValues = function(v1, v2) {
+      if (v1 === v2) {
+        return true;
+      }
+      if (_isValue(v1) && _isValue(v2) && v1['@value'] === v2['@value'] && v1['@type'] === v2['@type'] && v1['@language'] === v2['@language'] && v1['@index'] === v2['@index']) {
+        return true;
+      }
+      if (_isObject(v1) && ('@id' in v1) && _isObject(v2) && ('@id' in v2)) {
+        return v1['@id'] === v2['@id'];
+      }
+      return false;
+    };
+    jsonld.getContextValue = function(ctx, key, type) {
+      var rval = null;
+      if (key === null) {
+        return rval;
+      }
+      if (type === '@language' && (type in ctx)) {
+        rval = ctx[type];
+      }
+      if (ctx.mappings[key]) {
+        var entry = ctx.mappings[key];
+        if (_isUndefined(type)) {
+          rval = entry;
+        } else if (type in entry) {
+          rval = entry[type];
+        }
+      }
+      return rval;
+    };
+    var _rdfParsers = {};
+    jsonld.registerRDFParser = function(contentType, parser) {
+      _rdfParsers[contentType] = parser;
+    };
+    jsonld.unregisterRDFParser = function(contentType) {
+      delete _rdfParsers[contentType];
+    };
+    if (_nodejs) {
+      if (typeof XMLSerializer === 'undefined') {
+        var XMLSerializer = null;
+      }
+      if (typeof Node === 'undefined') {
+        var Node = {
+          ELEMENT_NODE: 1,
+          ATTRIBUTE_NODE: 2,
+          TEXT_NODE: 3,
+          CDATA_SECTION_NODE: 4,
+          ENTITY_REFERENCE_NODE: 5,
+          ENTITY_NODE: 6,
+          PROCESSING_INSTRUCTION_NODE: 7,
+          COMMENT_NODE: 8,
+          DOCUMENT_NODE: 9,
+          DOCUMENT_TYPE_NODE: 10,
+          DOCUMENT_FRAGMENT_NODE: 11,
+          NOTATION_NODE: 12
+        };
+      }
+    }
+    var XSD_BOOLEAN = 'http://www.w3.org/2001/XMLSchema#boolean';
+    var XSD_DOUBLE = 'http://www.w3.org/2001/XMLSchema#double';
+    var XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
+    var XSD_STRING = 'http://www.w3.org/2001/XMLSchema#string';
+    var RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    var RDF_LIST = RDF + 'List';
+    var RDF_FIRST = RDF + 'first';
+    var RDF_REST = RDF + 'rest';
+    var RDF_NIL = RDF + 'nil';
+    var RDF_TYPE = RDF + 'type';
+    var RDF_PLAIN_LITERAL = RDF + 'PlainLiteral';
+    var RDF_XML_LITERAL = RDF + 'XMLLiteral';
+    var RDF_OBJECT = RDF + 'object';
+    var RDF_LANGSTRING = RDF + 'langString';
+    var LINK_HEADER_REL = 'http://www.w3.org/ns/json-ld#context';
+    var MAX_CONTEXT_URLS = 10;
+    var JsonLdError = function(msg, type, details) {
+      if (_nodejs) {
+        Error.call(this);
+        Error.captureStackTrace(this, this.constructor);
+      } else if (typeof Error !== 'undefined') {
+        this.stack = (new Error()).stack;
+      }
+      this.name = type || 'jsonld.Error';
+      this.message = msg || 'An unspecified JSON-LD error occurred.';
+      this.details = details || {};
+    };
+    if (_nodejs) {
+      require('util').inherits(JsonLdError, Error);
+    } else if (typeof Error !== 'undefined') {
+      JsonLdError.prototype = new Error();
+    }
+    var Processor = function() {};
+    Processor.prototype.compact = function(activeCtx, activeProperty, element, options) {
+      if (_isArray(element)) {
+        var rval = [];
+        for (var i = 0; i < element.length; ++i) {
+          var compacted = this.compact(activeCtx, activeProperty, element[i], options);
+          if (compacted !== null) {
+            rval.push(compacted);
+          }
+        }
+        if (options.compactArrays && rval.length === 1) {
+          var container = jsonld.getContextValue(activeCtx, activeProperty, '@container');
+          if (container === null) {
+            rval = rval[0];
+          }
+        }
+        return rval;
+      }
+      if (_isObject(element)) {
+        if (options.link && '@id' in element && element['@id'] in options.link) {
+          var linked = options.link[element['@id']];
+          for (var i = 0; i < linked.length; ++i) {
+            if (linked[i].expanded === element) {
+              return linked[i].compacted;
+            }
+          }
+        }
+        if (_isValue(element) || _isSubjectReference(element)) {
+          var rval = _compactValue(activeCtx, activeProperty, element);
+          if (options.link && _isSubjectReference(element)) {
+            if (!(element['@id'] in options.link)) {
+              options.link[element['@id']] = [];
+            }
+            options.link[element['@id']].push({
+              expanded: element,
+              compacted: rval
+            });
+          }
+          return rval;
+        }
+        var insideReverse = (activeProperty === '@reverse');
+        var rval = {};
+        if (options.link && '@id' in element) {
+          if (!(element['@id'] in options.link)) {
+            options.link[element['@id']] = [];
+          }
+          options.link[element['@id']].push({
+            expanded: element,
+            compacted: rval
+          });
+        }
+        var keys = Object.keys(element).sort();
+        for (var ki = 0; ki < keys.length; ++ki) {
+          var expandedProperty = keys[ki];
+          var expandedValue = element[expandedProperty];
+          if (expandedProperty === '@id' || expandedProperty === '@type') {
+            var compactedValue;
+            if (_isString(expandedValue)) {
+              compactedValue = _compactIri(activeCtx, expandedValue, null, {vocab: (expandedProperty === '@type')});
+            } else {
+              compactedValue = [];
+              for (var vi = 0; vi < expandedValue.length; ++vi) {
+                compactedValue.push(_compactIri(activeCtx, expandedValue[vi], null, {vocab: true}));
+              }
+            }
+            var alias = _compactIri(activeCtx, expandedProperty);
+            var isArray = (_isArray(compactedValue) && expandedValue.length === 0);
+            jsonld.addValue(rval, alias, compactedValue, {propertyIsArray: isArray});
+            continue;
+          }
+          if (expandedProperty === '@reverse') {
+            var compactedValue = this.compact(activeCtx, '@reverse', expandedValue, options);
+            for (var compactedProperty in compactedValue) {
+              if (activeCtx.mappings[compactedProperty] && activeCtx.mappings[compactedProperty].reverse) {
+                var value = compactedValue[compactedProperty];
+                var container = jsonld.getContextValue(activeCtx, compactedProperty, '@container');
+                var useArray = (container === '@set' || !options.compactArrays);
+                jsonld.addValue(rval, compactedProperty, value, {propertyIsArray: useArray});
+                delete compactedValue[compactedProperty];
+              }
+            }
+            if (Object.keys(compactedValue).length > 0) {
+              var alias = _compactIri(activeCtx, expandedProperty);
+              jsonld.addValue(rval, alias, compactedValue);
+            }
+            continue;
+          }
+          if (expandedProperty === '@index') {
+            var container = jsonld.getContextValue(activeCtx, activeProperty, '@container');
+            if (container === '@index') {
+              continue;
+            }
+            var alias = _compactIri(activeCtx, expandedProperty);
+            jsonld.addValue(rval, alias, expandedValue);
+            continue;
+          }
+          if (expandedProperty !== '@graph' && expandedProperty !== '@list' && _isKeyword(expandedProperty)) {
+            var alias = _compactIri(activeCtx, expandedProperty);
+            jsonld.addValue(rval, alias, expandedValue);
+            continue;
+          }
+          if (expandedValue.length === 0) {
+            var itemActiveProperty = _compactIri(activeCtx, expandedProperty, expandedValue, {vocab: true}, insideReverse);
+            jsonld.addValue(rval, itemActiveProperty, expandedValue, {propertyIsArray: true});
+          }
+          for (var vi = 0; vi < expandedValue.length; ++vi) {
+            var expandedItem = expandedValue[vi];
+            var itemActiveProperty = _compactIri(activeCtx, expandedProperty, expandedItem, {vocab: true}, insideReverse);
+            var container = jsonld.getContextValue(activeCtx, itemActiveProperty, '@container');
+            var isList = _isList(expandedItem);
+            var list = null;
+            if (isList) {
+              list = expandedItem['@list'];
+            }
+            var compactedItem = this.compact(activeCtx, itemActiveProperty, isList ? list : expandedItem, options);
+            if (isList) {
+              if (!_isArray(compactedItem)) {
+                compactedItem = [compactedItem];
+              }
+              if (container !== '@list') {
+                var wrapper = {};
+                wrapper[_compactIri(activeCtx, '@list')] = compactedItem;
+                compactedItem = wrapper;
+                if ('@index' in expandedItem) {
+                  compactedItem[_compactIri(activeCtx, '@index')] = expandedItem['@index'];
+                }
+              } else if (itemActiveProperty in rval) {
+                throw new JsonLdError('JSON-LD compact error; property has a "@list" @container ' + 'rule but there is more than a single @list that matches ' + 'the compacted term in the document. Compaction might mix ' + 'unwanted items into the list.', 'jsonld.SyntaxError', {code: 'compaction to list of lists'});
+              }
+            }
+            if (container === '@language' || container === '@index') {
+              var mapObject;
+              if (itemActiveProperty in rval) {
+                mapObject = rval[itemActiveProperty];
+              } else {
+                rval[itemActiveProperty] = mapObject = {};
+              }
+              if (container === '@language' && _isValue(compactedItem)) {
+                compactedItem = compactedItem['@value'];
+              }
+              jsonld.addValue(mapObject, expandedItem[container], compactedItem);
+            } else {
+              var isArray = (!options.compactArrays || container === '@set' || container === '@list' || (_isArray(compactedItem) && compactedItem.length === 0) || expandedProperty === '@list' || expandedProperty === '@graph');
+              jsonld.addValue(rval, itemActiveProperty, compactedItem, {propertyIsArray: isArray});
+            }
+          }
+        }
+        return rval;
+      }
+      return element;
+    };
+    Processor.prototype.expand = function(activeCtx, activeProperty, element, options, insideList) {
+      var self = this;
+      if (element === null || element === undefined) {
+        return null;
+      }
+      if (!_isArray(element) && !_isObject(element)) {
+        if (!insideList && (activeProperty === null || _expandIri(activeCtx, activeProperty, {vocab: true}) === '@graph')) {
+          return null;
+        }
+        return _expandValue(activeCtx, activeProperty, element);
+      }
+      if (_isArray(element)) {
+        var rval = [];
+        var container = jsonld.getContextValue(activeCtx, activeProperty, '@container');
+        insideList = insideList || container === '@list';
+        for (var i = 0; i < element.length; ++i) {
+          var e = self.expand(activeCtx, activeProperty, element[i], options);
+          if (insideList && (_isArray(e) || _isList(e))) {
+            throw new JsonLdError('Invalid JSON-LD syntax; lists of lists are not permitted.', 'jsonld.SyntaxError', {code: 'list of lists'});
+          }
+          if (e !== null) {
+            if (_isArray(e)) {
+              rval = rval.concat(e);
+            } else {
+              rval.push(e);
+            }
+          }
+        }
+        return rval;
+      }
+      if ('@context' in element) {
+        activeCtx = self.processContext(activeCtx, element['@context'], options);
+      }
+      var expandedActiveProperty = _expandIri(activeCtx, activeProperty, {vocab: true});
+      var rval = {};
+      var keys = Object.keys(element).sort();
+      for (var ki = 0; ki < keys.length; ++ki) {
+        var key = keys[ki];
+        var value = element[key];
+        var expandedValue;
+        if (key === '@context') {
+          continue;
+        }
+        var expandedProperty = _expandIri(activeCtx, key, {vocab: true});
+        if (expandedProperty === null || !(_isAbsoluteIri(expandedProperty) || _isKeyword(expandedProperty))) {
+          continue;
+        }
+        if (_isKeyword(expandedProperty)) {
+          if (expandedActiveProperty === '@reverse') {
+            throw new JsonLdError('Invalid JSON-LD syntax; a keyword cannot be used as a @reverse ' + 'property.', 'jsonld.SyntaxError', {
+              code: 'invalid reverse property map',
+              value: value
+            });
+          }
+          if (expandedProperty in rval) {
+            throw new JsonLdError('Invalid JSON-LD syntax; colliding keywords detected.', 'jsonld.SyntaxError', {
+              code: 'colliding keywords',
+              keyword: expandedProperty
+            });
+          }
+        }
+        if (expandedProperty === '@id' && !_isString(value)) {
+          if (!options.isFrame) {
+            throw new JsonLdError('Invalid JSON-LD syntax; "@id" value must a string.', 'jsonld.SyntaxError', {
+              code: 'invalid @id value',
+              value: value
+            });
+          }
+          if (!_isObject(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; "@id" value must be a string or an ' + 'object.', 'jsonld.SyntaxError', {
+              code: 'invalid @id value',
+              value: value
+            });
+          }
+        }
+        if (expandedProperty === '@type') {
+          _validateTypeValue(value);
+        }
+        if (expandedProperty === '@graph' && !(_isObject(value) || _isArray(value))) {
+          throw new JsonLdError('Invalid JSON-LD syntax; "@graph" value must not be an ' + 'object or an array.', 'jsonld.SyntaxError', {
+            code: 'invalid @graph value',
+            value: value
+          });
+        }
+        if (expandedProperty === '@value' && (_isObject(value) || _isArray(value))) {
+          throw new JsonLdError('Invalid JSON-LD syntax; "@value" value must not be an ' + 'object or an array.', 'jsonld.SyntaxError', {
+            code: 'invalid value object value',
+            value: value
+          });
+        }
+        if (expandedProperty === '@language') {
+          if (value === null) {
+            continue;
+          }
+          if (!_isString(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; "@language" value must be a string.', 'jsonld.SyntaxError', {
+              code: 'invalid language-tagged string',
+              value: value
+            });
+          }
+          value = value.toLowerCase();
+        }
+        if (expandedProperty === '@index') {
+          if (!_isString(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; "@index" value must be a string.', 'jsonld.SyntaxError', {
+              code: 'invalid @index value',
+              value: value
+            });
+          }
+        }
+        if (expandedProperty === '@reverse') {
+          if (!_isObject(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; "@reverse" value must be an object.', 'jsonld.SyntaxError', {
+              code: 'invalid @reverse value',
+              value: value
+            });
+          }
+          expandedValue = self.expand(activeCtx, '@reverse', value, options);
+          if ('@reverse' in expandedValue) {
+            for (var property in expandedValue['@reverse']) {
+              jsonld.addValue(rval, property, expandedValue['@reverse'][property], {propertyIsArray: true});
+            }
+          }
+          var reverseMap = rval['@reverse'] || null;
+          for (var property in expandedValue) {
+            if (property === '@reverse') {
+              continue;
+            }
+            if (reverseMap === null) {
+              reverseMap = rval['@reverse'] = {};
+            }
+            jsonld.addValue(reverseMap, property, [], {propertyIsArray: true});
+            var items = expandedValue[property];
+            for (var ii = 0; ii < items.length; ++ii) {
+              var item = items[ii];
+              if (_isValue(item) || _isList(item)) {
+                throw new JsonLdError('Invalid JSON-LD syntax; "@reverse" value must not be a ' + '@value or an @list.', 'jsonld.SyntaxError', {
+                  code: 'invalid reverse property value',
+                  value: expandedValue
+                });
+              }
+              jsonld.addValue(reverseMap, property, item, {propertyIsArray: true});
+            }
+          }
+          continue;
+        }
+        var container = jsonld.getContextValue(activeCtx, key, '@container');
+        if (container === '@language' && _isObject(value)) {
+          expandedValue = _expandLanguageMap(value);
+        } else if (container === '@index' && _isObject(value)) {
+          expandedValue = (function _expandIndexMap(activeProperty) {
+            var rval = [];
+            var keys = Object.keys(value).sort();
+            for (var ki = 0; ki < keys.length; ++ki) {
+              var key = keys[ki];
+              var val = value[key];
+              if (!_isArray(val)) {
+                val = [val];
+              }
+              val = self.expand(activeCtx, activeProperty, val, options, false);
+              for (var vi = 0; vi < val.length; ++vi) {
+                var item = val[vi];
+                if (!('@index' in item)) {
+                  item['@index'] = key;
+                }
+                rval.push(item);
+              }
+            }
+            return rval;
+          })(key);
+        } else {
+          var isList = (expandedProperty === '@list');
+          if (isList || expandedProperty === '@set') {
+            var nextActiveProperty = activeProperty;
+            if (isList && expandedActiveProperty === '@graph') {
+              nextActiveProperty = null;
+            }
+            expandedValue = self.expand(activeCtx, nextActiveProperty, value, options, isList);
+            if (isList && _isList(expandedValue)) {
+              throw new JsonLdError('Invalid JSON-LD syntax; lists of lists are not permitted.', 'jsonld.SyntaxError', {code: 'list of lists'});
+            }
+          } else {
+            expandedValue = self.expand(activeCtx, key, value, options, false);
+          }
+        }
+        if (expandedValue === null && expandedProperty !== '@value') {
+          continue;
+        }
+        if (expandedProperty !== '@list' && !_isList(expandedValue) && container === '@list') {
+          expandedValue = (_isArray(expandedValue) ? expandedValue : [expandedValue]);
+          expandedValue = {'@list': expandedValue};
+        }
+        if (activeCtx.mappings[key] && activeCtx.mappings[key].reverse) {
+          var reverseMap = rval['@reverse'] = rval['@reverse'] || {};
+          if (!_isArray(expandedValue)) {
+            expandedValue = [expandedValue];
+          }
+          for (var ii = 0; ii < expandedValue.length; ++ii) {
+            var item = expandedValue[ii];
+            if (_isValue(item) || _isList(item)) {
+              throw new JsonLdError('Invalid JSON-LD syntax; "@reverse" value must not be a ' + '@value or an @list.', 'jsonld.SyntaxError', {
+                code: 'invalid reverse property value',
+                value: expandedValue
+              });
+            }
+            jsonld.addValue(reverseMap, expandedProperty, item, {propertyIsArray: true});
+          }
+          continue;
+        }
+        var useArray = ['@index', '@id', '@type', '@value', '@language'].indexOf(expandedProperty) === -1;
+        jsonld.addValue(rval, expandedProperty, expandedValue, {propertyIsArray: useArray});
+      }
+      keys = Object.keys(rval);
+      var count = keys.length;
+      if ('@value' in rval) {
+        if ('@type' in rval && '@language' in rval) {
+          throw new JsonLdError('Invalid JSON-LD syntax; an element containing "@value" may not ' + 'contain both "@type" and "@language".', 'jsonld.SyntaxError', {
+            code: 'invalid value object',
+            element: rval
+          });
+        }
+        var validCount = count - 1;
+        if ('@type' in rval) {
+          validCount -= 1;
+        }
+        if ('@index' in rval) {
+          validCount -= 1;
+        }
+        if ('@language' in rval) {
+          validCount -= 1;
+        }
+        if (validCount !== 0) {
+          throw new JsonLdError('Invalid JSON-LD syntax; an element containing "@value" may only ' + 'have an "@index" property and at most one other property ' + 'which can be "@type" or "@language".', 'jsonld.SyntaxError', {
+            code: 'invalid value object',
+            element: rval
+          });
+        }
+        if (rval['@value'] === null) {
+          rval = null;
+        } else if ('@language' in rval && !_isString(rval['@value'])) {
+          throw new JsonLdError('Invalid JSON-LD syntax; only strings may be language-tagged.', 'jsonld.SyntaxError', {
+            code: 'invalid language-tagged value',
+            element: rval
+          });
+        } else if ('@type' in rval && (!_isAbsoluteIri(rval['@type']) || rval['@type'].indexOf('_:') === 0)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; an element containing "@value" and "@type" ' + 'must have an absolute IRI for the value of "@type".', 'jsonld.SyntaxError', {
+            code: 'invalid typed value',
+            element: rval
+          });
+        }
+      } else if ('@type' in rval && !_isArray(rval['@type'])) {
+        rval['@type'] = [rval['@type']];
+      } else if ('@set' in rval || '@list' in rval) {
+        if (count > 1 && !(count === 2 && '@index' in rval)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; if an element has the property "@set" ' + 'or "@list", then it can have at most one other property that is ' + '"@index".', 'jsonld.SyntaxError', {
+            code: 'invalid set or list object',
+            element: rval
+          });
+        }
+        if ('@set' in rval) {
+          rval = rval['@set'];
+          keys = Object.keys(rval);
+          count = keys.length;
+        }
+      } else if (count === 1 && '@language' in rval) {
+        rval = null;
+      }
+      if (_isObject(rval) && !options.keepFreeFloatingNodes && !insideList && (activeProperty === null || expandedActiveProperty === '@graph')) {
+        if (count === 0 || '@value' in rval || '@list' in rval || (count === 1 && '@id' in rval)) {
+          rval = null;
+        }
+      }
+      return rval;
+    };
+    Processor.prototype.createNodeMap = function(input, options) {
+      options = options || {};
+      var issuer = options.namer || options.issuer || new IdentifierIssuer('_:b');
+      var graphs = {'@default': {}};
+      _createNodeMap(input, graphs, '@default', issuer);
+      return _mergeNodeMaps(graphs);
+    };
+    Processor.prototype.flatten = function(input) {
+      var defaultGraph = this.createNodeMap(input);
+      var flattened = [];
+      var keys = Object.keys(defaultGraph).sort();
+      for (var ki = 0; ki < keys.length; ++ki) {
+        var node = defaultGraph[keys[ki]];
+        if (!_isSubjectReference(node)) {
+          flattened.push(node);
+        }
+      }
+      return flattened;
+    };
+    Processor.prototype.frame = function(input, frame, options) {
+      var state = {
+        options: options,
+        graphs: {
+          '@default': {},
+          '@merged': {}
+        },
+        subjectStack: [],
+        link: {}
+      };
+      var issuer = new IdentifierIssuer('_:b');
+      _createNodeMap(input, state.graphs, '@merged', issuer);
+      state.subjects = state.graphs['@merged'];
+      var framed = [];
+      _frame(state, Object.keys(state.subjects).sort(), frame, framed, null);
+      return framed;
+    };
+    Processor.prototype.normalize = function(dataset, options, callback) {
+      if (options.algorithm === 'URDNA2015') {
+        return new URDNA2015(options).main(dataset, callback);
+      }
+      if (options.algorithm === 'URGNA2012') {
+        return new URGNA2012(options).main(dataset, callback);
+      }
+      callback(new Error('Invalid RDF Dataset Normalization algorithm: ' + options.algorithm));
+    };
+    Processor.prototype.fromRDF = function(dataset, options, callback) {
+      var defaultGraph = {};
+      var graphMap = {'@default': defaultGraph};
+      var referencedOnce = {};
+      for (var name in dataset) {
+        var graph = dataset[name];
+        if (!(name in graphMap)) {
+          graphMap[name] = {};
+        }
+        if (name !== '@default' && !(name in defaultGraph)) {
+          defaultGraph[name] = {'@id': name};
+        }
+        var nodeMap = graphMap[name];
+        for (var ti = 0; ti < graph.length; ++ti) {
+          var triple = graph[ti];
+          var s = triple.subject.value;
+          var p = triple.predicate.value;
+          var o = triple.object;
+          if (!(s in nodeMap)) {
+            nodeMap[s] = {'@id': s};
+          }
+          var node = nodeMap[s];
+          var objectIsId = (o.type === 'IRI' || o.type === 'blank node');
+          if (objectIsId && !(o.value in nodeMap)) {
+            nodeMap[o.value] = {'@id': o.value};
+          }
+          if (p === RDF_TYPE && !options.useRdfType && objectIsId) {
+            jsonld.addValue(node, '@type', o.value, {propertyIsArray: true});
+            continue;
+          }
+          var value = _RDFToObject(o, options.useNativeTypes);
+          jsonld.addValue(node, p, value, {propertyIsArray: true});
+          if (objectIsId) {
+            if (o.value === RDF_NIL) {
+              var object = nodeMap[o.value];
+              if (!('usages' in object)) {
+                object.usages = [];
+              }
+              object.usages.push({
+                node: node,
+                property: p,
+                value: value
+              });
+            } else if (o.value in referencedOnce) {
+              referencedOnce[o.value] = false;
+            } else {
+              referencedOnce[o.value] = {
+                node: node,
+                property: p,
+                value: value
+              };
+            }
+          }
+        }
+      }
+      for (var name in graphMap) {
+        var graphObject = graphMap[name];
+        if (!(RDF_NIL in graphObject)) {
+          continue;
+        }
+        var nil = graphObject[RDF_NIL];
+        for (var i = 0; i < nil.usages.length; ++i) {
+          var usage = nil.usages[i];
+          var node = usage.node;
+          var property = usage.property;
+          var head = usage.value;
+          var list = [];
+          var listNodes = [];
+          var nodeKeyCount = Object.keys(node).length;
+          while (property === RDF_REST && _isObject(referencedOnce[node['@id']]) && _isArray(node[RDF_FIRST]) && node[RDF_FIRST].length === 1 && _isArray(node[RDF_REST]) && node[RDF_REST].length === 1 && (nodeKeyCount === 3 || (nodeKeyCount === 4 && _isArray(node['@type']) && node['@type'].length === 1 && node['@type'][0] === RDF_LIST))) {
+            list.push(node[RDF_FIRST][0]);
+            listNodes.push(node['@id']);
+            usage = referencedOnce[node['@id']];
+            node = usage.node;
+            property = usage.property;
+            head = usage.value;
+            nodeKeyCount = Object.keys(node).length;
+            if (node['@id'].indexOf('_:') !== 0) {
+              break;
+            }
+          }
+          if (property === RDF_FIRST) {
+            if (node['@id'] === RDF_NIL) {
+              continue;
+            }
+            head = graphObject[head['@id']][RDF_REST][0];
+            list.pop();
+            listNodes.pop();
+          }
+          delete head['@id'];
+          head['@list'] = list.reverse();
+          for (var j = 0; j < listNodes.length; ++j) {
+            delete graphObject[listNodes[j]];
+          }
+        }
+        delete nil.usages;
+      }
+      var result = [];
+      var subjects = Object.keys(defaultGraph).sort();
+      for (var i = 0; i < subjects.length; ++i) {
+        var subject = subjects[i];
+        var node = defaultGraph[subject];
+        if (subject in graphMap) {
+          var graph = node['@graph'] = [];
+          var graphObject = graphMap[subject];
+          var subjects_ = Object.keys(graphObject).sort();
+          for (var si = 0; si < subjects_.length; ++si) {
+            var node_ = graphObject[subjects_[si]];
+            if (!_isSubjectReference(node_)) {
+              graph.push(node_);
+            }
+          }
+        }
+        if (!_isSubjectReference(node)) {
+          result.push(node);
+        }
+      }
+      callback(null, result);
+    };
+    Processor.prototype.toRDF = function(input, options) {
+      var issuer = new IdentifierIssuer('_:b');
+      var nodeMap = {'@default': {}};
+      _createNodeMap(input, nodeMap, '@default', issuer);
+      var dataset = {};
+      var graphNames = Object.keys(nodeMap).sort();
+      for (var i = 0; i < graphNames.length; ++i) {
+        var graphName = graphNames[i];
+        if (graphName === '@default' || _isAbsoluteIri(graphName)) {
+          dataset[graphName] = _graphToRDF(nodeMap[graphName], issuer, options);
+        }
+      }
+      return dataset;
+    };
+    Processor.prototype.processContext = function(activeCtx, localCtx, options) {
+      if (_isObject(localCtx) && '@context' in localCtx && _isArray(localCtx['@context'])) {
+        localCtx = localCtx['@context'];
+      }
+      var ctxs = _isArray(localCtx) ? localCtx : [localCtx];
+      if (ctxs.length === 0) {
+        return activeCtx.clone();
+      }
+      var rval = activeCtx;
+      for (var i = 0; i < ctxs.length; ++i) {
+        var ctx = ctxs[i];
+        if (ctx === null) {
+          rval = activeCtx = _getInitialContext(options);
+          continue;
+        }
+        if (_isObject(ctx) && '@context' in ctx) {
+          ctx = ctx['@context'];
+        }
+        if (!_isObject(ctx)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; @context must be an object.', 'jsonld.SyntaxError', {
+            code: 'invalid local context',
+            context: ctx
+          });
+        }
+        if (jsonld.cache.activeCtx) {
+          var cached = jsonld.cache.activeCtx.get(activeCtx, ctx);
+          if (cached) {
+            rval = activeCtx = cached;
+            continue;
+          }
+        }
+        activeCtx = rval;
+        rval = rval.clone();
+        var defined = {};
+        if ('@base' in ctx) {
+          var base = ctx['@base'];
+          if (base === null) {
+            base = null;
+          } else if (!_isString(base)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; the value of "@base" in a ' + '@context must be a string or null.', 'jsonld.SyntaxError', {
+              code: 'invalid base IRI',
+              context: ctx
+            });
+          } else if (base !== '' && !_isAbsoluteIri(base)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; the value of "@base" in a ' + '@context must be an absolute IRI or the empty string.', 'jsonld.SyntaxError', {
+              code: 'invalid base IRI',
+              context: ctx
+            });
+          }
+          if (base !== null) {
+            base = jsonld.url.parse(base || '');
+          }
+          rval['@base'] = base;
+          defined['@base'] = true;
+        }
+        if ('@vocab' in ctx) {
+          var value = ctx['@vocab'];
+          if (value === null) {
+            delete rval['@vocab'];
+          } else if (!_isString(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; the value of "@vocab" in a ' + '@context must be a string or null.', 'jsonld.SyntaxError', {
+              code: 'invalid vocab mapping',
+              context: ctx
+            });
+          } else if (!_isAbsoluteIri(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; the value of "@vocab" in a ' + '@context must be an absolute IRI.', 'jsonld.SyntaxError', {
+              code: 'invalid vocab mapping',
+              context: ctx
+            });
+          } else {
+            rval['@vocab'] = value;
+          }
+          defined['@vocab'] = true;
+        }
+        if ('@language' in ctx) {
+          var value = ctx['@language'];
+          if (value === null) {
+            delete rval['@language'];
+          } else if (!_isString(value)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; the value of "@language" in a ' + '@context must be a string or null.', 'jsonld.SyntaxError', {
+              code: 'invalid default language',
+              context: ctx
+            });
+          } else {
+            rval['@language'] = value.toLowerCase();
+          }
+          defined['@language'] = true;
+        }
+        for (var key in ctx) {
+          _createTermDefinition(rval, ctx, key, defined);
+        }
+        if (jsonld.cache.activeCtx) {
+          jsonld.cache.activeCtx.set(activeCtx, ctx, rval);
+        }
+      }
+      return rval;
+    };
+    function _expandLanguageMap(languageMap) {
+      var rval = [];
+      var keys = Object.keys(languageMap).sort();
+      for (var ki = 0; ki < keys.length; ++ki) {
+        var key = keys[ki];
+        var val = languageMap[key];
+        if (!_isArray(val)) {
+          val = [val];
+        }
+        for (var vi = 0; vi < val.length; ++vi) {
+          var item = val[vi];
+          if (item === null) {
+            continue;
+          }
+          if (!_isString(item)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; language map values must be strings.', 'jsonld.SyntaxError', {
+              code: 'invalid language map value',
+              languageMap: languageMap
+            });
+          }
+          rval.push({
+            '@value': item,
+            '@language': key.toLowerCase()
+          });
+        }
+      }
+      return rval;
+    }
+    function _labelBlankNodes(issuer, element) {
+      if (_isArray(element)) {
+        for (var i = 0; i < element.length; ++i) {
+          element[i] = _labelBlankNodes(issuer, element[i]);
+        }
+      } else if (_isList(element)) {
+        element['@list'] = _labelBlankNodes(issuer, element['@list']);
+      } else if (_isObject(element)) {
+        if (_isBlankNode(element)) {
+          element['@id'] = issuer.getId(element['@id']);
+        }
+        var keys = Object.keys(element).sort();
+        for (var ki = 0; ki < keys.length; ++ki) {
+          var key = keys[ki];
+          if (key !== '@id') {
+            element[key] = _labelBlankNodes(issuer, element[key]);
+          }
+        }
+      }
+      return element;
+    }
+    function _expandValue(activeCtx, activeProperty, value) {
+      if (value === null || value === undefined) {
+        return null;
+      }
+      var expandedProperty = _expandIri(activeCtx, activeProperty, {vocab: true});
+      if (expandedProperty === '@id') {
+        return _expandIri(activeCtx, value, {base: true});
+      } else if (expandedProperty === '@type') {
+        return _expandIri(activeCtx, value, {
+          vocab: true,
+          base: true
+        });
+      }
+      var type = jsonld.getContextValue(activeCtx, activeProperty, '@type');
+      if (type === '@id' || (expandedProperty === '@graph' && _isString(value))) {
+        return {'@id': _expandIri(activeCtx, value, {base: true})};
+      }
+      if (type === '@vocab') {
+        return {'@id': _expandIri(activeCtx, value, {
+            vocab: true,
+            base: true
+          })};
+      }
+      if (_isKeyword(expandedProperty)) {
+        return value;
+      }
+      var rval = {};
+      if (type !== null) {
+        rval['@type'] = type;
+      } else if (_isString(value)) {
+        var language = jsonld.getContextValue(activeCtx, activeProperty, '@language');
+        if (language !== null) {
+          rval['@language'] = language;
+        }
+      }
+      if (['boolean', 'number', 'string'].indexOf(typeof value) === -1) {
+        value = value.toString();
+      }
+      rval['@value'] = value;
+      return rval;
+    }
+    function _graphToRDF(graph, issuer, options) {
+      var rval = [];
+      var ids = Object.keys(graph).sort();
+      for (var i = 0; i < ids.length; ++i) {
+        var id = ids[i];
+        var node = graph[id];
+        var properties = Object.keys(node).sort();
+        for (var pi = 0; pi < properties.length; ++pi) {
+          var property = properties[pi];
+          var items = node[property];
+          if (property === '@type') {
+            property = RDF_TYPE;
+          } else if (_isKeyword(property)) {
+            continue;
+          }
+          for (var ii = 0; ii < items.length; ++ii) {
+            var item = items[ii];
+            var subject = {};
+            subject.type = (id.indexOf('_:') === 0) ? 'blank node' : 'IRI';
+            subject.value = id;
+            if (!_isAbsoluteIri(id)) {
+              continue;
+            }
+            var predicate = {};
+            predicate.type = (property.indexOf('_:') === 0) ? 'blank node' : 'IRI';
+            predicate.value = property;
+            if (!_isAbsoluteIri(property)) {
+              continue;
+            }
+            if (predicate.type === 'blank node' && !options.produceGeneralizedRdf) {
+              continue;
+            }
+            if (_isList(item)) {
+              _listToRDF(item['@list'], issuer, subject, predicate, rval);
+            } else {
+              var object = _objectToRDF(item);
+              if (object) {
+                rval.push({
+                  subject: subject,
+                  predicate: predicate,
+                  object: object
+                });
+              }
+            }
+          }
+        }
+      }
+      return rval;
+    }
+    function _listToRDF(list, issuer, subject, predicate, triples) {
+      var first = {
+        type: 'IRI',
+        value: RDF_FIRST
+      };
+      var rest = {
+        type: 'IRI',
+        value: RDF_REST
+      };
+      var nil = {
+        type: 'IRI',
+        value: RDF_NIL
+      };
+      for (var i = 0; i < list.length; ++i) {
+        var item = list[i];
+        var blankNode = {
+          type: 'blank node',
+          value: issuer.getId()
+        };
+        triples.push({
+          subject: subject,
+          predicate: predicate,
+          object: blankNode
+        });
+        subject = blankNode;
+        predicate = first;
+        var object = _objectToRDF(item);
+        if (object) {
+          triples.push({
+            subject: subject,
+            predicate: predicate,
+            object: object
+          });
+        }
+        predicate = rest;
+      }
+      triples.push({
+        subject: subject,
+        predicate: predicate,
+        object: nil
+      });
+    }
+    function _objectToRDF(item) {
+      var object = {};
+      if (_isValue(item)) {
+        object.type = 'literal';
+        var value = item['@value'];
+        var datatype = item['@type'] || null;
+        if (_isBoolean(value)) {
+          object.value = value.toString();
+          object.datatype = datatype || XSD_BOOLEAN;
+        } else if (_isDouble(value) || datatype === XSD_DOUBLE) {
+          if (!_isDouble(value)) {
+            value = parseFloat(value);
+          }
+          object.value = value.toExponential(15).replace(/(\d)0*e\+?/, '$1E');
+          object.datatype = datatype || XSD_DOUBLE;
+        } else if (_isNumber(value)) {
+          object.value = value.toFixed(0);
+          object.datatype = datatype || XSD_INTEGER;
+        } else if ('@language' in item) {
+          object.value = value;
+          object.datatype = datatype || RDF_LANGSTRING;
+          object.language = item['@language'];
+        } else {
+          object.value = value;
+          object.datatype = datatype || XSD_STRING;
+        }
+      } else {
+        var id = _isObject(item) ? item['@id'] : item;
+        object.type = (id.indexOf('_:') === 0) ? 'blank node' : 'IRI';
+        object.value = id;
+      }
+      if (object.type === 'IRI' && !_isAbsoluteIri(object.value)) {
+        return null;
+      }
+      return object;
+    }
+    function _RDFToObject(o, useNativeTypes) {
+      if (o.type === 'IRI' || o.type === 'blank node') {
+        return {'@id': o.value};
+      }
+      var rval = {'@value': o.value};
+      if (o.language) {
+        rval['@language'] = o.language;
+      } else {
+        var type = o.datatype;
+        if (!type) {
+          type = XSD_STRING;
+        }
+        if (useNativeTypes) {
+          if (type === XSD_BOOLEAN) {
+            if (rval['@value'] === 'true') {
+              rval['@value'] = true;
+            } else if (rval['@value'] === 'false') {
+              rval['@value'] = false;
+            }
+          } else if (_isNumeric(rval['@value'])) {
+            if (type === XSD_INTEGER) {
+              var i = parseInt(rval['@value'], 10);
+              if (i.toFixed(0) === rval['@value']) {
+                rval['@value'] = i;
+              }
+            } else if (type === XSD_DOUBLE) {
+              rval['@value'] = parseFloat(rval['@value']);
+            }
+          }
+          if ([XSD_BOOLEAN, XSD_INTEGER, XSD_DOUBLE, XSD_STRING].indexOf(type) === -1) {
+            rval['@type'] = type;
+          }
+        } else if (type !== XSD_STRING) {
+          rval['@type'] = type;
+        }
+      }
+      return rval;
+    }
+    function _compareRDFTriples(t1, t2) {
+      var attrs = ['subject', 'predicate', 'object'];
+      for (var i = 0; i < attrs.length; ++i) {
+        var attr = attrs[i];
+        if (t1[attr].type !== t2[attr].type || t1[attr].value !== t2[attr].value) {
+          return false;
+        }
+      }
+      if (t1.object.language !== t2.object.language) {
+        return false;
+      }
+      if (t1.object.datatype !== t2.object.datatype) {
+        return false;
+      }
+      return true;
+    }
+    var URDNA2015 = (function() {
+      var POSITIONS = {
+        'subject': 's',
+        'object': 'o',
+        'name': 'g'
+      };
+      var Normalize = function(options) {
+        options = options || {};
+        this.name = 'URDNA2015';
+        this.options = options;
+        this.blankNodeInfo = {};
+        this.hashToBlankNodes = {};
+        this.canonicalIssuer = new IdentifierIssuer('_:c14n');
+        this.quads = [];
+        this.schedule = {};
+        if ('maxCallStackDepth' in options) {
+          this.schedule.MAX_DEPTH = options.maxCallStackDepth;
+        } else {
+          this.schedule.MAX_DEPTH = 500;
+        }
+        if ('maxTotalCallStackDepth' in options) {
+          this.schedule.MAX_TOTAL_DEPTH = options.maxCallStackDepth;
+        } else {
+          this.schedule.MAX_TOTAL_DEPTH = 0xFFFFFFFF;
+        }
+        this.schedule.depth = 0;
+        this.schedule.totalDepth = 0;
+        if ('timeSlice' in options) {
+          this.schedule.timeSlice = options.timeSlice;
+        } else {
+          this.schedule.timeSlice = 10;
+        }
+      };
+      Normalize.prototype.doWork = function(fn, callback) {
+        var schedule = this.schedule;
+        if (schedule.totalDepth >= schedule.MAX_TOTAL_DEPTH) {
+          return callback(new Error('Maximum total call stack depth exceeded; normalization aborting.'));
+        }
+        (function work() {
+          if (schedule.depth === schedule.MAX_DEPTH) {
+            schedule.depth = 0;
+            schedule.running = false;
+            return jsonld.nextTick(work);
+          }
+          var now = new Date().getTime();
+          if (!schedule.running) {
+            schedule.start = new Date().getTime();
+            schedule.deadline = schedule.start + schedule.timeSlice;
+          }
+          if (now < schedule.deadline) {
+            schedule.running = true;
+            schedule.depth++;
+            schedule.totalDepth++;
+            return fn(function(err, result) {
+              schedule.depth--;
+              schedule.totalDepth--;
+              callback(err, result);
+            });
+          }
+          schedule.depth = 0;
+          schedule.running = false;
+          jsonld.setImmediate(work);
+        })();
+      };
+      Normalize.prototype.forEach = function(iterable, fn, callback) {
+        var self = this;
+        var iterator;
+        var idx = 0;
+        var length;
+        if (_isArray(iterable)) {
+          length = iterable.length;
+          iterator = function() {
+            if (idx === length) {
+              return false;
+            }
+            iterator.value = iterable[idx++];
+            iterator.key = idx;
+            return true;
+          };
+        } else {
+          var keys = Object.keys(iterable);
+          length = keys.length;
+          iterator = function() {
+            if (idx === length) {
+              return false;
+            }
+            iterator.key = keys[idx++];
+            iterator.value = iterable[iterator.key];
+            return true;
+          };
+        }
+        (function iterate(err, result) {
+          if (err) {
+            return callback(err);
+          }
+          if (iterator()) {
+            return self.doWork(function() {
+              fn(iterator.value, iterator.key, iterate);
+            });
+          }
+          callback();
+        })();
+      };
+      Normalize.prototype.waterfall = function(fns, callback) {
+        var self = this;
+        self.forEach(fns, function(fn, idx, callback) {
+          self.doWork(fn, callback);
+        }, callback);
+      };
+      Normalize.prototype.whilst = function(condition, fn, callback) {
+        var self = this;
+        (function loop(err) {
+          if (err) {
+            return callback(err);
+          }
+          if (!condition()) {
+            return callback();
+          }
+          self.doWork(fn, loop);
+        })();
+      };
+      Normalize.prototype.main = function(dataset, callback) {
+        var self = this;
+        self.schedule.start = new Date().getTime();
+        var result;
+        if (self.options.format) {
+          if (self.options.format !== 'application/nquads') {
+            return callback(new JsonLdError('Unknown output format.', 'jsonld.UnknownFormat', {format: self.options.format}));
+          }
+        }
+        var nonNormalized = {};
+        self.waterfall([function(callback) {
+          self.forEach(dataset, function(triples, graphName, callback) {
+            if (graphName === '@default') {
+              graphName = null;
+            }
+            self.forEach(triples, function(quad, idx, callback) {
+              if (graphName !== null) {
+                if (graphName.indexOf('_:') === 0) {
+                  quad.name = {
+                    type: 'blank node',
+                    value: graphName
+                  };
+                } else {
+                  quad.name = {
+                    type: 'IRI',
+                    value: graphName
+                  };
+                }
+              }
+              self.quads.push(quad);
+              self.forEachComponent(quad, function(component) {
+                if (component.type !== 'blank node') {
+                  return;
+                }
+                var id = component.value;
+                if (id in self.blankNodeInfo) {
+                  self.blankNodeInfo[id].quads.push(quad);
+                } else {
+                  nonNormalized[id] = true;
+                  self.blankNodeInfo[id] = {quads: [quad]};
+                }
+              });
+              callback();
+            }, callback);
+          }, callback);
+        }, function(callback) {
+          var simple = true;
+          self.whilst(function() {
+            return simple;
+          }, function(callback) {
+            simple = false;
+            self.hashToBlankNodes = {};
+            self.waterfall([function(callback) {
+              self.forEach(nonNormalized, function(value, id, callback) {
+                self.hashFirstDegreeQuads(id, function(err, hash) {
+                  if (err) {
+                    return callback(err);
+                  }
+                  if (hash in self.hashToBlankNodes) {
+                    self.hashToBlankNodes[hash].push(id);
+                  } else {
+                    self.hashToBlankNodes[hash] = [id];
+                  }
+                  callback();
+                });
+              }, callback);
+            }, function(callback) {
+              var hashes = Object.keys(self.hashToBlankNodes).sort();
+              self.forEach(hashes, function(hash, i, callback) {
+                var idList = self.hashToBlankNodes[hash];
+                if (idList.length > 1) {
+                  return callback();
+                }
+                var id = idList[0];
+                self.canonicalIssuer.getId(id);
+                delete nonNormalized[id];
+                delete self.hashToBlankNodes[hash];
+                simple = true;
+                callback();
+              }, callback);
+            }], callback);
+          }, callback);
+        }, function(callback) {
+          var hashes = Object.keys(self.hashToBlankNodes).sort();
+          self.forEach(hashes, function(hash, idx, callback) {
+            var hashPathList = [];
+            var idList = self.hashToBlankNodes[hash];
+            self.waterfall([function(callback) {
+              self.forEach(idList, function(id, idx, callback) {
+                if (self.canonicalIssuer.hasId(id)) {
+                  return callback();
+                }
+                var issuer = new IdentifierIssuer('_:b');
+                issuer.getId(id);
+                self.hashNDegreeQuads(id, issuer, function(err, result) {
+                  if (err) {
+                    return callback(err);
+                  }
+                  hashPathList.push(result);
+                  callback();
+                });
+              }, callback);
+            }, function(callback) {
+              hashPathList.sort(function(a, b) {
+                return (a.hash < b.hash) ? -1 : ((a.hash > b.hash) ? 1 : 0);
+              });
+              self.forEach(hashPathList, function(result, idx, callback) {
+                for (var existing in result.issuer.existing) {
+                  self.canonicalIssuer.getId(existing);
+                }
+                callback();
+              }, callback);
+            }], callback);
+          }, callback);
+        }, function(callback) {
+          var normalized = [];
+          self.waterfall([function(callback) {
+            self.forEach(self.quads, function(quad, idx, callback) {
+              self.forEachComponent(quad, function(component) {
+                if (component.type === 'blank node' && component.value.indexOf(self.canonicalIssuer.prefix) !== 0) {
+                  component.value = self.canonicalIssuer.getId(component.value);
+                }
+              });
+              normalized.push(_toNQuad(quad));
+              callback();
+            }, callback);
+          }, function(callback) {
+            normalized.sort();
+            if (self.options.format === 'application/nquads') {
+              result = normalized.join('');
+              return callback();
+            }
+            result = _parseNQuads(normalized.join(''));
+            callback();
+          }], callback);
+        }], function(err) {
+          callback(err, result);
+        });
+      };
+      Normalize.prototype.hashFirstDegreeQuads = function(id, callback) {
+        var self = this;
+        var info = self.blankNodeInfo[id];
+        if ('hash' in info) {
+          return callback(null, info.hash);
+        }
+        var nquads = [];
+        var quads = info.quads;
+        self.forEach(quads, function(quad, idx, callback) {
+          var copy = {predicate: quad.predicate};
+          self.forEachComponent(quad, function(component, key) {
+            copy[key] = self.modifyFirstDegreeComponent(id, component, key);
+          });
+          nquads.push(_toNQuad(copy));
+          callback();
+        }, function(err) {
+          if (err) {
+            return callback(err);
+          }
+          nquads.sort();
+          info.hash = NormalizeHash.hashNQuads(self.name, nquads);
+          callback(null, info.hash);
+        });
+      };
+      Normalize.prototype.modifyFirstDegreeComponent = function(id, component) {
+        if (component.type !== 'blank node') {
+          return component;
+        }
+        component = _clone(component);
+        component.value = (component.value === id ? '_:a' : '_:z');
+        return component;
+      };
+      Normalize.prototype.hashRelatedBlankNode = function(related, quad, issuer, position, callback) {
+        var self = this;
+        var id;
+        self.waterfall([function(callback) {
+          if (self.canonicalIssuer.hasId(related)) {
+            id = self.canonicalIssuer.getId(related);
+            return callback();
+          }
+          if (issuer.hasId(related)) {
+            id = issuer.getId(related);
+            return callback();
+          }
+          self.hashFirstDegreeQuads(related, function(err, hash) {
+            if (err) {
+              return callback(err);
+            }
+            id = hash;
+            callback();
+          });
+        }], function(err) {
+          if (err) {
+            return callback(err);
+          }
+          var md = new NormalizeHash(self.name);
+          md.update(position);
+          if (position !== 'g') {
+            md.update(self.getRelatedPredicate(quad));
+          }
+          md.update(id);
+          return callback(null, md.digest());
+        });
+      };
+      Normalize.prototype.getRelatedPredicate = function(quad) {
+        return '<' + quad.predicate.value + '>';
+      };
+      Normalize.prototype.hashNDegreeQuads = function(id, issuer, callback) {
+        var self = this;
+        var hashToRelated;
+        var md = new NormalizeHash(self.name);
+        self.waterfall([function(callback) {
+          self.createHashToRelated(id, issuer, function(err, result) {
+            if (err) {
+              return callback(err);
+            }
+            hashToRelated = result;
+            callback();
+          });
+        }, function(callback) {
+          var hashes = Object.keys(hashToRelated).sort();
+          self.forEach(hashes, function(hash, idx, callback) {
+            md.update(hash);
+            var chosenPath = '';
+            var chosenIssuer;
+            var permutator = new Permutator(hashToRelated[hash]);
+            self.whilst(function() {
+              return permutator.hasNext();
+            }, function(nextPermutation) {
+              var permutation = permutator.next();
+              var issuerCopy = issuer.clone();
+              var path = '';
+              var recursionList = [];
+              self.waterfall([function(callback) {
+                self.forEach(permutation, function(related, idx, callback) {
+                  if (self.canonicalIssuer.hasId(related)) {
+                    path += self.canonicalIssuer.getId(related);
+                  } else {
+                    if (!issuerCopy.hasId(related)) {
+                      recursionList.push(related);
+                    }
+                    path += issuerCopy.getId(related);
+                  }
+                  if (chosenPath.length !== 0 && path.length >= chosenPath.length && path > chosenPath) {
+                    return nextPermutation();
+                  }
+                  callback();
+                }, callback);
+              }, function(callback) {
+                self.forEach(recursionList, function(related, idx, callback) {
+                  self.hashNDegreeQuads(related, issuerCopy, function(err, result) {
+                    if (err) {
+                      return callback(err);
+                    }
+                    path += issuerCopy.getId(related);
+                    path += '<' + result.hash + '>';
+                    issuerCopy = result.issuer;
+                    if (chosenPath.length !== 0 && path.length >= chosenPath.length && path > chosenPath) {
+                      return nextPermutation();
+                    }
+                    callback();
+                  });
+                }, callback);
+              }, function(callback) {
+                if (chosenPath.length === 0 || path < chosenPath) {
+                  chosenPath = path;
+                  chosenIssuer = issuerCopy;
+                }
+                callback();
+              }], nextPermutation);
+            }, function(err) {
+              if (err) {
+                return callback(err);
+              }
+              md.update(chosenPath);
+              issuer = chosenIssuer;
+              callback();
+            });
+          }, callback);
+        }], function(err) {
+          callback(err, {
+            hash: md.digest(),
+            issuer: issuer
+          });
+        });
+      };
+      Normalize.prototype.createHashToRelated = function(id, issuer, callback) {
+        var self = this;
+        var hashToRelated = {};
+        var quads = self.blankNodeInfo[id].quads;
+        self.forEach(quads, function(quad, idx, callback) {
+          self.forEach(quad, function(component, key, callback) {
+            if (key === 'predicate' || !(component.type === 'blank node' && component.value !== id)) {
+              return callback();
+            }
+            var related = component.value;
+            var position = POSITIONS[key];
+            self.hashRelatedBlankNode(related, quad, issuer, position, function(err, hash) {
+              if (err) {
+                return callback(err);
+              }
+              if (hash in hashToRelated) {
+                hashToRelated[hash].push(related);
+              } else {
+                hashToRelated[hash] = [related];
+              }
+              callback();
+            });
+          }, callback);
+        }, function(err) {
+          callback(err, hashToRelated);
+        });
+      };
+      Normalize.prototype.forEachComponent = function(quad, op) {
+        for (var key in quad) {
+          if (key === 'predicate') {
+            continue;
+          }
+          op(quad[key], key, quad);
+        }
+      };
+      return Normalize;
+    })();
+    var URGNA2012 = (function() {
+      var Normalize = function(options) {
+        URDNA2015.call(this, options);
+        this.name = 'URGNA2012';
+      };
+      Normalize.prototype = new URDNA2015();
+      Normalize.prototype.modifyFirstDegreeComponent = function(id, component, key) {
+        if (component.type !== 'blank node') {
+          return component;
+        }
+        component = _clone(component);
+        if (key === 'name') {
+          component.value = '_:g';
+        } else {
+          component.value = (component.value === id ? '_:a' : '_:z');
+        }
+        return component;
+      };
+      Normalize.prototype.getRelatedPredicate = function(quad) {
+        return quad.predicate.value;
+      };
+      Normalize.prototype.createHashToRelated = function(id, issuer, callback) {
+        var self = this;
+        var hashToRelated = {};
+        var quads = self.blankNodeInfo[id].quads;
+        self.forEach(quads, function(quad, idx, callback) {
+          var position;
+          var related;
+          if (quad.subject.type === 'blank node' && quad.subject.value !== id) {
+            related = quad.subject.value;
+            position = 'p';
+          } else if (quad.object.type === 'blank node' && quad.object.value !== id) {
+            related = quad.object.value;
+            position = 'r';
+          } else {
+            return callback();
+          }
+          self.hashRelatedBlankNode(related, quad, issuer, position, function(err, hash) {
+            if (hash in hashToRelated) {
+              hashToRelated[hash].push(related);
+            } else {
+              hashToRelated[hash] = [related];
+            }
+            callback();
+          });
+        }, function(err) {
+          callback(err, hashToRelated);
+        });
+      };
+      return Normalize;
+    })();
+    function _createNodeMap(input, graphs, graph, issuer, name, list) {
+      if (_isArray(input)) {
+        for (var i = 0; i < input.length; ++i) {
+          _createNodeMap(input[i], graphs, graph, issuer, undefined, list);
+        }
+        return;
+      }
+      if (!_isObject(input)) {
+        if (list) {
+          list.push(input);
+        }
+        return;
+      }
+      if (_isValue(input)) {
+        if ('@type' in input) {
+          var type = input['@type'];
+          if (type.indexOf('_:') === 0) {
+            input['@type'] = type = issuer.getId(type);
+          }
+        }
+        if (list) {
+          list.push(input);
+        }
+        return;
+      }
+      if ('@type' in input) {
+        var types = input['@type'];
+        for (var i = 0; i < types.length; ++i) {
+          var type = types[i];
+          if (type.indexOf('_:') === 0) {
+            issuer.getId(type);
+          }
+        }
+      }
+      if (_isUndefined(name)) {
+        name = _isBlankNode(input) ? issuer.getId(input['@id']) : input['@id'];
+      }
+      if (list) {
+        list.push({'@id': name});
+      }
+      var subjects = graphs[graph];
+      var subject = subjects[name] = subjects[name] || {};
+      subject['@id'] = name;
+      var properties = Object.keys(input).sort();
+      for (var pi = 0; pi < properties.length; ++pi) {
+        var property = properties[pi];
+        if (property === '@id') {
+          continue;
+        }
+        if (property === '@reverse') {
+          var referencedNode = {'@id': name};
+          var reverseMap = input['@reverse'];
+          for (var reverseProperty in reverseMap) {
+            var items = reverseMap[reverseProperty];
+            for (var ii = 0; ii < items.length; ++ii) {
+              var item = items[ii];
+              var itemName = item['@id'];
+              if (_isBlankNode(item)) {
+                itemName = issuer.getId(itemName);
+              }
+              _createNodeMap(item, graphs, graph, issuer, itemName);
+              jsonld.addValue(subjects[itemName], reverseProperty, referencedNode, {
+                propertyIsArray: true,
+                allowDuplicate: false
+              });
+            }
+          }
+          continue;
+        }
+        if (property === '@graph') {
+          if (!(name in graphs)) {
+            graphs[name] = {};
+          }
+          var g = (graph === '@merged') ? graph : name;
+          _createNodeMap(input[property], graphs, g, issuer);
+          continue;
+        }
+        if (property !== '@type' && _isKeyword(property)) {
+          if (property === '@index' && property in subject && (input[property] !== subject[property] || input[property]['@id'] !== subject[property]['@id'])) {
+            throw new JsonLdError('Invalid JSON-LD syntax; conflicting @index property detected.', 'jsonld.SyntaxError', {
+              code: 'conflicting indexes',
+              subject: subject
+            });
+          }
+          subject[property] = input[property];
+          continue;
+        }
+        var objects = input[property];
+        if (property.indexOf('_:') === 0) {
+          property = issuer.getId(property);
+        }
+        if (objects.length === 0) {
+          jsonld.addValue(subject, property, [], {propertyIsArray: true});
+          continue;
+        }
+        for (var oi = 0; oi < objects.length; ++oi) {
+          var o = objects[oi];
+          if (property === '@type') {
+            o = (o.indexOf('_:') === 0) ? issuer.getId(o) : o;
+          }
+          if (_isSubject(o) || _isSubjectReference(o)) {
+            var id = _isBlankNode(o) ? issuer.getId(o['@id']) : o['@id'];
+            jsonld.addValue(subject, property, {'@id': id}, {
+              propertyIsArray: true,
+              allowDuplicate: false
+            });
+            _createNodeMap(o, graphs, graph, issuer, id);
+          } else if (_isList(o)) {
+            var _list = [];
+            _createNodeMap(o['@list'], graphs, graph, issuer, name, _list);
+            o = {'@list': _list};
+            jsonld.addValue(subject, property, o, {
+              propertyIsArray: true,
+              allowDuplicate: false
+            });
+          } else {
+            _createNodeMap(o, graphs, graph, issuer, name);
+            jsonld.addValue(subject, property, o, {
+              propertyIsArray: true,
+              allowDuplicate: false
+            });
+          }
+        }
+      }
+    }
+    function _mergeNodeMaps(graphs) {
+      var defaultGraph = graphs['@default'];
+      var graphNames = Object.keys(graphs).sort();
+      for (var i = 0; i < graphNames.length; ++i) {
+        var graphName = graphNames[i];
+        if (graphName === '@default') {
+          continue;
+        }
+        var nodeMap = graphs[graphName];
+        var subject = defaultGraph[graphName];
+        if (!subject) {
+          defaultGraph[graphName] = subject = {
+            '@id': graphName,
+            '@graph': []
+          };
+        } else if (!('@graph' in subject)) {
+          subject['@graph'] = [];
+        }
+        var graph = subject['@graph'];
+        var ids = Object.keys(nodeMap).sort();
+        for (var ii = 0; ii < ids.length; ++ii) {
+          var node = nodeMap[ids[ii]];
+          if (!_isSubjectReference(node)) {
+            graph.push(node);
+          }
+        }
+      }
+      return defaultGraph;
+    }
+    function _frame(state, subjects, frame, parent, property) {
+      _validateFrame(frame);
+      frame = frame[0];
+      var options = state.options;
+      var flags = {
+        embed: _getFrameFlag(frame, options, 'embed'),
+        explicit: _getFrameFlag(frame, options, 'explicit'),
+        requireAll: _getFrameFlag(frame, options, 'requireAll')
+      };
+      var matches = _filterSubjects(state, subjects, frame, flags);
+      var ids = Object.keys(matches).sort();
+      for (var idx = 0; idx < ids.length; ++idx) {
+        var id = ids[idx];
+        var subject = matches[id];
+        if (flags.embed === '@link' && id in state.link) {
+          _addFrameOutput(parent, property, state.link[id]);
+          continue;
+        }
+        if (property === null) {
+          state.uniqueEmbeds = {};
+        }
+        var output = {};
+        output['@id'] = id;
+        state.link[id] = output;
+        if (flags.embed === '@never' || _createsCircularReference(subject, state.subjectStack)) {
+          _addFrameOutput(parent, property, output);
+          continue;
+        }
+        if (flags.embed === '@last') {
+          if (id in state.uniqueEmbeds) {
+            _removeEmbed(state, id);
+          }
+          state.uniqueEmbeds[id] = {
+            parent: parent,
+            property: property
+          };
+        }
+        state.subjectStack.push(subject);
+        var props = Object.keys(subject).sort();
+        for (var i = 0; i < props.length; i++) {
+          var prop = props[i];
+          if (_isKeyword(prop)) {
+            output[prop] = _clone(subject[prop]);
+            continue;
+          }
+          if (flags.explicit && !(prop in frame)) {
+            continue;
+          }
+          var objects = subject[prop];
+          for (var oi = 0; oi < objects.length; ++oi) {
+            var o = objects[oi];
+            if (_isList(o)) {
+              var list = {'@list': []};
+              _addFrameOutput(output, prop, list);
+              var src = o['@list'];
+              for (var n in src) {
+                o = src[n];
+                if (_isSubjectReference(o)) {
+                  var subframe = (prop in frame ? frame[prop][0]['@list'] : _createImplicitFrame(flags));
+                  _frame(state, [o['@id']], subframe, list, '@list');
+                } else {
+                  _addFrameOutput(list, '@list', _clone(o));
+                }
+              }
+              continue;
+            }
+            if (_isSubjectReference(o)) {
+              var subframe = (prop in frame ? frame[prop] : _createImplicitFrame(flags));
+              _frame(state, [o['@id']], subframe, output, prop);
+            } else {
+              _addFrameOutput(output, prop, _clone(o));
+            }
+          }
+        }
+        var props = Object.keys(frame).sort();
+        for (var i = 0; i < props.length; ++i) {
+          var prop = props[i];
+          if (_isKeyword(prop)) {
+            continue;
+          }
+          var next = frame[prop][0];
+          var omitDefaultOn = _getFrameFlag(next, options, 'omitDefault');
+          if (!omitDefaultOn && !(prop in output)) {
+            var preserve = '@null';
+            if ('@default' in next) {
+              preserve = _clone(next['@default']);
+            }
+            if (!_isArray(preserve)) {
+              preserve = [preserve];
+            }
+            output[prop] = [{'@preserve': preserve}];
+          }
+        }
+        _addFrameOutput(parent, property, output);
+        state.subjectStack.pop();
+      }
+    }
+    function _createImplicitFrame(flags) {
+      var frame = {};
+      for (var key in flags) {
+        if (flags[key] !== undefined) {
+          frame['@' + key] = [flags[key]];
+        }
+      }
+      return [frame];
+    }
+    function _createsCircularReference(subjectToEmbed, subjectStack) {
+      for (var i = subjectStack.length - 1; i >= 0; --i) {
+        if (subjectStack[i]['@id'] === subjectToEmbed['@id']) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function _getFrameFlag(frame, options, name) {
+      var flag = '@' + name;
+      var rval = (flag in frame ? frame[flag][0] : options[name]);
+      if (name === 'embed') {
+        if (rval === true) {
+          rval = '@last';
+        } else if (rval === false) {
+          rval = '@never';
+        } else if (rval !== '@always' && rval !== '@never' && rval !== '@link') {
+          rval = '@last';
+        }
+      }
+      return rval;
+    }
+    function _validateFrame(frame) {
+      if (!_isArray(frame) || frame.length !== 1 || !_isObject(frame[0])) {
+        throw new JsonLdError('Invalid JSON-LD syntax; a JSON-LD frame must be a single object.', 'jsonld.SyntaxError', {frame: frame});
+      }
+    }
+    function _filterSubjects(state, subjects, frame, flags) {
+      var rval = {};
+      for (var i = 0; i < subjects.length; ++i) {
+        var id = subjects[i];
+        var subject = state.subjects[id];
+        if (_filterSubject(subject, frame, flags)) {
+          rval[id] = subject;
+        }
+      }
+      return rval;
+    }
+    function _filterSubject(subject, frame, flags) {
+      if ('@type' in frame && !(frame['@type'].length === 1 && _isObject(frame['@type'][0]))) {
+        var types = frame['@type'];
+        for (var i = 0; i < types.length; ++i) {
+          if (jsonld.hasValue(subject, '@type', types[i])) {
+            return true;
+          }
+        }
+        return false;
+      }
+      var wildcard = true;
+      var matchesSome = false;
+      for (var key in frame) {
+        if (_isKeyword(key)) {
+          if (key !== '@id' && key !== '@type') {
+            continue;
+          }
+          wildcard = false;
+          if (key === '@id' && _isString(frame[key])) {
+            if (subject[key] !== frame[key]) {
+              return false;
+            }
+            matchesSome = true;
+            continue;
+          }
+        }
+        wildcard = false;
+        if (key in subject) {
+          if (_isArray(frame[key]) && frame[key].length === 0 && subject[key] !== undefined) {
+            return false;
+          }
+          matchesSome = true;
+          continue;
+        }
+        var hasDefault = (_isArray(frame[key]) && _isObject(frame[key][0]) && '@default' in frame[key][0]);
+        if (flags.requireAll && !hasDefault) {
+          return false;
+        }
+      }
+      return wildcard || matchesSome;
+    }
+    function _removeEmbed(state, id) {
+      var embeds = state.uniqueEmbeds;
+      var embed = embeds[id];
+      var parent = embed.parent;
+      var property = embed.property;
+      var subject = {'@id': id};
+      if (_isArray(parent)) {
+        for (var i = 0; i < parent.length; ++i) {
+          if (jsonld.compareValues(parent[i], subject)) {
+            parent[i] = subject;
+            break;
+          }
+        }
+      } else {
+        var useArray = _isArray(parent[property]);
+        jsonld.removeValue(parent, property, subject, {propertyIsArray: useArray});
+        jsonld.addValue(parent, property, subject, {propertyIsArray: useArray});
+      }
+      var removeDependents = function(id) {
+        var ids = Object.keys(embeds);
+        for (var i = 0; i < ids.length; ++i) {
+          var next = ids[i];
+          if (next in embeds && _isObject(embeds[next].parent) && embeds[next].parent['@id'] === id) {
+            delete embeds[next];
+            removeDependents(next);
+          }
+        }
+      };
+      removeDependents(id);
+    }
+    function _addFrameOutput(parent, property, output) {
+      if (_isObject(parent)) {
+        jsonld.addValue(parent, property, output, {propertyIsArray: true});
+      } else {
+        parent.push(output);
+      }
+    }
+    function _removePreserve(ctx, input, options) {
+      if (_isArray(input)) {
+        var output = [];
+        for (var i = 0; i < input.length; ++i) {
+          var result = _removePreserve(ctx, input[i], options);
+          if (result !== null) {
+            output.push(result);
+          }
+        }
+        input = output;
+      } else if (_isObject(input)) {
+        if ('@preserve' in input) {
+          if (input['@preserve'] === '@null') {
+            return null;
+          }
+          return input['@preserve'];
+        }
+        if (_isValue(input)) {
+          return input;
+        }
+        if (_isList(input)) {
+          input['@list'] = _removePreserve(ctx, input['@list'], options);
+          return input;
+        }
+        var idAlias = _compactIri(ctx, '@id');
+        if (idAlias in input) {
+          var id = input[idAlias];
+          if (id in options.link) {
+            var idx = options.link[id].indexOf(input);
+            if (idx === -1) {
+              options.link[id].push(input);
+            } else {
+              return options.link[id][idx];
+            }
+          } else {
+            options.link[id] = [input];
+          }
+        }
+        for (var prop in input) {
+          var result = _removePreserve(ctx, input[prop], options);
+          var container = jsonld.getContextValue(ctx, prop, '@container');
+          if (options.compactArrays && _isArray(result) && result.length === 1 && container === null) {
+            result = result[0];
+          }
+          input[prop] = result;
+        }
+      }
+      return input;
+    }
+    function _compareShortestLeast(a, b) {
+      if (a.length < b.length) {
+        return -1;
+      }
+      if (b.length < a.length) {
+        return 1;
+      }
+      if (a === b) {
+        return 0;
+      }
+      return (a < b) ? -1 : 1;
+    }
+    function _selectTerm(activeCtx, iri, value, containers, typeOrLanguage, typeOrLanguageValue) {
+      if (typeOrLanguageValue === null) {
+        typeOrLanguageValue = '@null';
+      }
+      var prefs = [];
+      if ((typeOrLanguageValue === '@id' || typeOrLanguageValue === '@reverse') && _isSubjectReference(value)) {
+        if (typeOrLanguageValue === '@reverse') {
+          prefs.push('@reverse');
+        }
+        var term = _compactIri(activeCtx, value['@id'], null, {vocab: true});
+        if (term in activeCtx.mappings && activeCtx.mappings[term] && activeCtx.mappings[term]['@id'] === value['@id']) {
+          prefs.push.apply(prefs, ['@vocab', '@id']);
+        } else {
+          prefs.push.apply(prefs, ['@id', '@vocab']);
+        }
+      } else {
+        prefs.push(typeOrLanguageValue);
+      }
+      prefs.push('@none');
+      var containerMap = activeCtx.inverse[iri];
+      for (var ci = 0; ci < containers.length; ++ci) {
+        var container = containers[ci];
+        if (!(container in containerMap)) {
+          continue;
+        }
+        var typeOrLanguageValueMap = containerMap[container][typeOrLanguage];
+        for (var pi = 0; pi < prefs.length; ++pi) {
+          var pref = prefs[pi];
+          if (!(pref in typeOrLanguageValueMap)) {
+            continue;
+          }
+          return typeOrLanguageValueMap[pref];
+        }
+      }
+      return null;
+    }
+    function _compactIri(activeCtx, iri, value, relativeTo, reverse) {
+      if (iri === null) {
+        return iri;
+      }
+      if (_isUndefined(value)) {
+        value = null;
+      }
+      if (_isUndefined(reverse)) {
+        reverse = false;
+      }
+      relativeTo = relativeTo || {};
+      if (_isKeyword(iri)) {
+        relativeTo.vocab = true;
+      }
+      if (relativeTo.vocab && iri in activeCtx.getInverse()) {
+        var defaultLanguage = activeCtx['@language'] || '@none';
+        var containers = [];
+        if (_isObject(value) && '@index' in value) {
+          containers.push('@index');
+        }
+        var typeOrLanguage = '@language';
+        var typeOrLanguageValue = '@null';
+        if (reverse) {
+          typeOrLanguage = '@type';
+          typeOrLanguageValue = '@reverse';
+          containers.push('@set');
+        } else if (_isList(value)) {
+          if (!('@index' in value)) {
+            containers.push('@list');
+          }
+          var list = value['@list'];
+          var commonLanguage = (list.length === 0) ? defaultLanguage : null;
+          var commonType = null;
+          for (var i = 0; i < list.length; ++i) {
+            var item = list[i];
+            var itemLanguage = '@none';
+            var itemType = '@none';
+            if (_isValue(item)) {
+              if ('@language' in item) {
+                itemLanguage = item['@language'];
+              } else if ('@type' in item) {
+                itemType = item['@type'];
+              } else {
+                itemLanguage = '@null';
+              }
+            } else {
+              itemType = '@id';
+            }
+            if (commonLanguage === null) {
+              commonLanguage = itemLanguage;
+            } else if (itemLanguage !== commonLanguage && _isValue(item)) {
+              commonLanguage = '@none';
+            }
+            if (commonType === null) {
+              commonType = itemType;
+            } else if (itemType !== commonType) {
+              commonType = '@none';
+            }
+            if (commonLanguage === '@none' && commonType === '@none') {
+              break;
+            }
+          }
+          commonLanguage = commonLanguage || '@none';
+          commonType = commonType || '@none';
+          if (commonType !== '@none') {
+            typeOrLanguage = '@type';
+            typeOrLanguageValue = commonType;
+          } else {
+            typeOrLanguageValue = commonLanguage;
+          }
+        } else {
+          if (_isValue(value)) {
+            if ('@language' in value && !('@index' in value)) {
+              containers.push('@language');
+              typeOrLanguageValue = value['@language'];
+            } else if ('@type' in value) {
+              typeOrLanguage = '@type';
+              typeOrLanguageValue = value['@type'];
+            }
+          } else {
+            typeOrLanguage = '@type';
+            typeOrLanguageValue = '@id';
+          }
+          containers.push('@set');
+        }
+        containers.push('@none');
+        var term = _selectTerm(activeCtx, iri, value, containers, typeOrLanguage, typeOrLanguageValue);
+        if (term !== null) {
+          return term;
+        }
+      }
+      if (relativeTo.vocab) {
+        if ('@vocab' in activeCtx) {
+          var vocab = activeCtx['@vocab'];
+          if (iri.indexOf(vocab) === 0 && iri !== vocab) {
+            var suffix = iri.substr(vocab.length);
+            if (!(suffix in activeCtx.mappings)) {
+              return suffix;
+            }
+          }
+        }
+      }
+      var choice = null;
+      for (var term in activeCtx.mappings) {
+        if (term.indexOf(':') !== -1) {
+          continue;
+        }
+        var definition = activeCtx.mappings[term];
+        if (!definition || definition['@id'] === iri || iri.indexOf(definition['@id']) !== 0) {
+          continue;
+        }
+        var curie = term + ':' + iri.substr(definition['@id'].length);
+        var isUsableCurie = (!(curie in activeCtx.mappings) || (value === null && activeCtx.mappings[curie] && activeCtx.mappings[curie]['@id'] === iri));
+        if (isUsableCurie && (choice === null || _compareShortestLeast(curie, choice) < 0)) {
+          choice = curie;
+        }
+      }
+      if (choice !== null) {
+        return choice;
+      }
+      if (!relativeTo.vocab) {
+        return _removeBase(activeCtx['@base'], iri);
+      }
+      return iri;
+    }
+    function _compactValue(activeCtx, activeProperty, value) {
+      if (_isValue(value)) {
+        var type = jsonld.getContextValue(activeCtx, activeProperty, '@type');
+        var language = jsonld.getContextValue(activeCtx, activeProperty, '@language');
+        var container = jsonld.getContextValue(activeCtx, activeProperty, '@container');
+        var preserveIndex = (('@index' in value) && container !== '@index');
+        if (!preserveIndex) {
+          if (value['@type'] === type || value['@language'] === language) {
+            return value['@value'];
+          }
+        }
+        var keyCount = Object.keys(value).length;
+        var isValueOnlyKey = (keyCount === 1 || (keyCount === 2 && ('@index' in value) && !preserveIndex));
+        var hasDefaultLanguage = ('@language' in activeCtx);
+        var isValueString = _isString(value['@value']);
+        var hasNullMapping = (activeCtx.mappings[activeProperty] && activeCtx.mappings[activeProperty]['@language'] === null);
+        if (isValueOnlyKey && (!hasDefaultLanguage || !isValueString || hasNullMapping)) {
+          return value['@value'];
+        }
+        var rval = {};
+        if (preserveIndex) {
+          rval[_compactIri(activeCtx, '@index')] = value['@index'];
+        }
+        if ('@type' in value) {
+          rval[_compactIri(activeCtx, '@type')] = _compactIri(activeCtx, value['@type'], null, {vocab: true});
+        } else if ('@language' in value) {
+          rval[_compactIri(activeCtx, '@language')] = value['@language'];
+        }
+        rval[_compactIri(activeCtx, '@value')] = value['@value'];
+        return rval;
+      }
+      var expandedProperty = _expandIri(activeCtx, activeProperty, {vocab: true});
+      var type = jsonld.getContextValue(activeCtx, activeProperty, '@type');
+      var compacted = _compactIri(activeCtx, value['@id'], null, {vocab: type === '@vocab'});
+      if (type === '@id' || type === '@vocab' || expandedProperty === '@graph') {
+        return compacted;
+      }
+      var rval = {};
+      rval[_compactIri(activeCtx, '@id')] = compacted;
+      return rval;
+    }
+    function _createTermDefinition(activeCtx, localCtx, term, defined) {
+      if (term in defined) {
+        if (defined[term]) {
+          return;
+        }
+        throw new JsonLdError('Cyclical context definition detected.', 'jsonld.CyclicalContext', {
+          code: 'cyclic IRI mapping',
+          context: localCtx,
+          term: term
+        });
+      }
+      defined[term] = false;
+      if (_isKeyword(term)) {
+        throw new JsonLdError('Invalid JSON-LD syntax; keywords cannot be overridden.', 'jsonld.SyntaxError', {
+          code: 'keyword redefinition',
+          context: localCtx,
+          term: term
+        });
+      }
+      if (term === '') {
+        throw new JsonLdError('Invalid JSON-LD syntax; a term cannot be an empty string.', 'jsonld.SyntaxError', {
+          code: 'invalid term definition',
+          context: localCtx
+        });
+      }
+      if (activeCtx.mappings[term]) {
+        delete activeCtx.mappings[term];
+      }
+      var value = localCtx[term];
+      if (value === null || (_isObject(value) && value['@id'] === null)) {
+        activeCtx.mappings[term] = null;
+        defined[term] = true;
+        return;
+      }
+      if (_isString(value)) {
+        value = {'@id': value};
+      }
+      if (!_isObject(value)) {
+        throw new JsonLdError('Invalid JSON-LD syntax; @context property values must be ' + 'strings or objects.', 'jsonld.SyntaxError', {
+          code: 'invalid term definition',
+          context: localCtx
+        });
+      }
+      var mapping = activeCtx.mappings[term] = {};
+      mapping.reverse = false;
+      if ('@reverse' in value) {
+        if ('@id' in value) {
+          throw new JsonLdError('Invalid JSON-LD syntax; a @reverse term definition must not ' + 'contain @id.', 'jsonld.SyntaxError', {
+            code: 'invalid reverse property',
+            context: localCtx
+          });
+        }
+        var reverse = value['@reverse'];
+        if (!_isString(reverse)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; a @context @reverse value must be a string.', 'jsonld.SyntaxError', {
+            code: 'invalid IRI mapping',
+            context: localCtx
+          });
+        }
+        var id = _expandIri(activeCtx, reverse, {
+          vocab: true,
+          base: false
+        }, localCtx, defined);
+        if (!_isAbsoluteIri(id)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; a @context @reverse value must be an ' + 'absolute IRI or a blank node identifier.', 'jsonld.SyntaxError', {
+            code: 'invalid IRI mapping',
+            context: localCtx
+          });
+        }
+        mapping['@id'] = id;
+        mapping.reverse = true;
+      } else if ('@id' in value) {
+        var id = value['@id'];
+        if (!_isString(id)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; a @context @id value must be an array ' + 'of strings or a string.', 'jsonld.SyntaxError', {
+            code: 'invalid IRI mapping',
+            context: localCtx
+          });
+        }
+        if (id !== term) {
+          id = _expandIri(activeCtx, id, {
+            vocab: true,
+            base: false
+          }, localCtx, defined);
+          if (!_isAbsoluteIri(id) && !_isKeyword(id)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; a @context @id value must be an ' + 'absolute IRI, a blank node identifier, or a keyword.', 'jsonld.SyntaxError', {
+              code: 'invalid IRI mapping',
+              context: localCtx
+            });
+          }
+          mapping['@id'] = id;
+        }
+      }
+      if (!('@id' in mapping)) {
+        var colon = term.indexOf(':');
+        if (colon !== -1) {
+          var prefix = term.substr(0, colon);
+          if (prefix in localCtx) {
+            _createTermDefinition(activeCtx, localCtx, prefix, defined);
+          }
+          if (activeCtx.mappings[prefix]) {
+            var suffix = term.substr(colon + 1);
+            mapping['@id'] = activeCtx.mappings[prefix]['@id'] + suffix;
+          } else {
+            mapping['@id'] = term;
+          }
+        } else {
+          if (!('@vocab' in activeCtx)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; @context terms must define an @id.', 'jsonld.SyntaxError', {
+              code: 'invalid IRI mapping',
+              context: localCtx,
+              term: term
+            });
+          }
+          mapping['@id'] = activeCtx['@vocab'] + term;
+        }
+      }
+      defined[term] = true;
+      if ('@type' in value) {
+        var type = value['@type'];
+        if (!_isString(type)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; an @context @type values must be a string.', 'jsonld.SyntaxError', {
+            code: 'invalid type mapping',
+            context: localCtx
+          });
+        }
+        if (type !== '@id' && type !== '@vocab') {
+          type = _expandIri(activeCtx, type, {
+            vocab: true,
+            base: false
+          }, localCtx, defined);
+          if (!_isAbsoluteIri(type)) {
+            throw new JsonLdError('Invalid JSON-LD syntax; an @context @type value must be an ' + 'absolute IRI.', 'jsonld.SyntaxError', {
+              code: 'invalid type mapping',
+              context: localCtx
+            });
+          }
+          if (type.indexOf('_:') === 0) {
+            throw new JsonLdError('Invalid JSON-LD syntax; an @context @type values must be an IRI, ' + 'not a blank node identifier.', 'jsonld.SyntaxError', {
+              code: 'invalid type mapping',
+              context: localCtx
+            });
+          }
+        }
+        mapping['@type'] = type;
+      }
+      if ('@container' in value) {
+        var container = value['@container'];
+        if (container !== '@list' && container !== '@set' && container !== '@index' && container !== '@language') {
+          throw new JsonLdError('Invalid JSON-LD syntax; @context @container value must be ' + 'one of the following: @list, @set, @index, or @language.', 'jsonld.SyntaxError', {
+            code: 'invalid container mapping',
+            context: localCtx
+          });
+        }
+        if (mapping.reverse && container !== '@index' && container !== '@set' && container !== null) {
+          throw new JsonLdError('Invalid JSON-LD syntax; @context @container value for a @reverse ' + 'type definition must be @index or @set.', 'jsonld.SyntaxError', {
+            code: 'invalid reverse property',
+            context: localCtx
+          });
+        }
+        mapping['@container'] = container;
+      }
+      if ('@language' in value && !('@type' in value)) {
+        var language = value['@language'];
+        if (language !== null && !_isString(language)) {
+          throw new JsonLdError('Invalid JSON-LD syntax; @context @language value must be ' + 'a string or null.', 'jsonld.SyntaxError', {
+            code: 'invalid language mapping',
+            context: localCtx
+          });
+        }
+        if (language !== null) {
+          language = language.toLowerCase();
+        }
+        mapping['@language'] = language;
+      }
+      var id = mapping['@id'];
+      if (id === '@context' || id === '@preserve') {
+        throw new JsonLdError('Invalid JSON-LD syntax; @context and @preserve cannot be aliased.', 'jsonld.SyntaxError', {
+          code: 'invalid keyword alias',
+          context: localCtx
+        });
+      }
+    }
+    function _expandIri(activeCtx, value, relativeTo, localCtx, defined) {
+      if (value === null || _isKeyword(value)) {
+        return value;
+      }
+      value = String(value);
+      if (localCtx && value in localCtx && defined[value] !== true) {
+        _createTermDefinition(activeCtx, localCtx, value, defined);
+      }
+      relativeTo = relativeTo || {};
+      if (relativeTo.vocab) {
+        var mapping = activeCtx.mappings[value];
+        if (mapping === null) {
+          return null;
+        }
+        if (mapping) {
+          return mapping['@id'];
+        }
+      }
+      var colon = value.indexOf(':');
+      if (colon !== -1) {
+        var prefix = value.substr(0, colon);
+        var suffix = value.substr(colon + 1);
+        if (prefix === '_' || suffix.indexOf('//') === 0) {
+          return value;
+        }
+        if (localCtx && prefix in localCtx) {
+          _createTermDefinition(activeCtx, localCtx, prefix, defined);
+        }
+        var mapping = activeCtx.mappings[prefix];
+        if (mapping) {
+          return mapping['@id'] + suffix;
+        }
+        return value;
+      }
+      if (relativeTo.vocab && '@vocab' in activeCtx) {
+        return activeCtx['@vocab'] + value;
+      }
+      var rval = value;
+      if (relativeTo.base) {
+        rval = jsonld.prependBase(activeCtx['@base'], rval);
+      }
+      return rval;
+    }
+    function _prependBase(base, iri) {
+      if (base === null) {
+        return iri;
+      }
+      if (iri.indexOf(':') !== -1) {
+        return iri;
+      }
+      if (_isString(base)) {
+        base = jsonld.url.parse(base || '');
+      }
+      var rel = jsonld.url.parse(iri);
+      var transform = {protocol: base.protocol || ''};
+      if (rel.authority !== null) {
+        transform.authority = rel.authority;
+        transform.path = rel.path;
+        transform.query = rel.query;
+      } else {
+        transform.authority = base.authority;
+        if (rel.path === '') {
+          transform.path = base.path;
+          if (rel.query !== null) {
+            transform.query = rel.query;
+          } else {
+            transform.query = base.query;
+          }
+        } else {
+          if (rel.path.indexOf('/') === 0) {
+            transform.path = rel.path;
+          } else {
+            var path = base.path;
+            if (rel.path !== '') {
+              path = path.substr(0, path.lastIndexOf('/') + 1);
+              if (path.length > 0 && path.substr(-1) !== '/') {
+                path += '/';
+              }
+              path += rel.path;
+            }
+            transform.path = path;
+          }
+          transform.query = rel.query;
+        }
+      }
+      transform.path = _removeDotSegments(transform.path, !!transform.authority);
+      var rval = transform.protocol;
+      if (transform.authority !== null) {
+        rval += '//' + transform.authority;
+      }
+      rval += transform.path;
+      if (transform.query !== null) {
+        rval += '?' + transform.query;
+      }
+      if (rel.fragment !== null) {
+        rval += '#' + rel.fragment;
+      }
+      if (rval === '') {
+        rval = './';
+      }
+      return rval;
+    }
+    function _removeBase(base, iri) {
+      if (base === null) {
+        return iri;
+      }
+      if (_isString(base)) {
+        base = jsonld.url.parse(base || '');
+      }
+      var root = '';
+      if (base.href !== '') {
+        root += (base.protocol || '') + '//' + (base.authority || '');
+      } else if (iri.indexOf('//')) {
+        root += '//';
+      }
+      if (iri.indexOf(root) !== 0) {
+        return iri;
+      }
+      var rel = jsonld.url.parse(iri.substr(root.length));
+      var baseSegments = base.normalizedPath.split('/');
+      var iriSegments = rel.normalizedPath.split('/');
+      var last = (rel.fragment || rel.query) ? 0 : 1;
+      while (baseSegments.length > 0 && iriSegments.length > last) {
+        if (baseSegments[0] !== iriSegments[0]) {
+          break;
+        }
+        baseSegments.shift();
+        iriSegments.shift();
+      }
+      var rval = '';
+      if (baseSegments.length > 0) {
+        baseSegments.pop();
+        for (var i = 0; i < baseSegments.length; ++i) {
+          rval += '../';
+        }
+      }
+      rval += iriSegments.join('/');
+      if (rel.query !== null) {
+        rval += '?' + rel.query;
+      }
+      if (rel.fragment !== null) {
+        rval += '#' + rel.fragment;
+      }
+      if (rval === '') {
+        rval = './';
+      }
+      return rval;
+    }
+    function _getInitialContext(options) {
+      var base = jsonld.url.parse(options.base || '');
+      return {
+        '@base': base,
+        mappings: {},
+        inverse: null,
+        getInverse: _createInverseContext,
+        clone: _cloneActiveContext
+      };
+      function _createInverseContext() {
+        var activeCtx = this;
+        if (activeCtx.inverse) {
+          return activeCtx.inverse;
+        }
+        var inverse = activeCtx.inverse = {};
+        var defaultLanguage = activeCtx['@language'] || '@none';
+        var mappings = activeCtx.mappings;
+        var terms = Object.keys(mappings).sort(_compareShortestLeast);
+        for (var i = 0; i < terms.length; ++i) {
+          var term = terms[i];
+          var mapping = mappings[term];
+          if (mapping === null) {
+            continue;
+          }
+          var container = mapping['@container'] || '@none';
+          var ids = mapping['@id'];
+          if (!_isArray(ids)) {
+            ids = [ids];
+          }
+          for (var ii = 0; ii < ids.length; ++ii) {
+            var iri = ids[ii];
+            var entry = inverse[iri];
+            if (!entry) {
+              inverse[iri] = entry = {};
+            }
+            if (!entry[container]) {
+              entry[container] = {
+                '@language': {},
+                '@type': {}
+              };
+            }
+            entry = entry[container];
+            if (mapping.reverse) {
+              _addPreferredTerm(mapping, term, entry['@type'], '@reverse');
+            } else if ('@type' in mapping) {
+              _addPreferredTerm(mapping, term, entry['@type'], mapping['@type']);
+            } else if ('@language' in mapping) {
+              var language = mapping['@language'] || '@null';
+              _addPreferredTerm(mapping, term, entry['@language'], language);
+            } else {
+              _addPreferredTerm(mapping, term, entry['@language'], defaultLanguage);
+              _addPreferredTerm(mapping, term, entry['@type'], '@none');
+              _addPreferredTerm(mapping, term, entry['@language'], '@none');
+            }
+          }
+        }
+        return inverse;
+      }
+      function _addPreferredTerm(mapping, term, entry, typeOrLanguageValue) {
+        if (!(typeOrLanguageValue in entry)) {
+          entry[typeOrLanguageValue] = term;
+        }
+      }
+      function _cloneActiveContext() {
+        var child = {};
+        child['@base'] = this['@base'];
+        child.mappings = _clone(this.mappings);
+        child.clone = this.clone;
+        child.inverse = null;
+        child.getInverse = this.getInverse;
+        if ('@language' in this) {
+          child['@language'] = this['@language'];
+        }
+        if ('@vocab' in this) {
+          child['@vocab'] = this['@vocab'];
+        }
+        return child;
+      }
+    }
+    function _isKeyword(v) {
+      if (!_isString(v)) {
+        return false;
+      }
+      switch (v) {
+        case '@base':
+        case '@context':
+        case '@container':
+        case '@default':
+        case '@embed':
+        case '@explicit':
+        case '@graph':
+        case '@id':
+        case '@index':
+        case '@language':
+        case '@list':
+        case '@omitDefault':
+        case '@preserve':
+        case '@requireAll':
+        case '@reverse':
+        case '@set':
+        case '@type':
+        case '@value':
+        case '@vocab':
+          return true;
+      }
+      return false;
+    }
+    function _isObject(v) {
+      return (Object.prototype.toString.call(v) === '[object Object]');
+    }
+    function _isEmptyObject(v) {
+      return _isObject(v) && Object.keys(v).length === 0;
+    }
+    function _isArray(v) {
+      return Array.isArray(v);
+    }
+    function _validateTypeValue(v) {
+      if (_isString(v) || _isEmptyObject(v)) {
+        return;
+      }
+      var isValid = false;
+      if (_isArray(v)) {
+        isValid = true;
+        for (var i = 0; i < v.length; ++i) {
+          if (!(_isString(v[i]))) {
+            isValid = false;
+            break;
+          }
+        }
+      }
+      if (!isValid) {
+        throw new JsonLdError('Invalid JSON-LD syntax; "@type" value must a string, an array of ' + 'strings, or an empty object.', 'jsonld.SyntaxError', {
+          code: 'invalid type value',
+          value: v
+        });
+      }
+    }
+    function _isString(v) {
+      return (typeof v === 'string' || Object.prototype.toString.call(v) === '[object String]');
+    }
+    function _isNumber(v) {
+      return (typeof v === 'number' || Object.prototype.toString.call(v) === '[object Number]');
+    }
+    function _isDouble(v) {
+      return _isNumber(v) && String(v).indexOf('.') !== -1;
+    }
+    function _isNumeric(v) {
+      return !isNaN(parseFloat(v)) && isFinite(v);
+    }
+    function _isBoolean(v) {
+      return (typeof v === 'boolean' || Object.prototype.toString.call(v) === '[object Boolean]');
+    }
+    function _isUndefined(v) {
+      return (typeof v === 'undefined');
+    }
+    function _isSubject(v) {
+      var rval = false;
+      if (_isObject(v) && !(('@value' in v) || ('@set' in v) || ('@list' in v))) {
+        var keyCount = Object.keys(v).length;
+        rval = (keyCount > 1 || !('@id' in v));
+      }
+      return rval;
+    }
+    function _isSubjectReference(v) {
+      return (_isObject(v) && Object.keys(v).length === 1 && ('@id' in v));
+    }
+    function _isValue(v) {
+      return _isObject(v) && ('@value' in v);
+    }
+    function _isList(v) {
+      return _isObject(v) && ('@list' in v);
+    }
+    function _isBlankNode(v) {
+      var rval = false;
+      if (_isObject(v)) {
+        if ('@id' in v) {
+          rval = (v['@id'].indexOf('_:') === 0);
+        } else {
+          rval = (Object.keys(v).length === 0 || !(('@value' in v) || ('@set' in v) || ('@list' in v)));
+        }
+      }
+      return rval;
+    }
+    function _isAbsoluteIri(v) {
+      return _isString(v) && v.indexOf(':') !== -1;
+    }
+    function _clone(value) {
+      if (value && typeof value === 'object') {
+        var rval;
+        if (_isArray(value)) {
+          rval = [];
+          for (var i = 0; i < value.length; ++i) {
+            rval[i] = _clone(value[i]);
+          }
+        } else if (_isObject(value)) {
+          rval = {};
+          for (var key in value) {
+            rval[key] = _clone(value[key]);
+          }
+        } else {
+          rval = value.toString();
+        }
+        return rval;
+      }
+      return value;
+    }
+    function _findContextUrls(input, urls, replace, base) {
+      var count = Object.keys(urls).length;
+      if (_isArray(input)) {
+        for (var i = 0; i < input.length; ++i) {
+          _findContextUrls(input[i], urls, replace, base);
+        }
+        return (count < Object.keys(urls).length);
+      } else if (_isObject(input)) {
+        for (var key in input) {
+          if (key !== '@context') {
+            _findContextUrls(input[key], urls, replace, base);
+            continue;
+          }
+          var ctx = input[key];
+          if (_isArray(ctx)) {
+            var length = ctx.length;
+            for (var i = 0; i < length; ++i) {
+              var _ctx = ctx[i];
+              if (_isString(_ctx)) {
+                _ctx = jsonld.prependBase(base, _ctx);
+                if (replace) {
+                  _ctx = urls[_ctx];
+                  if (_isArray(_ctx)) {
+                    Array.prototype.splice.apply(ctx, [i, 1].concat(_ctx));
+                    i += _ctx.length - 1;
+                    length = ctx.length;
+                  } else {
+                    ctx[i] = _ctx;
+                  }
+                } else if (!(_ctx in urls)) {
+                  urls[_ctx] = false;
+                }
+              }
+            }
+          } else if (_isString(ctx)) {
+            ctx = jsonld.prependBase(base, ctx);
+            if (replace) {
+              input[key] = urls[ctx];
+            } else if (!(ctx in urls)) {
+              urls[ctx] = false;
+            }
+          }
+        }
+        return (count < Object.keys(urls).length);
+      }
+      return false;
+    }
+    function _retrieveContextUrls(input, options, callback) {
+      var error = null;
+      var documentLoader = options.documentLoader;
+      var retrieve = function(input, cycles, documentLoader, base, callback) {
+        if (Object.keys(cycles).length > MAX_CONTEXT_URLS) {
+          error = new JsonLdError('Maximum number of @context URLs exceeded.', 'jsonld.ContextUrlError', {
+            code: 'loading remote context failed',
+            max: MAX_CONTEXT_URLS
+          });
+          return callback(error);
+        }
+        var urls = {};
+        var finished = function() {
+          _findContextUrls(input, urls, true, base);
+          callback(null, input);
+        };
+        if (!_findContextUrls(input, urls, false, base)) {
+          finished();
+        }
+        var queue = [];
+        for (var url in urls) {
+          if (urls[url] === false) {
+            queue.push(url);
+          }
+        }
+        var count = queue.length;
+        for (var i = 0; i < queue.length; ++i) {
+          (function(url) {
+            if (url in cycles) {
+              error = new JsonLdError('Cyclical @context URLs detected.', 'jsonld.ContextUrlError', {
+                code: 'recursive context inclusion',
+                url: url
+              });
+              return callback(error);
+            }
+            var _cycles = _clone(cycles);
+            _cycles[url] = true;
+            var done = function(err, remoteDoc) {
+              if (error) {
+                return;
+              }
+              var ctx = remoteDoc ? remoteDoc.document : null;
+              if (!err && _isString(ctx)) {
+                try {
+                  ctx = JSON.parse(ctx);
+                } catch (ex) {
+                  err = ex;
+                }
+              }
+              if (err) {
+                err = new JsonLdError('Dereferencing a URL did not result in a valid JSON-LD object. ' + 'Possible causes are an inaccessible URL perhaps due to ' + 'a same-origin policy (ensure the server uses CORS if you are ' + 'using client-side JavaScript), too many redirects, a ' + 'non-JSON response, or more than one HTTP Link Header was ' + 'provided for a remote context.', 'jsonld.InvalidUrl', {
+                  code: 'loading remote context failed',
+                  url: url,
+                  cause: err
+                });
+              } else if (!_isObject(ctx)) {
+                err = new JsonLdError('Dereferencing a URL did not result in a JSON object. The ' + 'response was valid JSON, but it was not a JSON object.', 'jsonld.InvalidUrl', {
+                  code: 'invalid remote context',
+                  url: url,
+                  cause: err
+                });
+              }
+              if (err) {
+                error = err;
+                return callback(error);
+              }
+              if (!('@context' in ctx)) {
+                ctx = {'@context': {}};
+              } else {
+                ctx = {'@context': ctx['@context']};
+              }
+              if (remoteDoc.contextUrl) {
+                if (!_isArray(ctx['@context'])) {
+                  ctx['@context'] = [ctx['@context']];
+                }
+                ctx['@context'].push(remoteDoc.contextUrl);
+              }
+              retrieve(ctx, _cycles, documentLoader, url, function(err, ctx) {
+                if (err) {
+                  return callback(err);
+                }
+                urls[url] = ctx['@context'];
+                count -= 1;
+                if (count === 0) {
+                  finished();
+                }
+              });
+            };
+            var promise = documentLoader(url, done);
+            if (promise && 'then' in promise) {
+              promise.then(done.bind(null, null), done);
+            }
+          }(queue[i]));
+        }
+      };
+      retrieve(input, {}, documentLoader, options.base, callback);
+    }
+    if (!Object.keys) {
+      Object.keys = function(o) {
+        if (o !== Object(o)) {
+          throw new TypeError('Object.keys called on non-object');
+        }
+        var rval = [];
+        for (var p in o) {
+          if (Object.prototype.hasOwnProperty.call(o, p)) {
+            rval.push(p);
+          }
+        }
+        return rval;
+      };
+    }
+    function _parseNQuads(input) {
+      var iri = '(?:<([^:]+:[^>]*)>)';
+      var bnode = '(_:(?:[A-Za-z0-9]+))';
+      var plain = '"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"';
+      var datatype = '(?:\\^\\^' + iri + ')';
+      var language = '(?:@([a-z]+(?:-[a-z0-9]+)*))';
+      var literal = '(?:' + plain + '(?:' + datatype + '|' + language + ')?)';
+      var ws = '[ \\t]+';
+      var wso = '[ \\t]*';
+      var eoln = /(?:\r\n)|(?:\n)|(?:\r)/g;
+      var empty = new RegExp('^' + wso + '$');
+      var subject = '(?:' + iri + '|' + bnode + ')' + ws;
+      var property = iri + ws;
+      var object = '(?:' + iri + '|' + bnode + '|' + literal + ')' + wso;
+      var graphName = '(?:\\.|(?:(?:' + iri + '|' + bnode + ')' + wso + '\\.))';
+      var quad = new RegExp('^' + wso + subject + property + object + graphName + wso + '$');
+      var dataset = {};
+      var lines = input.split(eoln);
+      var lineNumber = 0;
+      for (var li = 0; li < lines.length; ++li) {
+        var line = lines[li];
+        lineNumber++;
+        if (empty.test(line)) {
+          continue;
+        }
+        var match = line.match(quad);
+        if (match === null) {
+          throw new JsonLdError('Error while parsing N-Quads; invalid quad.', 'jsonld.ParseError', {line: lineNumber});
+        }
+        var triple = {};
+        if (!_isUndefined(match[1])) {
+          triple.subject = {
+            type: 'IRI',
+            value: match[1]
+          };
+        } else {
+          triple.subject = {
+            type: 'blank node',
+            value: match[2]
+          };
+        }
+        triple.predicate = {
+          type: 'IRI',
+          value: match[3]
+        };
+        if (!_isUndefined(match[4])) {
+          triple.object = {
+            type: 'IRI',
+            value: match[4]
+          };
+        } else if (!_isUndefined(match[5])) {
+          triple.object = {
+            type: 'blank node',
+            value: match[5]
+          };
+        } else {
+          triple.object = {type: 'literal'};
+          if (!_isUndefined(match[7])) {
+            triple.object.datatype = match[7];
+          } else if (!_isUndefined(match[8])) {
+            triple.object.datatype = RDF_LANGSTRING;
+            triple.object.language = match[8];
+          } else {
+            triple.object.datatype = XSD_STRING;
+          }
+          var unescaped = match[6].replace(/\\"/g, '"').replace(/\\t/g, '\t').replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\\\/g, '\\');
+          triple.object.value = unescaped;
+        }
+        var name = '@default';
+        if (!_isUndefined(match[9])) {
+          name = match[9];
+        } else if (!_isUndefined(match[10])) {
+          name = match[10];
+        }
+        if (!(name in dataset)) {
+          dataset[name] = [triple];
+        } else {
+          var unique = true;
+          var triples = dataset[name];
+          for (var ti = 0; unique && ti < triples.length; ++ti) {
+            if (_compareRDFTriples(triples[ti], triple)) {
+              unique = false;
+            }
+          }
+          if (unique) {
+            triples.push(triple);
+          }
+        }
+      }
+      return dataset;
+    }
+    jsonld.registerRDFParser('application/nquads', _parseNQuads);
+    function _toNQuads(dataset) {
+      var quads = [];
+      for (var graphName in dataset) {
+        var triples = dataset[graphName];
+        for (var ti = 0; ti < triples.length; ++ti) {
+          var triple = triples[ti];
+          if (graphName === '@default') {
+            graphName = null;
+          }
+          quads.push(_toNQuad(triple, graphName));
+        }
+      }
+      return quads.sort().join('');
+    }
+    function _toNQuad(triple, graphName) {
+      var s = triple.subject;
+      var p = triple.predicate;
+      var o = triple.object;
+      var g = graphName || null;
+      if ('name' in triple && triple.name) {
+        g = triple.name.value;
+      }
+      var quad = '';
+      if (s.type === 'IRI') {
+        quad += '<' + s.value + '>';
+      } else {
+        quad += s.value;
+      }
+      quad += ' ';
+      if (p.type === 'IRI') {
+        quad += '<' + p.value + '>';
+      } else {
+        quad += p.value;
+      }
+      quad += ' ';
+      if (o.type === 'IRI') {
+        quad += '<' + o.value + '>';
+      } else if (o.type === 'blank node') {
+        quad += o.value;
+      } else {
+        var escaped = o.value.replace(/\\/g, '\\\\').replace(/\t/g, '\\t').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\"/g, '\\"');
+        quad += '"' + escaped + '"';
+        if (o.datatype === RDF_LANGSTRING) {
+          if (o.language) {
+            quad += '@' + o.language;
+          }
+        } else if (o.datatype !== XSD_STRING) {
+          quad += '^^<' + o.datatype + '>';
+        }
+      }
+      if (g !== null && g !== undefined) {
+        if (g.indexOf('_:') !== 0) {
+          quad += ' <' + g + '>';
+        } else {
+          quad += ' ' + g;
+        }
+      }
+      quad += ' .\n';
+      return quad;
+    }
+    function _parseRdfaApiData(data) {
+      var dataset = {};
+      dataset['@default'] = [];
+      var subjects = data.getSubjects();
+      for (var si = 0; si < subjects.length; ++si) {
+        var subject = subjects[si];
+        if (subject === null) {
+          continue;
+        }
+        var triples = data.getSubjectTriples(subject);
+        if (triples === null) {
+          continue;
+        }
+        var predicates = triples.predicates;
+        for (var predicate in predicates) {
+          var objects = predicates[predicate].objects;
+          for (var oi = 0; oi < objects.length; ++oi) {
+            var object = objects[oi];
+            var triple = {};
+            if (subject.indexOf('_:') === 0) {
+              triple.subject = {
+                type: 'blank node',
+                value: subject
+              };
+            } else {
+              triple.subject = {
+                type: 'IRI',
+                value: subject
+              };
+            }
+            if (predicate.indexOf('_:') === 0) {
+              triple.predicate = {
+                type: 'blank node',
+                value: predicate
+              };
+            } else {
+              triple.predicate = {
+                type: 'IRI',
+                value: predicate
+              };
+            }
+            var value = object.value;
+            if (object.type === RDF_XML_LITERAL) {
+              if (!XMLSerializer) {
+                _defineXMLSerializer();
+              }
+              var serializer = new XMLSerializer();
+              value = '';
+              for (var x = 0; x < object.value.length; x++) {
+                if (object.value[x].nodeType === Node.ELEMENT_NODE) {
+                  value += serializer.serializeToString(object.value[x]);
+                } else if (object.value[x].nodeType === Node.TEXT_NODE) {
+                  value += object.value[x].nodeValue;
+                }
+              }
+            }
+            triple.object = {};
+            if (object.type === RDF_OBJECT) {
+              if (object.value.indexOf('_:') === 0) {
+                triple.object.type = 'blank node';
+              } else {
+                triple.object.type = 'IRI';
+              }
+            } else {
+              triple.object.type = 'literal';
+              if (object.type === RDF_PLAIN_LITERAL) {
+                if (object.language) {
+                  triple.object.datatype = RDF_LANGSTRING;
+                  triple.object.language = object.language;
+                } else {
+                  triple.object.datatype = XSD_STRING;
+                }
+              } else {
+                triple.object.datatype = object.type;
+              }
+            }
+            triple.object.value = value;
+            dataset['@default'].push(triple);
+          }
+        }
+      }
+      return dataset;
+    }
+    jsonld.registerRDFParser('rdfa-api', _parseRdfaApiData);
+    function IdentifierIssuer(prefix) {
+      this.prefix = prefix;
+      this.counter = 0;
+      this.existing = {};
+    }
+    jsonld.IdentifierIssuer = IdentifierIssuer;
+    jsonld.UniqueNamer = IdentifierIssuer;
+    IdentifierIssuer.prototype.clone = function() {
+      var copy = new IdentifierIssuer(this.prefix);
+      copy.counter = this.counter;
+      copy.existing = _clone(this.existing);
+      return copy;
+    };
+    IdentifierIssuer.prototype.getId = function(old) {
+      if (old && old in this.existing) {
+        return this.existing[old];
+      }
+      var identifier = this.prefix + this.counter;
+      this.counter += 1;
+      if (old) {
+        this.existing[old] = identifier;
+      }
+      return identifier;
+    };
+    IdentifierIssuer.prototype.getName = IdentifierIssuer.prototype.getName;
+    IdentifierIssuer.prototype.hasId = function(old) {
+      return (old in this.existing);
+    };
+    IdentifierIssuer.prototype.isNamed = IdentifierIssuer.prototype.hasId;
+    var Permutator = function(list) {
+      this.list = list.sort();
+      this.done = false;
+      this.left = {};
+      for (var i = 0; i < list.length; ++i) {
+        this.left[list[i]] = true;
+      }
+    };
+    Permutator.prototype.hasNext = function() {
+      return !this.done;
+    };
+    Permutator.prototype.next = function() {
+      var rval = this.list.slice();
+      var k = null;
+      var pos = 0;
+      var length = this.list.length;
+      for (var i = 0; i < length; ++i) {
+        var element = this.list[i];
+        var left = this.left[element];
+        if ((k === null || element > k) && ((left && i > 0 && element > this.list[i - 1]) || (!left && i < (length - 1) && element > this.list[i + 1]))) {
+          k = element;
+          pos = i;
+        }
+      }
+      if (k === null) {
+        this.done = true;
+      } else {
+        var swap = this.left[k] ? pos - 1 : pos + 1;
+        this.list[pos] = this.list[swap];
+        this.list[swap] = k;
+        for (var i = 0; i < length; ++i) {
+          if (this.list[i] > k) {
+            this.left[this.list[i]] = !this.left[this.list[i]];
+          }
+        }
+      }
+      return rval;
+    };
+    var NormalizeHash = function(algorithm) {
+      if (!(this instanceof NormalizeHash)) {
+        return new NormalizeHash(algorithm);
+      }
+      if (['URDNA2015', 'URGNA2012'].indexOf(algorithm) === -1) {
+        throw new Error('Invalid RDF Dataset Normalization algorithm: ' + algorithm);
+      }
+      NormalizeHash._init.call(this, algorithm);
+    };
+    NormalizeHash.hashNQuads = function(algorithm, nquads) {
+      var md = new NormalizeHash(algorithm);
+      for (var i = 0; i < nquads.length; ++i) {
+        md.update(nquads[i]);
+      }
+      return md.digest();
+    };
+    (function(_nodejs) {
+      if (_nodejs) {
+        var crypto = require('crypto');
+        NormalizeHash._init = function(algorithm) {
+          if (algorithm === 'URDNA2015') {
+            algorithm = 'sha256';
+          } else {
+            algorithm = 'sha1';
+          }
+          this.md = crypto.createHash(algorithm);
+        };
+        NormalizeHash.prototype.update = function(msg) {
+          return this.md.update(msg, 'utf8');
+        };
+        NormalizeHash.prototype.digest = function() {
+          return this.md.digest('hex');
+        };
+        return;
+      }
+      NormalizeHash._init = function(algorithm) {
+        if (algorithm === 'URDNA2015') {
+          algorithm = new sha256.Algorithm();
+        } else {
+          algorithm = new sha1.Algorithm();
+        }
+        this.md = new MessageDigest(algorithm);
+      };
+      NormalizeHash.prototype.update = function(msg) {
+        return this.md.update(msg);
+      };
+      NormalizeHash.prototype.digest = function() {
+        return this.md.digest().toHex();
+      };
+      var MessageDigest = function(algorithm) {
+        if (!(this instanceof MessageDigest)) {
+          return new MessageDigest(algorithm);
+        }
+        this._algorithm = algorithm;
+        if (!MessageDigest._padding || MessageDigest._padding.length < this._algorithm.blockSize) {
+          MessageDigest._padding = String.fromCharCode(128);
+          var c = String.fromCharCode(0x00);
+          var n = 64;
+          while (n > 0) {
+            if (n & 1) {
+              MessageDigest._padding += c;
+            }
+            n >>>= 1;
+            if (n > 0) {
+              c += c;
+            }
+          }
+        }
+        this.start();
+      };
+      MessageDigest.prototype.start = function() {
+        this.messageLength = 0;
+        this.fullMessageLength = [];
+        var int32s = this._algorithm.messageLengthSize / 4;
+        for (var i = 0; i < int32s; ++i) {
+          this.fullMessageLength.push(0);
+        }
+        this._input = new MessageDigest.ByteBuffer();
+        this.state = this._algorithm.start();
+        return this;
+      };
+      MessageDigest.prototype.update = function(msg) {
+        msg = new MessageDigest.ByteBuffer(unescape(encodeURIComponent(msg)));
+        this.messageLength += msg.length();
+        var len = msg.length();
+        len = [(len / 0x100000000) >>> 0, len >>> 0];
+        for (var i = this.fullMessageLength.length - 1; i >= 0; --i) {
+          this.fullMessageLength[i] += len[1];
+          len[1] = len[0] + ((this.fullMessageLength[i] / 0x100000000) >>> 0);
+          this.fullMessageLength[i] = this.fullMessageLength[i] >>> 0;
+          len[0] = ((len[1] / 0x100000000) >>> 0);
+        }
+        this._input.putBytes(msg.bytes());
+        while (this._input.length() >= this._algorithm.blockSize) {
+          this.state = this._algorithm.digest(this.state, this._input);
+        }
+        if (this._input.read > 2048 || this._input.length() === 0) {
+          this._input.compact();
+        }
+        return this;
+      };
+      MessageDigest.prototype.digest = function() {
+        var finalBlock = new MessageDigest.ByteBuffer();
+        finalBlock.putBytes(this._input.bytes());
+        var remaining = (this.fullMessageLength[this.fullMessageLength.length - 1] + this._algorithm.messageLengthSize);
+        var overflow = remaining & (this._algorithm.blockSize - 1);
+        finalBlock.putBytes(MessageDigest._padding.substr(0, this._algorithm.blockSize - overflow));
+        var messageLength = new MessageDigest.ByteBuffer();
+        for (var i = 0; i < this.fullMessageLength.length; ++i) {
+          messageLength.putInt32((this.fullMessageLength[i] << 3) | (this.fullMessageLength[i + 1] >>> 28));
+        }
+        this._algorithm.writeMessageLength(finalBlock, messageLength);
+        var state = this._algorithm.digest(this.state.copy(), finalBlock);
+        var rval = new MessageDigest.ByteBuffer();
+        state.write(rval);
+        return rval;
+      };
+      MessageDigest.ByteBuffer = function(data) {
+        if (typeof data === 'string') {
+          this.data = data;
+        } else {
+          this.data = '';
+        }
+        this.read = 0;
+      };
+      MessageDigest.ByteBuffer.prototype.putInt32 = function(i) {
+        this.data += (String.fromCharCode(i >> 24 & 0xFF) + String.fromCharCode(i >> 16 & 0xFF) + String.fromCharCode(i >> 8 & 0xFF) + String.fromCharCode(i & 0xFF));
+      };
+      MessageDigest.ByteBuffer.prototype.getInt32 = function() {
+        var rval = (this.data.charCodeAt(this.read) << 24 ^ this.data.charCodeAt(this.read + 1) << 16 ^ this.data.charCodeAt(this.read + 2) << 8 ^ this.data.charCodeAt(this.read + 3));
+        this.read += 4;
+        return rval;
+      };
+      MessageDigest.ByteBuffer.prototype.putBytes = function(bytes) {
+        this.data += bytes;
+      };
+      MessageDigest.ByteBuffer.prototype.bytes = function() {
+        return this.data.slice(this.read);
+      };
+      MessageDigest.ByteBuffer.prototype.length = function() {
+        return this.data.length - this.read;
+      };
+      MessageDigest.ByteBuffer.prototype.compact = function() {
+        this.data = this.data.slice(this.read);
+        this.read = 0;
+      };
+      MessageDigest.ByteBuffer.prototype.toHex = function() {
+        var rval = '';
+        for (var i = this.read; i < this.data.length; ++i) {
+          var b = this.data.charCodeAt(i);
+          if (b < 16) {
+            rval += '0';
+          }
+          rval += b.toString(16);
+        }
+        return rval;
+      };
+      var sha1 = {_w: null};
+      sha1.Algorithm = function() {
+        this.name = 'sha1', this.blockSize = 64;
+        this.digestLength = 20;
+        this.messageLengthSize = 8;
+      };
+      sha1.Algorithm.prototype.start = function() {
+        if (!sha1._w) {
+          sha1._w = new Array(80);
+        }
+        return sha1._createState();
+      };
+      sha1.Algorithm.prototype.writeMessageLength = function(finalBlock, messageLength) {
+        finalBlock.putBytes(messageLength.bytes());
+      };
+      sha1.Algorithm.prototype.digest = function(s, input) {
+        var t,
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            i;
+        var len = input.length();
+        var _w = sha1._w;
+        while (len >= 64) {
+          a = s.h0;
+          b = s.h1;
+          c = s.h2;
+          d = s.h3;
+          e = s.h4;
+          for (i = 0; i < 16; ++i) {
+            t = input.getInt32();
+            _w[i] = t;
+            f = d ^ (b & (c ^ d));
+            t = ((a << 5) | (a >>> 27)) + f + e + 0x5A827999 + t;
+            e = d;
+            d = c;
+            c = (b << 30) | (b >>> 2);
+            b = a;
+            a = t;
+          }
+          for (; i < 20; ++i) {
+            t = (_w[i - 3] ^ _w[i - 8] ^ _w[i - 14] ^ _w[i - 16]);
+            t = (t << 1) | (t >>> 31);
+            _w[i] = t;
+            f = d ^ (b & (c ^ d));
+            t = ((a << 5) | (a >>> 27)) + f + e + 0x5A827999 + t;
+            e = d;
+            d = c;
+            c = (b << 30) | (b >>> 2);
+            b = a;
+            a = t;
+          }
+          for (; i < 32; ++i) {
+            t = (_w[i - 3] ^ _w[i - 8] ^ _w[i - 14] ^ _w[i - 16]);
+            t = (t << 1) | (t >>> 31);
+            _w[i] = t;
+            f = b ^ c ^ d;
+            t = ((a << 5) | (a >>> 27)) + f + e + 0x6ED9EBA1 + t;
+            e = d;
+            d = c;
+            c = (b << 30) | (b >>> 2);
+            b = a;
+            a = t;
+          }
+          for (; i < 40; ++i) {
+            t = (_w[i - 6] ^ _w[i - 16] ^ _w[i - 28] ^ _w[i - 32]);
+            t = (t << 2) | (t >>> 30);
+            _w[i] = t;
+            f = b ^ c ^ d;
+            t = ((a << 5) | (a >>> 27)) + f + e + 0x6ED9EBA1 + t;
+            e = d;
+            d = c;
+            c = (b << 30) | (b >>> 2);
+            b = a;
+            a = t;
+          }
+          for (; i < 60; ++i) {
+            t = (_w[i - 6] ^ _w[i - 16] ^ _w[i - 28] ^ _w[i - 32]);
+            t = (t << 2) | (t >>> 30);
+            _w[i] = t;
+            f = (b & c) | (d & (b ^ c));
+            t = ((a << 5) | (a >>> 27)) + f + e + 0x8F1BBCDC + t;
+            e = d;
+            d = c;
+            c = (b << 30) | (b >>> 2);
+            b = a;
+            a = t;
+          }
+          for (; i < 80; ++i) {
+            t = (_w[i - 6] ^ _w[i - 16] ^ _w[i - 28] ^ _w[i - 32]);
+            t = (t << 2) | (t >>> 30);
+            _w[i] = t;
+            f = b ^ c ^ d;
+            t = ((a << 5) | (a >>> 27)) + f + e + 0xCA62C1D6 + t;
+            e = d;
+            d = c;
+            c = (b << 30) | (b >>> 2);
+            b = a;
+            a = t;
+          }
+          s.h0 = (s.h0 + a) | 0;
+          s.h1 = (s.h1 + b) | 0;
+          s.h2 = (s.h2 + c) | 0;
+          s.h3 = (s.h3 + d) | 0;
+          s.h4 = (s.h4 + e) | 0;
+          len -= 64;
+        }
+        return s;
+      };
+      sha1._createState = function() {
+        var state = {
+          h0: 0x67452301,
+          h1: 0xEFCDAB89,
+          h2: 0x98BADCFE,
+          h3: 0x10325476,
+          h4: 0xC3D2E1F0
+        };
+        state.copy = function() {
+          var rval = sha1._createState();
+          rval.h0 = state.h0;
+          rval.h1 = state.h1;
+          rval.h2 = state.h2;
+          rval.h3 = state.h3;
+          rval.h4 = state.h4;
+          return rval;
+        };
+        state.write = function(buffer) {
+          buffer.putInt32(state.h0);
+          buffer.putInt32(state.h1);
+          buffer.putInt32(state.h2);
+          buffer.putInt32(state.h3);
+          buffer.putInt32(state.h4);
+        };
+        return state;
+      };
+      var sha256 = {
+        _k: null,
+        _w: null
+      };
+      sha256.Algorithm = function() {
+        this.name = 'sha256', this.blockSize = 64;
+        this.digestLength = 32;
+        this.messageLengthSize = 8;
+      };
+      sha256.Algorithm.prototype.start = function() {
+        if (!sha256._k) {
+          sha256._init();
+        }
+        return sha256._createState();
+      };
+      sha256.Algorithm.prototype.writeMessageLength = function(finalBlock, messageLength) {
+        finalBlock.putBytes(messageLength.bytes());
+      };
+      sha256.Algorithm.prototype.digest = function(s, input) {
+        var t1,
+            t2,
+            s0,
+            s1,
+            ch,
+            maj,
+            i,
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h;
+        var len = input.length();
+        var _k = sha256._k;
+        var _w = sha256._w;
+        while (len >= 64) {
+          for (i = 0; i < 16; ++i) {
+            _w[i] = input.getInt32();
+          }
+          for (; i < 64; ++i) {
+            t1 = _w[i - 2];
+            t1 = ((t1 >>> 17) | (t1 << 15)) ^ ((t1 >>> 19) | (t1 << 13)) ^ (t1 >>> 10);
+            t2 = _w[i - 15];
+            t2 = ((t2 >>> 7) | (t2 << 25)) ^ ((t2 >>> 18) | (t2 << 14)) ^ (t2 >>> 3);
+            _w[i] = (t1 + _w[i - 7] + t2 + _w[i - 16]) | 0;
+          }
+          a = s.h0;
+          b = s.h1;
+          c = s.h2;
+          d = s.h3;
+          e = s.h4;
+          f = s.h5;
+          g = s.h6;
+          h = s.h7;
+          for (i = 0; i < 64; ++i) {
+            s1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+            ch = g ^ (e & (f ^ g));
+            s0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+            maj = (a & b) | (c & (a ^ b));
+            t1 = h + s1 + ch + _k[i] + _w[i];
+            t2 = s0 + maj;
+            h = g;
+            g = f;
+            f = e;
+            e = (d + t1) | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = (t1 + t2) | 0;
+          }
+          s.h0 = (s.h0 + a) | 0;
+          s.h1 = (s.h1 + b) | 0;
+          s.h2 = (s.h2 + c) | 0;
+          s.h3 = (s.h3 + d) | 0;
+          s.h4 = (s.h4 + e) | 0;
+          s.h5 = (s.h5 + f) | 0;
+          s.h6 = (s.h6 + g) | 0;
+          s.h7 = (s.h7 + h) | 0;
+          len -= 64;
+        }
+        return s;
+      };
+      sha256._createState = function() {
+        var state = {
+          h0: 0x6A09E667,
+          h1: 0xBB67AE85,
+          h2: 0x3C6EF372,
+          h3: 0xA54FF53A,
+          h4: 0x510E527F,
+          h5: 0x9B05688C,
+          h6: 0x1F83D9AB,
+          h7: 0x5BE0CD19
+        };
+        state.copy = function() {
+          var rval = sha256._createState();
+          rval.h0 = state.h0;
+          rval.h1 = state.h1;
+          rval.h2 = state.h2;
+          rval.h3 = state.h3;
+          rval.h4 = state.h4;
+          rval.h5 = state.h5;
+          rval.h6 = state.h6;
+          rval.h7 = state.h7;
+          return rval;
+        };
+        state.write = function(buffer) {
+          buffer.putInt32(state.h0);
+          buffer.putInt32(state.h1);
+          buffer.putInt32(state.h2);
+          buffer.putInt32(state.h3);
+          buffer.putInt32(state.h4);
+          buffer.putInt32(state.h5);
+          buffer.putInt32(state.h6);
+          buffer.putInt32(state.h7);
+        };
+        return state;
+      };
+      sha256._init = function() {
+        sha256._k = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+        sha256._w = new Array(64);
+      };
+    })(_nodejs);
+    if (!XMLSerializer) {
+      var _defineXMLSerializer = function() {
+        XMLSerializer = require('xmldom').XMLSerializer;
+      };
+    }
+    jsonld.url = {};
+    jsonld.url.parsers = {
+      simple: {
+        keys: ['href', 'scheme', 'authority', 'path', 'query', 'fragment'],
+        regex: /^(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/
+      },
+      full: {
+        keys: ['href', 'protocol', 'scheme', 'authority', 'auth', 'user', 'password', 'hostname', 'port', 'path', 'directory', 'file', 'query', 'fragment'],
+        regex: /^(([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?(?:(((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/
+      }
+    };
+    jsonld.url.parse = function(str, parser) {
+      var parsed = {};
+      var o = jsonld.url.parsers[parser || 'full'];
+      var m = o.regex.exec(str);
+      var i = o.keys.length;
+      while (i--) {
+        parsed[o.keys[i]] = (m[i] === undefined) ? null : m[i];
+      }
+      parsed.normalizedPath = _removeDotSegments(parsed.path, !!parsed.authority);
+      return parsed;
+    };
+    function _removeDotSegments(path, hasAuthority) {
+      var rval = '';
+      if (path.indexOf('/') === 0) {
+        rval = '/';
+      }
+      var input = path.split('/');
+      var output = [];
+      while (input.length > 0) {
+        if (input[0] === '.' || (input[0] === '' && input.length > 1)) {
+          input.shift();
+          continue;
+        }
+        if (input[0] === '..') {
+          input.shift();
+          if (hasAuthority || (output.length > 0 && output[output.length - 1] !== '..')) {
+            output.pop();
+          } else {
+            output.push('..');
+          }
+          continue;
+        }
+        output.push(input.shift());
+      }
+      return rval + output.join('/');
+    }
+    if (_nodejs) {
+      jsonld.useDocumentLoader('node');
+    } else if (typeof XMLHttpRequest !== 'undefined') {
+      jsonld.useDocumentLoader('xhr');
+    }
+    if (_nodejs) {
+      jsonld.use = function(extension) {
+        switch (extension) {
+          case 'request':
+            jsonld.request = require('jsonld-request');
+            break;
+          default:
+            throw new JsonLdError('Unknown extension.', 'jsonld.UnknownExtension', {extension: extension});
+        }
+      };
+      var _module = {
+        exports: {},
+        filename: __dirname
+      };
+      require('pkginfo')(_module, 'version');
+      jsonld.version = _module.exports.version;
+    }
+    return jsonld;
+  };
+  var factory = function() {
+    return wrapper(function() {
+      return factory();
+    });
+  };
+  if (!_nodejs && (typeof define === 'function' && define.amd)) {
+    define("9", [], function() {
+      wrapper(factory);
+      return factory;
+    });
+  } else {
+    wrapper(factory);
+    if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
+      module.exports = factory;
+    }
+    if (_browser) {
+      if (typeof jsonld === 'undefined') {
+        jsonld = jsonldjs = factory;
+      } else {
+        jsonldjs = factory;
+      }
+    }
+  }
+  return factory;
+})();
+
+_removeDefine();
+})();
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+define("a", ["9"], function(main) {
+  return main;
+});
+
+_removeDefine();
+})();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 /^u/.test(typeof define) && function(a) {
@@ -7420,7 +12722,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("8", [], function() {
+}({}), define("b", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -8514,25 +13816,1050 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("9", ["8"], function(main) {
+define("c", ["b"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("a", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $Object = Object;
+  module.exports = {
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
+  };
+  global.define = __define;
+  return module.exports;
+});
 
-$__System.register('1', ['3', '4', '6', '7', '9', 'a'], function (_export) {
+$__System.registerDynamic("e", ["d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('d');
+  module.exports = function defineProperty(it, key, desc) {
+    return $.setDesc(it, key, desc);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f", ["e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('e'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("10", ["f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _Object$defineProperty = req('f')["default"];
+  exports["default"] = (function() {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor)
+          descriptor.writable = true;
+        _Object$defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function(Constructor, protoProps, staticProps) {
+      if (protoProps)
+        defineProperties(Constructor.prototype, protoProps);
+      if (staticProps)
+        defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  })();
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("11", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  exports["default"] = function(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("12", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function() {};
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("13", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(done, value) {
+    return {
+      value: value,
+      done: !!done
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("14", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {};
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("15", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toString = {}.toString;
+  module.exports = function(it) {
+    return toString.call(it).slice(8, -1);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("16", ["15"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('15');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("17", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    if (it == undefined)
+      throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("18", ["16", "17"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var IObject = req('16'),
+      defined = req('17');
+  module.exports = function(it) {
+    return IObject(defined(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("19", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1a", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number')
+    __g = global;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1b", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var core = module.exports = {version: '1.2.3'};
+  if (typeof __e == 'number')
+    __e = core;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1c", ["1a", "1b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('1a'),
+      core = req('1b'),
+      PROTOTYPE = 'prototype';
+  var ctx = function(fn, that) {
+    return function() {
+      return fn.apply(that, arguments);
+    };
+  };
+  var $def = function(type, name, source) {
+    var key,
+        own,
+        out,
+        exp,
+        isGlobal = type & $def.G,
+        isProto = type & $def.P,
+        target = isGlobal ? global : type & $def.S ? global[name] : (global[name] || {})[PROTOTYPE],
+        exports = isGlobal ? core : core[name] || (core[name] = {});
+    if (isGlobal)
+      source = name;
+    for (key in source) {
+      own = !(type & $def.F) && target && key in target;
+      if (own && key in exports)
+        continue;
+      out = own ? target[key] : source[key];
+      if (isGlobal && typeof target[key] != 'function')
+        exp = source[key];
+      else if (type & $def.B && own)
+        exp = ctx(out, global);
+      else if (type & $def.W && target[key] == out)
+        !function(C) {
+          exp = function(param) {
+            return this instanceof C ? new C(param) : C(param);
+          };
+          exp[PROTOTYPE] = C[PROTOTYPE];
+        }(out);
+      else
+        exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
+      exports[key] = exp;
+      if (isProto)
+        (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+    }
+  };
+  $def.F = 1;
+  $def.G = 2;
+  $def.S = 4;
+  $def.P = 8;
+  $def.B = 16;
+  $def.W = 32;
+  module.exports = $def;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1e", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1f", ["1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = !req('1e')(function() {
+    return Object.defineProperty({}, 'a', {get: function() {
+        return 7;
+      }}).a != 7;
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("20", ["d", "1d", "1f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('d'),
+      createDesc = req('1d');
+  module.exports = req('1f') ? function(object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function(object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("21", ["20"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('20');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("22", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var hasOwnProperty = {}.hasOwnProperty;
+  module.exports = function(it, key) {
+    return hasOwnProperty.call(it, key);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("23", ["1a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('1a'),
+      SHARED = '__core-js_shared__',
+      store = global[SHARED] || (global[SHARED] = {});
+  module.exports = function(key) {
+    return store[key] || (store[key] = {});
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("24", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var id = 0,
+      px = Math.random();
+  module.exports = function(key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("25", ["23", "1a", "24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var store = req('23')('wks'),
+      Symbol = req('1a').Symbol;
+  module.exports = function(name) {
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || req('24'))('Symbol.' + name));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("26", ["d", "22", "25"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var def = req('d').setDesc,
+      has = req('22'),
+      TAG = req('25')('toStringTag');
+  module.exports = function(it, tag, stat) {
+    if (it && !has(it = stat ? it : it.prototype, TAG))
+      def(it, TAG, {
+        configurable: true,
+        value: tag
+      });
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("27", ["d", "20", "25", "1d", "26"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $ = req('d'),
+      IteratorPrototype = {};
+  req('20')(IteratorPrototype, req('25')('iterator'), function() {
+    return this;
+  });
+  module.exports = function(Constructor, NAME, next) {
+    Constructor.prototype = $.create(IteratorPrototype, {next: req('1d')(1, next)});
+    req('26')(Constructor, NAME + ' Iterator');
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("28", ["19", "1c", "21", "20", "22", "25", "14", "27", "d", "26"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var LIBRARY = req('19'),
+      $def = req('1c'),
+      $redef = req('21'),
+      hide = req('20'),
+      has = req('22'),
+      SYMBOL_ITERATOR = req('25')('iterator'),
+      Iterators = req('14'),
+      BUGGY = !([].keys && 'next' in [].keys()),
+      FF_ITERATOR = '@@iterator',
+      KEYS = 'keys',
+      VALUES = 'values';
+  var returnThis = function() {
+    return this;
+  };
+  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE) {
+    req('27')(Constructor, NAME, next);
+    var createMethod = function(kind) {
+      switch (kind) {
+        case KEYS:
+          return function keys() {
+            return new Constructor(this, kind);
+          };
+        case VALUES:
+          return function values() {
+            return new Constructor(this, kind);
+          };
+      }
+      return function entries() {
+        return new Constructor(this, kind);
+      };
+    };
+    var TAG = NAME + ' Iterator',
+        proto = Base.prototype,
+        _native = proto[SYMBOL_ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
+        _default = _native || createMethod(DEFAULT),
+        methods,
+        key;
+    if (_native) {
+      var IteratorPrototype = req('d').getProto(_default.call(new Base));
+      req('26')(IteratorPrototype, TAG, true);
+      if (!LIBRARY && has(proto, FF_ITERATOR))
+        hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
+    }
+    if (!LIBRARY || FORCE)
+      hide(proto, SYMBOL_ITERATOR, _default);
+    Iterators[NAME] = _default;
+    Iterators[TAG] = returnThis;
+    if (DEFAULT) {
+      methods = {
+        values: DEFAULT == VALUES ? _default : createMethod(VALUES),
+        keys: IS_SET ? _default : createMethod(KEYS),
+        entries: DEFAULT != VALUES ? _default : createMethod('entries')
+      };
+      if (FORCE)
+        for (key in methods) {
+          if (!(key in proto))
+            $redef(proto, key, methods[key]);
+        }
+      else
+        $def($def.P + $def.F * BUGGY, NAME, methods);
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("29", ["12", "13", "14", "18", "28"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var setUnscope = req('12'),
+      step = req('13'),
+      Iterators = req('14'),
+      toIObject = req('18');
+  req('28')(Array, 'Array', function(iterated, kind) {
+    this._t = toIObject(iterated);
+    this._i = 0;
+    this._k = kind;
+  }, function() {
+    var O = this._t,
+        kind = this._k,
+        index = this._i++;
+    if (!O || index >= O.length) {
+      this._t = undefined;
+      return step(1);
+    }
+    if (kind == 'keys')
+      return step(0, index);
+    if (kind == 'values')
+      return step(0, O[index]);
+    return step(0, [index, O[index]]);
+  }, 'values');
+  Iterators.Arguments = Iterators.Array;
+  setUnscope('keys');
+  setUnscope('values');
+  setUnscope('entries');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2a", ["29", "14"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('29');
+  var Iterators = req('14');
+  Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2b", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function(it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2c", ["2b", "17"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('2b'),
+      defined = req('17');
+  module.exports = function(TO_STRING) {
+    return function(that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l)
+        return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2d", ["2c", "28"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $at = req('2c')(true);
+  req('28')(String, 'String', function(iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function() {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length)
+      return {
+        value: undefined,
+        done: true
+      };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2e", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2f", ["2e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('2e');
+  module.exports = function(it) {
+    if (!isObject(it))
+      throw TypeError(it + ' is not an object!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("30", ["15", "25"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('15'),
+      TAG = req('25')('toStringTag'),
+      ARG = cof(function() {
+        return arguments;
+      }()) == 'Arguments';
+  module.exports = function(it) {
+    var O,
+        T,
+        B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("31", ["30", "25", "14", "1b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var classof = req('30'),
+      ITERATOR = req('25')('iterator'),
+      Iterators = req('14');
+  module.exports = req('1b').getIteratorMethod = function(it) {
+    if (it != undefined)
+      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("32", ["2f", "31", "1b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('2f'),
+      get = req('31');
+  module.exports = req('1b').getIterator = function(it) {
+    var iterFn = get(it);
+    if (typeof iterFn != 'function')
+      throw TypeError(it + ' is not iterable!');
+    return anObject(iterFn.call(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("33", ["2a", "2d", "32"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('2a');
+  req('2d');
+  module.exports = req('32');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("34", ["33"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('33'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("35", [], false, function(__require, __exports, __module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+  (function() {
+    "format global";
+    L.Control.Sidebar = L.Control.extend({
+      includes: L.Mixin.Events,
+      options: {position: 'left'},
+      initialize: function(id, options) {
+        var i,
+            child;
+        L.setOptions(this, options);
+        this._sidebar = L.DomUtil.get(id);
+        L.DomUtil.addClass(this._sidebar, 'sidebar-' + this.options.position);
+        if (L.Browser.touch)
+          L.DomUtil.addClass(this._sidebar, 'leaflet-touch');
+        for (i = this._sidebar.children.length - 1; i >= 0; i--) {
+          child = this._sidebar.children[i];
+          if (child.tagName == 'DIV' && L.DomUtil.hasClass(child, 'sidebar-content'))
+            this._container = child;
+        }
+        this._tabitems = this._sidebar.querySelectorAll('ul.sidebar-tabs > li, .sidebar-tabs > ul > li');
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          this._tabitems[i]._sidebar = this;
+        }
+        this._panes = [];
+        this._closeButtons = [];
+        for (i = this._container.children.length - 1; i >= 0; i--) {
+          child = this._container.children[i];
+          if (child.tagName == 'DIV' && L.DomUtil.hasClass(child, 'sidebar-pane')) {
+            this._panes.push(child);
+            var closeButtons = child.querySelectorAll('.sidebar-close');
+            for (var j = 0,
+                len = closeButtons.length; j < len; j++)
+              this._closeButtons.push(closeButtons[j]);
+          }
+        }
+      },
+      addTo: function(map) {
+        var i,
+            child;
+        this._map = map;
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          child = this._tabitems[i];
+          L.DomEvent.on(child.querySelector('a'), 'click', L.DomEvent.preventDefault).on(child.querySelector('a'), 'click', this._onClick, child);
+        }
+        for (i = this._closeButtons.length - 1; i >= 0; i--) {
+          child = this._closeButtons[i];
+          L.DomEvent.on(child, 'click', this._onCloseClick, this);
+        }
+        return this;
+      },
+      removeFrom: function(map) {
+        var i,
+            child;
+        this._map = null;
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          child = this._tabitems[i];
+          L.DomEvent.off(child.querySelector('a'), 'click', this._onClick);
+        }
+        for (i = this._closeButtons.length - 1; i >= 0; i--) {
+          child = this._closeButtons[i];
+          L.DomEvent.off(child, 'click', this._onCloseClick, this);
+        }
+        return this;
+      },
+      open: function(id) {
+        var i,
+            child;
+        for (i = this._panes.length - 1; i >= 0; i--) {
+          child = this._panes[i];
+          if (child.id == id)
+            L.DomUtil.addClass(child, 'active');
+          else if (L.DomUtil.hasClass(child, 'active'))
+            L.DomUtil.removeClass(child, 'active');
+        }
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          child = this._tabitems[i];
+          if (child.querySelector('a').hash == '#' + id)
+            L.DomUtil.addClass(child, 'active');
+          else if (L.DomUtil.hasClass(child, 'active'))
+            L.DomUtil.removeClass(child, 'active');
+        }
+        this.fire('content', {id: id});
+        if (L.DomUtil.hasClass(this._sidebar, 'collapsed')) {
+          this.fire('opening');
+          L.DomUtil.removeClass(this._sidebar, 'collapsed');
+        }
+        return this;
+      },
+      close: function() {
+        for (var i = this._tabitems.length - 1; i >= 0; i--) {
+          var child = this._tabitems[i];
+          if (L.DomUtil.hasClass(child, 'active'))
+            L.DomUtil.removeClass(child, 'active');
+        }
+        if (!L.DomUtil.hasClass(this._sidebar, 'collapsed')) {
+          this.fire('closing');
+          L.DomUtil.addClass(this._sidebar, 'collapsed');
+        }
+        return this;
+      },
+      _onClick: function() {
+        if (L.DomUtil.hasClass(this, 'active'))
+          this._sidebar.close();
+        else if (!L.DomUtil.hasClass(this, 'disabled'))
+          this._sidebar.open(this.querySelector('a').hash.slice(1));
+      },
+      _onCloseClick: function() {
+        this.close();
+      }
+    });
+    L.control.sidebar = function(id, options) {
+      return new L.Control.Sidebar(id, options);
+    };
+  })();
+  return _retrieveGlobal();
+});
+
+$__System.register("36", [], function() { return { setters: [], execute: function() {} } });
+
+$__System.register('37', ['3', '8', '10', '11', '34', '35', '36', 'c'], function (_export) {
+  var L, _createClass, _classCallCheck, _getIterator, $, HTML, templatesHtml, sidebarHtml, Sidebar;
+
+  function fromTemplate(id) {
+    return document.importNode($('#' + id)[0].content, true).children[0];
+  }
+
+  function sortByKey(array, key) {
+    return array.sort(function (a, b) {
+      var x = a[key];
+      var y = b[key];
+      return x < y ? -1 : x > y ? 1 : 0;
+    });
+  }
+  return {
+    setters: [function (_4) {
+      L = _4['default'];
+    }, function (_7) {}, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _getIterator = _3['default'];
+    }, function (_5) {}, function (_6) {}, function (_c) {
+      $ = _c.$;
+      HTML = _c.HTML;
+    }],
+    execute: function () {
+      'use strict';
+
+      templatesHtml = '\n<template id="template-dataset-list-item">\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading"><a target="_new" class="external dataset-title"></a></h4>\n    <p class="dataset-description"></p>\n    <p><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal"></span></p>\n    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>\n    <div class="dataset-spatial-minimap"></div>\n  </li>\n</template\n';
+
+      $('body').add(HTML(templatesHtml));
+
+      sidebarHtml = function sidebarHtml(id) {
+        return '\n<div id="' + id + '" class="sidebar collapsed">\n  <!-- Nav tabs -->\n  <div class="sidebar-tabs">\n      <ul role="tablist">\n          <li><a href="#datasets" role="tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>\n      </ul>\n  </div>\n  \n  <!-- Tab panes -->\n  <div class="sidebar-content">\n      <div class="sidebar-pane" id="datasets">\n          <h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>\n  \n          <ul class="list-group dataset-list"></ul>\n      </div>\n  </div>\n</div>\n';
+      };
+
+      Sidebar = (function () {
+        function Sidebar(map) {
+          var id = arguments.length <= 1 || arguments[1] === undefined ? 'sidebar' : arguments[1];
+
+          _classCallCheck(this, Sidebar);
+
+          this.id = id;
+          // has to come before the map div, otherwise it overlays zoom controls
+          $('body').addFront(HTML(sidebarHtml(id)));
+
+          $('#' + map.getContainer().id).set('+sidebar-map');
+          this.control = L.control.sidebar(id).addTo(map);
+        }
+
+        _createClass(Sidebar, [{
+          key: 'addDatasets',
+          value: function addDatasets(datasets) {
+            var sortKey = arguments.length <= 1 || arguments[1] === undefined ? 'title' : arguments[1];
+
+            datasets = sortByKey(datasets, sortKey);
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = _getIterator(datasets), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var dataset = _step.value;
+
+                this.addDataset(dataset);
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          }
+        }, {
+          key: 'addDataset',
+          value: function addDataset(dataset) {
+            var el = fromTemplate('template-dataset-list-item');
+            $('.dataset-list', '#' + this.id).add(el);
+            $('.dataset-title', el).fill(dataset.title);
+            $('.dataset-title', el).set('@href', dataset['@id']);
+            $('.dataset-description', el).fill(dataset.description);
+
+            var temporal = undefined;
+            if (dataset.temporal) {
+              temporal = dataset.temporal.startDate.substr(0, 10) + ' to ' + dataset.temporal.endDate.substr(0, 10);
+            } else {
+              temporal = 'unknown';
+            }
+            $('.dataset-temporal', el).fill(temporal);
+
+            var isGlobal = undefined;
+            var geom = dataset.spatial ? JSON.parse(dataset.spatial.geometry) : null;
+            // check if global bounding box and don't display map in that case
+            if (geom) {
+              var geomLayer = L.geoJson(geom);
+              isGlobal = geomLayer.getBounds().equals([[-90, -180], [90, 180]]);
+            }
+
+            if (dataset.spatial && !isGlobal) {
+              (function () {
+                $('.dataset-spatial-geometry', el).hide();
+
+                var map = L.map($('.dataset-spatial-minimap', el)[0], {
+                  touchZoom: false,
+                  scrollWheelZoom: false,
+                  doubleClickZoom: false,
+                  boxZoom: false,
+                  zoomControl: false,
+                  attributionControl: false
+                }).on('load', function () {
+                  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                });
+
+                setTimeout(function () {
+                  var geomLayer = L.geoJson(geom, {
+                    style: function style() {
+                      return { color: "#ff7800", weight: 1, clickable: false };
+                    }
+                  });
+                  map.fitBounds(geomLayer.getBounds(), { reset: true });
+                  geomLayer.addTo(map);
+                }, 1000);
+              })();
+            } else {
+              $('.dataset-spatial-minimap', el).hide();
+              $('.dataset-spatial-geometry-text', el).fill(isGlobal ? 'global' : 'unknown');
+            }
+          }
+        }, {
+          key: 'open',
+          value: function open(tabId) {
+            this.control.open(tabId);
+          }
+        }]);
+
+        return Sidebar;
+      })();
+
+      _export('default', Sidebar);
+    }
+  };
+});
+
+$__System.register("38", [], function() { return { setters: [], execute: function() {} } });
+
+$__System.register('1', ['3', '4', '6', '7', '8', '37', '38', 'a', 'c'], function (_export) {
   'use strict';
 
-  var L, $, map, baseLayers;
+  var L, Sidebar, jsonld, $, HTML, DCAT_CATALOG_URL, DCAT_CATALOG_FRAME, map, baseLayers, sidebar;
   return {
     setters: [function (_) {
       L = _['default'];
-    }, function (_2) {}, function (_3) {}, function (_4) {}, function (_5) {
-      $ = _5.$;
-    }, function (_a) {}],
+    }, function (_2) {}, function (_3) {}, function (_4) {}, function (_5) {}, function (_6) {
+      Sidebar = _6['default'];
+    }, function (_7) {}, function (_a) {
+      jsonld = _a.promises;
+    }, function (_c) {
+      $ = _c.$;
+      HTML = _c.HTML;
+    }],
     execute: function () {
+      DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu';
+      DCAT_CATALOG_FRAME = {
+        "@context": ["https://rawgit.com/ec-melodies/wp02-dcat/master/context.jsonld", { // override since we want the GeoJSON geometry, not the WKT one
+          "geometry": {
+            "@id": "locn:geometry",
+            "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
+          }
+        }],
+        "@type": "Catalog"
+      };
       map = L.map('map', {
         loadingControl: true,
         // initial center and zoom has to be set before layers can be added
@@ -8546,15 +14873,30 @@ $__System.register('1', ['3', '4', '6', '7', '9', 'a'], function (_export) {
       };
 
       baseLayers['OSM'].addTo(map);
+
+      sidebar = new Sidebar(map);
+
+      jsonld.frame(DCAT_CATALOG_URL, DCAT_CATALOG_FRAME).then(function (framed) {
+        return jsonld.compact(framed, framed['@context']);
+      }).then(function (compacted) {
+        var datasets = compacted.datasets;
+        console.log(datasets);
+        sidebar.addDatasets(datasets);
+        sidebar.open('datasets');
+      })['catch'](function (e) {
+        alert('Error: ' + e);
+      });
     }
   };
 });
 
 $__System.register('github:Leaflet/Leaflet@0.7.7/dist/leaflet.css!github:systemjs/plugin-css@0.1.19', [], false, function() {});
 $__System.register('github:ebrelsford/Leaflet.loading@0.1.16/src/Control.Loading.css!github:systemjs/plugin-css@0.1.19', [], false, function() {});
+$__System.register('github:twbs/bootstrap@3.3.5/css/bootstrap.css!github:systemjs/plugin-css@0.1.19', [], false, function() {});
+$__System.register('github:Turbo87/sidebar-v2@master/css/leaflet-sidebar.css!github:systemjs/plugin-css@0.1.19', [], false, function() {});
 $__System.register('app/style.css!github:systemjs/plugin-css@0.1.19', [], false, function() {});
 (function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})
-(".leaflet-image-layer,.leaflet-layer,.leaflet-map-pane,.leaflet-marker-icon,.leaflet-marker-pane,.leaflet-marker-shadow,.leaflet-overlay-pane,.leaflet-overlay-pane svg,.leaflet-popup-pane,.leaflet-shadow-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-tile-pane,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-ms-touch-action:none;touch-action:none}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container img{max-width:none!important}.leaflet-container img.leaflet-image-layer{max-width:15000px!important}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-tile-pane{z-index:2}.leaflet-objects-pane{z-index:3}.leaflet-overlay-pane{z-index:4}.leaflet-shadow-pane{z-index:5}.leaflet-marker-pane{z-index:6}.leaflet-popup-pane{z-index:7}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:7;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup,.leaflet-fade-anim .leaflet-tile{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;-o-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup,.leaflet-fade-anim .leaflet-tile-loaded{opacity:1}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);-o-transition:-o-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-touching .leaflet-zoom-animated,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-clickable{cursor:pointer}.leaflet-container{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-clickable,.leaflet-dragging .leaflet-container{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078A8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font:12px/1.5 \"Helvetica Neue\",Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box;background:#fff;background:rgba(255,255,255,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{margin:0 auto;width:40px;height:20px;position:relative;overflow:hidden}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:0 0}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678, M12=.70710678, M21=-.70710678, M22=.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}body,html{height:98%}#map{height:100%}.info{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}");
+(".leaflet-image-layer,.leaflet-layer,.leaflet-map-pane,.leaflet-marker-icon,.leaflet-marker-pane,.leaflet-marker-shadow,.leaflet-overlay-pane,.leaflet-overlay-pane svg,.leaflet-popup-pane,.leaflet-shadow-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-tile-pane,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-ms-touch-action:none;touch-action:none}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container img{max-width:none!important}.leaflet-container img.leaflet-image-layer{max-width:15000px!important}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-tile-pane{z-index:2}.leaflet-objects-pane{z-index:3}.leaflet-overlay-pane{z-index:4}.leaflet-shadow-pane{z-index:5}.leaflet-marker-pane{z-index:6}.leaflet-popup-pane{z-index:7}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:7;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup,.leaflet-fade-anim .leaflet-tile{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;-o-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup,.leaflet-fade-anim .leaflet-tile-loaded{opacity:1}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);-o-transition:-o-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-touching .leaflet-zoom-animated,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-clickable{cursor:pointer}.leaflet-container{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-clickable,.leaflet-dragging .leaflet-container{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078A8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font:12px/1.5 \"Helvetica Neue\",Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box;background:#fff;background:rgba(255,255,255,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{margin:0 auto;width:40px;height:20px;position:relative;overflow:hidden}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:0 0}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678, M12=.70710678, M21=-.70710678, M22=.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}/*!\n * Bootstrap v3.3.5 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type=checkbox],input[type=radio]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:0 0!important;-webkit-box-shadow:none!important;box-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000!important}.label{border:1px solid #000}.table{border-collapse:collapse!important}.table td,.table th{background-color:#fff!important}.table-bordered td,.table-bordered th{border:1px solid #ddd!important}}@font-face{font-family:'Glyphicons Halflings';src:url(jspm_packages/github/twbs/bootstrap@3.3.5/fonts/glyphicons-halflings-regular.eot);src:url(jspm_packages/github/twbs/bootstrap@3.3.5/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),url(jspm_packages/github/twbs/bootstrap@3.3.5/fonts/glyphicons-halflings-regular.woff2) format('woff2'),url(jspm_packages/github/twbs/bootstrap@3.3.5/fonts/glyphicons-halflings-regular.woff) format('woff'),url(jspm_packages/github/twbs/bootstrap@3.3.5/fonts/glyphicons-halflings-regular.ttf) format('truetype'),url(jspm_packages/github/twbs/bootstrap@3.3.5/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\2a\"}.glyphicon-plus:before{content:\"\\2b\"}.glyphicon-eur:before,.glyphicon-euro:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}:after,:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:transparent}body{font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#337ab7;text-decoration:none}a:focus,a:hover{color:#23527c;text-decoration:underline}a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:6px}.img-thumbnail{display:inline-block;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out}.img-circle{border-radius:50%}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}.h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}.h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}.h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}.h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}.lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}.mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}.page-header{padding-bottom:9px;margin:40px 0 20px;border-bottom:1px solid #eee}ol,ul{margin-top:0;margin-bottom:10px}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;margin-left:-5px;list-style:none}.list-inline>li{display:inline-block;padding-right:5px;padding-left:5px}dl{margin-top:0;margin-bottom:20px}dd,dt{line-height:1.42857143}dt{font-weight:700}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;overflow:hidden;clear:left;text-align:right;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[data-original-title],abbr[title]{cursor:help;border-bottom:1px dotted #777}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10px 20px;margin:0 0 20px;font-size:17.5px;border-left:5px solid #eee}blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{margin-bottom:0}blockquote .small,blockquote footer,blockquote small{display:block;font-size:80%;line-height:1.42857143;color:#777}blockquote .small:before,blockquote footer:before,blockquote small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;text-align:right;border-right:5px solid #eee;border-left:0}.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{content:''}.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{content:'\\00A0 \\2014'}address{margin-bottom:20px;font-style:normal;line-height:1.42857143}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:4px}kbd{padding:2px 4px;font-size:90%;color:#fff;background-color:#333;border-radius:3px;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}kbd kbd{padding:0;font-size:100%;font-weight:700;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:9.5px;margin:0 0 10px;font-size:13px;line-height:1.42857143;color:#333;word-break:break-all;word-wrap:break-word;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{margin-right:-15px;margin-left:-15px}.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{position:relative;min-height:1px;padding-right:15px;padding-left:15px}.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0}@media (min-width:768px){.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0}}@media (min-width:992px){.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0}}@media (min-width:1200px){.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#777;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:20px}.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}.table>caption+thead>tr:first-child>td,.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>td,.table>thead:first-child>tr:first-child>th{border-top:0}.table>tbody+tbody{border-top:2px solid #ddd}.table .table{background-color:#fff}.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:5px}.table-bordered{border:1px solid #ddd}.table-bordered>tbody>tr>td,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>td,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border:1px solid #ddd}.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=col-]{position:static;display:table-column;float:none}table td[class*=col-],table th[class*=col-]{position:static;display:table-cell;float:none}.table>tbody>tr.active>td,.table>tbody>tr.active>th,.table>tbody>tr>td.active,.table>tbody>tr>th.active,.table>tfoot>tr.active>td,.table>tfoot>tr.active>th,.table>tfoot>tr>td.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>thead>tr.active>th,.table>thead>tr>td.active,.table>thead>tr>th.active{background-color:#f5f5f5}.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr.active:hover>th,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover{background-color:#e8e8e8}.table>tbody>tr.success>td,.table>tbody>tr.success>th,.table>tbody>tr>td.success,.table>tbody>tr>th.success,.table>tfoot>tr.success>td,.table>tfoot>tr.success>th,.table>tfoot>tr>td.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>thead>tr.success>th,.table>thead>tr>td.success,.table>thead>tr>th.success{background-color:#dff0d8}.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr.success:hover>th,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover{background-color:#d0e9c6}.table>tbody>tr.info>td,.table>tbody>tr.info>th,.table>tbody>tr>td.info,.table>tbody>tr>th.info,.table>tfoot>tr.info>td,.table>tfoot>tr.info>th,.table>tfoot>tr>td.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>thead>tr.info>th,.table>thead>tr>td.info,.table>thead>tr>th.info{background-color:#d9edf7}.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr.info:hover>th,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover{background-color:#c4e3f3}.table>tbody>tr.warning>td,.table>tbody>tr.warning>th,.table>tbody>tr>td.warning,.table>tbody>tr>th.warning,.table>tfoot>tr.warning>td,.table>tfoot>tr.warning>th,.table>tfoot>tr>td.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>thead>tr.warning>th,.table>thead>tr>td.warning,.table>thead>tr>th.warning{background-color:#fcf8e3}.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr.warning:hover>th,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover{background-color:#faf2cc}.table>tbody>tr.danger>td,.table>tbody>tr.danger>th,.table>tbody>tr>td.danger,.table>tbody>tr>th.danger,.table>tfoot>tr.danger>td,.table>tfoot>tr.danger>th,.table>tfoot>tr>td.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>thead>tr.danger>th,.table>thead>tr>td.danger,.table>thead>tr>th.danger{background-color:#f2dede}.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr.danger:hover>th,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover{background-color:#ebcccc}.table-responsive{min-height:.01%;overflow-x:auto}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #ddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>td,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>thead>tr>th{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}}fieldset{min-width:0;padding:0;margin:0;border:0}legend{display:block;width:100%;padding:0;margin-bottom:20px;font-size:21px;line-height:inherit;color:#333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700}input[type=search]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=checkbox],input[type=radio]{margin:4px 0 0;margin-top:1px\\9;line-height:normal}input[type=file]{display:block}input[type=range]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=file]:focus,input[type=checkbox]:focus,input[type=radio]:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:7px;font-size:14px;line-height:1.42857143;color:#555}.form-control{display:block;width:100%;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=search]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=date].form-control,input[type=time].form-control,input[type=datetime-local].form-control,input[type=month].form-control{line-height:34px}.input-group-sm input[type=date],.input-group-sm input[type=time],.input-group-sm input[type=datetime-local],.input-group-sm input[type=month],input[type=date].input-sm,input[type=time].input-sm,input[type=datetime-local].input-sm,input[type=month].input-sm{line-height:30px}.input-group-lg input[type=date],.input-group-lg input[type=time],.input-group-lg input[type=datetime-local],.input-group-lg input[type=month],input[type=date].input-lg,input[type=time].input-lg,input[type=datetime-local].input-lg,input[type=month].input-lg{line-height:46px}}.form-group{margin-bottom:15px}.checkbox,.radio{position:relative;display:block;margin-top:10px;margin-bottom:10px}.checkbox label,.radio label{min-height:20px;padding-left:20px;margin-bottom:0;font-weight:400;cursor:pointer}.checkbox input[type=checkbox],.checkbox-inline input[type=checkbox],.radio input[type=radio],.radio-inline input[type=radio]{position:absolute;margin-top:4px\\9;margin-left:-20px}.checkbox+.checkbox,.radio+.radio{margin-top:-5px}.checkbox-inline,.radio-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;font-weight:400;vertical-align:middle;cursor:pointer}.checkbox-inline+.checkbox-inline,.radio-inline+.radio-inline{margin-top:0;margin-left:10px}fieldset[disabled] input[type=checkbox],fieldset[disabled] input[type=radio],input[type=checkbox].disabled,input[type=checkbox][disabled],input[type=radio].disabled,input[type=radio][disabled]{cursor:not-allowed}.checkbox-inline.disabled,.radio-inline.disabled,fieldset[disabled] .checkbox-inline,fieldset[disabled] .radio-inline{cursor:not-allowed}.checkbox.disabled label,.radio.disabled label,fieldset[disabled] .checkbox label,fieldset[disabled] .radio label{cursor:not-allowed}.form-control-static{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}.form-control-static.input-lg,.form-control-static.input-sm{padding-right:0;padding-left:0}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}select[multiple].input-sm,textarea.input-sm{height:auto}.form-group-sm .form-control{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.form-group-sm select.form-control{height:30px;line-height:30px}.form-group-sm select[multiple].form-control,.form-group-sm textarea.form-control{height:auto}.form-group-sm .form-control-static{height:30px;min-height:32px;padding:6px 10px;font-size:12px;line-height:1.5}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-lg{height:46px;line-height:46px}select[multiple].input-lg,textarea.input-lg{height:auto}.form-group-lg .form-control{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.form-group-lg select.form-control{height:46px;line-height:46px}.form-group-lg select[multiple].form-control,.form-group-lg textarea.form-control{height:auto}.form-group-lg .form-control-static{height:46px;min-height:38px;padding:11px 16px;font-size:18px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:42.5px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:34px;height:34px;line-height:34px;text-align:center;pointer-events:none}.form-group-lg .form-control+.form-control-feedback,.input-group-lg+.form-control-feedback,.input-lg+.form-control-feedback{width:46px;height:46px;line-height:46px}.form-group-sm .form-control+.form-control-feedback,.input-group-sm+.form-control-feedback,.input-sm+.form-control-feedback{width:30px;height:30px;line-height:30px}.has-success .checkbox,.has-success .checkbox-inline,.has-success .control-label,.has-success .help-block,.has-success .radio,.has-success .radio-inline,.has-success.checkbox label,.has-success.checkbox-inline label,.has-success.radio label,.has-success.radio-inline label{color:#3c763d}.has-success .form-control{border-color:#3c763d;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-success .form-control:focus{border-color:#2b542c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168}.has-success .input-group-addon{color:#3c763d;background-color:#dff0d8;border-color:#3c763d}.has-success .form-control-feedback{color:#3c763d}.has-warning .checkbox,.has-warning .checkbox-inline,.has-warning .control-label,.has-warning .help-block,.has-warning .radio,.has-warning .radio-inline,.has-warning.checkbox label,.has-warning.checkbox-inline label,.has-warning.radio label,.has-warning.radio-inline label{color:#8a6d3b}.has-warning .form-control{border-color:#8a6d3b;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-warning .form-control:focus{border-color:#66512c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b}.has-warning .input-group-addon{color:#8a6d3b;background-color:#fcf8e3;border-color:#8a6d3b}.has-warning .form-control-feedback{color:#8a6d3b}.has-error .checkbox,.has-error .checkbox-inline,.has-error .control-label,.has-error .help-block,.has-error .radio,.has-error .radio-inline,.has-error.checkbox label,.has-error.checkbox-inline label,.has-error.radio label,.has-error.radio-inline label{color:#a94442}.has-error .form-control{border-color:#a94442;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-error .form-control:focus{border-color:#843534;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483}.has-error .input-group-addon{color:#a94442;background-color:#f2dede;border-color:#a94442}.has-error .form-control-feedback{color:#a94442}.has-feedback label~.form-control-feedback{top:25px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#737373}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .form-control,.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .checkbox,.form-inline .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .checkbox label,.form-inline .radio label{padding-left:0}.form-inline .checkbox input[type=checkbox],.form-inline .radio input[type=radio]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .checkbox,.form-horizontal .checkbox-inline,.form-horizontal .radio,.form-horizontal .radio-inline{padding-top:7px;margin-top:0;margin-bottom:0}.form-horizontal .checkbox,.form-horizontal .radio{min-height:27px}.form-horizontal .form-group{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.form-horizontal .control-label{padding-top:7px;margin-bottom:0;text-align:right}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:14.33px;font-size:18px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:6px;font-size:12px}}.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px}.btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn.focus,.btn:focus,.btn:hover{color:#333;text-decoration:none}.btn.active,.btn:active{background-image:none;outline:0;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none;opacity:.65}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333;background-color:#fff;border-color:#ccc}.btn-default.focus,.btn-default:focus{color:#333;background-color:#e6e6e6;border-color:#8c8c8c}.btn-default:hover{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active.focus,.btn-default.active:focus,.btn-default.active:hover,.btn-default:active.focus,.btn-default:active:focus,.btn-default:active:hover,.open>.dropdown-toggle.btn-default.focus,.open>.dropdown-toggle.btn-default:focus,.open>.dropdown-toggle.btn-default:hover{color:#333;background-color:#d4d4d4;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled,.btn-default.disabled.active,.btn-default.disabled.focus,.btn-default.disabled:active,.btn-default.disabled:focus,.btn-default.disabled:hover,.btn-default[disabled],.btn-default[disabled].active,.btn-default[disabled].focus,.btn-default[disabled]:active,.btn-default[disabled]:focus,.btn-default[disabled]:hover,fieldset[disabled] .btn-default,fieldset[disabled] .btn-default.active,fieldset[disabled] .btn-default.focus,fieldset[disabled] .btn-default:active,fieldset[disabled] .btn-default:focus,fieldset[disabled] .btn-default:hover{background-color:#fff;border-color:#ccc}.btn-default .badge{color:#fff;background-color:#333}.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active.focus,.btn-primary.active:focus,.btn-primary.active:hover,.btn-primary:active.focus,.btn-primary:active:focus,.btn-primary:active:hover,.open>.dropdown-toggle.btn-primary.focus,.open>.dropdown-toggle.btn-primary:focus,.open>.dropdown-toggle.btn-primary:hover{color:#fff;background-color:#204d74;border-color:#122b40}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled,.btn-primary.disabled.active,.btn-primary.disabled.focus,.btn-primary.disabled:active,.btn-primary.disabled:focus,.btn-primary.disabled:hover,.btn-primary[disabled],.btn-primary[disabled].active,.btn-primary[disabled].focus,.btn-primary[disabled]:active,.btn-primary[disabled]:focus,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary,fieldset[disabled] .btn-primary.active,fieldset[disabled] .btn-primary.focus,fieldset[disabled] .btn-primary:active,fieldset[disabled] .btn-primary:focus,fieldset[disabled] .btn-primary:hover{background-color:#337ab7;border-color:#2e6da4}.btn-primary .badge{color:#337ab7;background-color:#fff}.btn-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c}.btn-success.focus,.btn-success:focus{color:#fff;background-color:#449d44;border-color:#255625}.btn-success:hover{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active.focus,.btn-success.active:focus,.btn-success.active:hover,.btn-success:active.focus,.btn-success:active:focus,.btn-success:active:hover,.open>.dropdown-toggle.btn-success.focus,.open>.dropdown-toggle.btn-success:focus,.open>.dropdown-toggle.btn-success:hover{color:#fff;background-color:#398439;border-color:#255625}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled,.btn-success.disabled.active,.btn-success.disabled.focus,.btn-success.disabled:active,.btn-success.disabled:focus,.btn-success.disabled:hover,.btn-success[disabled],.btn-success[disabled].active,.btn-success[disabled].focus,.btn-success[disabled]:active,.btn-success[disabled]:focus,.btn-success[disabled]:hover,fieldset[disabled] .btn-success,fieldset[disabled] .btn-success.active,fieldset[disabled] .btn-success.focus,fieldset[disabled] .btn-success:active,fieldset[disabled] .btn-success:focus,fieldset[disabled] .btn-success:hover{background-color:#5cb85c;border-color:#4cae4c}.btn-success .badge{color:#5cb85c;background-color:#fff}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn-info.focus,.btn-info:focus{color:#fff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active.focus,.btn-info.active:focus,.btn-info.active:hover,.btn-info:active.focus,.btn-info:active:focus,.btn-info:active:hover,.open>.dropdown-toggle.btn-info.focus,.open>.dropdown-toggle.btn-info:focus,.open>.dropdown-toggle.btn-info:hover{color:#fff;background-color:#269abc;border-color:#1b6d85}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled,.btn-info.disabled.active,.btn-info.disabled.focus,.btn-info.disabled:active,.btn-info.disabled:focus,.btn-info.disabled:hover,.btn-info[disabled],.btn-info[disabled].active,.btn-info[disabled].focus,.btn-info[disabled]:active,.btn-info[disabled]:focus,.btn-info[disabled]:hover,fieldset[disabled] .btn-info,fieldset[disabled] .btn-info.active,fieldset[disabled] .btn-info.focus,fieldset[disabled] .btn-info:active,fieldset[disabled] .btn-info:focus,fieldset[disabled] .btn-info:hover{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#fff}.btn-warning{color:#fff;background-color:#f0ad4e;border-color:#eea236}.btn-warning.focus,.btn-warning:focus{color:#fff;background-color:#ec971f;border-color:#985f0d}.btn-warning:hover{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active.focus,.btn-warning.active:focus,.btn-warning.active:hover,.btn-warning:active.focus,.btn-warning:active:focus,.btn-warning:active:hover,.open>.dropdown-toggle.btn-warning.focus,.open>.dropdown-toggle.btn-warning:focus,.open>.dropdown-toggle.btn-warning:hover{color:#fff;background-color:#d58512;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled,.btn-warning.disabled.active,.btn-warning.disabled.focus,.btn-warning.disabled:active,.btn-warning.disabled:focus,.btn-warning.disabled:hover,.btn-warning[disabled],.btn-warning[disabled].active,.btn-warning[disabled].focus,.btn-warning[disabled]:active,.btn-warning[disabled]:focus,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning,fieldset[disabled] .btn-warning.active,fieldset[disabled] .btn-warning.focus,fieldset[disabled] .btn-warning:active,fieldset[disabled] .btn-warning:focus,fieldset[disabled] .btn-warning:hover{background-color:#f0ad4e;border-color:#eea236}.btn-warning .badge{color:#f0ad4e;background-color:#fff}.btn-danger{color:#fff;background-color:#d9534f;border-color:#d43f3a}.btn-danger.focus,.btn-danger:focus{color:#fff;background-color:#c9302c;border-color:#761c19}.btn-danger:hover{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active.focus,.btn-danger.active:focus,.btn-danger.active:hover,.btn-danger:active.focus,.btn-danger:active:focus,.btn-danger:active:hover,.open>.dropdown-toggle.btn-danger.focus,.open>.dropdown-toggle.btn-danger:focus,.open>.dropdown-toggle.btn-danger:hover{color:#fff;background-color:#ac2925;border-color:#761c19}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled,.btn-danger.disabled.active,.btn-danger.disabled.focus,.btn-danger.disabled:active,.btn-danger.disabled:focus,.btn-danger.disabled:hover,.btn-danger[disabled],.btn-danger[disabled].active,.btn-danger[disabled].focus,.btn-danger[disabled]:active,.btn-danger[disabled]:focus,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger,fieldset[disabled] .btn-danger.active,fieldset[disabled] .btn-danger.focus,fieldset[disabled] .btn-danger:active,fieldset[disabled] .btn-danger:focus,fieldset[disabled] .btn-danger:hover{background-color:#d9534f;border-color:#d43f3a}.btn-danger .badge{color:#d9534f;background-color:#fff}.btn-link{font-weight:400;color:#337ab7;border-radius:0}.btn-link,.btn-link.active,.btn-link:active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:active,.btn-link:focus,.btn-link:hover{border-color:transparent}.btn-link:focus,.btn-link:hover{color:#23527c;text-decoration:underline;background-color:transparent}.btn-link[disabled]:focus,.btn-link[disabled]:hover,fieldset[disabled] .btn-link:focus,fieldset[disabled] .btn-link:hover{color:#777;text-decoration:none}.btn-group-lg>.btn,.btn-lg{padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-group-xs>.btn,.btn-xs{padding:1px 5px;font-size:12px;line-height:1.5;border-radius:3px}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=button].btn-block,input[type=reset].btn-block,input[type=submit].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity .15s linear;-o-transition:opacity .15s linear;transition:opacity .15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease;-webkit-transition-duration:.35s;-o-transition-duration:.35s;transition-duration:.35s;-webkit-transition-property:height,visibility;-o-transition-property:height,visibility;transition-property:height,visibility}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid\\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropdown,.dropup{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;font-size:14px;text-align:left;list-style:none;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.15);border-radius:4px;-webkit-box-shadow:0 6px 12px rgba(0,0,0,.175);box-shadow:0 6px 12px rgba(0,0,0,.175)}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{color:#262626;text-decoration:none;background-color:#f5f5f5}.dropdown-menu>.active>a,.dropdown-menu>.active>a:focus,.dropdown-menu>.active>a:hover{color:#fff;text-decoration:none;background-color:#337ab7;outline:0}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{color:#777}.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{text-decoration:none;cursor:not-allowed;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{right:0;left:auto}.dropdown-menu-left{right:auto;left:0}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.42857143;color:#777;white-space:nowrap}.dropdown-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{content:\"\";border-top:0;border-bottom:4px dashed;border-bottom:4px solid\\9}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{right:0;left:auto}.navbar-right .dropdown-menu-left{right:auto;left:0}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group-vertical>.btn,.btn-group>.btn{position:relative;float:left}.btn-group-vertical>.btn.active,.btn-group-vertical>.btn:active,.btn-group-vertical>.btn:focus,.btn-group-vertical>.btn:hover,.btn-group>.btn.active,.btn-group>.btn:active,.btn-group>.btn:focus,.btn-group>.btn:hover{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-bottom-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-right:8px;padding-left:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-right:12px;padding-left:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-left-radius:0;border-top-right-radius:0;border-bottom-left-radius:4px}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-top-right-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{display:table-cell;float:none;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=buttons]>.btn input[type=checkbox],[data-toggle=buttons]>.btn input[type=radio],[data-toggle=buttons]>.btn-group>.btn input[type=checkbox],[data-toggle=buttons]>.btn-group>.btn input[type=radio]{position:absolute;clip:rect(0,0,0,0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=col-]{float:none;padding-right:0;padding-left:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:46px;line-height:46px}select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn,textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:30px;line-height:30px}select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{height:auto}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group .form-control:not(:first-child):not(:last-child),.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:6px 12px;font-size:14px;font-weight:400;line-height:1;color:#555;text-align:center;background-color:#eee;border:1px solid #ccc;border-radius:4px}.input-group-addon.input-sm{padding:5px 10px;font-size:12px;border-radius:3px}.input-group-addon.input-lg{padding:10px 16px;font-size:18px;border-radius:6px}.input-group-addon input[type=checkbox],.input-group-addon input[type=radio]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn-group:not(:last-child)>.btn,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:first-child>.btn-group:not(:first-child)>.btn,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle{border-top-left-radius:0;border-bottom-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:active,.input-group-btn>.btn:focus,.input-group-btn>.btn:hover{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{padding-left:0;margin-bottom:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:focus,.nav>li>a:hover{text-decoration:none;background-color:#eee}.nav>li.disabled>a{color:#777}.nav>li.disabled>a:focus,.nav>li.disabled>a:hover{color:#777;text-decoration:none;cursor:not-allowed;background-color:transparent}.nav .open>a,.nav .open>a:focus,.nav .open>a:hover{background-color:#eee;border-color:#337ab7}.nav .nav-divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #ddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.42857143;border:1px solid transparent;border-radius:4px 4px 0 0}.nav-tabs>li>a:hover{border-color:#eee #eee #ddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:focus,.nav-tabs>li.active>a:hover{color:#555;cursor:default;background-color:#fff;border:1px solid #ddd;border-bottom-color:transparent}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border-bottom-color:#fff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:4px}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:focus,.nav-pills>li.active>a:hover{color:#fff;background-color:#337ab7}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border-bottom-color:#fff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}.navbar{position:relative;min-height:50px;margin-bottom:20px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:4px}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{padding-right:15px;padding-left:15px;overflow-x:visible;-webkit-overflow-scrolling:touch;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block!important;height:auto!important;padding-bottom:0;overflow:visible!important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse{padding-right:0;padding-left:0}}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:200px}}.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-bottom,.navbar-fixed-top{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-bottom,.navbar-fixed-top{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;height:50px;padding:15px 15px;font-size:18px;line-height:20px}.navbar-brand:focus,.navbar-brand:hover{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;padding:9px 10px;margin-top:8px;margin-right:15px;margin-bottom:8px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:4px}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:7.5px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:20px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:20px}.navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:15px;padding-bottom:15px}}.navbar-form{padding:10px 15px;margin-top:8px;margin-right:-15px;margin-bottom:8px;margin-left:-15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1)}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .form-control,.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .checkbox,.navbar-form .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .checkbox label,.navbar-form .radio label{padding-left:0}.navbar-form .checkbox input[type=checkbox],.navbar-form .radio input[type=radio]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;padding-top:0;padding-bottom:0;margin-right:0;margin-left:0;border:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:8px;margin-bottom:8px}.navbar-btn.btn-sm{margin-top:10px;margin-bottom:10px}.navbar-btn.btn-xs{margin-top:14px;margin-bottom:14px}.navbar-text{margin-top:15px;margin-bottom:15px}@media (min-width:768px){.navbar-text{float:left;margin-right:15px;margin-left:15px}}@media (min-width:768px){.navbar-left{float:left!important}.navbar-right{float:right!important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#f8f8f8;border-color:#e7e7e7}.navbar-default .navbar-brand{color:#777}.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{color:#5e5e5e;background-color:transparent}.navbar-default .navbar-text{color:#777}.navbar-default .navbar-nav>li>a{color:#777}.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:focus,.navbar-default .navbar-nav>.disabled>a:hover{color:#ccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:#ddd}.navbar-default .navbar-toggle:focus,.navbar-default .navbar-toggle:hover{background-color:#ddd}.navbar-default .navbar-toggle .icon-bar{background-color:#888}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#e7e7e7}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:focus,.navbar-default .navbar-nav>.open>a:hover{color:#555;background-color:#e7e7e7}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#777}.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#ccc;background-color:transparent}}.navbar-default .navbar-link{color:#777}.navbar-default .navbar-link:hover{color:#333}.navbar-default .btn-link{color:#777}.navbar-default .btn-link:focus,.navbar-default .btn-link:hover{color:#333}.navbar-default .btn-link[disabled]:focus,.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:focus,fieldset[disabled] .navbar-default .btn-link:hover{color:#ccc}.navbar-inverse{background-color:#222;border-color:#080808}.navbar-inverse .navbar-brand{color:#9d9d9d}.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-text{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a:focus,.navbar-inverse .navbar-nav>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:focus,.navbar-inverse .navbar-nav>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:focus,.navbar-inverse .navbar-nav>.disabled>a:hover{color:#444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:#333}.navbar-inverse .navbar-toggle:focus,.navbar-inverse .navbar-toggle:hover{background-color:#333}.navbar-inverse .navbar-toggle .icon-bar{background-color:#fff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#101010}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:focus,.navbar-inverse .navbar-nav>.open>a:hover{color:#fff;background-color:#080808}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#444;background-color:transparent}}.navbar-inverse .navbar-link{color:#9d9d9d}.navbar-inverse .navbar-link:hover{color:#fff}.navbar-inverse .btn-link{color:#9d9d9d}.navbar-inverse .btn-link:focus,.navbar-inverse .btn-link:hover{color:#fff}.navbar-inverse .btn-link[disabled]:focus,.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:focus,fieldset[disabled] .navbar-inverse .btn-link:hover{color:#444}.breadcrumb{padding:8px 15px;margin-bottom:20px;list-style:none;background-color:#f5f5f5;border-radius:4px}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{padding:0 5px;color:#ccc;content:\"/\\00a0\"}.breadcrumb>.active{color:#777}.pagination{display:inline-block;padding-left:0;margin:20px 0;border-radius:4px}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:6px 12px;margin-left:-1px;line-height:1.42857143;color:#337ab7;text-decoration:none;background-color:#fff;border:1px solid #ddd}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination>li:last-child>a,.pagination>li:last-child>span{border-top-right-radius:4px;border-bottom-right-radius:4px}.pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{z-index:3;color:#23527c;background-color:#eee;border-color:#ddd}.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span,.pagination>.active>span:focus,.pagination>.active>span:hover{z-index:2;color:#fff;cursor:default;background-color:#337ab7;border-color:#337ab7}.pagination>.disabled>a,.pagination>.disabled>a:focus,.pagination>.disabled>a:hover,.pagination>.disabled>span,.pagination>.disabled>span:focus,.pagination>.disabled>span:hover{color:#777;cursor:not-allowed;background-color:#fff;border-color:#ddd}.pagination-lg>li>a,.pagination-lg>li>span{padding:10px 16px;font-size:18px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-top-left-radius:6px;border-bottom-left-radius:6px}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-top-right-radius:6px;border-bottom-right-radius:6px}.pagination-sm>li>a,.pagination-sm>li>span{padding:5px 10px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-top-left-radius:3px;border-bottom-left-radius:3px}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-top-right-radius:3px;border-bottom-right-radius:3px}.pager{padding-left:0;margin:20px 0;text-align:center;list-style:none}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:#fff;border:1px solid #ddd;border-radius:15px}.pager li>a:focus,.pager li>a:hover{text-decoration:none;background-color:#eee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:focus,.pager .disabled>a:hover,.pager .disabled>span{color:#777;cursor:not-allowed;background-color:#fff}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:focus,a.label:hover{color:#fff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#777}.label-default[href]:focus,.label-default[href]:hover{background-color:#5e5e5e}.label-primary{background-color:#337ab7}.label-primary[href]:focus,.label-primary[href]:hover{background-color:#286090}.label-success{background-color:#5cb85c}.label-success[href]:focus,.label-success[href]:hover{background-color:#449d44}.label-info{background-color:#5bc0de}.label-info[href]:focus,.label-info[href]:hover{background-color:#31b0d5}.label-warning{background-color:#f0ad4e}.label-warning[href]:focus,.label-warning[href]:hover{background-color:#ec971f}.label-danger{background-color:#d9534f}.label-danger[href]:focus,.label-danger[href]:hover{background-color:#c9302c}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:middle;background-color:#777;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-group-xs>.btn .badge,.btn-xs .badge{top:0;padding:1px 5px}a.badge:focus,a.badge:hover{color:#fff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#337ab7;background-color:#fff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#eee}.jumbotron .h1,.jumbotron h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:21px;font-weight:200}.jumbotron>hr{border-top-color:#d5d5d5}.container .jumbotron,.container-fluid .jumbotron{border-radius:6px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-right:60px;padding-left:60px}.jumbotron .h1,.jumbotron h1{font-size:63px}}.thumbnail{display:block;padding:4px;margin-bottom:20px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail a>img,.thumbnail>img{margin-right:auto;margin-left:auto}a.thumbnail.active,a.thumbnail:focus,a.thumbnail:hover{border-color:#337ab7}.thumbnail .caption{padding:9px;color:#333}.alert{padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:700}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.alert-success hr{border-top-color:#c9e2b3}.alert-success .alert-link{color:#2b542c}.alert-info{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.alert-info hr{border-top-color:#a6e1ec}.alert-info .alert-link{color:#245269}.alert-warning{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.alert-warning hr{border-top-color:#f7e1b5}.alert-warning .alert-link{color:#66512c}.alert-danger{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.alert-danger hr{border-top-color:#e4b9c0}.alert-danger .alert-link{color:#843534}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{height:20px;margin-bottom:20px;overflow:hidden;background-color:#f5f5f5;border-radius:4px;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.1)}.progress-bar{float:left;width:0;height:100%;font-size:12px;line-height:20px;color:#fff;text-align:center;background-color:#337ab7;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition:width .6s ease;-o-transition:width .6s ease;transition:width .6s ease}.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#5cb85c}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-warning{background-color:#f0ad4e}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-danger{background-color:#d9534f}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{overflow:hidden;zoom:1}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-body,.media-left,.media-right{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{padding-left:0;margin-bottom:20px}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#fff;border:1px solid #ddd}.list-group-item:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}a.list-group-item,button.list-group-item{color:#555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:focus,.list-group-item.disabled:hover{color:#777;cursor:not-allowed;background-color:#eee}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text{color:#777}.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#fff;background-color:#337ab7;border-color:#337ab7}.list-group-item.active .list-group-item-heading,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#c7ddef}.list-group-item-success{color:#3c763d;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#3c763d}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:focus,a.list-group-item-success:hover,button.list-group-item-success:focus,button.list-group-item-success:hover{color:#3c763d;background-color:#d0e9c6}a.list-group-item-success.active,a.list-group-item-success.active:focus,a.list-group-item-success.active:hover,button.list-group-item-success.active,button.list-group-item-success.active:focus,button.list-group-item-success.active:hover{color:#fff;background-color:#3c763d;border-color:#3c763d}.list-group-item-info{color:#31708f;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#31708f}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:focus,a.list-group-item-info:hover,button.list-group-item-info:focus,button.list-group-item-info:hover{color:#31708f;background-color:#c4e3f3}a.list-group-item-info.active,a.list-group-item-info.active:focus,a.list-group-item-info.active:hover,button.list-group-item-info.active,button.list-group-item-info.active:focus,button.list-group-item-info.active:hover{color:#fff;background-color:#31708f;border-color:#31708f}.list-group-item-warning{color:#8a6d3b;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#8a6d3b}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:focus,a.list-group-item-warning:hover,button.list-group-item-warning:focus,button.list-group-item-warning:hover{color:#8a6d3b;background-color:#faf2cc}a.list-group-item-warning.active,a.list-group-item-warning.active:focus,a.list-group-item-warning.active:hover,button.list-group-item-warning.active,button.list-group-item-warning.active:focus,button.list-group-item-warning.active:hover{color:#fff;background-color:#8a6d3b;border-color:#8a6d3b}.list-group-item-danger{color:#a94442;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#a94442}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:focus,a.list-group-item-danger:hover,button.list-group-item-danger:focus,button.list-group-item-danger:hover{color:#a94442;background-color:#ebcccc}a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-group-item-danger.active:hover,button.list-group-item-danger.active,button.list-group-item-danger.active:focus,button.list-group-item-danger.active:hover{color:#fff;background-color:#a94442;border-color:#a94442}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,.05);box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-left-radius:3px;border-top-right-radius:3px}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.panel-title>.small,.panel-title>.small>a,.panel-title>a,.panel-title>small,.panel-title>small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-left-radius:3px;border-top-right-radius:3px}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-left-radius:0;border-top-right-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.panel-collapse>.table,.panel>.table,.panel>.table-responsive>.table{margin-bottom:0}.panel>.panel-collapse>.table caption,.panel>.table caption,.panel>.table-responsive>.table caption{padding-right:15px;padding-left:15px}.panel>.table-responsive:first-child>.table:first-child,.panel>.table:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table:first-child>thead:first-child>tr:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child{border-top-left-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child{border-top-right-radius:3px}.panel>.table-responsive:last-child>.table:last-child,.panel>.table:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:3px}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #ddd}.panel>.table>tbody:first-child>tr:first-child td,.panel>.table>tbody:first-child>tr:first-child th{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{margin-bottom:0;border:0}.panel-group{margin-bottom:20px}.panel-group .panel{margin-bottom:0;border-radius:4px}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.list-group,.panel-group .panel-heading+.panel-collapse>.panel-body{border-top:1px solid #ddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #ddd}.panel-default{border-color:#ddd}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ddd}.panel-primary{border-color:#337ab7}.panel-primary>.panel-heading{color:#fff;background-color:#337ab7;border-color:#337ab7}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#337ab7}.panel-primary>.panel-heading .badge{color:#337ab7;background-color:#fff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#337ab7}.panel-success{border-color:#d6e9c6}.panel-success>.panel-heading{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d6e9c6}.panel-success>.panel-heading .badge{color:#dff0d8;background-color:#3c763d}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d6e9c6}.panel-info{border-color:#bce8f1}.panel-info>.panel-heading{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#bce8f1}.panel-info>.panel-heading .badge{color:#d9edf7;background-color:#31708f}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#bce8f1}.panel-warning{border-color:#faebcc}.panel-warning>.panel-heading{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#faebcc}.panel-warning>.panel-heading .badge{color:#fcf8e3;background-color:#8a6d3b}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#faebcc}.panel-danger{border-color:#ebccd1}.panel-danger>.panel-heading{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ebccd1}.panel-danger>.panel-heading .badge{color:#f2dede;background-color:#a94442}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ebccd1}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video{position:absolute;top:0;bottom:0;left:0;width:100%;height:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.05);box-shadow:inset 0 1px 1px rgba(0,0,0,.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,.15)}.well-lg{padding:24px;border-radius:6px}.well-sm{padding:9px;border-radius:3px}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;filter:alpha(opacity=20);opacity:.2}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;filter:alpha(opacity=50);opacity:.5}button.close{-webkit-appearance:none;padding:0;cursor:pointer;background:0 0;border:0}.modal-open{overflow:hidden}.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;display:none;overflow:hidden;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out;-webkit-transform:translate(0,-25%);-ms-transform:translate(0,-25%);-o-transform:translate(0,-25%);transform:translate(0,-25%)}.modal.in .modal-dialog{-webkit-transform:translate(0,0);-ms-transform:translate(0,0);-o-transform:translate(0,0);transform:translate(0,0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);box-shadow:0 3px 9px rgba(0,0,0,.5)}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000}.modal-backdrop.fade{filter:alpha(opacity=0);opacity:0}.modal-backdrop.in{filter:alpha(opacity=50);opacity:.5}.modal-header{min-height:16.43px;padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.42857143}.modal-body{position:relative;padding:15px}.modal-footer{padding:15px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-bottom:0;margin-left:5px}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,.5);box-shadow:0 5px 15px rgba(0,0,0,.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto}.tooltip.in{filter:alpha(opacity=90);opacity:.9}.tooltip.top{padding:5px 0;margin-top:-3px}.tooltip.right{padding:0 5px;margin-left:3px}.tooltip.bottom{padding:5px 0;margin-top:3px}.tooltip.left{padding:0 5px;margin-left:-3px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#fff;text-align:center;background-color:#000;border-radius:4px}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-left .tooltip-arrow{right:5px;bottom:0;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#000}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#000}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.2);border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,.2);box-shadow:0 5px 10px rgba(0,0,0,.2);line-break:auto}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{padding:8px 14px;margin:0;font-size:14px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;border-radius:5px 5px 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{content:\"\";border-width:10px}.popover.top>.arrow{bottom:-11px;left:50%;margin-left:-11px;border-top-color:#999;border-top-color:rgba(0,0,0,.25);border-bottom-width:0}.popover.top>.arrow:after{bottom:1px;margin-left:-10px;content:\" \";border-top-color:#fff;border-bottom-width:0}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-right-color:#999;border-right-color:rgba(0,0,0,.25);border-left-width:0}.popover.right>.arrow:after{bottom:-10px;left:1px;content:\" \";border-right-color:#fff;border-left-width:0}.popover.bottom>.arrow{top:-11px;left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#999;border-bottom-color:rgba(0,0,0,.25)}.popover.bottom>.arrow:after{top:1px;margin-left:-10px;content:\" \";border-top-width:0;border-bottom-color:#fff}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#999;border-left-color:rgba(0,0,0,.25)}.popover.left>.arrow:after{right:1px;bottom:-10px;content:\" \";border-right-width:0;border-left-color:#fff}.carousel{position:relative}.carousel-inner{position:relative;width:100%;overflow:hidden}.carousel-inner>.item{position:relative;display:none;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>a>img,.carousel-inner>.item>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.active.right,.carousel-inner>.item.next{left:0;-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0)}.carousel-inner>.item.active.left,.carousel-inner>.item.prev{left:0;-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0)}.carousel-inner>.item.active,.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right{left:0;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;bottom:0;left:0;width:15%;font-size:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);filter:alpha(opacity=50);opacity:.5}.carousel-control.left{background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,.0001)));background-image:linear-gradient(to right,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);background-repeat:repeat-x}.carousel-control.right{right:0;left:auto;background-image:-webkit-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.0001)),to(rgba(0,0,0,.5)));background-image:linear-gradient(to right,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);background-repeat:repeat-x}.carousel-control:focus,.carousel-control:hover{color:#fff;text-decoration:none;filter:alpha(opacity=90);outline:0;opacity:.9}.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{position:absolute;top:50%;z-index:5;display:inline-block;margin-top:-10px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{left:50%;margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{right:50%;margin-right:-10px}.carousel-control .icon-next,.carousel-control .icon-prev{width:20px;height:20px;font-family:serif;line-height:1}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;padding-left:0;margin-left:-30%;text-align:center;list-style:none}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;cursor:pointer;background-color:#000\\9;background-color:transparent;border:1px solid #fff;border-radius:10px}.carousel-indicators .active{width:12px;height:12px;margin:0;background-color:#fff}.carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:10;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{width:30px;height:30px;margin-top:-15px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-15px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-15px}.carousel-caption{right:20%;left:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.btn-group-vertical>.btn-group:after,.btn-group-vertical>.btn-group:before,.btn-toolbar:after,.btn-toolbar:before,.clearfix:after,.clearfix:before,.container-fluid:after,.container-fluid:before,.container:after,.container:before,.dl-horizontal dd:after,.dl-horizontal dd:before,.form-horizontal .form-group:after,.form-horizontal .form-group:before,.modal-footer:after,.modal-footer:before,.nav:after,.nav:before,.navbar-collapse:after,.navbar-collapse:before,.navbar-header:after,.navbar-header:before,.navbar:after,.navbar:before,.pager:after,.pager:before,.panel-body:after,.panel-body:before,.row:after,.row:before{display:table;content:\" \"}.btn-group-vertical>.btn-group:after,.btn-toolbar:after,.clearfix:after,.container-fluid:after,.container:after,.dl-horizontal dd:after,.form-horizontal .form-group:after,.modal-footer:after,.nav:after,.navbar-collapse:after,.navbar-header:after,.navbar:after,.pager:after,.panel-body:after,.row:after{clear:both}.center-block{display:block;margin-right:auto;margin-left:auto}.pull-right{float:right!important}.pull-left{float:left!important}.hide{display:none!important}.show{display:block!important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none!important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-lg,.visible-md,.visible-sm,.visible-xs{display:none!important}.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block{display:none!important}@media (max-width:767px){.visible-xs{display:block!important}table.visible-xs{display:table!important}tr.visible-xs{display:table-row!important}td.visible-xs,th.visible-xs{display:table-cell!important}}@media (max-width:767px){.visible-xs-block{display:block!important}}@media (max-width:767px){.visible-xs-inline{display:inline!important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block!important}table.visible-sm{display:table!important}tr.visible-sm{display:table-row!important}td.visible-sm,th.visible-sm{display:table-cell!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block!important}table.visible-md{display:table!important}tr.visible-md{display:table-row!important}td.visible-md,th.visible-md{display:table-cell!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block!important}}@media (min-width:1200px){.visible-lg{display:block!important}table.visible-lg{display:table!important}tr.visible-lg{display:table-row!important}td.visible-lg,th.visible-lg{display:table-cell!important}}@media (min-width:1200px){.visible-lg-block{display:block!important}}@media (min-width:1200px){.visible-lg-inline{display:inline!important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block!important}}@media (max-width:767px){.hidden-xs{display:none!important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none!important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none!important}}@media (min-width:1200px){.hidden-lg{display:none!important}}.visible-print{display:none!important}@media print{.visible-print{display:block!important}table.visible-print{display:table!important}tr.visible-print{display:table-row!important}td.visible-print,th.visible-print{display:table-cell!important}}.visible-print-block{display:none!important}@media print{.visible-print-block{display:block!important}}.visible-print-inline{display:none!important}@media print{.visible-print-inline{display:inline!important}}.visible-print-inline-block{display:none!important}@media print{.visible-print-inline-block{display:inline-block!important}}@media print{.hidden-print{display:none!important}}.sidebar{position:absolute;top:0;bottom:0;width:100%;overflow:hidden;z-index:2000}.sidebar.collapsed{width:40px}@media (min-width:768px){.sidebar{top:10px;bottom:10px;transition:width .5s}}@media (min-width:768px) and (max-width:991px){.sidebar{width:305px}}@media (min-width:992px) and (max-width:1199px){.sidebar{width:390px}}@media (min-width:1200px){.sidebar{width:460px}}.sidebar-left{left:0}@media (min-width:768px){.sidebar-left{left:10px}}.sidebar-right{right:0}@media (min-width:768px){.sidebar-right{right:10px}}.sidebar-tabs{top:0;bottom:0;height:100%;background-color:#fff}.sidebar-left .sidebar-tabs{left:0}.sidebar-right .sidebar-tabs{right:0}.sidebar-tabs,.sidebar-tabs>ul{position:absolute;width:40px;margin:0;padding:0}.sidebar-tabs>li,.sidebar-tabs>ul>li{width:100%;height:40px;color:#333;font-size:12pt;overflow:hidden;transition:all 80ms}.sidebar-tabs>li:hover,.sidebar-tabs>ul>li:hover{color:#000;background-color:#eee}.sidebar-tabs>li.active,.sidebar-tabs>ul>li.active{color:#fff;background-color:#0074d9}.sidebar-tabs>li.disabled,.sidebar-tabs>ul>li.disabled{color:rgba(51,51,51,.4)}.sidebar-tabs>li.disabled:hover,.sidebar-tabs>ul>li.disabled:hover{background:0 0}.sidebar-tabs>li.disabled>a,.sidebar-tabs>ul>li.disabled>a{cursor:default}.sidebar-tabs>li>a,.sidebar-tabs>ul>li>a{display:block;width:100%;height:100%;line-height:40px;color:inherit;text-decoration:none;text-align:center}.sidebar-tabs>ul+ul{bottom:0}.sidebar-content{position:absolute;top:0;bottom:0;background-color:rgba(255,255,255,.95);overflow-x:hidden;overflow-y:auto}.sidebar-left .sidebar-content{left:40px;right:0}.sidebar-right .sidebar-content{left:0;right:40px}.sidebar.collapsed>.sidebar-content{overflow-y:hidden}.sidebar-pane{display:none;left:0;right:0;box-sizing:border-box;padding:10px 20px}.sidebar-pane.active{display:block}@media (min-width:768px) and (max-width:991px){.sidebar-pane{min-width:265px}}@media (min-width:992px) and (max-width:1199px){.sidebar-pane{min-width:350px}}@media (min-width:1200px){.sidebar-pane{min-width:420px}}.sidebar-header{margin:-10px -20px 0;height:40px;padding:0 20px;line-height:40px;font-size:14.4pt;color:#fff;background-color:#0074d9}.sidebar-right .sidebar-header{padding-left:40px}.sidebar-close{position:absolute;top:0;width:40px;height:40px;text-align:center;cursor:pointer}.sidebar-left .sidebar-close{right:0}.sidebar-right .sidebar-close{left:0}.sidebar-left~.sidebar-map{margin-left:40px}@media (min-width:768px){.sidebar-left~.sidebar-map{margin-left:0}}.sidebar-right~.sidebar-map{margin-right:40px}@media (min-width:768px){.sidebar-right~.sidebar-map{margin-right:0}}.sidebar{box-shadow:0 1px 5px rgba(0,0,0,.65)}.sidebar.leaflet-touch{box-shadow:none;border-right:2px solid rgba(0,0,0,.2)}@media (min-width:768px){.sidebar{border-radius:4px}.sidebar.leaflet-touch{border:2px solid rgba(0,0,0,.2)}}@media (min-width:768px){.sidebar-left~.sidebar-map .leaflet-left{transition:left .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-left~.sidebar-map .leaflet-left{left:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-left~.sidebar-map .leaflet-left{left:400px}}@media (min-width:1200px){.sidebar-left~.sidebar-map .leaflet-left{left:470px}}@media (min-width:768px){.sidebar-left.collapsed~.sidebar-map .leaflet-left{left:50px}}@media (min-width:768px){.sidebar-right~.sidebar-map .leaflet-right{transition:right .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-right~.sidebar-map .leaflet-right{right:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-right~.sidebar-map .leaflet-right{right:400px}}@media (min-width:1200px){.sidebar-right~.sidebar-map .leaflet-right{right:470px}}@media (min-width:768px){.sidebar-right.collapsed~.sidebar-map .leaflet-right{right:50px}}body,html{height:100%;margin:0}#map{height:100%}.info{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}.external{background-image:linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cg%20transform%3D%22translate%28-826.429%20-698.791%29%22%3E%3Crect%20width%3D%225.982%22%20height%3D%225.982%22%20x%3D%22826.929%22%20y%3D%22702.309%22%20fill%3D%22%23fff%22%20stroke%3D%22%2306c%22%2F%3E%3Cg%3E%3Cpath%20d%3D%22M831.194%20698.791h5.234v5.391l-1.571%201.545-1.31-1.31-2.725%202.725-2.689-2.689%202.808-2.808-1.311-1.311z%22%20fill%3D%22%2306f%22%2F%3E%3Cpath%20d%3D%22M835.424%20699.795l.022%204.885-1.817-1.817-2.881%202.881-1.228-1.228%202.881-2.881-1.851-1.851z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E);background-position:right center;background-repeat:no-repeat;padding-right:13px}.dataset-spatial-minimap{height:120px}");
 })
 (function(factory) {
   factory();
