@@ -62,8 +62,15 @@ export default class Sidebar {
     $('.dataset-title', el).fill(dataset.title)
     $('.dataset-title', el).set('@href', dataset['@id'])
     $('.dataset-description', el).fill(dataset.description)
-    if (dataset.publisher.name) {
-      $('.dataset-publisher', el).fill(HTML(`<a class="external" href="${dataset.publisher['@id']}"><em>${dataset.publisher.name}</em></a>`))
+    if (dataset.publisher) {
+      // TODO switch to .homepage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
+      //let homepage = dataset.publisher.homepage
+      let homepage = dataset.publisher['foaf:homepage']
+      if (homepage) {
+        $('.dataset-publisher', el).fill(HTML(`<a class="external" href="${homepage}"><em>${dataset.publisher.name}</em></a>`))
+      } else {
+        $('.dataset-publisher', el).fill(HTML(`<em>${dataset.publisher.name}</em>`))
+      }
     } else {
       $('.dataset-publisher', el).hide()
     }
