@@ -14709,7 +14709,7 @@ $__System.register('37', ['3', '8', '10', '11', '34', '35', '36', 'c'], function
     execute: function () {
       'use strict';
 
-      templatesHtml = '\n<template id="template-dataset-list-item">\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading"><a target="_new" class="external dataset-title"></a></h4>\n    <p class="dataset-description"></p>\n    <p><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal"></span></p>\n    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>\n    <div class="dataset-spatial-minimap"></div>\n  </li>\n</template\n';
+      templatesHtml = '\n<template id="template-dataset-list-item">\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading dataset-title"></h4>\n    <p class="dataset-publisher"></p>\n    <p class="dataset-description"></p>\n    <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>\n    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>\n    <div class="dataset-spatial-minimap"></div>\n  </li>\n</template\n';
 
       $('body').add(HTML(templatesHtml));
 
@@ -14767,17 +14767,37 @@ $__System.register('37', ['3', '8', '10', '11', '34', '35', '36', 'c'], function
           value: function addDataset(dataset) {
             var el = fromTemplate('template-dataset-list-item');
             $('.dataset-list', '#' + this.id).add(el);
-            $('.dataset-title', el).fill(dataset.title);
-            $('.dataset-title', el).set('@href', dataset['@id']);
+
+            // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
+            //let landingPage = dataset.landingPage
+            var landingPage = dataset['dcat:landingPage'];
+            if (landingPage) {
+              $('.dataset-title', el).fill(HTML('<a href="' + landingPage + '" target="_new" class="external dataset-title">' + dataset.title + '</a>'));
+            } else {
+              $('.dataset-title', el).fill(dataset.title);
+            }
+
             $('.dataset-description', el).fill(dataset.description);
 
-            var temporal = undefined;
-            if (dataset.temporal) {
-              temporal = dataset.temporal.startDate.substr(0, 10) + ' to ' + dataset.temporal.endDate.substr(0, 10);
+            if (dataset.publisher) {
+              // TODO switch to .homepage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
+              //let homepage = dataset.publisher.homepage
+              var homepage = dataset.publisher['foaf:homepage'];
+              if (homepage) {
+                $('.dataset-publisher', el).fill(HTML('<a class="external" href="' + homepage + '"><em>' + dataset.publisher.name + '</em></a>'));
+              } else {
+                $('.dataset-publisher', el).fill(HTML('<em>' + dataset.publisher.name + '</em>'));
+              }
             } else {
-              temporal = 'unknown';
+              $('.dataset-publisher', el).hide();
             }
-            $('.dataset-temporal', el).fill(temporal);
+
+            if (dataset.temporal) {
+              var temporal = dataset.temporal.startDate.substr(0, 10) + ' to ' + dataset.temporal.endDate.substr(0, 10);
+              $('.dataset-temporal-text', el).fill(temporal);
+            } else {
+              $('.dataset-temporal', el).hide();
+            }
 
             var isGlobal = undefined;
             var geom = dataset.spatial ? JSON.parse(dataset.spatial.geometry) : null;
@@ -14814,7 +14834,11 @@ $__System.register('37', ['3', '8', '10', '11', '34', '35', '36', 'c'], function
               })();
             } else {
               $('.dataset-spatial-minimap', el).hide();
-              $('.dataset-spatial-geometry-text', el).fill(isGlobal ? 'global' : 'unknown');
+              if (isGlobal) {
+                $('.dataset-spatial-geometry-text', el).fill('global');
+              } else {
+                $('.dataset-spatial-geometry', el).hide();
+              }
             }
           }
         }, {
