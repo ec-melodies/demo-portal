@@ -9,8 +9,9 @@ let templatesHtml = `
 <template id="template-dataset-list-item">
   <li class="list-group-item">
     <h4 class="list-group-item-heading"><a target="_new" class="external dataset-title"></a></h4>
+    <p class="dataset-publisher"></p>
     <p class="dataset-description"></p>
-    <p><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal"></span></p>
+    <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>
     <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>
     <div class="dataset-spatial-minimap"></div>
   </li>
@@ -61,14 +62,18 @@ export default class Sidebar {
     $('.dataset-title', el).fill(dataset.title)
     $('.dataset-title', el).set('@href', dataset['@id'])
     $('.dataset-description', el).fill(dataset.description)
-    
-    let temporal
-    if (dataset.temporal) {
-      temporal = dataset.temporal.startDate.substr(0,10) + ' to ' + dataset.temporal.endDate.substr(0,10)
+    if (dataset.publisher.name) {
+      $('.dataset-publisher', el).fill(HTML(`<a class="external" href="${dataset.publisher['@id']}"><em>${dataset.publisher.name}</em></a>`))
     } else {
-      temporal = 'unknown'
+      $('.dataset-publisher', el).hide()
     }
-    $('.dataset-temporal', el).fill(temporal)
+    
+    if (dataset.temporal) {
+      let temporal = dataset.temporal.startDate.substr(0,10) + ' to ' + dataset.temporal.endDate.substr(0,10)
+      $('.dataset-temporal-text', el).fill(temporal)
+    } else {
+      $('.dataset-temporal', el).hide()
+    }
     
     let isGlobal
     let geom = dataset.spatial ? JSON.parse(dataset.spatial.geometry) : null
@@ -102,7 +107,11 @@ export default class Sidebar {
 
     } else {
       $('.dataset-spatial-minimap', el).hide()
-      $('.dataset-spatial-geometry-text', el).fill(isGlobal ? 'global' : 'unknown')
+      if (isGlobal) {
+        $('.dataset-spatial-geometry-text', el).fill('global')
+      } else {
+        $('.dataset-spatial-geometry', el).hide()
+      }
     }
     
     
