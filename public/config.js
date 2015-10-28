@@ -16,11 +16,11 @@ System.config({
   map: {
     "babel": "npm:babel-core@5.8.29",
     "babel-runtime": "npm:babel-runtime@5.8.29",
+    "bootstrap": "github:twbs/bootstrap@3.3.5",
     "clean-css": "npm:clean-css@3.4.6",
     "core-js": "npm:core-js@1.2.3",
     "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",
     "css": "github:systemjs/plugin-css@0.1.19",
-    "font-awesome": "npm:font-awesome@4.4.0",
     "jsonld": "github:digitalbazaar/jsonld.js@0.4.2",
     "leaflet": "github:Leaflet/Leaflet@0.7.7",
     "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",
@@ -78,6 +78,9 @@ System.config({
     },
     "github:jspm/nodelibs-util@0.1.0": {
       "util": "npm:util@0.10.3"
+    },
+    "github:twbs/bootstrap@3.3.5": {
+      "jquery": "github:components/jquery@2.1.4"
     },
     "npm:amdefine@1.0.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -154,9 +157,6 @@ System.config({
     },
     "npm:entities@1.1.1": {
       "systemjs-json": "github:systemjs/plugin-json@0.1.0"
-    },
-    "npm:font-awesome@4.4.0": {
-      "css": "github:systemjs/plugin-css@0.1.19"
     },
     "npm:graceful-readlink@1.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2"
