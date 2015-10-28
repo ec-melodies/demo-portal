@@ -8,7 +8,7 @@ import {$, HTML} from 'minified'
 let templatesHtml = `
 <template id="template-dataset-list-item">
   <li class="list-group-item">
-    <h4 class="list-group-item-heading"><a target="_new" class="external dataset-title"></a></h4>
+    <h4 class="list-group-item-heading dataset-title"></h4>
     <p class="dataset-publisher"></p>
     <p class="dataset-description"></p>
     <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>
@@ -59,9 +59,18 @@ export default class Sidebar {
   addDataset (dataset) {
     let el = fromTemplate('template-dataset-list-item')
     $('.dataset-list', '#' + this.id).add(el)
-    $('.dataset-title', el).fill(dataset.title)
-    $('.dataset-title', el).set('@href', dataset['@id'])
+
+    // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
+    //let landingPage = dataset.landingPage
+    let landingPage = dataset['dcat:landingPage']
+    if (landingPage) {
+      $('.dataset-title', el).fill(HTML(`<a href="${landingPage}" target="_new" class="external dataset-title">${dataset.title}</a>`))
+    } else {
+      $('.dataset-title', el).fill(dataset.title)
+    }
+    
     $('.dataset-description', el).fill(dataset.description)
+    
     if (dataset.publisher) {
       // TODO switch to .homepage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
       //let homepage = dataset.publisher.homepage
