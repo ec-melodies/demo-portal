@@ -21,3 +21,8 @@ html, body { height: 100%; margin: 0; }
 .dataset-spatial-minimap {
 	height: 120px;
 }
+
+.code-nowrap {
+  word-wrap: normal;
+  white-space: pre;
+}

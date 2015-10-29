@@ -4,7 +4,6 @@ import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 import 'bootstrap/css/bootstrap.css!'
 import {promises as jsonld} from 'jsonld'
-import {$, HTML} from 'minified'
 
 import Sidebar from './sidebar.js'
 import './style.css!'

@@ -10,6 +10,7 @@ let templatesHtml = `
   <li class="list-group-item">
     <h4 class="list-group-item-heading dataset-title"></h4>
     <p class="dataset-publisher"></p>
+    <p class="dataset-distribution-labels"></p>
     <p class="dataset-description"></p>
     <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>
     <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>
@@ -41,6 +42,7 @@ let sidebarHtml = id => `
 
 export default class Sidebar {
   constructor (map, id='sidebar') {
+    this.map = map
     this.id = id
     // has to come before the map div, otherwise it overlays zoom controls
     $('body').addFront(HTML(sidebarHtml(id)))
@@ -130,13 +132,64 @@ export default class Sidebar {
       }
     }
     
+    let supportedFormats = new Set(['WMS', 'GeoJSON'])
+    if (dataset.distributions) {
+      let types = new Set(dataset.distributions.map(dist => dist.format ? dist.format : dist.mediaType))
+      for (let type of types) {
+        if (!type) continue
+        let color = supportedFormats.has(type) ? 'success' : 'default'
+        let html
+        if (supportedFormats.has(type)) {
+          html = HTML(`<a href="#"><span class="label label-success">${type}</span></a> `)
+          
+          // hacky, see https://github.com/timjansen/minified.js/issues/68
+          $(html[0]).on('click', () => {
+            if (type === 'WMS') {
+              this._displayWMS(dataset)
+            } else if (type === 'GeoJSON') {
+              this._displayGeoJSON(dataset)
+            } else {
+              throw new Error('should not happen')
+            }
+          })
+        } else {
+          html = HTML(`<span class="label label-${color}">${type}</span> `)
+        }
+        $('.dataset-distribution-labels', el).add(html)
+      }
+    }
     
+  }
+  
+  // TODO should not happen directly in the sidebar module
+  _displayWMS (dataset) {
+    
+  }
+  
+  _displayGeoJSON (dataset) {
+    let bounds = []
+    for (let dist of dataset.distributions.filter(dist => dist.format === 'GeoJSON')) {
+      // TODO remove dcat: once ckanext-dcat is fixed
+      let url = dist['dcat:accessURL'] || dist['dcat:downloadURL']
+      $.request('get', url).then(json => {
+        let layer = L.geoJson(JSON.parse(json), {
+          onEachFeature: (feature, layer) => {
+            layer.bindPopup(
+                '<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>',
+                { maxWidth: 400 })
+          }
+        })
+        bounds.push(layer.getBounds())
+        layer.addTo(this.map)
+        this.map.fitBounds(bounds)
+      })
+    }
   }
   
   open (tabId) {
     this.control.open(tabId)
   }
-} 
+}
 
 function fromTemplate (id) {
   return document.importNode($('#' + id)[0].content, true).children[0]
