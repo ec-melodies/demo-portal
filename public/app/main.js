@@ -1,12 +1,14 @@
+import 'bootstrap/css/bootstrap.css!'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css!'
 import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
-import 'bootstrap/css/bootstrap.css!'
+import 'leaflet-styledlayercontrol'
 import {promises as jsonld} from 'jsonld'
 
 import Sidebar from './sidebar.js'
-import './style.css!'
+import './css/style.css!'
+import './css/styledLayerControl/styledLayerControl.css!'
 
 const DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 const DCAT_CATALOG_FRAME = {
@@ -29,15 +31,29 @@ let map = L.map('map', {
   zoom: 2
 })
 
-let baseLayers = {
-  'OSM':
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-       attribution: 'Map data &copy; <a href="http://www.osm.org">OpenStreetMap</a>'
-    })
-}
-baseLayers['OSM'].addTo(map)
+// Layer control and base layer setup
+let osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: 'Map data &copy; <a href="http://www.osm.org">OpenStreetMap</a>'
+})
+osm.addTo(map)
 
-let sidebar = new Sidebar(map)
+let baseMaps = [{
+  groupName: 'Base Maps',
+  expanded: true,
+  layers: {
+    'OpenStreetMap': osm
+  }
+}]
+
+let layerControl = L.Control.styledLayerControl(baseMaps, [], {
+  container_width     : "300px",
+  container_maxHeight : "500px",
+  collapsed: false
+})
+map.addControl(layerControl)
+
+// Sidebar setup
+let sidebar = new Sidebar(map, {layerControl})
 
 jsonld.frame(DCAT_CATALOG_URL, DCAT_CATALOG_FRAME)
 .then(framed => jsonld.compact(framed, framed['@context']))

@@ -2,8 +2,9 @@ import L from 'leaflet'
 import 'sidebar-v2/js/leaflet-sidebar.js'
 import 'sidebar-v2/css/leaflet-sidebar.css!'
 import 'bootstrap/css/bootstrap.css!'
-
 import {$, HTML} from 'minified'
+
+import * as wms from './wms.js'
 
 let templatesHtml = `
 <template id="template-dataset-list-item">
@@ -41,9 +42,10 @@ let sidebarHtml = id => `
 `
 
 export default class Sidebar {
-  constructor (map, id='sidebar') {
+  constructor (map, {id='sidebar', layerControl=null}={}) {
     this.map = map
     this.id = id
+    this.layerControl = layerControl
     // has to come before the map div, otherwise it overlays zoom controls
     $('body').addFront(HTML(sidebarHtml(id)))
     
@@ -135,6 +137,8 @@ export default class Sidebar {
     let supportedFormats = new Set(['WMS', 'GeoJSON'])
     if (dataset.distributions) {
       let types = new Set(dataset.distributions.map(dist => dist.format ? dist.format : dist.mediaType))
+      types = [...types]
+      types.sort()
       for (let type of types) {
         if (!type) continue
         let color = supportedFormats.has(type) ? 'success' : 'default'
@@ -161,9 +165,24 @@ export default class Sidebar {
     
   }
   
-  // TODO should not happen directly in the sidebar module
+  // TODO the display code should not be directly in the sidebar module
   _displayWMS (dataset) {
-    
+    for (let dist of dataset.distributions.filter(dist => dist.format === 'WMS')) {
+      // TODO remove dcat: once ckanext-dcat is fixed
+      let url = dist['dcat:accessURL']
+      this.map.fire('dataloading')
+      wms.readLayers(url).then(wmsLayers => {
+        for (let wmsLayer of wmsLayers) {
+          let layer = L.tileLayer.wms(url, {
+            layers: wmsLayer.name,
+            format: 'image/png',
+            transparent: true
+          })
+          this.layerControl.addOverlay(layer, wmsLayer.title, {groupName: dataset.title, expanded: true})
+        }
+        this.map.fire('dataload')
+      })
+    }
   }
   
   _displayGeoJSON (dataset) {
@@ -171,17 +190,20 @@ export default class Sidebar {
     for (let dist of dataset.distributions.filter(dist => dist.format === 'GeoJSON')) {
       // TODO remove dcat: once ckanext-dcat is fixed
       let url = dist['dcat:accessURL'] || dist['dcat:downloadURL']
+      this.map.fire('dataloading')
       $.request('get', url).then(json => {
         let layer = L.geoJson(JSON.parse(json), {
           onEachFeature: (feature, layer) => {
             layer.bindPopup(
                 '<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>',
-                { maxWidth: 400 })
+                { maxWidth: 400, maxHeight: 300 })
           }
         })
         bounds.push(layer.getBounds())
         layer.addTo(this.map)
+        this.layerControl.addOverlay(layer, dist.title, {groupName: dataset.title, expanded: true})
         this.map.fitBounds(bounds)
+        this.map.fire('dataload')
       })
     }
   }
