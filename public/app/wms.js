@@ -1,3 +1,5 @@
+import {$} from 'minified'
+
 export function readLayers (wmsEndpoint) {
   return readCapabilities(wmsEndpoint).then(getLayers)
 }
@@ -25,19 +27,13 @@ export function readCapabilities (wmsEndpoint) {
 }
 
 export function getLayers (xml) {
-  // not using minified.js here since it has problems with external xml documents
-  // see https://github.com/timjansen/minified.js/issues/66
+  xml = xml.documentElement
   let layers = []
-  let layerNodes = xml.getElementsByTagName('Layer')
-  for (let layerNode of layerNodes) {
-    if (layerNode.getAttribute('queryable') !== '1') continue
-    let children = [].slice.call(layerNode.children)
-    let nameEl = children.find(el => el.tagName === 'Name')
-    let titleEl = children.find(el => el.tagName === 'Title')
-    if (nameEl) {
-      let name = nameEl.textContent
-      layers.push({name: name, title: titleEl.textContent})
-    }
-  }
+  $('Layer', xml).each(layerNode => {
+    if ($(layerNode).get('@queryable') !== '1') return
+    let name = $('Name', layerNode, true).text()
+    let title = $('Title', layerNode, true).text()
+    layers.push({name, title})
+  })
   return layers
 }
