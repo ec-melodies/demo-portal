@@ -52,6 +52,9 @@ let templatesHtml = `
 .catalog-url-panel {
   margin-top: 20px;
 }
+.dataset-spatial-minimap {
+  margin-bottom: 10px;
+}
 </style>
 `
 $('body').add(HTML(templatesHtml))
@@ -247,10 +250,10 @@ export default class Sidebar {
       for (let type of types) {
         if (!type) continue
         let color = MappableFormats.has(type) ? 'success' : 'default'
-        let glyph = DataFormats.has(type) ? ' <span class="glyphicon glyphicon-flash"></span>' : ''
+        let glyph = DataFormats.has(type) ? '<span class="glyphicon glyphicon-flash"></span> ' : ''
         let html
         if (MappableFormats.has(type)) {
-          html = HTML(`<a href="#"><span class="label label-success">${getFormatLabel(type)}${glyph}</span></a> `)
+          html = HTML(`<a href="#"><span class="label label-success">${glyph}${getFormatLabel(type)}</span></a> `)
           
           // hacky, see https://github.com/timjansen/minified.js/issues/68
           $(html[0]).on('click', () => {
