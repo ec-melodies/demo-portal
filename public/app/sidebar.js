@@ -4,7 +4,15 @@ import 'sidebar-v2/css/leaflet-sidebar.css!'
 import 'bootstrap/css/bootstrap.css!'
 import {$, HTML} from 'minified'
 
+import * as CovJSON from 'covjson-reader'
+import LayerFactory from 'leaflet-coverage'
+
 import * as wms from './wms.js'
+import ImageLegend from './ImageLegend.js'
+
+const MediaTypes = {
+    CovJSON: 'application/prs.coverage+json'
+}
 
 let templatesHtml = `
 <template id="template-dataset-list-item">
@@ -134,7 +142,7 @@ export default class Sidebar {
       }
     }
     
-    let supportedFormats = new Set(['WMS', 'GeoJSON'])
+    let supportedFormats = new Set(['WMS', 'GeoJSON', MediaTypes.CovJSON])
     if (dataset.distributions) {
       let types = new Set(dataset.distributions.map(dist => dist.format ? dist.format : dist.mediaType))
       types = [...types]
@@ -152,6 +160,8 @@ export default class Sidebar {
               this._displayWMS(dataset)
             } else if (type === 'GeoJSON') {
               this._displayGeoJSON(dataset)
+            } else if (type === MediaTypes.CovJSON) {
+              this._displayCovJSON(dataset)
             } else {
               throw new Error('should not happen')
             }
@@ -178,6 +188,11 @@ export default class Sidebar {
             format: 'image/png',
             transparent: true
           })
+          this.map.on('layeradd', e => {
+            if (e.layer !== layer) return
+            let legendUrl = wms.getLegendUrl(url, wmsLayer.name)
+            new ImageLegend(legendUrl, {layer: e.layer, title: wmsLayer.title}).addTo(this.map)
+          })
           this.layerControl.addOverlay(layer, wmsLayer.title, {groupName: dataset.title, expanded: true})
         }
         this.map.fire('dataload')
@@ -203,6 +218,27 @@ export default class Sidebar {
         layer.addTo(this.map)
         this.layerControl.addOverlay(layer, dist.title, {groupName: dataset.title, expanded: true})
         this.map.fitBounds(bounds)
+        this.map.fire('dataload')
+      })
+    }
+  }
+  
+  _displayCovJSON (dataset) {
+    for (let dist of dataset.distributions.filter(dist => dist.mediaType === MediaTypes.CovJSON)) {
+      // TODO remove dcat: once ckanext-dcat is fixed
+      let url = dist['dcat:downloadURL']
+      this.map.fire('dataloading')
+      CovJSON.read(url).then(cov => {
+        // each parameter becomes a layer
+        for (let key of cov.parameters.keys()) {
+          let opts = {keys: [key]}
+          let layer = LayerFactory()(cov, opts).on('add', e => {
+            let covLayer = e.target
+            this.map.fitBounds(covLayer.getBounds())
+          })
+          let layername = cov.parameters.get(key).observedProperty.label.get('en')
+          this.layerControl.addOverlay(layer, layername, {groupName: dataset.title, expanded: true})
+        }
         this.map.fire('dataload')
       })
     }
