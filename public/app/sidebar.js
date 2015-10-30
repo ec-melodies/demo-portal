@@ -6,6 +6,7 @@ import {$, HTML} from 'minified'
 
 import * as CovJSON from 'covjson-reader'
 import LayerFactory from 'leaflet-coverage'
+import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 
 import * as wms from './wms.js'
 import ImageLegend from './ImageLegend.js'
@@ -193,7 +194,7 @@ export default class Sidebar {
             let legendUrl = wms.getLegendUrl(url, wmsLayer.name)
             new ImageLegend(legendUrl, {layer: e.layer, title: wmsLayer.title}).addTo(this.map)
           })
-          this.layerControl.addOverlay(layer, wmsLayer.title, {groupName: dataset.title, expanded: true})
+          this.layerControl.addOverlay(layer, 'WMS: ' + wmsLayer.title, {groupName: dataset.title, expanded: true})
         }
         this.map.fire('dataload')
       })
@@ -216,7 +217,7 @@ export default class Sidebar {
         })
         bounds.push(layer.getBounds())
         layer.addTo(this.map)
-        this.layerControl.addOverlay(layer, dist.title, {groupName: dataset.title, expanded: true})
+        this.layerControl.addOverlay(layer, 'GeoJSON: ' + dist.title, {groupName: dataset.title, expanded: true})
         this.map.fitBounds(bounds)
         this.map.fire('dataload')
       })
@@ -235,9 +236,15 @@ export default class Sidebar {
           let layer = LayerFactory()(cov, opts).on('add', e => {
             let covLayer = e.target
             this.map.fitBounds(covLayer.getBounds())
+            
+            if (covLayer.palette) {
+              CoverageLegend(layer, {
+                position: 'bottomright'
+              }).addTo(this.map)
+            }
           })
           let layername = cov.parameters.get(key).observedProperty.label.get('en')
-          this.layerControl.addOverlay(layer, layername, {groupName: dataset.title, expanded: true})
+          this.layerControl.addOverlay(layer, 'CovJSON: ' + layername, {groupName: dataset.title, expanded: true})
         }
         this.map.fire('dataload')
       })
