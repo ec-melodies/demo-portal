@@ -12,7 +12,16 @@ import * as wms from './wms.js'
 import ImageLegend from './ImageLegend.js'
 
 const MediaTypes = {
-    CovJSON: 'application/prs.coverage+json'
+    CovJSON: 'application/prs.coverage+json',
+    netCDF: 'application/x-netcdf'
+}
+function getFormatLabel (formatOrMediaType) {
+  for (let key in MediaTypes) {
+    if (MediaTypes[key] === formatOrMediaType) {
+      return key
+    }
+  }
+  return formatOrMediaType
 }
 
 let templatesHtml = `
@@ -147,13 +156,14 @@ export default class Sidebar {
     if (dataset.distributions) {
       let types = new Set(dataset.distributions.map(dist => dist.format ? dist.format : dist.mediaType))
       types = [...types]
-      types.sort()
+      types.sort((a, b) => getFormatLabel(a).toLowerCase().localeCompare(getFormatLabel(b).toLowerCase()))
+      
       for (let type of types) {
         if (!type) continue
         let color = supportedFormats.has(type) ? 'success' : 'default'
         let html
         if (supportedFormats.has(type)) {
-          html = HTML(`<a href="#"><span class="label label-success">${type}</span></a> `)
+          html = HTML(`<a href="#"><span class="label label-success">${getFormatLabel(type)}</span></a> `)
           
           // hacky, see https://github.com/timjansen/minified.js/issues/68
           $(html[0]).on('click', () => {
@@ -168,7 +178,7 @@ export default class Sidebar {
             }
           })
         } else {
-          html = HTML(`<span class="label label-${color}">${type}</span> `)
+          html = HTML(`<span class="label label-${color}">${getFormatLabel(type)}</span> `)
         }
         $('.dataset-distribution-labels', el).add(html)
       }
@@ -189,6 +199,7 @@ export default class Sidebar {
             format: 'image/png',
             transparent: true
           })
+          // In leaflet 1.0 every layer will have add/remove events, this is a workaround
           this.map.on('layeradd', e => {
             if (e.layer !== layer) return
             let legendUrl = wms.getLegendUrl(url, wmsLayer.name)
