@@ -8,6 +8,7 @@ import * as CovJSON from 'covjson-reader'
 import LayerFactory from 'leaflet-coverage'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 
+import * as dcat from './dcat.js'
 import * as wms from './wms.js'
 import ImageLegend from './ImageLegend.js'
 
@@ -45,7 +46,13 @@ let templatesHtml = `
       <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse
     </button>
   </li>
-</template
+</template>
+
+<style>
+.catalog-url-panel {
+  margin-top: 20px;
+}
+</style>
 `
 $('body').add(HTML(templatesHtml))
 
@@ -64,6 +71,30 @@ let sidebarHtml = id => `
       <div class="sidebar-pane" id="datasets">
           <h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
   
+          <div class="panel panel-default catalog-url-panel">
+            <div class="panel-heading">
+              <h3 class="panel-title">
+                <a href="http://json-ld.org/" title="JSON-LD Data"><img width="32" src="http://json-ld.org/images/json-ld-data-32.png" alt="JSON-LD-logo-32"></a>
+                <span style="vertical-align:middle">
+                  <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a> Catalogue
+                </span>
+              </h3>
+            </div>
+            <div class="panel-body catalog-url-info">
+              <a href="#" class="catalog-url-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+              <a class="catalog-url"></a>
+            </div>
+            <div class="panel-body catalog-url-form" style="display:none">
+              <form>
+                <div class="form-group">
+                  <input type="text" class="form-control" placeholder="http://">
+                </div>
+                <button type="submit" class="btn btn-default">Load</button>
+                <button type="button" name="cancel" class="btn btn-default">Cancel</button>
+              </form>
+            </div>
+          </div>
+          
           <ul class="list-group dataset-list"></ul>
       </div>
       <div class="sidebar-pane" id="analyse">
@@ -85,6 +116,46 @@ export default class Sidebar {
     
     $('#' + map.getContainer().id).set('+sidebar-map')
     this.control = L.control.sidebar(id).addTo(map)
+    
+    let el = $('#' + this.id)
+    let input = $('input', $('.catalog-url-form', el))
+    $('.catalog-url-edit', el).on('click', () => {
+      $('.catalog-url-info', el).hide()
+      $('.catalog-url-form', el).show()
+      input.set('value', this.url)
+    })
+    $('form', $('.catalog-url-form', el)).on('submit', () => {
+      this.loadCatalog(input.get('value')).then(() => {
+        $('.catalog-url-info', el).show()
+        $('.catalog-url-form', el).hide()
+      }).catch(e => {
+        alert(e)
+      })
+    })
+    $('button', $('.catalog-url-form', el)).filter(b => b.name === 'cancel').on('click', () => {
+      $('.catalog-url-info', el).show()
+      $('.catalog-url-form', el).hide()
+    })
+  }
+  
+  loadCatalog (url) {
+    return dcat.loadCatalog(url).then(catalog => {
+      this.clearDatasets()
+      let datasets = catalog.datasets
+      console.log(datasets)
+      this.addDatasets(datasets)
+      
+      this.url = url
+      $('.catalog-url', '#' + this.id)
+        .set('@href', url)
+        .fill(url)
+      
+      return catalog
+    })
+  }
+  
+  clearDatasets () {
+    $('.dataset-list', '#' + this.id).fill()
   }
   
   addDatasets (datasets, sortKey='title') {

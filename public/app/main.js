@@ -1,28 +1,16 @@
 import 'bootstrap/css/bootstrap.css!'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css!'
+import 'leaflet-providers'
 import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 import 'leaflet-styledlayercontrol'
-import {promises as jsonld} from 'jsonld'
 
 import Sidebar from './sidebar.js'
 import './css/style.css!'
 import './css/styledLayerControl/styledLayerControl.css!'
 
-const DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
-const DCAT_CATALOG_FRAME = {
-  "@context": [
-    "https://rawgit.com/ec-melodies/wp02-dcat/master/context.jsonld",
-    { // override since we want the GeoJSON geometry, not the WKT one
-      "geometry": { 
-        "@id": "locn:geometry", 
-        "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
-      }
-    }
-  ],
-  "@type": "Catalog"
-}
+const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
 let map = L.map('map', {
   loadingControl: true,
@@ -32,17 +20,25 @@ let map = L.map('map', {
 })
 
 // Layer control and base layer setup
-let osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: 'Map data &copy; <a href="http://www.osm.org">OpenStreetMap</a>'
-})
-osm.addTo(map)
+var baseLayerLabels = {
+  'Hydda.Base': 'Hydda',
+  'OpenStreetMap': 'OpenStreetMap',
+  'OpenStreetMap.BlackAndWhite': 'OpenStreetMap (B/W)',
+  'OpenTopoMap': 'OpenTopoMap',
+  'MapQuestOpen.Aerial': 'MapQuestOpen Aerial'  
+}
+
+var baseLayers = {}
+for (let id in baseLayerLabels) {
+  let layer = L.tileLayer.provider(id)
+  baseLayers[baseLayerLabels[id]] = layer
+}
+baseLayers[baseLayerLabels['OpenStreetMap']].addTo(map)
 
 let baseMaps = [{
   groupName: 'Base Maps',
   expanded: true,
-  layers: {
-    'OpenStreetMap': osm
-  }
+  layers: baseLayers
 }]
 
 let layerControl = L.Control.styledLayerControl(baseMaps, [], {
@@ -54,15 +50,6 @@ map.addControl(layerControl)
 
 // Sidebar setup
 let sidebar = new Sidebar(map, {layerControl})
-
-jsonld.frame(DCAT_CATALOG_URL, DCAT_CATALOG_FRAME)
-.then(framed => jsonld.compact(framed, framed['@context']))
-.then(compacted => {
-  let datasets = compacted.datasets
-  console.log(datasets)
-  sidebar.addDatasets(datasets)
+sidebar.loadCatalog(MELODIES_DCAT_CATALOG_URL).then(() => {
   sidebar.open('datasets')
-}).catch(e => {
-  console.log(e)
-  alert('Error: ' + e)
 })

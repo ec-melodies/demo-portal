@@ -25,6 +25,7 @@ System.config({
     "leaflet": "github:Leaflet/Leaflet@0.7.7",
     "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.16",
+    "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.5",
     "leaflet-styledlayercontrol": "github:davicustodio/Leaflet.StyledLayerControl@master",
     "minified": "github:timjansen/minified.js@2015.1.1",
     "sidebar-v2": "github:Turbo87/sidebar-v2@master",
