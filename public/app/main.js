@@ -63,5 +63,6 @@ jsonld.frame(DCAT_CATALOG_URL, DCAT_CATALOG_FRAME)
   sidebar.addDatasets(datasets)
   sidebar.open('datasets')
 }).catch(e => {
+  console.log(e)
   alert('Error: ' + e)
 })

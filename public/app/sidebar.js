@@ -15,6 +15,13 @@ const MediaTypes = {
     CovJSON: 'application/prs.coverage+json',
     netCDF: 'application/x-netcdf'
 }
+/** Formats we can visualize on a map */
+const MappableFormats = new Set(['WMS', 'GeoJSON', MediaTypes.CovJSON])
+
+/** Formats we can do data processing on */
+const DataFormats = new Set(['GeoJSON', MediaTypes.CovJSON])
+
+/** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
 function getFormatLabel (formatOrMediaType) {
   for (let key in MediaTypes) {
     if (MediaTypes[key] === formatOrMediaType) {
@@ -34,6 +41,9 @@ let templatesHtml = `
     <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>
     <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>
     <div class="dataset-spatial-minimap"></div>
+    <button type="button" class="btn btn-success dataset-analyse-button" style="display:none">
+      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse
+    </button>
   </li>
 </template
 `
@@ -45,6 +55,7 @@ let sidebarHtml = id => `
   <div class="sidebar-tabs">
       <ul role="tablist">
           <li><a href="#datasets" role="tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>
+          <li><a href="#analyse" role="tab"><i class="glyphicon glyphicon-flash"></i></a></li>
       </ul>
   </div>
   
@@ -54,6 +65,11 @@ let sidebarHtml = id => `
           <h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
   
           <ul class="list-group dataset-list"></ul>
+      </div>
+      <div class="sidebar-pane" id="analyse">
+          <h1 class="sidebar-header">Analyse<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
+    
+          
       </div>
   </div>
 </div>
@@ -152,7 +168,6 @@ export default class Sidebar {
       }
     }
     
-    let supportedFormats = new Set(['WMS', 'GeoJSON', MediaTypes.CovJSON])
     if (dataset.distributions) {
       let types = new Set(dataset.distributions.map(dist => dist.format ? dist.format : dist.mediaType))
       types = [...types]
@@ -160,10 +175,11 @@ export default class Sidebar {
       
       for (let type of types) {
         if (!type) continue
-        let color = supportedFormats.has(type) ? 'success' : 'default'
+        let color = MappableFormats.has(type) ? 'success' : 'default'
+        let glyph = DataFormats.has(type) ? ' <span class="glyphicon glyphicon-flash"></span>' : ''
         let html
-        if (supportedFormats.has(type)) {
-          html = HTML(`<a href="#"><span class="label label-success">${getFormatLabel(type)}</span></a> `)
+        if (MappableFormats.has(type)) {
+          html = HTML(`<a href="#"><span class="label label-success">${getFormatLabel(type)}${glyph}</span></a> `)
           
           // hacky, see https://github.com/timjansen/minified.js/issues/68
           $(html[0]).on('click', () => {
@@ -181,6 +197,10 @@ export default class Sidebar {
           html = HTML(`<span class="label label-${color}">${getFormatLabel(type)}</span> `)
         }
         $('.dataset-distribution-labels', el).add(html)
+      }
+      
+      if (types.some(t => DataFormats.has(t))) {
+        $('.dataset-analyse-button', el).show()
       }
     }
     
