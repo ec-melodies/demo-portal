@@ -39,5 +39,5 @@ export function getLayers (xml) {
 }
 
 export function getLegendUrl (wmsEndpoint, layer) {
-  return wmsEndpoint + '?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&layer=' + layer
+  return wmsEndpoint + '?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&transparent=true&layer=' + layer
 }

@@ -7,6 +7,7 @@ const DEFAULT_TEMPLATE = `
   <div class="info legend image-legend">
     <div class="legend-title">
       <strong class="legend-title-text"></strong>
+      <a href="#"><span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span></a>
     </div>
     <img alt="Legend" />
   </div>
@@ -51,13 +52,23 @@ export default class ImageLegend extends L.Control {
     }
     
     let el = document.importNode($('#' + this.id)[0].content, true).children[0]
-    this._el = el
     $('img', el).set('@src', this.url)
     if (this.title) {
       $('.legend-title-text', el).fill(this.title)  
     } else {
       $('.legend-title', el).hide() 
-    }    
+    }
+    
+    $('a', el).on('click', () => {
+      let img = $('img', el)
+      if (img.get('$$show')) {
+        img.hide()
+        $('.glyphicon', el).set('+glyphicon-menu-down -glyphicon-menu-up')
+      } else {
+        img.show()
+        $('.glyphicon', el).set('-glyphicon-menu-down +glyphicon-menu-up')
+      }
+    })
     
     return el
   }
