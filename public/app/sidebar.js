@@ -204,14 +204,14 @@ export default class Sidebar {
     }
     
     let isGlobal
-    let geom = dataset.spatial ? JSON.parse(dataset.spatial.geometry) : null
+    let geom = dataset.spatial && dataset.spatial.geometry ? JSON.parse(dataset.spatial.geometry) : null
     // check if global bounding box and don't display map in that case
     if (geom) {
       let geomLayer = L.geoJson(geom)
       isGlobal = geomLayer.getBounds().equals([[-90, -180], [90, 180]])
     }
     
-    if (dataset.spatial && !isGlobal) {
+    if (geom && !isGlobal) {
       $('.dataset-spatial-geometry', el).hide()
       
       let map = L.map($('.dataset-spatial-minimap', el)[0], {

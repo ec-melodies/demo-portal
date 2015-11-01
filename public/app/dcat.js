@@ -10,7 +10,18 @@ const DCAT_CATALOG_FRAME = {
         }
       }
     ],
-    "@type": "Catalog"
+    "@type": "Catalog",
+	  "datasets": {
+	    "@type": "Dataset",
+	    "isPartOf": {
+	      "@embed": "@never",
+	      "@omitDefault": true
+	    },
+	    "parts": {
+	      "@embed": "@never",
+	      "@omitDefault": true
+	    }
+	  }
   }
 
 export function loadCatalog (url) {
