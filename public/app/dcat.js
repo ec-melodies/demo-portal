@@ -45,12 +45,9 @@ export function loadCatalog (url) {
   return jsonld.frame(url, DCAT_CATALOG_FRAME)
     .then(framed => jsonld.compact(framed, framed['@context']))
     .then(compacted => {
-      // We restore the structure that we really want:
-      // title/description is either an untranslated string or a language map.
-      // This is not possible with JSON-LD framing since in general there may
-      // be multiple untranslated strings or a mix of untranslated and translated.
-      // But since this doesn't happen in our case, we can apply this further domain-specific
-      // transformation for better ease-of-use.
+      // We create our own preferred structure:
+      // title/description is always a language map where an untagged string is stored under the "unknown"
+      // language key. This is not possible with JSON-LD framing alone.
       for (let dataset of compacted.datasets) {
         for (let key of ['title', 'description']) {
           transform_i18n(dataset, key)
