@@ -168,20 +168,37 @@ export default class Sidebar {
     }
   }
   
+  _i18n (prop) {
+    if (typeof prop === 'string') {
+      return prop
+    } else {
+      // TODO be clever and select proper language
+      if (prop.has('en')) {
+        return prop.get('en')
+      } else {
+        // random
+        return prop.values().next().value
+      }
+    } 
+  }
+  
   addDataset (dataset) {
     let el = fromTemplate('template-dataset-list-item')
     $('.dataset-list', '#' + this.id).add(el)
 
+    let title = this._i18n(dataset.title)
+    let description = this._i18n(dataset.description)
+    
     // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
     //let landingPage = dataset.landingPage
     let landingPage = dataset['dcat:landingPage']
     if (landingPage) {
-      $('.dataset-title', el).fill(HTML(`<a href="${landingPage}" target="_new" class="external dataset-title">${dataset.title}</a>`))
+      $('.dataset-title', el).fill(HTML(`<a href="${landingPage}" target="_new" class="external dataset-title">${title}</a>`))
     } else {
-      $('.dataset-title', el).fill(dataset.title)
+      $('.dataset-title', el).fill(title)
     }
     
-    $('.dataset-description', el).fill(dataset.description)
+    $('.dataset-description', el).fill(description)
     
     if (dataset.publisher) {
       // TODO switch to .homepage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed

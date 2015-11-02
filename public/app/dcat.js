@@ -14,6 +14,7 @@ const DCAT_CATALOG_FRAME = {
       // If a language map is given, then the simple string property probably doesn't exist.
       // If *all* DCAT feeds had language tags then we would only need the latter,
       // but for wider support, we do a little more effort.
+      // Note that these dual fields get collapsed in a post-processing step, see loadCatalog(). 
       {
         "geometry": { 
           "@id": "locn:geometry", 
@@ -42,7 +43,33 @@ const DCAT_CATALOG_FRAME = {
 
 export function loadCatalog (url) {
   return jsonld.frame(url, DCAT_CATALOG_FRAME)
-    .then(framed => {
-      return jsonld.compact(framed, framed['@context'])
+    .then(framed => jsonld.compact(framed, framed['@context']))
+    .then(compacted => {
+      // We restore the structure that we really want:
+      // title/description is either an untranslated string or a language map.
+      // This is not possible with JSON-LD framing since in general there may
+      // be multiple untranslated strings or a mix of untranslated and translated.
+      // But since this doesn't happen in our case, we can apply this further domain-specific
+      // transformation for better ease-of-use.
+      for (let dataset of compacted.datasets) {
+        for (let key of ['title', 'description']) {
+          transform_i18n(dataset, key)
+        }
+      }
+      // since this is not a valid JSON-LD doc anymore, we might as well remove the context now
+      delete compacted['@context']
+      return compacted
     })
+}
+
+const i18n = '_i18n'
+function transform_i18n (obj, key) {
+  if (obj[key + i18n]) {
+    let map = new Map()
+    for (let lang in obj[key + i18n]) {
+      map.set(lang, obj[key + i18n][lang])
+    }
+    obj[key] = map
+    delete obj[key + i18n]
+  }
 }
