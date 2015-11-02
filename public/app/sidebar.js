@@ -169,17 +169,13 @@ export default class Sidebar {
   }
   
   _i18n (prop) {
-    if (typeof prop === 'string') {
-      return prop
+    // TODO be clever and select proper language
+    if (prop.has('en')) {
+      return prop.get('en')
     } else {
-      // TODO be clever and select proper language
-      if (prop.has('en')) {
-        return prop.get('en')
-      } else {
-        // random
-        return prop.values().next().value
-      }
-    } 
+      // random
+      return prop.values().next().value
+    }
   }
   
   addDataset (dataset) {

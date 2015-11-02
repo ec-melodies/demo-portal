@@ -62,8 +62,20 @@ export function loadCatalog (url) {
     })
 }
 
+const UNKNOWN_LANG = 'unknown'
 const i18n = '_i18n'
+
+/**
+ * Transforms %key% and %key%_i18n into a single %key% language map
+ * where strings with unknown language get the language tag "unknown". 
+ */
 function transform_i18n (obj, key) {
+  if (obj[key]) {
+    if (!obj[key + i18n]) {
+      obj[key + i18n] = {}
+    }
+    obj[key + i18n][UNKNOWN_LANG] = obj[key]
+  }
   if (obj[key + i18n]) {
     let map = new Map()
     for (let lang in obj[key + i18n]) {
