@@ -53,6 +53,11 @@ export function loadCatalog (url) {
         for (let key of ['title', 'description']) {
           transform_i18n(dataset, key)
         }
+        for (let dist of dataset.distributions) {
+          for (let key of ['title', 'description']) {
+            transform_i18n(dist, key)
+          }
+        }
       }
       // since this is not a valid JSON-LD doc anymore, we might as well remove the context now
       delete compacted['@context']

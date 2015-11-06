@@ -14,13 +14,15 @@ import ImageLegend from './ImageLegend.js'
 
 const MediaTypes = {
     CovJSON: 'application/prs.coverage+json',
-    netCDF: 'application/x-netcdf'
+    CovCBOR: 'application/prs.coverage+cbor',
+    netCDF: 'application/x-netcdf',
+    GeoJSON: 'application/vnd.geo+json'
 }
 /** Formats we can visualize on a map */
-const MappableFormats = new Set(['WMS', 'GeoJSON', MediaTypes.CovJSON])
+const MappableFormats = new Set(['WMS', 'GeoJSON', MediaTypes.GeoJSON, MediaTypes.CovJSON, MediaTypes.CovCBOR])
 
 /** Formats we can do data processing on */
-const DataFormats = new Set(['GeoJSON', MediaTypes.CovJSON])
+const DataFormats = new Set(['GeoJSON', MediaTypes.GeoJSON, MediaTypes.CovJSON, MediaTypes.CovCBOR])
 
 /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
 function getFormatLabel (formatOrMediaType) {
@@ -189,7 +191,7 @@ export default class Sidebar {
     
     // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
     //let landingPage = dataset.landingPage
-    let landingPage = dataset['dcat:landingPage']
+    let landingPage = dataset['dcat:landingPage'] || dataset['landingPage']
     if (landingPage) {
       $('.dataset-title', el).fill(HTML(`<a href="${landingPage}" target="_new" class="external dataset-title">${title}</a>`))
     } else {
@@ -274,7 +276,7 @@ export default class Sidebar {
           $(html[0]).on('click', () => {
             if (type === 'WMS') {
               this._displayWMS(dataset)
-            } else if (type === 'GeoJSON') {
+            } else if (type === 'GeoJSON' || type === MediaTypes.GeoJSON) {
               this._displayGeoJSON(dataset)
             } else if (type === MediaTypes.CovJSON) {
               this._displayCovJSON(dataset)
@@ -299,7 +301,7 @@ export default class Sidebar {
   _displayWMS (dataset) {
     for (let dist of dataset.distributions.filter(dist => dist.format === 'WMS')) {
       // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:accessURL']
+      let url = dist['dcat:accessURL'] || dist['accessURL']
       this.map.fire('dataloading')
       wms.readLayers(url).then(wmsLayers => {
         for (let wmsLayer of wmsLayers) {
@@ -314,7 +316,8 @@ export default class Sidebar {
             let legendUrl = wms.getLegendUrl(url, wmsLayer.name)
             new ImageLegend(legendUrl, {layer: e.layer, title: wmsLayer.title}).addTo(this.map)
           })
-          this.layerControl.addOverlay(layer, 'WMS: ' + wmsLayer.title, {groupName: dataset.title, expanded: true})
+          let datasetTitle = this._i18n(dataset.title)
+          this.layerControl.addOverlay(layer, 'WMS: ' + wmsLayer.title, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
       })
@@ -323,11 +326,13 @@ export default class Sidebar {
   
   _displayGeoJSON (dataset) {
     let bounds = []
-    for (let dist of dataset.distributions.filter(dist => dist.format === 'GeoJSON')) {
+    for (let dist of dataset.distributions.filter(dist => dist.format === 'GeoJSON' || dist.mediaType === MediaTypes.GeoJSON)) {
       // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:accessURL'] || dist['dcat:downloadURL']
+      let url = dist['dcat:accessURL'] || dist['dcat:downloadURL'] || dist['downloadURL'] || dist['accessURL']
       this.map.fire('dataloading')
-      $.request('get', url).then(json => {
+      $.request('get', url, null, {headers: {
+        Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5'}})
+      .then(json => {
         let layer = L.geoJson(JSON.parse(json), {
           onEachFeature: (feature, layer) => {
             layer.bindPopup(
@@ -337,7 +342,9 @@ export default class Sidebar {
         })
         bounds.push(layer.getBounds())
         layer.addTo(this.map)
-        this.layerControl.addOverlay(layer, 'GeoJSON: ' + dist.title, {groupName: dataset.title, expanded: true})
+        let distTitle = this._i18n(dist.title)
+        let datasetTitle = this._i18n(dataset.title)
+        this.layerControl.addOverlay(layer, 'GeoJSON: ' + distTitle, {groupName: datasetTitle, expanded: true})
         this.map.fitBounds(bounds)
         this.map.fire('dataload')
       })
@@ -347,7 +354,7 @@ export default class Sidebar {
   _displayCovJSON (dataset) {
     for (let dist of dataset.distributions.filter(dist => dist.mediaType === MediaTypes.CovJSON)) {
       // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['accessURL'] || dist['downloadURL']
+      let url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['downloadURL'] || dist['accessURL']
       this.map.fire('dataloading')
       // FIXME handle collections
       CovJSON.read(url).then(cov => {
@@ -364,8 +371,9 @@ export default class Sidebar {
               }).addTo(this.map)
             }
           })
-          let layername = cov.parameters.get(key).observedProperty.label.get('en')
-          this.layerControl.addOverlay(layer, 'CovJSON: ' + layername, {groupName: dataset.title, expanded: true})
+          let layerName = this._i18n(cov.parameters.get(key).observedProperty.label)
+          let datasetTitle = this._i18n(dataset.title)
+          this.layerControl.addOverlay(layer, 'CovJSON: ' + layerName, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
       })
