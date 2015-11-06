@@ -170,6 +170,7 @@ export default class Sidebar {
   }
   
   _i18n (prop) {
+    if (!prop) return
     // TODO be clever and select proper language
     if (prop.has('en')) {
       return prop.get('en')
@@ -346,8 +347,9 @@ export default class Sidebar {
   _displayCovJSON (dataset) {
     for (let dist of dataset.distributions.filter(dist => dist.mediaType === MediaTypes.CovJSON)) {
       // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:downloadURL']
+      let url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['accessURL'] || dist['downloadURL']
       this.map.fire('dataloading')
+      // FIXME handle collections
       CovJSON.read(url).then(cov => {
         // each parameter becomes a layer
         for (let key of cov.parameters.keys()) {
