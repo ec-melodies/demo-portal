@@ -132,6 +132,7 @@ export default class Sidebar {
         $('.catalog-url-info', el).show()
         $('.catalog-url-form', el).hide()
       }).catch(e => {
+        console.log(e)
         alert(e)
       })
     })
