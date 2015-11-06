@@ -12,22 +12,26 @@ import * as dcat from './dcat.js'
 import * as wms from './wms.js'
 import ImageLegend from './ImageLegend.js'
 
+// maps short format identifiers to media types
 const MediaTypes = {
-    CovJSON: 'application/prs.coverage+json',
-    CovCBOR: 'application/prs.coverage+cbor',
-    netCDF: 'application/x-netcdf',
-    GeoJSON: 'application/vnd.geo+json'
+    CovJSON: ['application/prs.coverage+json', 'application/prs.coverage+cbor'],
+    netCDF: ['application/x-netcdf'],
+    GeoJSON: ['application/vnd.geo+json']
 }
 /** Formats we can visualize on a map */
-const MappableFormats = new Set(['WMS', 'GeoJSON', MediaTypes.GeoJSON, MediaTypes.CovJSON, MediaTypes.CovCBOR])
+const MappableFormats = new Set(['WMS', 'GeoJSON', 'CovJSON'])
 
 /** Formats we can do data processing on */
-const DataFormats = new Set(['GeoJSON', MediaTypes.GeoJSON, MediaTypes.CovJSON, MediaTypes.CovCBOR])
+const DataFormats = new Set(['GeoJSON', 'CovJSON'])
 
 /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
-function getFormatLabel (formatOrMediaType) {
+function getDistFormat (dist) {
+  let formatOrMediaType = dist.format ? dist.format : dist.mediaType
+  if (!formatOrMediaType) {
+    return 'generic'
+  }
   for (let key in MediaTypes) {
-    if (MediaTypes[key] === formatOrMediaType) {
+    if (MediaTypes[key].indexOf(formatOrMediaType) !== -1) {
       return key
     }
   }
@@ -260,37 +264,37 @@ export default class Sidebar {
     }
     
     if (dataset.distributions) {
-      let types = new Set(dataset.distributions.map(dist => dist.format ? dist.format : dist.mediaType))
-      types = [...types]
-      types.sort((a, b) => getFormatLabel(a).toLowerCase().localeCompare(getFormatLabel(b).toLowerCase()))
+      let formats = new Set(dataset.distributions.map(getDistFormat))
+      formats = [...formats]
+      formats.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       
-      for (let type of types) {
-        if (!type) continue
-        let color = MappableFormats.has(type) ? 'success' : 'default'
-        let glyph = DataFormats.has(type) ? '<span class="glyphicon glyphicon-flash"></span> ' : ''
+      for (let format of formats) {
+        if (!format) continue
+        let color = MappableFormats.has(format) ? 'success' : 'default'
+        let glyph = DataFormats.has(format) ? '<span class="glyphicon glyphicon-flash"></span> ' : ''
         let html
-        if (MappableFormats.has(type)) {
-          html = HTML(`<a href="#"><span class="label label-success">${glyph}${getFormatLabel(type)}</span></a> `)
+        if (MappableFormats.has(format)) {
+          html = HTML(`<a href="#"><span class="label label-success">${glyph}${format}</span></a> `)
           
           // hacky, see https://github.com/timjansen/minified.js/issues/68
           $(html[0]).on('click', () => {
-            if (type === 'WMS') {
+            if (format === 'WMS') {
               this._displayWMS(dataset)
-            } else if (type === 'GeoJSON' || type === MediaTypes.GeoJSON) {
+            } else if (format === 'GeoJSON') {
               this._displayGeoJSON(dataset)
-            } else if (type === MediaTypes.CovJSON) {
+            } else if (format === 'CovJSON') {
               this._displayCovJSON(dataset)
             } else {
               throw new Error('should not happen')
             }
           })
         } else {
-          html = HTML(`<span class="label label-${color}">${getFormatLabel(type)}</span> `)
+          html = HTML(`<span class="label label-${color}">${format}</span> `)
         }
         $('.dataset-distribution-labels', el).add(html)
       }
       
-      if (types.some(t => DataFormats.has(t))) {
+      if (formats.some(t => DataFormats.has(t))) {
         $('.dataset-analyse-button', el).show()
       }
     }
@@ -299,7 +303,7 @@ export default class Sidebar {
   
   // TODO the display code should not be directly in the sidebar module
   _displayWMS (dataset) {
-    for (let dist of dataset.distributions.filter(dist => dist.format === 'WMS')) {
+    for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'WMS')) {
       // TODO remove dcat: once ckanext-dcat is fixed
       let url = dist['dcat:accessURL'] || dist['accessURL']
       this.map.fire('dataloading')
@@ -317,7 +321,7 @@ export default class Sidebar {
             new ImageLegend(legendUrl, {layer: e.layer, title: wmsLayer.title}).addTo(this.map)
           })
           let datasetTitle = this._i18n(dataset.title)
-          this.layerControl.addOverlay(layer, 'WMS: ' + wmsLayer.title, {groupName: datasetTitle, expanded: true})
+          this.layerControl.addOverlay(layer, '<span class="label label-success">WMS</span> ' + wmsLayer.title, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
       })
@@ -326,7 +330,7 @@ export default class Sidebar {
   
   _displayGeoJSON (dataset) {
     let bounds = []
-    for (let dist of dataset.distributions.filter(dist => dist.format === 'GeoJSON' || dist.mediaType === MediaTypes.GeoJSON)) {
+    for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'GeoJSON')) {
       // TODO remove dcat: once ckanext-dcat is fixed
       let url = dist['dcat:accessURL'] || dist['dcat:downloadURL'] || dist['downloadURL'] || dist['accessURL']
       this.map.fire('dataloading')
@@ -344,7 +348,7 @@ export default class Sidebar {
         layer.addTo(this.map)
         let distTitle = this._i18n(dist.title)
         let datasetTitle = this._i18n(dataset.title)
-        this.layerControl.addOverlay(layer, 'GeoJSON: ' + distTitle, {groupName: datasetTitle, expanded: true})
+        this.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, {groupName: datasetTitle, expanded: true})
         this.map.fitBounds(bounds)
         this.map.fire('dataload')
       })
@@ -352,7 +356,7 @@ export default class Sidebar {
   }
   
   _displayCovJSON (dataset) {
-    for (let dist of dataset.distributions.filter(dist => dist.mediaType === MediaTypes.CovJSON)) {
+    for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'CovJSON')) {
       // TODO remove dcat: once ckanext-dcat is fixed
       let url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['downloadURL'] || dist['accessURL']
       this.map.fire('dataloading')
@@ -373,7 +377,7 @@ export default class Sidebar {
           })
           let layerName = this._i18n(cov.parameters.get(key).observedProperty.label)
           let datasetTitle = this._i18n(dataset.title)
-          this.layerControl.addOverlay(layer, 'CovJSON: ' + layerName, {groupName: datasetTitle, expanded: true})
+          this.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span>: ' + layerName, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
       })

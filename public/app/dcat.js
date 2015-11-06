@@ -38,7 +38,8 @@ const DCAT_CATALOG_FRAME = {
 	    "parts": {
 	      "@embed": "@never",
 	      "@omitDefault": true
-	    }
+	    },
+	    "distributions": {}
 	  }
   }
 
