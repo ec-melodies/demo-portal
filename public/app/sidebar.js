@@ -338,6 +338,7 @@ export default class Sidebar {
         Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5'}})
       .then(json => {
         let layer = L.geoJson(JSON.parse(json), {
+          pointToLayer: (feature, latlng) => L.circleMarker(latlng),
           onEachFeature: (feature, layer) => {
             layer.bindPopup(
                 '<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>',
