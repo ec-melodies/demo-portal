@@ -356,6 +356,7 @@ export default class Sidebar {
   }
   
   _displayCovJSON (dataset) {
+    // TODO check if both CovJSON and CovCBOR exist and prefer CovCBOR in that case (ignore the other)
     for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'CovJSON')) {
       // TODO remove dcat: once ckanext-dcat is fixed
       let url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['downloadURL'] || dist['accessURL']
