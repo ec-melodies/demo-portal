@@ -6131,18 +6131,15 @@ define("e", ["d"], function(main) {
 _removeDefine();
 })();
 $__System.register("f", ["10", "11", "e"], function (_export) {
-  var _getIterator, _Map, jsonld, DCAT_CATALOG_FRAME, i18n;
+  var _getIterator, _Map, jsonld, DCAT_CATALOG_FRAME, UNKNOWN_LANG, i18n;
 
   function loadCatalog(url) {
     return jsonld.frame(url, DCAT_CATALOG_FRAME).then(function (framed) {
       return jsonld.compact(framed, framed['@context']);
     }).then(function (compacted) {
-      // We restore the structure that we really want:
-      // title/description is either an untranslated string or a language map.
-      // This is not possible with JSON-LD framing since in general there may
-      // be multiple untranslated strings or a mix of untranslated and translated.
-      // But since this doesn't happen in our case, we can apply this further domain-specific
-      // transformation for better ease-of-use.
+      // We create our own preferred structure:
+      // title/description is always a language map where an untagged string is stored under the "unknown"
+      // language key. This is not possible with JSON-LD framing alone.
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -6155,6 +6152,34 @@ $__System.register("f", ["10", "11", "e"], function (_export) {
           for (var _i = 0; _i < _arr.length; _i++) {
             var key = _arr[_i];
             transform_i18n(dataset, key);
+          }
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = _getIterator(dataset.distributions), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var dist = _step2.value;
+              var _arr2 = ['title', 'description'];
+
+              for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+                var key = _arr2[_i2];
+                transform_i18n(dist, key);
+              }
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
+                _iterator2["return"]();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
           }
         }
         // since this is not a valid JSON-LD doc anymore, we might as well remove the context now
@@ -6178,7 +6203,17 @@ $__System.register("f", ["10", "11", "e"], function (_export) {
     });
   }
 
+  /**
+   * Transforms %key% and %key%_i18n into a single %key% language map
+   * where strings with unknown language get the language tag "unknown". 
+   */
   function transform_i18n(obj, key) {
+    if (obj[key]) {
+      if (!obj[key + i18n]) {
+        obj[key + i18n] = {};
+      }
+      obj[key + i18n][UNKNOWN_LANG] = obj[key];
+    }
     if (obj[key + i18n]) {
       var map = new _Map();
       for (var lang in obj[key + i18n]) {
@@ -6224,7 +6259,8 @@ $__System.register("f", ["10", "11", "e"], function (_export) {
           "title": { "@id": "dct:title" },
           "description": { "@id": "dct:description" },
           "title_i18n": { "@id": "dct:title", "@container": "@language" },
-          "description_i18n": { "@id": "dct:description", "@container": "@language" }
+          "description_i18n": { "@id": "dct:description", "@container": "@language" },
+          "@base": null
         }],
         "@type": "Catalog",
         "datasets": {
@@ -6236,9 +6272,11 @@ $__System.register("f", ["10", "11", "e"], function (_export) {
           "parts": {
             "@embed": "@never",
             "@omitDefault": true
-          }
+          },
+          "distributions": {}
         }
       };
+      UNKNOWN_LANG = 'unknown';
       i18n = '_i18n';
     }
   };
@@ -16209,9 +16247,13 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
   var ImageLegend, L, $, HTML, _createClass, _getIterator, CoverageLegend, _toConsumableArray, CovJSON, _Set, _classCallCheck, LayerFactory, dcat, wms, MediaTypes, MappableFormats, DataFormats, templatesHtml, sidebarHtml, Sidebar;
 
   /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
-  function getFormatLabel(formatOrMediaType) {
+  function getDistFormat(dist) {
+    var formatOrMediaType = dist.format ? dist.format : dist.mediaType;
+    if (!formatOrMediaType) {
+      return 'generic';
+    }
     for (var key in MediaTypes) {
-      if (MediaTypes[key] === formatOrMediaType) {
+      if (MediaTypes[key].indexOf(formatOrMediaType) !== -1) {
         return key;
       }
     }
@@ -16259,18 +16301,21 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
       wms = _b;
     }],
     execute: function () {
+
+      // maps short format identifiers to media types
       'use strict';
 
       MediaTypes = {
-        CovJSON: 'application/prs.coverage+json',
-        netCDF: 'application/x-netcdf'
+        CovJSON: ['application/prs.coverage+json', 'application/prs.coverage+cbor'],
+        netCDF: ['application/x-netcdf'],
+        GeoJSON: ['application/vnd.geo+json']
       };
 
       /** Formats we can visualize on a map */
-      MappableFormats = new _Set(['WMS', 'GeoJSON', MediaTypes.CovJSON]);
+      MappableFormats = new _Set(['WMS', 'GeoJSON', 'CovJSON']);
 
       /** Formats we can do data processing on */
-      DataFormats = new _Set(['GeoJSON', MediaTypes.CovJSON]);
+      DataFormats = new _Set(['GeoJSON', 'CovJSON']);
       templatesHtml = '\n<template id="template-dataset-list-item">\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading dataset-title"></h4>\n    <p class="dataset-publisher"></p>\n    <p class="dataset-distribution-labels"></p>\n    <p class="dataset-description"></p>\n    <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>\n    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>\n    <div class="dataset-spatial-minimap"></div>\n    <button type="button" class="btn btn-success dataset-analyse-button" style="display:none">\n      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse\n    </button>\n  </li>\n</template>\n\n<style>\n.catalog-url-panel {\n  margin-top: 20px;\n}\n.dataset-spatial-minimap {\n  margin-bottom: 10px;\n}\n</style>\n';
 
       $('body').add(HTML(templatesHtml));
@@ -16313,6 +16358,7 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
               $('.catalog-url-info', el).show();
               $('.catalog-url-form', el).hide();
             })['catch'](function (e) {
+              console.log(e);
               alert(e);
             });
           });
@@ -16380,16 +16426,13 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
         }, {
           key: '_i18n',
           value: function _i18n(prop) {
-            if (typeof prop === 'string') {
-              return prop;
+            if (!prop) return;
+            // TODO be clever and select proper language
+            if (prop.has('en')) {
+              return prop.get('en');
             } else {
-              // TODO be clever and select proper language
-              if (prop.has('en')) {
-                return prop.get('en');
-              } else {
-                // random
-                return prop.values().next().value;
-              }
+              // random
+              return prop.values().next().value;
             }
           }
         }, {
@@ -16405,7 +16448,7 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
 
             // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
             //let landingPage = dataset.landingPage
-            var landingPage = dataset['dcat:landingPage'];
+            var landingPage = dataset['dcat:landingPage'] || dataset['landingPage'];
             if (landingPage) {
               $('.dataset-title', el).fill(HTML('<a href="' + landingPage + '" target="_new" class="external dataset-title">' + title + '</a>'));
             } else {
@@ -16477,12 +16520,10 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
             }
 
             if (dataset.distributions) {
-              var types = new _Set(dataset.distributions.map(function (dist) {
-                return dist.format ? dist.format : dist.mediaType;
-              }));
-              types = [].concat(_toConsumableArray(types));
-              types.sort(function (a, b) {
-                return getFormatLabel(a).toLowerCase().localeCompare(getFormatLabel(b).toLowerCase());
+              var formats = new _Set(dataset.distributions.map(getDistFormat));
+              formats = [].concat(_toConsumableArray(formats));
+              formats.sort(function (a, b) {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
               });
 
               var _iteratorNormalCompletion2 = true;
@@ -16491,34 +16532,34 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
 
               try {
                 var _loop = function () {
-                  var type = _step2.value;
+                  var format = _step2.value;
 
-                  if (!type) return 'continue';
-                  var color = MappableFormats.has(type) ? 'success' : 'default';
-                  var glyph = DataFormats.has(type) ? '<span class="glyphicon glyphicon-flash"></span> ' : '';
+                  if (!format) return 'continue';
+                  var color = MappableFormats.has(format) ? 'success' : 'default';
+                  var glyph = DataFormats.has(format) ? '<span class="glyphicon glyphicon-flash"></span> ' : '';
                   var html = undefined;
-                  if (MappableFormats.has(type)) {
-                    html = HTML('<a href="#"><span class="label label-success">' + glyph + getFormatLabel(type) + '</span></a> ');
+                  if (MappableFormats.has(format)) {
+                    html = HTML('<a href="#"><span class="label label-success">' + glyph + format + '</span></a> ');
 
                     // hacky, see https://github.com/timjansen/minified.js/issues/68
                     $(html[0]).on('click', function () {
-                      if (type === 'WMS') {
+                      if (format === 'WMS') {
                         _this3._displayWMS(dataset);
-                      } else if (type === 'GeoJSON') {
+                      } else if (format === 'GeoJSON') {
                         _this3._displayGeoJSON(dataset);
-                      } else if (type === MediaTypes.CovJSON) {
+                      } else if (format === 'CovJSON') {
                         _this3._displayCovJSON(dataset);
                       } else {
                         throw new Error('should not happen');
                       }
                     });
                   } else {
-                    html = HTML('<span class="label label-' + color + '">' + getFormatLabel(type) + '</span> ');
+                    html = HTML('<span class="label label-' + color + '">' + format + '</span> ');
                   }
                   $('.dataset-distribution-labels', el).add(html);
                 };
 
-                for (var _iterator2 = _getIterator(types), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                for (var _iterator2 = _getIterator(formats), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                   var _ret2 = _loop();
 
                   if (_ret2 === 'continue') continue;
@@ -16538,7 +16579,7 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
                 }
               }
 
-              if (types.some(function (t) {
+              if (formats.some(function (t) {
                 return DataFormats.has(t);
               })) {
                 $('.dataset-analyse-button', el).show();
@@ -16561,7 +16602,7 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
                 var dist = _step3.value;
 
                 // TODO remove dcat: once ckanext-dcat is fixed
-                var url = dist['dcat:accessURL'];
+                var url = dist['dcat:accessURL'] || dist['accessURL'];
                 _this4.map.fire('dataloading');
                 wms.readLayers(url).then(function (wmsLayers) {
                   var _iteratorNormalCompletion4 = true;
@@ -16583,7 +16624,8 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
                         var legendUrl = wms.getLegendUrl(url, wmsLayer.name);
                         new ImageLegend(legendUrl, { layer: e.layer, title: wmsLayer.title }).addTo(_this4.map);
                       });
-                      _this4.layerControl.addOverlay(layer, 'WMS: ' + wmsLayer.title, { groupName: dataset.title, expanded: true });
+                      var datasetTitle = _this4._i18n(dataset.title);
+                      _this4.layerControl.addOverlay(layer, '<span class="label label-success">WMS</span> ' + wmsLayer.title, { groupName: datasetTitle, expanded: true });
                     };
 
                     for (var _iterator4 = _getIterator(wmsLayers), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
@@ -16609,7 +16651,7 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
               };
 
               for (var _iterator3 = _getIterator(dataset.distributions.filter(function (dist) {
-                return dist.format === 'WMS';
+                return getDistFormat(dist) === 'WMS';
               })), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                 _loop2();
               }
@@ -16643,24 +16685,30 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
                 var dist = _step5.value;
 
                 // TODO remove dcat: once ckanext-dcat is fixed
-                var url = dist['dcat:accessURL'] || dist['dcat:downloadURL'];
+                var url = dist['dcat:accessURL'] || dist['dcat:downloadURL'] || dist['downloadURL'] || dist['accessURL'];
                 _this5.map.fire('dataloading');
-                $.request('get', url).then(function (json) {
+                $.request('get', url, null, { headers: {
+                    Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5' } }).then(function (json) {
                   var layer = L.geoJson(JSON.parse(json), {
+                    pointToLayer: function pointToLayer(feature, latlng) {
+                      return L.circleMarker(latlng);
+                    },
                     onEachFeature: function onEachFeature(feature, layer) {
                       layer.bindPopup('<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>', { maxWidth: 400, maxHeight: 300 });
                     }
                   });
                   bounds.push(layer.getBounds());
                   layer.addTo(_this5.map);
-                  _this5.layerControl.addOverlay(layer, 'GeoJSON: ' + dist.title, { groupName: dataset.title, expanded: true });
+                  var distTitle = _this5._i18n(dist.title);
+                  var datasetTitle = _this5._i18n(dataset.title);
+                  _this5.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, { groupName: datasetTitle, expanded: true });
                   _this5.map.fitBounds(bounds);
                   _this5.map.fire('dataload');
                 });
               };
 
               for (var _iterator5 = _getIterator(dataset.distributions.filter(function (dist) {
-                return dist.format === 'GeoJSON';
+                return getDistFormat(dist) === 'GeoJSON';
               })), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                 _loop4();
               }
@@ -16684,19 +16732,21 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
           value: function _displayCovJSON(dataset) {
             var _this6 = this;
 
+            // TODO check if both CovJSON and CovCBOR exist and prefer CovCBOR in that case (ignore the other)
             var _iteratorNormalCompletion6 = true;
             var _didIteratorError6 = false;
             var _iteratorError6 = undefined;
 
             try {
               for (var _iterator6 = _getIterator(dataset.distributions.filter(function (dist) {
-                return dist.mediaType === MediaTypes.CovJSON;
+                return getDistFormat(dist) === 'CovJSON';
               })), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
                 var dist = _step6.value;
 
                 // TODO remove dcat: once ckanext-dcat is fixed
-                var url = dist['dcat:downloadURL'];
+                var url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['downloadURL'] || dist['accessURL'];
                 this.map.fire('dataloading');
+                // FIXME handle collections
                 CovJSON.read(url).then(function (cov) {
                   // each parameter becomes a layer
                   var _iteratorNormalCompletion7 = true;
@@ -16718,8 +16768,9 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
                           }).addTo(_this6.map);
                         }
                       });
-                      var layername = cov.parameters.get(key).observedProperty.label.get('en');
-                      _this6.layerControl.addOverlay(layer, 'CovJSON: ' + layername, { groupName: dataset.title, expanded: true });
+                      var layerName = _this6._i18n(cov.parameters.get(key).observedProperty.label);
+                      var datasetTitle = _this6._i18n(dataset.title);
+                      _this6.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span>: ' + layerName, { groupName: datasetTitle, expanded: true });
                     };
 
                     for (var _iterator7 = _getIterator(cov.parameters.keys()), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
@@ -24380,7 +24431,7 @@ $__System.register("a0", [], function() { return { setters: [], execute: functio
 $__System.register('1', ['2', '3', '5', 'a0', 'a8', 'a7', 'a5', 'a3', 'a2', '9f'], function (_export) {
   'use strict';
 
-  var L, Sidebar, MELODIES_DCAT_CATALOG_URL, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, sidebar;
+  var L, Sidebar, MELODIES_DCAT_CATALOG_URL, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, catalogUrl, sidebar;
   return {
     setters: [function (_3) {}, function (_2) {}, function (_) {
       L = _['default'];
@@ -24427,9 +24478,17 @@ $__System.register('1', ['2', '3', '5', 'a0', 'a8', 'a7', 'a5', 'a3', 'a2', '9f'
       map.addControl(layerControl);
 
       // Sidebar setup
+      catalogUrl = undefined;
+
+      if (window.location.hash) {
+        catalogUrl = window.location.hash.substr(1);
+      } else {
+        catalogUrl = MELODIES_DCAT_CATALOG_URL;
+      }
+
       sidebar = new Sidebar(map, { layerControl: layerControl });
 
-      sidebar.loadCatalog(MELODIES_DCAT_CATALOG_URL).then(function () {
+      sidebar.loadCatalog(catalogUrl).then(function () {
         sidebar.open('datasets');
       });
     }
