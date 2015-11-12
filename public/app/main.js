@@ -49,7 +49,14 @@ let layerControl = L.Control.styledLayerControl(baseMaps, [], {
 map.addControl(layerControl)
 
 // Sidebar setup
+let catalogUrl
+if (window.location.hash) {
+  catalogUrl = window.location.hash.substr(1)
+} else {
+  catalogUrl = MELODIES_DCAT_CATALOG_URL
+}
+
 let sidebar = new Sidebar(map, {layerControl})
-sidebar.loadCatalog(MELODIES_DCAT_CATALOG_URL).then(() => {
+sidebar.loadCatalog(catalogUrl).then(() => {
   sidebar.open('datasets')
 })
