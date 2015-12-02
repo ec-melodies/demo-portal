@@ -2,7 +2,53 @@ import {promises as jsonld} from 'jsonld'
 
 const DCAT_CATALOG_FRAME = {
     "@context": [
-      "https://rawgit.com/ec-melodies/wp02-dcat/master/context.jsonld",
+      // unmodified copy of https://github.com/ec-melodies/wp02-dcat/blob/master/context.jsonld
+      // Note: This has to be kept in sync when changes are made to the context!
+      // We embed the context here directly to save a network request.
+      {
+        "@language": "en",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "dcat": "http://www.w3.org/ns/dcat#",
+        "dct": "http://purl.org/dc/terms/",
+        "locn": "http://www.w3.org/ns/locn#",
+        "foaf": "http://xmlns.com/foaf/0.1/",
+        "schema": "http://schema.org/",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "Catalog": "dcat:Catalog",
+        "datasets": {"@id": "dcat:dataset", "@container": "@set"},
+        "Dataset": "dcat:Dataset",
+        "Location": "dct:Location",
+        "geometry": { "@id": "locn:geometry", "@type": "gsp:wktLiteral" },
+        "gsp": "http://www.opengis.net/ont/geosparql#",
+        "PeriodOfTime": "dct:PeriodOfTime",
+        "startDate": { "@id": "schema:startDate", "@type": "xsd:dateTime" },
+        "endDate": { "@id": "schema:endDate", "@type": "xsd:dateTime" },
+        "title": { "@id": "dct:title", "@container": "@language" },
+        "description": { "@id": "dct:description", "@container": "@language" },
+        "theme": {"@id": "dcat:theme", "@type": "@id" },
+        "issued": { "@id": "dct:issued", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
+        "modified": { "@id": "dct:modified", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
+        "landingPage": {"@id": "dcat:landingPage", "@type": "@id" },
+        "homepage": {"@id": "foaf:homepage", "@type": "@id" },
+        "spatial": "dct:spatial",
+        "temporal": "dct:temporal",
+        "keywords": {"@id": "dcat:keyword", "@container": "@set"},
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+        "observedProperties": { "@id": "ssn:observedProperty", "@type": "@id", "@container": "@set" },
+        "publisher": "dct:publisher",
+        "Organization": "foaf:Organization",
+        "Group": "foaf:Group",
+        "name": {"@id": "foaf:name", "@language": null},
+        "Distribution": "dcat:Distribution",
+        "distributions": {"@id": "dcat:distribution", "@container": "@set"},
+        "accessURL": { "@id": "dcat:accessURL", "@type": "@id" },
+        "downloadURL": { "@id": "dcat:downloadURL", "@type": "@id" },
+        "mediaType": {"@id": "dcat:mediaType", "@language": null},
+        "format": {"@id": "dct:format", "@language": null},
+        "isPartOf": { "@id": "dct:isPartOf", "@type": "@id"},
+        "parts": { "@id": "dct:hasPart", "@type": "@id", "@container": "@set" }
+      },
+      
       // geometry override since we want the GeoJSON geometry, not the WKT one
       // Also, @language and title/description override is because CKAN
       // isn't giving us language-tagged strings which means that we
