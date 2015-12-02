@@ -61,6 +61,17 @@ let templatesHtml = `
 .dataset-spatial-minimap {
   margin-bottom: 10px;
 }
+@keyframes flash-red {
+  0%   {color: red}
+  50%  {color: black}
+  100% {color: red}
+}
+.highlight-anim {
+  animation-name: flash-red;
+  animation-duration: 1s;
+  animation-iteration-count: 3;
+  animation-timing-function: ease-in-out;
+}
 </style>
 `
 $('body').add(HTML(templatesHtml))
@@ -70,8 +81,8 @@ let sidebarHtml = id => `
   <!-- Nav tabs -->
   <div class="sidebar-tabs">
       <ul role="tablist">
-          <li><a href="#datasets" role="tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>
-          <li><a href="#analyse" role="tab"><i class="glyphicon glyphicon-flash"></i></a></li>
+          <li><a href="#datasets" role="tab" class="sidebar-tab" data-name="datasets"><i class="glyphicon glyphicon-align-justify"></i></a></li>
+          <li><a href="#analyse" role="tab" class="sidebar-tab" data-name="analyse"><i class="glyphicon glyphicon-flash"></i></a></li>
       </ul>
   </div>
   
@@ -116,8 +127,10 @@ let sidebarHtml = id => `
 `
 
 export default class Sidebar {
-  constructor (map, {id='sidebar', layerControl=null}={}) {
+  constructor (map, {app, id='sidebar', layerControl=null}={}) {
     this.map = map
+    this.catalogue = app.catalogue
+    this.analysisCatalogue = app.analysisCatalogue
     this.id = id
     this.layerControl = layerControl
     // has to come before the map div, otherwise it overlays zoom controls
@@ -134,7 +147,7 @@ export default class Sidebar {
       input.set('value', this.url)
     })
     $('form', $('.catalog-url-form', el)).on('submit', () => {
-      this.loadCatalog(input.get('value')).then(() => {
+      this.catalogue.loadFromDCAT(input.get('value')).then(() => {
         $('.catalog-url-info', el).show()
         $('.catalog-url-form', el).hide()
       }).catch(e => {
@@ -146,32 +159,31 @@ export default class Sidebar {
       $('.catalog-url-info', el).show()
       $('.catalog-url-form', el).hide()
     })
+    
+    this._registerListeners()
   }
   
-  loadCatalog (url) {
-    return dcat.loadCatalog(url).then(catalog => {
-      this.clearDatasets()
-      let datasets = catalog.datasets
-      console.log(datasets)
-      this.addDatasets(datasets)
+  _registerListeners () {
+    this.catalogue.on('load').then(({url}) => {
+      $('.dataset-list', '#' + this.id).fill()
+      
+      this._addDatasets(this.catalogue.datasets)
       
       this.url = url
       $('.catalog-url', '#' + this.id)
         .set('@href', url)
         .fill(url)
-      
-      return catalog
+    })
+    
+    this.analysisCatalogue.on('add').then(({dataset}) => {
+      console.log('added ' + dataset.id + ' to analysis catalogue')
     })
   }
-  
-  clearDatasets () {
-    $('.dataset-list', '#' + this.id).fill()
-  }
-  
-  addDatasets (datasets, sortKey='title') {
+    
+  _addDatasets (datasets, sortKey='title') {
     datasets = sortByKey(datasets, sortKey)
     for (let dataset of datasets) {
-      this.addDataset(dataset)
+      this._addDataset(dataset)
     }
   }
   
@@ -186,7 +198,7 @@ export default class Sidebar {
     }
   }
   
-  addDataset (dataset) {
+  _addDataset (dataset) {
     let el = fromTemplate('template-dataset-list-item')
     $('.dataset-list', '#' + this.id).add(el)
 
@@ -296,6 +308,11 @@ export default class Sidebar {
       
       if (formats.some(t => DataFormats.has(t))) {
         $('.dataset-analyse-button', el).show()
+        $('.dataset-analyse-button', el).on('click', () => {
+          this.analysisCatalogue.addDataset(dataset)
+          
+          $('a.sidebar-tab', el).filter(t => t.get('%name') === 'analyse').set('+highlight-anim')
+        })
       }
     }
     

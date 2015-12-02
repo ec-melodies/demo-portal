@@ -25,11 +25,11 @@ const DCAT_CATALOG_FRAME = {
         "endDate": { "@id": "schema:endDate", "@type": "xsd:dateTime" },
         "title": { "@id": "dct:title", "@container": "@language" },
         "description": { "@id": "dct:description", "@container": "@language" },
-        "theme": {"@id": "dcat:theme", "@type": "@id" },
+        "theme": { "@id": "dcat:theme", "@type": "@id" },
         "issued": { "@id": "dct:issued", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
         "modified": { "@id": "dct:modified", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
-        "landingPage": {"@id": "dcat:landingPage", "@type": "@id" },
-        "homepage": {"@id": "foaf:homepage", "@type": "@id" },
+        "landingPage": { "@id": "dcat:landingPage", "@type": "@id" },
+        "homepage": { "@id": "foaf:homepage", "@type": "@id" },
         "spatial": "dct:spatial",
         "temporal": "dct:temporal",
         "keywords": {"@id": "dcat:keyword", "@container": "@set"},
@@ -45,7 +45,7 @@ const DCAT_CATALOG_FRAME = {
         "downloadURL": { "@id": "dcat:downloadURL", "@type": "@id" },
         "mediaType": {"@id": "dcat:mediaType", "@language": null},
         "format": {"@id": "dct:format", "@language": null},
-        "isPartOf": { "@id": "dct:isPartOf", "@type": "@id"},
+        "isPartOf": { "@id": "dct:isPartOf", "@type": "@id" },
         "parts": { "@id": "dct:hasPart", "@type": "@id", "@container": "@set" }
       },
       
@@ -75,18 +75,18 @@ const DCAT_CATALOG_FRAME = {
       }
     ],
     "@type": "Catalog",
-	  "datasets": {
-	    "@type": "Dataset",
-	    "isPartOf": {
-	      "@embed": "@never",
-	      "@omitDefault": true
-	    },
-	    "parts": {
-	      "@embed": "@never",
-	      "@omitDefault": true
-	    },
-	    "distributions": {}
-	  }
+    "datasets": {
+      "@type": "Dataset",
+      "isPartOf": {
+        "@embed": "@never",
+        "@omitDefault": true
+      },
+      "parts": {
+        "@embed": "@never",
+        "@omitDefault": true
+      },
+      "distributions": {}
+    }
   }
 
 export function loadCatalog (url) {

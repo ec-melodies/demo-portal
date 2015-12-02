@@ -6,6 +6,7 @@ import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 import 'leaflet-styledlayercontrol'
 
+import App from './App.js'
 import Sidebar from './sidebar.js'
 import './css/style.css!'
 import './css/styledLayerControl/styledLayerControl.css!'
@@ -48,6 +49,8 @@ let layerControl = L.Control.styledLayerControl(baseMaps, [], {
 })
 map.addControl(layerControl)
 
+let app = new App()
+
 // Sidebar setup
 let catalogUrl
 if (window.location.hash) {
@@ -56,7 +59,7 @@ if (window.location.hash) {
   catalogUrl = MELODIES_DCAT_CATALOG_URL
 }
 
-let sidebar = new Sidebar(map, {layerControl})
-sidebar.loadCatalog(catalogUrl).then(() => {
+let sidebar = new Sidebar(map, {app, layerControl})
+app.catalogue.loadFromDCAT(catalogUrl).then(() => {
   sidebar.open('datasets')
 })
