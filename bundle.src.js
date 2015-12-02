@@ -6586,7 +6586,7 @@ $__System.register('16', ['5', '6', '7', '8', '9', '14', '15', 'a'], function (_
             var html = '';
 
             for (var i = 0; i < palette.steps; i++) {
-              var cat = i18n.getLanguageString(param.categories[i].label, this.language);
+              var cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this.language);
               html += '\n        <i style="background:rgb(' + palette.red[i] + ', ' + palette.green[i] + ', ' + palette.blue[i] + ')"></i>\n        ' + cat + '\n        <br>';
             }
 
@@ -6652,7 +6652,7 @@ $__System.register('17', ['12', '16'], function (_export) {
     }],
     execute: function () {
       _export('default', function (layer, options) {
-        if (layer.parameter.categories) {
+        if (layer.parameter.observedProperty.categories) {
           return new DiscreteLegend(layer, options);
         } else {
           return new ContinuousLegend(layer, options);
@@ -6663,11 +6663,11 @@ $__System.register('17', ['12', '16'], function (_export) {
 });
 
 $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', '1c'], function (_export) {
-  var L, _get, _inherits, _createClass, _slicedToArray, _toConsumableArray, _classCallCheck, _Promise, linearPalette, scale, arrays, opsnull, DOMAIN_TYPE, DEFAULT_COLOR, DEFAULT_PALETTE, Profile;
+  var L, _get, _inherits, _createClass, _slicedToArray, linearPalette, scale, _classCallCheck, _Promise, arrays, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_COLOR, DEFAULT_PALETTE, VerticalProfile;
 
   return {
-    setters: [function (_6) {
-      L = _6['default'];
+    setters: [function (_5) {
+      L = _5['default'];
     }, function (_) {
       _get = _['default'];
     }, function (_2) {
@@ -6676,25 +6676,25 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
       _createClass = _3['default'];
     }, function (_4) {
       _slicedToArray = _4['default'];
-    }, function (_5) {
-      _toConsumableArray = _5['default'];
+    }, function (_6) {
+      linearPalette = _6.linearPalette;
+      scale = _6.scale;
     }, function (_a) {
       _classCallCheck = _a['default'];
     }, function (_c) {
       _Promise = _c['default'];
     }, function (_a2) {
-      linearPalette = _a2.linearPalette;
-      scale = _a2.scale;
+      arrays = _a2;
     }, function (_b) {
-      arrays = _b;
+      rangeutil = _b;
     }, function (_c2) {
-      opsnull = _c2;
+      referencingutil = _c2;
     }],
     execute: function () {
       /* */
       'use strict';
 
-      DOMAIN_TYPE = 'http://coveragejson.org/def#Profile';
+      DOMAIN_TYPE = 'http://coveragejson.org/def#VerticalProfile';
       DEFAULT_COLOR = 'black';
       DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
       // blues
@@ -6708,13 +6708,13 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
        * a palette together with a target depth if a parameter is chosen.
        */
 
-      Profile = (function (_L$Class) {
-        _inherits(Profile, _L$Class);
+      VerticalProfile = (function (_L$Class) {
+        _inherits(VerticalProfile, _L$Class);
 
-        function Profile(cov, options) {
-          _classCallCheck(this, Profile);
+        function VerticalProfile(cov, options) {
+          _classCallCheck(this, VerticalProfile);
 
-          _get(Object.getPrototypeOf(Profile.prototype), 'constructor', this).call(this);
+          _get(Object.getPrototypeOf(VerticalProfile.prototype), 'constructor', this).call(this);
           if (cov.domainType !== DOMAIN_TYPE) {
             throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
           }
@@ -6746,7 +6746,7 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
           }
         }
 
-        _createClass(Profile, [{
+        _createClass(VerticalProfile, [{
           key: 'onAdd',
           value: function onAdd(map) {
             var _this = this;
@@ -6754,6 +6754,13 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
             this._map = map;
 
             map.fire('dataloading'); // for supporting loading spinners
+
+            function checkWGS84(domain) {
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+            }
 
             var promise = undefined;
             if (this.param) {
@@ -6765,6 +6772,7 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
 
                 console.log('domain and range loaded');
                 _this.domain = domain;
+                checkWGS84(domain);
                 _this.range = range;
                 _this._updatePaletteExtent(_this._paletteExtent);
                 _this._addMarker();
@@ -6775,6 +6783,7 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
               promise = this.cov.loadDomain().then(function (domain) {
                 console.log('domain loaded');
                 _this.domain = domain;
+                checkWGS84(domain);
                 _this._addMarker();
                 _this.fire('add');
                 map.fire('dataload');
@@ -6808,24 +6817,20 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
             }
 
             if (!this.param) {
-              throw new Error('palette extent cannot be set when no trajectory parameter has been chosen');
+              throw new Error('palette extent cannot be set when no profile parameter has been chosen');
             }
 
-            // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-            var arr = arrays.asSciJSndarray(this.range.values);
-
-            // scan the whole range for min/max values
-            this._paletteExtent = [arr.get.apply(arr, _toConsumableArray(opsnull.nullargmin(arr))), arr.get.apply(arr, _toConsumableArray(opsnull.nullargmax(arr)))];
+            this._paletteExtent = rangeutil.minMax(this.range);
           }
         }, {
           key: '_addMarker',
           value: function _addMarker() {
             var _this2 = this;
 
-            var _domain = this.domain;
-            var x = _domain.x;
-            var y = _domain.y;
+            // TODO do coordinate transformation to lat/lon if necessary
 
+            var x = this.domain.axes.get('x').values[0];
+            var y = this.domain.axes.get('y').values[0];
             this.marker = L.circleMarker(L.latLng(y, x), { color: this._getColor() });
 
             this.marker.on('click', function () {
@@ -6843,14 +6848,12 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
         }, {
           key: '_getColor',
           value: function _getColor() {
-            var z = this.domain.z;
-
-            // TODO do coordinate transformation to lat/lon if necessary
+            var z = this.domain.axes.get('z').values.z;
 
             if (this.param && this.targetZ !== null) {
               // use a palette
               // find the value with z nearest to targetZ
-              var val = this.range.get(z[arrays.indexOfNearest(z, this.targetZ)]);
+              var val = this.range.get({ z: arrays.indexOfNearest(z, this.targetZ) });
               if (val !== null) {
                 var valScaled = scale(val, this.palette, this.paletteExtent);
                 var _palette = this.palette;
@@ -6918,26 +6921,26 @@ $__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
           }
         }]);
 
-        return Profile;
+        return VerticalProfile;
       })(L.Class);
 
-      _export('Profile', Profile);
+      _export('VerticalProfile', VerticalProfile);
 
-      Profile.include(L.Mixin.Events);
+      VerticalProfile.include(L.Mixin.Events);
 
       // work-around for Babel bug, otherwise Profile cannot be referenced here
 
-      _export('default', Profile);
+      _export('default', VerticalProfile);
     }
   };
 });
 
 $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', '1c'], function (_export) {
-  var L, _get, _inherits, _createClass, _slicedToArray, _toConsumableArray, _classCallCheck, _Promise, linearPalette, scale, arrays, opsnull, DOMAIN_TYPE, DEFAULT_PALETTE, Trajectory;
+  var L, _get, _inherits, _createClass, _slicedToArray, linearPalette, scale, _classCallCheck, _Promise, arrays, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_PALETTE, Trajectory;
 
   return {
-    setters: [function (_6) {
-      L = _6['default'];
+    setters: [function (_5) {
+      L = _5['default'];
     }, function (_) {
       _get = _['default'];
     }, function (_2) {
@@ -6946,19 +6949,19 @@ $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
       _createClass = _3['default'];
     }, function (_4) {
       _slicedToArray = _4['default'];
-    }, function (_5) {
-      _toConsumableArray = _5['default'];
+    }, function (_6) {
+      linearPalette = _6.linearPalette;
+      scale = _6.scale;
     }, function (_a) {
       _classCallCheck = _a['default'];
     }, function (_c) {
       _Promise = _c['default'];
     }, function (_a2) {
-      linearPalette = _a2.linearPalette;
-      scale = _a2.scale;
+      arrays = _a2;
     }, function (_b) {
-      arrays = _b;
+      rangeutil = _b;
     }, function (_c2) {
-      opsnull = _c2;
+      referencingutil = _c2;
     }],
     execute: function () {
       /* */
@@ -7045,6 +7048,11 @@ $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
 
               console.log('domain and range loaded');
               _this.domain = domain;
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+
               _this.range = range;
               _this._updatePaletteExtent(_this._paletteExtent);
               _this._addTrajectoryLayers();
@@ -7073,11 +7081,10 @@ $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
               return;
             }
 
-            // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-            var arr = arrays.asSciJSndarray(this.range.values);
+            var range = this.range;
 
             if (extent === 'full') {
-              // scan the whole range for min/max values, don't subset
+              // scan the whole range for min/max values
 
             } else if (extent === 'fov') {
                 // scan the values that are currently in field of view on the map for min/max
@@ -7089,17 +7096,14 @@ $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
                 throw new Error('Unknown extent specification: ' + extent);
               }
 
-            this._paletteExtent = [arr.get.apply(arr, _toConsumableArray(opsnull.nullargmin(arr))), arr.get.apply(arr, _toConsumableArray(opsnull.nullargmax(arr)))];
+            this._paletteExtent = rangeutil.minMax(range);
           }
         }, {
           key: '_addTrajectoryLayers',
           value: function _addTrajectoryLayers() {
             // add a Polyline in black, and coloured CircleMarker's for each domain point
-            var _domain = this.domain;
-            var x = _domain.x;
-            var y = _domain.y;
-
-            var vals = this.range.values;
+            var composite = this.domain.axes.get('composite').values;
+            var range = this.range;
 
             // TODO do coordinate transformation to lat/lon if necessary
 
@@ -7112,10 +7116,12 @@ $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
             var paletteExtent = this.paletteExtent;
 
             var coords = [];
-            for (var i = 0; i < x.length; i++) {
-              var val = vals.get(i);
+            for (var i = 0; i < composite.length; i++) {
+              var val = range.get({ composite: i });
               // this always has to be lat/lon, no matter which map projection is used
-              var coord = new L.LatLng(y[i], x[i]);
+              var x = composite[i][1];
+              var y = composite[i][2];
+              var coord = new L.LatLng(y, x);
               coords.push(coord);
               if (val !== null) {
                 var valScaled = scale(val, palette, paletteExtent);
@@ -7187,616 +7193,132 @@ $__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', 
   };
 });
 
-$__System.registerDynamic("1e", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  function unique_pred(list, compare) {
-    var ptr = 1,
-        len = list.length,
-        a = list[0],
-        b = list[0];
-    for (var i = 1; i < len; ++i) {
-      b = a;
-      a = list[i];
-      if (compare(a, b)) {
-        if (i === ptr) {
-          ptr++;
-          continue;
-        }
-        list[ptr++] = a;
-      }
-    }
-    list.length = ptr;
-    return list;
-  }
-  function unique_eq(list) {
-    var ptr = 1,
-        len = list.length,
-        a = list[0],
-        b = list[0];
-    for (var i = 1; i < len; ++i, b = a) {
-      b = a;
-      a = list[i];
-      if (a !== b) {
-        if (i === ptr) {
-          ptr++;
-          continue;
-        }
-        list[ptr++] = a;
-      }
-    }
-    list.length = ptr;
-    return list;
-  }
-  function unique(list, compare, sorted) {
-    if (list.length === 0) {
-      return list;
-    }
-    if (compare) {
-      if (!sorted) {
-        list.sort(compare);
-      }
-      return unique_pred(list, compare);
-    }
-    if (!sorted) {
-      list.sort();
-    }
-    return unique_eq(list);
-  }
-  module.exports = unique;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1f", ["1e"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('1e');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("20", ["1f", "21"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(process) {
-    "use strict";
-    var uniq = req('1f');
-    function innerFill(order, proc, body) {
-      var dimension = order.length,
-          nargs = proc.arrayArgs.length,
-          has_index = proc.indexArgs.length > 0,
-          code = [],
-          vars = [],
-          idx = 0,
-          pidx = 0,
-          i,
-          j;
-      for (i = 0; i < dimension; ++i) {
-        vars.push(["i", i, "=0"].join(""));
-      }
-      for (j = 0; j < nargs; ++j) {
-        for (i = 0; i < dimension; ++i) {
-          pidx = idx;
-          idx = order[i];
-          if (i === 0) {
-            vars.push(["d", j, "s", i, "=t", j, "p", idx].join(""));
-          } else {
-            vars.push(["d", j, "s", i, "=(t", j, "p", idx, "-s", pidx, "*t", j, "p", pidx, ")"].join(""));
-          }
-        }
-      }
-      code.push("var " + vars.join(","));
-      for (i = dimension - 1; i >= 0; --i) {
-        idx = order[i];
-        code.push(["for(i", i, "=0;i", i, "<s", idx, ";++i", i, "){"].join(""));
-      }
-      code.push(body);
-      for (i = 0; i < dimension; ++i) {
-        pidx = idx;
-        idx = order[i];
-        for (j = 0; j < nargs; ++j) {
-          code.push(["p", j, "+=d", j, "s", i].join(""));
-        }
-        if (has_index) {
-          if (i > 0) {
-            code.push(["index[", pidx, "]-=s", pidx].join(""));
-          }
-          code.push(["++index[", idx, "]"].join(""));
-        }
-        code.push("}");
-      }
-      return code.join("\n");
-    }
-    function outerFill(matched, order, proc, body) {
-      var dimension = order.length,
-          nargs = proc.arrayArgs.length,
-          blockSize = proc.blockSize,
-          has_index = proc.indexArgs.length > 0,
-          code = [];
-      for (var i = 0; i < nargs; ++i) {
-        code.push(["var offset", i, "=p", i].join(""));
-      }
-      for (var i = matched; i < dimension; ++i) {
-        code.push(["for(var j" + i + "=SS[", order[i], "]|0;j", i, ">0;){"].join(""));
-        code.push(["if(j", i, "<", blockSize, "){"].join(""));
-        code.push(["s", order[i], "=j", i].join(""));
-        code.push(["j", i, "=0"].join(""));
-        code.push(["}else{s", order[i], "=", blockSize].join(""));
-        code.push(["j", i, "-=", blockSize, "}"].join(""));
-        if (has_index) {
-          code.push(["index[", order[i], "]=j", i].join(""));
-        }
-      }
-      for (var i = 0; i < nargs; ++i) {
-        var indexStr = ["offset" + i];
-        for (var j = matched; j < dimension; ++j) {
-          indexStr.push(["j", j, "*t", i, "p", order[j]].join(""));
-        }
-        code.push(["p", i, "=(", indexStr.join("+"), ")"].join(""));
-      }
-      code.push(innerFill(order, proc, body));
-      for (var i = matched; i < dimension; ++i) {
-        code.push("}");
-      }
-      return code.join("\n");
-    }
-    function countMatches(orders) {
-      var matched = 0,
-          dimension = orders[0].length;
-      while (matched < dimension) {
-        for (var j = 1; j < orders.length; ++j) {
-          if (orders[j][matched] !== orders[0][matched]) {
-            return matched;
-          }
-        }
-        ++matched;
-      }
-      return matched;
-    }
-    function processBlock(block, proc, dtypes) {
-      var code = block.body;
-      var pre = [];
-      var post = [];
-      for (var i = 0; i < block.args.length; ++i) {
-        var carg = block.args[i];
-        if (carg.count <= 0) {
-          continue;
-        }
-        var re = new RegExp(carg.name, "g");
-        var ptrStr = "";
-        var arrNum = proc.arrayArgs.indexOf(i);
-        switch (proc.argTypes[i]) {
-          case "offset":
-            var offArgIndex = proc.offsetArgIndex.indexOf(i);
-            var offArg = proc.offsetArgs[offArgIndex];
-            arrNum = offArg.array;
-            ptrStr = "+q" + offArgIndex;
-          case "array":
-            ptrStr = "p" + arrNum + ptrStr;
-            var localStr = "l" + i;
-            var arrStr = "a" + arrNum;
-            if (proc.arrayBlockIndices[arrNum] === 0) {
-              if (carg.count === 1) {
-                if (dtypes[arrNum] === "generic") {
-                  if (carg.lvalue) {
-                    pre.push(["var ", localStr, "=", arrStr, ".get(", ptrStr, ")"].join(""));
-                    code = code.replace(re, localStr);
-                    post.push([arrStr, ".set(", ptrStr, ",", localStr, ")"].join(""));
-                  } else {
-                    code = code.replace(re, [arrStr, ".get(", ptrStr, ")"].join(""));
-                  }
-                } else {
-                  code = code.replace(re, [arrStr, "[", ptrStr, "]"].join(""));
-                }
-              } else if (dtypes[arrNum] === "generic") {
-                pre.push(["var ", localStr, "=", arrStr, ".get(", ptrStr, ")"].join(""));
-                code = code.replace(re, localStr);
-                if (carg.lvalue) {
-                  post.push([arrStr, ".set(", ptrStr, ",", localStr, ")"].join(""));
-                }
-              } else {
-                pre.push(["var ", localStr, "=", arrStr, "[", ptrStr, "]"].join(""));
-                code = code.replace(re, localStr);
-                if (carg.lvalue) {
-                  post.push([arrStr, "[", ptrStr, "]=", localStr].join(""));
-                }
-              }
-            } else {
-              var reStrArr = [carg.name],
-                  ptrStrArr = [ptrStr];
-              for (var j = 0; j < Math.abs(proc.arrayBlockIndices[arrNum]); j++) {
-                reStrArr.push("\\s*\\[([^\\]]+)\\]");
-                ptrStrArr.push("$" + (j + 1) + "*t" + arrNum + "b" + j);
-              }
-              re = new RegExp(reStrArr.join(""), "g");
-              ptrStr = ptrStrArr.join("+");
-              if (dtypes[arrNum] === "generic") {
-                throw new Error("cwise: Generic arrays not supported in combination with blocks!");
-              } else {
-                code = code.replace(re, [arrStr, "[", ptrStr, "]"].join(""));
-              }
-            }
-            break;
-          case "scalar":
-            code = code.replace(re, "Y" + proc.scalarArgs.indexOf(i));
-            break;
-          case "index":
-            code = code.replace(re, "index");
-            break;
-          case "shape":
-            code = code.replace(re, "shape");
-            break;
-        }
-      }
-      return [pre.join("\n"), code, post.join("\n")].join("\n").trim();
-    }
-    function typeSummary(dtypes) {
-      var summary = new Array(dtypes.length);
-      var allEqual = true;
-      for (var i = 0; i < dtypes.length; ++i) {
-        var t = dtypes[i];
-        var digits = t.match(/\d+/);
-        if (!digits) {
-          digits = "";
-        } else {
-          digits = digits[0];
-        }
-        if (t.charAt(0) === 0) {
-          summary[i] = "u" + t.charAt(1) + digits;
-        } else {
-          summary[i] = t.charAt(0) + digits;
-        }
-        if (i > 0) {
-          allEqual = allEqual && summary[i] === summary[i - 1];
-        }
-      }
-      if (allEqual) {
-        return summary[0];
-      }
-      return summary.join("");
-    }
-    function generateCWiseOp(proc, typesig) {
-      var dimension = (typesig[1].length - Math.abs(proc.arrayBlockIndices[0])) | 0;
-      var orders = new Array(proc.arrayArgs.length);
-      var dtypes = new Array(proc.arrayArgs.length);
-      for (var i = 0; i < proc.arrayArgs.length; ++i) {
-        dtypes[i] = typesig[2 * i];
-        orders[i] = typesig[2 * i + 1];
-      }
-      var blockBegin = [],
-          blockEnd = [];
-      var loopBegin = [],
-          loopEnd = [];
-      var loopOrders = [];
-      for (var i = 0; i < proc.arrayArgs.length; ++i) {
-        if (proc.arrayBlockIndices[i] < 0) {
-          loopBegin.push(0);
-          loopEnd.push(dimension);
-          blockBegin.push(dimension);
-          blockEnd.push(dimension + proc.arrayBlockIndices[i]);
-        } else {
-          loopBegin.push(proc.arrayBlockIndices[i]);
-          loopEnd.push(proc.arrayBlockIndices[i] + dimension);
-          blockBegin.push(0);
-          blockEnd.push(proc.arrayBlockIndices[i]);
-        }
-        var newOrder = [];
-        for (var j = 0; j < orders[i].length; j++) {
-          if (loopBegin[i] <= orders[i][j] && orders[i][j] < loopEnd[i]) {
-            newOrder.push(orders[i][j] - loopBegin[i]);
-          }
-        }
-        loopOrders.push(newOrder);
-      }
-      var arglist = ["SS"];
-      var code = ["'use strict'"];
-      var vars = [];
-      for (var j = 0; j < dimension; ++j) {
-        vars.push(["s", j, "=SS[", j, "]"].join(""));
-      }
-      for (var i = 0; i < proc.arrayArgs.length; ++i) {
-        arglist.push("a" + i);
-        arglist.push("t" + i);
-        arglist.push("p" + i);
-        for (var j = 0; j < dimension; ++j) {
-          vars.push(["t", i, "p", j, "=t", i, "[", loopBegin[i] + j, "]"].join(""));
-        }
-        for (var j = 0; j < Math.abs(proc.arrayBlockIndices[i]); ++j) {
-          vars.push(["t", i, "b", j, "=t", i, "[", blockBegin[i] + j, "]"].join(""));
-        }
-      }
-      for (var i = 0; i < proc.scalarArgs.length; ++i) {
-        arglist.push("Y" + i);
-      }
-      if (proc.shapeArgs.length > 0) {
-        vars.push("shape=SS.slice(0)");
-      }
-      if (proc.indexArgs.length > 0) {
-        var zeros = new Array(dimension);
-        for (var i = 0; i < dimension; ++i) {
-          zeros[i] = "0";
-        }
-        vars.push(["index=[", zeros.join(","), "]"].join(""));
-      }
-      for (var i = 0; i < proc.offsetArgs.length; ++i) {
-        var off_arg = proc.offsetArgs[i];
-        var init_string = [];
-        for (var j = 0; j < off_arg.offset.length; ++j) {
-          if (off_arg.offset[j] === 0) {
-            continue;
-          } else if (off_arg.offset[j] === 1) {
-            init_string.push(["t", off_arg.array, "p", j].join(""));
-          } else {
-            init_string.push([off_arg.offset[j], "*t", off_arg.array, "p", j].join(""));
-          }
-        }
-        if (init_string.length === 0) {
-          vars.push("q" + i + "=0");
-        } else {
-          vars.push(["q", i, "=", init_string.join("+")].join(""));
-        }
-      }
-      var thisVars = uniq([].concat(proc.pre.thisVars).concat(proc.body.thisVars).concat(proc.post.thisVars));
-      vars = vars.concat(thisVars);
-      code.push("var " + vars.join(","));
-      for (var i = 0; i < proc.arrayArgs.length; ++i) {
-        code.push("p" + i + "|=0");
-      }
-      if (proc.pre.body.length > 3) {
-        code.push(processBlock(proc.pre, proc, dtypes));
-      }
-      var body = processBlock(proc.body, proc, dtypes);
-      var matched = countMatches(loopOrders);
-      if (matched < dimension) {
-        code.push(outerFill(matched, loopOrders[0], proc, body));
-      } else {
-        code.push(innerFill(loopOrders[0], proc, body));
-      }
-      if (proc.post.body.length > 3) {
-        code.push(processBlock(proc.post, proc, dtypes));
-      }
-      if (proc.debug) {
-        console.log("-----Generated cwise routine for ", typesig, ":\n" + code.join("\n") + "\n----------");
-      }
-      var loopName = [(proc.funcName || "unnamed"), "_cwise_loop_", orders[0].join("s"), "m", matched, typeSummary(dtypes)].join("");
-      var f = new Function(["function ", loopName, "(", arglist.join(","), "){", code.join("\n"), "} return ", loopName].join(""));
-      return f();
-    }
-    module.exports = generateCWiseOp;
-  })(req('21'));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("22", ["20"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var compile = req('20');
-  function createThunk(proc) {
-    var code = ["'use strict'", "var CACHED={}"];
-    var vars = [];
-    var thunkName = proc.funcName + "_cwise_thunk";
-    code.push(["return function ", thunkName, "(", proc.shimArgs.join(","), "){"].join(""));
-    var typesig = [];
-    var string_typesig = [];
-    var proc_args = [["array", proc.arrayArgs[0], ".shape.slice(", Math.max(0, proc.arrayBlockIndices[0]), proc.arrayBlockIndices[0] < 0 ? ("," + proc.arrayBlockIndices[0] + ")") : ")"].join("")];
-    var shapeLengthConditions = [],
-        shapeConditions = [];
-    for (var i = 0; i < proc.arrayArgs.length; ++i) {
-      var j = proc.arrayArgs[i];
-      vars.push(["t", j, "=array", j, ".dtype,", "r", j, "=array", j, ".order"].join(""));
-      typesig.push("t" + j);
-      typesig.push("r" + j);
-      string_typesig.push("t" + j);
-      string_typesig.push("r" + j + ".join()");
-      proc_args.push("array" + j + ".data");
-      proc_args.push("array" + j + ".stride");
-      proc_args.push("array" + j + ".offset|0");
-      if (i > 0) {
-        shapeLengthConditions.push("array" + proc.arrayArgs[0] + ".shape.length===array" + j + ".shape.length+" + (Math.abs(proc.arrayBlockIndices[0]) - Math.abs(proc.arrayBlockIndices[i])));
-        shapeConditions.push("array" + proc.arrayArgs[0] + ".shape[shapeIndex+" + Math.max(0, proc.arrayBlockIndices[0]) + "]===array" + j + ".shape[shapeIndex+" + Math.max(0, proc.arrayBlockIndices[i]) + "]");
-      }
-    }
-    if (proc.arrayArgs.length > 1) {
-      code.push("if (!(" + shapeLengthConditions.join(" && ") + ")) throw new Error('cwise: Arrays do not all have the same dimensionality!')");
-      code.push("for(var shapeIndex=array" + proc.arrayArgs[0] + ".shape.length-" + Math.abs(proc.arrayBlockIndices[0]) + "; shapeIndex-->0;) {");
-      code.push("if (!(" + shapeConditions.join(" && ") + ")) throw new Error('cwise: Arrays do not all have the same shape!')");
-      code.push("}");
-    }
-    for (var i = 0; i < proc.scalarArgs.length; ++i) {
-      proc_args.push("scalar" + proc.scalarArgs[i]);
-    }
-    vars.push(["type=[", string_typesig.join(","), "].join()"].join(""));
-    vars.push("proc=CACHED[type]");
-    code.push("var " + vars.join(","));
-    code.push(["if(!proc){", "CACHED[type]=proc=compile([", typesig.join(","), "])}", "return proc(", proc_args.join(","), ")}"].join(""));
-    if (proc.debug) {
-      console.log("-----Generated thunk:\n" + code.join("\n") + "\n----------");
-    }
-    var thunk = new Function("compile", code.join("\n"));
-    return thunk(compile.bind(undefined, proc));
-  }
-  module.exports = createThunk;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("23", ["22"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var createThunk = req('22');
-  function Procedure() {
-    this.argTypes = [];
-    this.shimArgs = [];
-    this.arrayArgs = [];
-    this.arrayBlockIndices = [];
-    this.scalarArgs = [];
-    this.offsetArgs = [];
-    this.offsetArgIndex = [];
-    this.indexArgs = [];
-    this.shapeArgs = [];
-    this.funcName = "";
-    this.pre = null;
-    this.body = null;
-    this.post = null;
-    this.debug = false;
-  }
-  function compileCwise(user_args) {
-    var proc = new Procedure();
-    proc.pre = user_args.pre;
-    proc.body = user_args.body;
-    proc.post = user_args.post;
-    var proc_args = user_args.args.slice(0);
-    proc.argTypes = proc_args;
-    for (var i = 0; i < proc_args.length; ++i) {
-      var arg_type = proc_args[i];
-      if (arg_type === "array" || (typeof arg_type === "object" && arg_type.blockIndices)) {
-        proc.argTypes[i] = "array";
-        proc.arrayArgs.push(i);
-        proc.arrayBlockIndices.push(arg_type.blockIndices ? arg_type.blockIndices : 0);
-        proc.shimArgs.push("array" + i);
-        if (i < proc.pre.args.length && proc.pre.args[i].count > 0) {
-          throw new Error("cwise: pre() block may not reference array args");
-        }
-        if (i < proc.post.args.length && proc.post.args[i].count > 0) {
-          throw new Error("cwise: post() block may not reference array args");
-        }
-      } else if (arg_type === "scalar") {
-        proc.scalarArgs.push(i);
-        proc.shimArgs.push("scalar" + i);
-      } else if (arg_type === "index") {
-        proc.indexArgs.push(i);
-        if (i < proc.pre.args.length && proc.pre.args[i].count > 0) {
-          throw new Error("cwise: pre() block may not reference array index");
-        }
-        if (i < proc.body.args.length && proc.body.args[i].lvalue) {
-          throw new Error("cwise: body() block may not write to array index");
-        }
-        if (i < proc.post.args.length && proc.post.args[i].count > 0) {
-          throw new Error("cwise: post() block may not reference array index");
-        }
-      } else if (arg_type === "shape") {
-        proc.shapeArgs.push(i);
-        if (i < proc.pre.args.length && proc.pre.args[i].lvalue) {
-          throw new Error("cwise: pre() block may not write to array shape");
-        }
-        if (i < proc.body.args.length && proc.body.args[i].lvalue) {
-          throw new Error("cwise: body() block may not write to array shape");
-        }
-        if (i < proc.post.args.length && proc.post.args[i].lvalue) {
-          throw new Error("cwise: post() block may not write to array shape");
-        }
-      } else if (typeof arg_type === "object" && arg_type.offset) {
-        proc.argTypes[i] = "offset";
-        proc.offsetArgs.push({
-          array: arg_type.array,
-          offset: arg_type.offset
-        });
-        proc.offsetArgIndex.push(i);
-      } else {
-        throw new Error("cwise: Unknown argument type " + proc_args[i]);
-      }
-    }
-    if (proc.arrayArgs.length <= 0) {
-      throw new Error("cwise: No array arguments specified");
-    }
-    if (proc.pre.args.length > proc_args.length) {
-      throw new Error("cwise: Too many arguments in pre() block");
-    }
-    if (proc.body.args.length > proc_args.length) {
-      throw new Error("cwise: Too many arguments in body() block");
-    }
-    if (proc.post.args.length > proc_args.length) {
-      throw new Error("cwise: Too many arguments in post() block");
-    }
-    proc.debug = !!user_args.printCode || !!user_args.debug;
-    proc.funcName = user_args.funcName || "cwise";
-    proc.blockSize = user_args.blockSize || 64;
-    return createThunk(proc);
-  }
-  module.exports = compileCwise;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("24", ["23"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('23');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('1c', ['24'], function (_export) {
-  /* */
-
-  // handle null values in arrays
-  // ndarray-ops only provides standard argmin and argmax
-
-  /*eslint-disable */
+$__System.register('1c', [], function (_export) {
+  /** 3D WGS84 in lat-lon-height order */
   'use strict';
 
-  var compile, nullargmin, nullargmax;
-  function nullargminmax(op) {
-    var minus = op === 'max' ? '-' : '';
-    var comp = op === 'max' ? '>' : '<';
+  var EPSG4979, EPSG4326, CRS84, GeodeticWGS84CRS;
 
-    // adapted from ndarray-ops argmin/argmax
-    return compile({
-      args: ["index", "array", "shape"],
-      pre: {
-        body: "{this_v=" + minus + "Infinity;this_i=_inline_0_arg2_.slice(0);for(var _inline_1_k=0;_inline_1_k<this_i.length;_inline_1_k++){this_i[_inline_1_k]=null}}",
-        args: [{ name: "_inline_0_arg0_", lvalue: false, rvalue: false, count: 0 }, { name: "_inline_0_arg1_", lvalue: false, rvalue: false, count: 0 }, { name: "_inline_0_arg2_", lvalue: false, rvalue: true, count: 1 }],
-        thisVars: ["this_i", "this_v"],
-        localVars: [] },
-      body: {
-        body: "{if(_inline_1_arg1_ !== null && _inline_1_arg1_ " + comp + "this_v){this_v=_inline_1_arg1_;for(var _inline_1_k=0;_inline_1_k<_inline_1_arg0_.length;++_inline_1_k){this_i[_inline_1_k]=_inline_1_arg0_[_inline_1_k]}}}",
-        args: [{ name: "_inline_1_arg0_", lvalue: false, rvalue: true, count: 2 }, { name: "_inline_1_arg1_", lvalue: false, rvalue: true, count: 2 }],
-        thisVars: ["this_i", "this_v"],
-        localVars: ["_inline_1_k"] },
-      post: {
-        body: "{return this_i[0] === null ? null : this_i}",
-        args: [],
-        thisVars: ["this_i"],
-        localVars: [] }
-    });
+  /**
+   * Returns the referencing system matching the given identifiers.
+   * 
+   * Note: If the input identifiers used for searching are associated
+   * to multiple referencing systems, then this function returns `undefined`.
+   */
+
+  _export('isGeodeticWGS84CRS', isGeodeticWGS84CRS);
+
+  _export('getRefSystem', getRefSystem);
+
+  function isGeodeticWGS84CRS(rs) {
+    return GeodeticWGS84CRS.indexOf(rs.id) !== -1;
   }
-  /*eslint-enable */
+
+  function getRefSystem(domain, identifiers) {
+    var refs = domain.referencing;
+    var ref = refs.find(function (ref) {
+      return identifiers.every(function (id) {
+        return ref.identifiers.indexOf(id) !== -1;
+      });
+    });
+    if (!ref) return;
+    var rs = ref.srs || ref.trs || ref.rs;
+    return rs;
+  }
 
   return {
-    setters: [function (_) {
-      compile = _['default'];
-    }],
+    setters: [],
     execute: function () {
-      nullargmin = nullargminmax('min');
+      EPSG4979 = 'http://www.opengis.net/def/crs/EPSG/0/4979';
 
-      _export('nullargmin', nullargmin);
+      /** 2D WGS84 in lat-lon order */
+      EPSG4326 = 'http://www.opengis.net/def/crs/EPSG/0/4326';
 
-      nullargmax = nullargminmax('max');
-
-      _export('nullargmax', nullargmax);
+      /** 2D WGS84 in lon-lat order */
+      CRS84 = 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
+      GeodeticWGS84CRS = [EPSG4979, EPSG4326, CRS84];
     }
   };
 });
 
-$__System.register('1b', ['9', '25', '26', 'a'], function (_export) {
-  var _createClass, ndarray, _Math$trunc, _classCallCheck, Wrapper1D;
+$__System.register("1b", ["13", "1e"], function (_export) {
+  var _slicedToArray, _toConsumableArray;
+
+  function iterate(range, fn) {
+    // TODO create pre-compiled for-loop version to improve speed
+    function iterateRecurse(obj, shape, axisIdx) {
+      if (shape.length === axisIdx) {
+        var val = range.get(obj);
+        fn(val, obj);
+      } else {
+        var _shape$axisIdx = _slicedToArray(shape[axisIdx], 2);
+
+        var axis = _shape$axisIdx[0];
+        var size = _shape$axisIdx[1];
+
+        for (var i = 0; i < size; i++) {
+          obj[axis] = i;
+          iterateRecurse(obj, shape, axisIdx + 1);
+        }
+      }
+    }
+    var shape = [].concat(_toConsumableArray(range.shape));
+    return iterateRecurse({}, shape, 0);
+  }
+
+  /**
+   * Apply a reduce function over the range values.
+   */
+
+  function reduce(range, fn, start) {
+    var v1 = start;
+    var iterFn = function iterFn(v2) {
+      v1 = fn(v1, v2);
+    };
+    iterate(range, iterFn);
+    return v1;
+  }
+
+  /**
+   * Return the minimum/maximum across all range values,
+   * ignoring null's.
+   */
+
+  function minMax(range) {
+    var min = Infinity;
+    var max = -Infinity;
+    var fn = function fn(val) {
+      if (val === null) return;
+      if (val < min) min = val;
+      if (val > max) max = val;
+    };
+    iterate(range, fn);
+    return [min, max];
+  }
+
+  return {
+    setters: [function (_) {
+      _slicedToArray = _["default"];
+    }, function (_e) {
+      _toConsumableArray = _e["default"];
+    }],
+    execute: function () {
+      /**
+       * Iterate over all range values and run a function for each value.
+       */
+      "use strict";
+
+      _export("iterate", iterate);
+
+      _export("reduce", reduce);
+
+      _export("minMax", minMax);
+    }
+  };
+});
+
+$__System.register('1a', ['9', '20', 'a', '1f'], function (_export) {
+  var _createClass, _Math$trunc, _classCallCheck, ndarray, Wrapper1D;
 
   /***
    * Return the indices of the two neighbors in the a array closest to x.
@@ -7893,12 +7415,12 @@ $__System.register('1b', ['9', '25', '26', 'a'], function (_export) {
   return {
     setters: [function (_) {
       _createClass = _['default'];
-    }, function (_3) {
-      ndarray = _3['default'];
     }, function (_2) {
       _Math$trunc = _2['default'];
     }, function (_a) {
       _classCallCheck = _a['default'];
+    }, function (_f) {
+      ndarray = _f['default'];
     }],
     execute: function () {
       /* */
@@ -7958,33 +7480,33 @@ $__System.register('1b', ['9', '25', '26', 'a'], function (_export) {
   };
 });
 
-$__System.registerDynamic("27", ["28", "29", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("21", ["22", "23", "24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('28');
-  req('29');
-  module.exports = req('2a')('iterator');
+  req('22');
+  req('23');
+  module.exports = req('24')('iterator');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("2b", ["27"], true, function(req, exports, module) {
+$__System.registerDynamic("25", ["21"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('27'),
+    "default": req('21'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('1a', ['9', '11', '26', 'a', '2b'], function (_export) {
-  var _createClass, _Map, _Math$trunc, _classCallCheck, _Symbol$iterator, PaletteManager;
+$__System.register('19', ['9', '11', '20', '25', 'a'], function (_export) {
+  var _createClass, _Map, _Math$trunc, _Symbol$iterator, _classCallCheck, PaletteManager;
 
   function linearPalette(colors) {
     var steps = arguments.length <= 1 || arguments[1] === undefined ? 256 : arguments[1];
@@ -8104,10 +7626,10 @@ $__System.register('1a', ['9', '11', '26', 'a', '2b'], function (_export) {
       _Map = _3['default'];
     }, function (_2) {
       _Math$trunc = _2['default'];
+    }, function (_4) {
+      _Symbol$iterator = _4['default'];
     }, function (_a) {
       _classCallCheck = _a['default'];
-    }, function (_b) {
-      _Symbol$iterator = _b['default'];
     }],
     execute: function () {
       /**
@@ -8229,47 +7751,47 @@ $__System.register('1a', ['9', '11', '26', 'a', '2b'], function (_export) {
   };
 });
 
-$__System.registerDynamic("2c", ["2d", "2e"], true, function(req, exports, module) {
+$__System.registerDynamic("26", ["27", "28"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $def = req('2d');
-  $def($def.S, 'Object', {setPrototypeOf: req('2e').set});
+  var $def = req('27');
+  $def($def.S, 'Object', {setPrototypeOf: req('28').set});
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("2f", ["2c", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("29", ["26", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('2c');
-  module.exports = req('30').Object.setPrototypeOf;
+  req('26');
+  module.exports = req('2a').Object.setPrototypeOf;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("31", ["2f"], true, function(req, exports, module) {
+$__System.registerDynamic("2b", ["29"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('2f'),
+    "default": req('29'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("32", ["33"], true, function(req, exports, module) {
+$__System.registerDynamic("2c", ["2d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('33');
+  var $ = req('2d');
   module.exports = function create(P, D) {
     return $.create(P, D);
   };
@@ -8277,27 +7799,27 @@ $__System.registerDynamic("32", ["33"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("34", ["32"], true, function(req, exports, module) {
+$__System.registerDynamic("2e", ["2c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('32'),
+    "default": req('2c'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8", ["34", "31"], true, function(req, exports, module) {
+$__System.registerDynamic("8", ["2e", "2b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$create = req('34')["default"];
-  var _Object$setPrototypeOf = req('31')["default"];
+  var _Object$create = req('2e')["default"];
+  var _Object$setPrototypeOf = req('2b')["default"];
   exports["default"] = function(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
@@ -8316,13 +7838,13 @@ $__System.registerDynamic("8", ["34", "31"], true, function(req, exports, module
   return module.exports;
 });
 
-$__System.registerDynamic("35", ["36", "37"], true, function(req, exports, module) {
+$__System.registerDynamic("2f", ["30", "31"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toIObject = req('36');
-  req('37')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
+  var toIObject = req('30');
+  req('31')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
     return function getOwnPropertyDescriptor(it, key) {
       return $getOwnPropertyDescriptor(toIObject(it), key);
     };
@@ -8331,13 +7853,13 @@ $__System.registerDynamic("35", ["36", "37"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("38", ["33", "35"], true, function(req, exports, module) {
+$__System.registerDynamic("32", ["2d", "2f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('33');
-  req('35');
+  var $ = req('2d');
+  req('2f');
   module.exports = function getOwnPropertyDescriptor(it, key) {
     return $.getDesc(it, key);
   };
@@ -8345,26 +7867,26 @@ $__System.registerDynamic("38", ["33", "35"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("39", ["38"], true, function(req, exports, module) {
+$__System.registerDynamic("33", ["32"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('38'),
+    "default": req('32'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7", ["39"], true, function(req, exports, module) {
+$__System.registerDynamic("7", ["33"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$getOwnPropertyDescriptor = req('39')["default"];
+  var _Object$getOwnPropertyDescriptor = req('33')["default"];
   exports["default"] = function get(_x, _x2, _x3) {
     var _again = true;
     _function: while (_again) {
@@ -8403,8 +7925,8 @@ $__System.registerDynamic("7", ["39"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a', 'c', '3b', '1a', '1b', '1c'], function (_export) {
-  var L, _get, _inherits, _createClass, _getIterator, _Map, _slicedToArray, _toConsumableArray, ndarray, _classCallCheck, _Promise, _Object$keys, linearPalette, scale, arrays, opsnull, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
+$__System.register('34', ['5', '7', '8', '9', '10', '11', '19', '35', 'a', '1f', '1a', '1b', '1c'], function (_export) {
+  var L, _get, _inherits, _createClass, _getIterator, _Map, linearPalette, scale, _Object$keys, _classCallCheck, ndarray, arrays, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
 
   function wrapLongitude(lon, range) {
     return wrapNum(lon, range, true);
@@ -8419,37 +7941,33 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
     return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
   }
   return {
-    setters: [function (_8) {
-      L = _8['default'];
+    setters: [function (_7) {
+      L = _7['default'];
     }, function (_) {
       _get = _['default'];
     }, function (_2) {
       _inherits = _2['default'];
     }, function (_3) {
       _createClass = _3['default'];
-    }, function (_6) {
-      _getIterator = _6['default'];
-    }, function (_7) {
-      _Map = _7['default'];
     }, function (_4) {
-      _slicedToArray = _4['default'];
+      _getIterator = _4['default'];
+    }, function (_6) {
+      _Map = _6['default'];
+    }, function (_8) {
+      linearPalette = _8.linearPalette;
+      scale = _8.scale;
     }, function (_5) {
-      _toConsumableArray = _5['default'];
-    }, function (_9) {
-      ndarray = _9['default'];
+      _Object$keys = _5['default'];
     }, function (_a) {
       _classCallCheck = _a['default'];
-    }, function (_c) {
-      _Promise = _c['default'];
-    }, function (_b) {
-      _Object$keys = _b['default'];
+    }, function (_f) {
+      ndarray = _f['default'];
     }, function (_a2) {
-      linearPalette = _a2.linearPalette;
-      scale = _a2.scale;
-    }, function (_b2) {
-      arrays = _b2;
-    }, function (_c2) {
-      opsnull = _c2;
+      arrays = _a2;
+    }, function (_b) {
+      rangeutil = _b;
+    }, function (_c) {
+      referencingutil = _c;
     }],
     execute: function () {
       /* */
@@ -8521,29 +8039,31 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
             z: { coordPref: options.vertical }
           };
 
+          var categories = this.param.observedProperty.categories;
+
           if (options.palette) {
             this._palette = options.palette;
-          } else if (this.param.categories) {
-            this._palette = DEFAULT_CATEGORICAL_PALETTE(this.param.categories.length);
+          } else if (categories) {
+            this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length);
           } else {
             this._palette = DEFAULT_CONTINUOUS_PALETTE();
           }
 
-          if (this.param.categories && this.param.categories.length !== this._palette.steps) {
+          if (categories && categories.length !== this._palette.steps) {
             throw new Error('Categorical palettes must match the number of categories of the parameter');
           }
 
-          if (this.param.categories) {
+          if (categories) {
             if (options.paletteExtent) {
               throw new Error('paletteExtent cannot be given for categorical parameters');
             }
           } else {
             if (options.paletteExtent === undefined) {
-              this._paletteExtent = 'full';
-            } else if (Array.isArray(options.paletteExtent) || ['full', 'subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
+              this._paletteExtent = 'subset';
+            } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
               this._paletteExtent = options.paletteExtent;
             } else {
-              throw new Error('paletteExtent must either be a 2-element array, one of "full", "subset", or "fov", or be omitted');
+              throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted');
             }
           }
 
@@ -8567,16 +8087,20 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
 
             this._map = map;
             map.fire('dataloading'); // for supporting loading spinners
-            _Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
-              var _ref2 = _slicedToArray(_ref, 2);
-
-              var domain = _ref2[0];
-              var range = _ref2[1];
-
+            this.cov.loadDomain().then(function (domain) {
               _this.domain = domain;
-              _this.range = range;
-              _this._subsetAxesByCoordinatePreference();
-              if (!_this.param.categories) {
+
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+            }).then(function () {
+              return _this._subsetByCoordinatePreference();
+            }).then(function () {
+              return _this.subsetCov.loadRange(_this.param.key);
+            }).then(function (subsetRange) {
+              _this.subsetRange = subsetRange;
+              if (!_this.param.observedProperty.categories) {
                 _this._updatePaletteExtent(_this._paletteExtent);
               }
               _this.fire('add');
@@ -8602,7 +8126,7 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
             var bbox = undefined;
             if (this.cov.bbox) {
               bbox = this.cov.bbox;
-            } else if (this._isRectilinearGeodeticDomainGrid()) {
+            } else if (this._isDomainUsingGeodeticWGS84CRS()) {
               bbox = this._getDomainBbox();
             } else {
               return;
@@ -8617,12 +8141,33 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
            * Subsets the temporal and vertical axes based on the _axesSubset.*.coordPref property,
            * which is regarded as a preference and does not have to exactly match a coordinate.
            * 
+           * The return value is a promise that succeeds with an empty result and
+           * sets this.subsetCov to the subsetted coverage.
+           * The subsetting always fixes a single time and vertical slice, choosing the first
+           * axis value if no preference was given.
+           * 
            * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
            * values from the actual axes.
            */
         }, {
-          key: '_subsetAxesByCoordinatePreference',
-          value: function _subsetAxesByCoordinatePreference() {
+          key: '_subsetByCoordinatePreference',
+          value: function _subsetByCoordinatePreference() {
+            var _this2 = this;
+
+            /**
+             * Return the index of the coordinate value closest to the given value
+             * within the given axis. Supports ascending and descending axes.
+             * If the axis does not exist, then undefined is returned.
+             */
+            var getClosestIndex = function getClosestIndex(axis, val) {
+              if (!_this2.domain.axes.has(axis)) {
+                return;
+              }
+              var vals = _this2.domain.axes.get(axis).values;
+              var idx = arrays.indexOfNearest(vals, val);
+              return idx;
+            };
+
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -8632,13 +8177,13 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
                 var axis = _step.value;
 
                 var ax = this._axesSubset[axis];
-                if (ax.coordPref == undefined) {
+                if (ax.coordPref == undefined && this.domain.axes.has(axis)) {
                   // == also handles null
                   ax.idx = 0;
                 } else {
-                  ax.idx = this._getClosestIndex(axis, ax.coordPref);
+                  ax.idx = getClosestIndex(axis, ax.coordPref);
                 }
-                ax.coord = this.domain[axis] ? this.domain[axis][ax.idx] : null;
+                ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null;
               }
             } catch (err) {
               _didIteratorError = true;
@@ -8654,99 +8199,41 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
                 }
               }
             }
-          }
 
-          /**
-           * Subsets the temporal and vertical axes based on the _axesSubset.*.idx property
-           * which has been explicitly set.
-           * 
-           * After calling this method, the _axesSubset.*.coord properties have
-           * values from the actual axes.
-           */
-        }, {
-          key: '_subsetAxesByIndex',
-          value: function _subsetAxesByIndex() {
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = _getIterator(_Object$keys(this._axesSubset)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var axis = _step2.value;
-
-                var ax = this._axesSubset[axis];
-                ax.coord = this.domain[axis] ? this.domain[axis][ax.idx] : null;
-                delete ax.coordPref; // in case it was set
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                  _iterator2['return']();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
-            }
-          }
-
-          /**
-           * Return the index of the coordinate value closest to the given value
-           * within the given axis. Supports ascending and descending axes.
-           * If the axis is empty, then 0 is returned, since we regard an empty axis
-           * as consisting of a single "unknown" coordinate value.
-           */
-        }, {
-          key: '_getClosestIndex',
-          value: function _getClosestIndex(axis, val) {
-            if (!(axis in this.domain)) {
-              return 0;
-            }
-            var vals = this.domain[axis];
-            var idx = arrays.indexOfNearest(vals, val);
-            return idx;
+            return this.cov.subsetByIndex({ t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
+              _this2.subsetCov = subsetCov;
+            });
           }
         }, {
           key: '_updatePaletteExtent',
           value: function _updatePaletteExtent(extent) {
-            var _arr, _arr2;
-
             if (Array.isArray(extent) && extent.length === 2) {
               this._paletteExtent = extent;
               return;
             }
 
-            // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-            var arr = arrays.asSciJSndarray(this.range.values);
-            var sub = this._axesSubset;
+            var range = undefined;
 
-            if (extent === 'full') {
-              // scan the whole range for min/max values, don't subset
+            if (extent === 'subset') {
+              // scan the current subset for min/max values
+              range = this.subsetRange;
+            } else if (extent === 'fov') {
+              // scan the values that are currently in field of view on the map for min/max
+              // this implies using the current subset
+              var bounds = this._map.getBounds();
 
-            } else if (extent === 'subset') {
-                // scan the current subset (per _axesSubset) for min/max values
-                arr = arr.pick(sub.t.idx, sub.z.idx, null, null);
-              } else if (extent === 'fov') {
-                // scan the values that are currently in field of view on the map for min/max
-                // this implies using the current subset
-                var bounds = this._map.getBounds();
+              // TODO implement
+              throw new Error('NOT IMPLEMENTED YET');
+            } else {
+              throw new Error('Unknown extent specification: ' + extent);
+            }
 
-                // TODO implement
-                throw new Error('NOT IMPLEMENTED YET');
-              } else {
-                throw new Error('Unknown extent specification: ' + extent);
-              }
-
-            this._paletteExtent = [(_arr = arr).get.apply(_arr, _toConsumableArray(opsnull.nullargmin(arr))), (_arr2 = arr).get.apply(_arr2, _toConsumableArray(opsnull.nullargmax(arr)))];
+            this._paletteExtent = rangeutil.minMax(range);
           }
         }, {
           key: 'drawTile',
           value: function drawTile(canvas, tilePoint, zoom) {
-            var _this2 = this;
+            var _this3 = this;
 
             var ctx = canvas.getContext('2d');
             var tileSize = this.options.tileSize;
@@ -8776,45 +8263,41 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
             };
 
             var setPixel = undefined;
-            if (this.param.categories) {
-              var _iteratorNormalCompletion3;
+            if (this.param.categoryEncoding) {
+              var _iteratorNormalCompletion2;
 
-              var _didIteratorError3;
+              var _didIteratorError2;
 
-              var _iteratorError3;
+              var _iteratorError2;
 
-              var _iterator3, _step3;
+              var _iterator2, _step2;
 
               (function () {
-                // categorical parameter
+                // categorical parameter with integer encoding
                 var valIdxMap = new _Map();
-                for (var idx = 0; idx < _this2.param.categories.length; idx++) {
-                  var cat = _this2.param.categories[idx];
-                  if (cat.value) {
-                    valIdxMap.set(cat.value, idx);
-                  } else {
-                    _iteratorNormalCompletion3 = true;
-                    _didIteratorError3 = false;
-                    _iteratorError3 = undefined;
+                for (var idx = 0; idx < _this3.param.observedProperty.categories.length; idx++) {
+                  var cat = _this3.param.observedProperty.categories[idx];
+                  _iteratorNormalCompletion2 = true;
+                  _didIteratorError2 = false;
+                  _iteratorError2 = undefined;
 
+                  try {
+                    for (_iterator2 = _getIterator(_this3.param.categoryEncoding.get(cat.id)); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                      var val = _step2.value;
+
+                      valIdxMap.set(val, idx);
+                    }
+                  } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                  } finally {
                     try {
-                      for (_iterator3 = _getIterator(cat.values); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var val = _step3.value;
-
-                        valIdxMap.set(val, idx);
+                      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                        _iterator2['return']();
                       }
-                    } catch (err) {
-                      _didIteratorError3 = true;
-                      _iteratorError3 = err;
                     } finally {
-                      try {
-                        if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                          _iterator3['return']();
-                        }
-                      } finally {
-                        if (_didIteratorError3) {
-                          throw _iteratorError3;
-                        }
+                      if (_didIteratorError2) {
+                        throw _iteratorError2;
                       }
                     }
                   }
@@ -8834,16 +8317,14 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
               };
             }
 
-            var sub = this._axesSubset;
-            var vals = arrays.asSciJSndarray(this.range.values).pick(sub.t.idx, sub.z.idx, null, null);
+            var vals = this.subsetRange.get;
 
-            if (this._isRectilinearGeodeticDomainGrid()) {
-              if (this._isProjectedCoverageCRS()) {
-                // unproject to lon/lat first
-                // TODO how can we do that? this means adding a dependency to proj4js!
-                // should probably be made optional since this is an edge case
-                throw new Error('NOT IMPLEMENTED YET');
-              }
+            // FIXME check if "Geodetic WGS84 CRS" as term is enough to describe WGS84 angular
+            //          what about cartesian??
+
+            // TODO check if the domain and map CRS datum match
+            // -> if not, then at least a warning should be shown
+            if (this._isDomainUsingGeodeticWGS84CRS()) {
               if (this._isRectilinearGeodeticMap()) {
                 // here we can apply heavy optimizations
                 this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals);
@@ -8853,14 +8334,22 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
                 this._drawAnyMapProjection(setPixel, tileSize, startX, startY, vals);
               }
             } else {
-              if (true /*map CRS == domain CRS*/) {
-                  // TODO implement
-                  throw new Error('NOT IMPLEMENTED YET');
-                } else {
-                // here we would have to reproject the coverage
-                // since this is not feasible in browsers, we just throw an error
-                throw new Error('The map CRS must match the Coverage CRS ' + 'if the latter cannot be mapped to a rectilinear geodetic grid');
-              }
+              // here we either have a projected CRS with base CRS = CRS84, or
+              // a projected CRS with non-CRS84 base CRS (like British National Grid), or
+              // a geodetic CRS not using a WGS84 datum
+              // FIXME check this, what does geodetic CRS really mean? = lat/lon? = ellipsoid?
+
+              if (this._isGeodeticTransformAvailableForDomain()) {
+                throw new Error('NOT IMPLEMENTED YET');
+                // TODO implement, use 2D coordinate arrays and/or proj4 transforms
+              } else {
+                  // TODO if the map projection base CRS matches the CRS of the domain,
+                  //      could we still draw the grid in projected coordinates?
+                  // -> e.g. UK domain CRS (not projected! easting, northing) and
+                  //         UK basemap in that CRS
+
+                  throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 'and no geodetic transform data is available');
+                }
             }
 
             ctx.putImageData(imgData, 0, 0);
@@ -8873,32 +8362,35 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
         }, {
           key: '_getDomainBbox',
           value: function _getDomainBbox() {
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
+
             // TODO use bounds if they are supplied
-            var xend = this.domain.x.length - 1;
-            var yend = this.domain.y.length - 1;
-            var xmin = this.domain.x[0];
-            var xmax = this.domain.x[xend];
-            var ymin = this.domain.y[0];
-            var ymax = this.domain.y[yend];
+            var xend = x.length - 1;
+            var yend = y.length - 1;
+            var xmin = x[0];
+            var xmax = x[xend];
+            var ymin = y[0];
+            var ymax = y[yend];
 
             // TODO only enlarge when bounds haven't been used above
-            if (this.domain.x.length > 1) {
-              xmin -= Math.abs(this.domain.x[0] - this.domain.x[1]) / 2;
-              xmax += Math.abs(this.domain.x[xend] - this.domain.x[xend - 1]) / 2;
+            if (x.length > 1) {
+              xmin -= Math.abs(x[0] - x[1]) / 2;
+              xmax += Math.abs(x[xend] - x[xend - 1]) / 2;
             }
-            if (this.domain.y.length > 1) {
-              ymin -= Math.abs(this.domain.y[0] - this.domain.y[1]) / 2;
-              ymax += Math.abs(this.domain.y[yend] - this.domain.y[yend - 1]) / 2;
+            if (y.length > 1) {
+              ymin -= Math.abs(y[0] - y[1]) / 2;
+              ymax += Math.abs(y[yend] - y[yend - 1]) / 2;
             }
             if (xmin > xmax) {
-              var _ref3 = [xmax, xmin];
-              xmin = _ref3[0];
-              xmax = _ref3[1];
+              var _ref = [xmax, xmin];
+              xmin = _ref[0];
+              xmax = _ref[1];
             }
             if (ymin > ymax) {
-              var _ref4 = [ymax, ymin];
-              ymin = _ref4[0];
-              ymax = _ref4[1];
+              var _ref2 = [ymax, ymin];
+              ymin = _ref2[0];
+              ymax = _ref2[1];
             }
             return [xmin, ymin, xmax, ymax];
           }
@@ -8920,10 +8412,8 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
             // there are two hotspots in the loops: map.unproject and indexOfNearest
 
             var map = this._map;
-            var _domain = this.domain;
-            var x = _domain.x;
-            var y = _domain.y;
-
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
             var bbox = this._getDomainBbox();
             var lonRange = [bbox[0], bbox[0] + 360];
 
@@ -8951,7 +8441,7 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
                 var iLat = arrays.indexOfNearest(y, lat);
                 var iLon = arrays.indexOfNearest(x, lon);
 
-                setPixel(tileY, tileX, vals.get(iLat, iLon));
+                setPixel(tileY, tileX, vals({ y: iLat, x: iLon }));
               }
             }
           }
@@ -8967,10 +8457,8 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
             // this can be used when lat and lon can be computed independently for a given pixel
 
             var map = this._map;
-            var _domain2 = this.domain;
-            var x = _domain2.x;
-            var y = _domain2.y;
-
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
             var bbox = this._getDomainBbox();
             var lonRange = [bbox[0], bbox[0] + 360];
 
@@ -9006,7 +8494,7 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
 
                 var iLat = iLatCache[tileY];
 
-                setPixel(tileY, tileX, vals.get(iLat, iLon));
+                setPixel(tileY, tileX, vals({ y: iLat, x: iLon }));
               }
             }
           }
@@ -9031,41 +8519,20 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
           }
 
           /**
-           * Same as _isRectilinearGeodeticMap but for the coverage CRS.
+           * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
            */
         }, {
-          key: '_isRectilinearGeodeticDomainGrid',
-          value: function _isRectilinearGeodeticDomainGrid() {
-            var _this3 = this;
-
-            if (!this.domain.crs) {
-              // defaults to CRS84 if not given
-              return true;
-            }
-            // TODO add other common ones or somehow detect it automatically
-            var recti = ['http://www.opengis.net/def/crs/OGC/1.3/CRS84'];
-            return recti.some(function (r) {
-              return _this3.domain.crs === r;
-            });
+          key: '_isDomainUsingGeodeticWGS84CRS',
+          value: function _isDomainUsingGeodeticWGS84CRS() {
+            var srs = referencingutil.getRefSystem(this.domain, ['x', 'y']);
+            return referencingutil.isGeodeticWGS84CRS(srs);
           }
-
-          /**
-           * Whether the CRS of the coverage is a projected one, meaning
-           * that x and y are not geographic coordinates (lon/lat) but easting and northing
-           * which have to be converted to geographic coordinates.
-           */
         }, {
-          key: '_isProjectedCoverageCRS',
-          value: function _isProjectedCoverageCRS() {
-            var _this4 = this;
-
-            if (!this.domain.crs) {
-              return false;
-            }
-            var geographic = ['http://www.opengis.net/def/crs/OGC/1.3/CRS84'];
-            return !geographic.some(function (uri) {
-              return _this4.domain.crs === uri;
-            });
+          key: '_isGeodeticTransformAvailableForDomain',
+          value: function _isGeodeticTransformAvailableForDomain() {
+            var srs = referencingutil.getRefSystem(this.domain, ['x', 'y']);
+            // TODO implement
+            return false;
           }
         }, {
           key: '_doAutoRedraw',
@@ -9089,13 +8556,19 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
         }, {
           key: 'time',
           set: function set(val) {
+            var _this4 = this;
+
+            if (!this.domain.axes.has('t')) {
+              throw new Error('No time axis found');
+            }
             var old = this.time;
             this._axesSubset.t.coordPref = val;
-            this._subsetAxesByPreference();
-            this._doAutoRedraw();
-            if (old !== this.time) {
-              this.fire('axisChange', { axis: 'time' });
-            }
+            this._subsetByCoordinatePreference().then(function () {
+              _this4._doAutoRedraw();
+              if (old !== _this4.time) {
+                _this4.fire('axisChange', { axis: 'time' });
+              }
+            });
           },
 
           /**
@@ -9113,13 +8586,19 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
         }, {
           key: 'vertical',
           set: function set(val) {
+            var _this5 = this;
+
+            if (!this.domain.axes.has('z')) {
+              throw new Error('No vertical axis found');
+            }
             var old = this.vertical;
             this._axesSubset.z.coordPref = val;
-            this._subsetAxesByPreference();
-            this._doAutoRedraw();
-            if (old !== this.vertical) {
-              this.fire('axisChange', { axis: 'vertical' });
-            }
+            this._subsetByCoordinatePreference().then(function () {
+              _this5._doAutoRedraw();
+              if (old !== _this5.vertical) {
+                _this5.fire('axisChange', { axis: 'vertical' });
+              }
+            });
           },
 
           /**
@@ -9142,7 +8621,7 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
         }, {
           key: 'paletteExtent',
           set: function set(extent) {
-            if (this.param.categories) {
+            if (this.param.observedProperty.categories) {
               throw new Error('Cannot set palette extent for categorical parameters');
             }
             this._updatePaletteExtent(extent);
@@ -9162,13 +8641,13 @@ $__System.register('3a', ['5', '7', '8', '9', '10', '11', '13', '19', '25', 'a',
   };
 });
 
-$__System.registerDynamic("3c", ["3d"], true, function(req, exports, module) {
+$__System.registerDynamic("36", ["37"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$defineProperty = req('3d')["default"];
+  var _Object$defineProperty = req('37')["default"];
   exports["default"] = function(obj, key, value) {
     if (key in obj) {
       _Object$defineProperty(obj, key, {
@@ -9187,8 +8666,8 @@ $__System.registerDynamic("3c", ["3d"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('3e', ['18', '3c', '3b', '3a', '1d'], function (_export) {
-  var Profile, _defineProperty, _Object$keys, Grid, Trajectory, _DEFAULT_RENDERERS, pre, DEFAULT_RENDERERS;
+$__System.register('38', ['18', '34', '35', '36', '1d'], function (_export) {
+  var VerticalProfile, Grid, _Object$keys, _defineProperty, Trajectory, _DEFAULT_RENDERERS, pre, DEFAULT_RENDERERS;
 
   function LayerFactory() {
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -9218,14 +8697,14 @@ $__System.register('3e', ['18', '3c', '3b', '3a', '1d'], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      Profile = _['default'];
-    }, function (_c) {
-      _defineProperty = _c['default'];
-    }, function (_b) {
-      _Object$keys = _b['default'];
-    }, function (_a) {
-      Grid = _a['default'];
+    setters: [function (_4) {
+      VerticalProfile = _4['default'];
+    }, function (_3) {
+      Grid = _3['default'];
+    }, function (_2) {
+      _Object$keys = _2['default'];
+    }, function (_) {
+      _defineProperty = _['default'];
     }, function (_d) {
       Trajectory = _d['default'];
     }],
@@ -9236,29 +8715,143 @@ $__System.register('3e', ['18', '3c', '3b', '3a', '1d'], function (_export) {
       _export('default', LayerFactory);
 
       pre = 'http://coveragejson.org/def#';
-      DEFAULT_RENDERERS = (_DEFAULT_RENDERERS = {}, _defineProperty(_DEFAULT_RENDERERS, pre + 'Grid', Grid), _defineProperty(_DEFAULT_RENDERERS, pre + 'Profile', Profile), _defineProperty(_DEFAULT_RENDERERS, pre + 'Trajectory', Trajectory), _DEFAULT_RENDERERS);
+      DEFAULT_RENDERERS = (_DEFAULT_RENDERERS = {}, _defineProperty(_DEFAULT_RENDERERS, pre + 'Grid', Grid), _defineProperty(_DEFAULT_RENDERERS, pre + 'VerticalProfile', VerticalProfile), _defineProperty(_DEFAULT_RENDERERS, pre + 'Trajectory', Trajectory), _DEFAULT_RENDERERS);
 
       _export('DEFAULT_RENDERERS', DEFAULT_RENDERERS);
     }
   };
 });
 
-$__System.register("3f", ["3e"], function (_export) {
+$__System.register("39", ["38"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_e) {
+    setters: [function (_) {
       var _exportObj = {};
 
-      for (var _key in _e) {
-        if (_key !== "default") _exportObj[_key] = _e[_key];
+      for (var _key in _) {
+        if (_key !== "default") _exportObj[_key] = _[_key];
       }
 
-      _exportObj["default"] = _e["default"];
+      _exportObj["default"] = _["default"];
 
       _export(_exportObj);
     }],
     execute: function () {}
+  };
+});
+
+$__System.register('3a', ['9', '10', '35', 'a', '3b', '3c'], function (_export) {
+  var _createClass, _getIterator, _Object$keys, _classCallCheck, Coverage, shallowcopy, CoverageCollection;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _getIterator = _2['default'];
+    }, function (_3) {
+      _Object$keys = _3['default'];
+    }, function (_a) {
+      _classCallCheck = _a['default'];
+    }, function (_b) {
+      Coverage = _b['default'];
+    }, function (_c) {
+      shallowcopy = _c.shallowcopy;
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      CoverageCollection = (function () {
+        function CoverageCollection(covjson) {
+          _classCallCheck(this, CoverageCollection);
+
+          this._exposeLd(covjson);
+          this.id = covjson.id;
+          var covs = [];
+          var rootParams = covjson.parameters ? covjson.parameters : {};
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = _getIterator(covjson.coverages), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var coverage = _step.value;
+
+              if (coverage.parameters) {
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                  for (var _iterator2 = _getIterator(_Object$keys(rootParams)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var key = _step2.value;
+
+                    if (key in coverage.ranges) {
+                      coverage.parameters[key] = rootParams[key];
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+              } else {
+                coverage.parameters = rootParams;
+              }
+              covs.push(new Coverage(coverage));
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator['return']) {
+                _iterator['return']();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          this.coverages = covs;
+          if (covjson.parameters) {
+            this.parameters = covjson.parameters;
+          }
+        }
+
+        _createClass(CoverageCollection, [{
+          key: '_exposeLd',
+          value: function _exposeLd(covjson) {
+            if (!covjson['@context']) {
+              // no LD love here...
+              this.ld = {};
+              return;
+            }
+            // make a deep copy since the object gets modified in-place later
+            // but first, remove the coverages (those have their own .ld property)
+            var copy = shallowcopy(covjson);
+            delete copy.coverages;
+            this.ld = JSON.parse(JSON.stringify(copy));
+          }
+        }]);
+
+        return CoverageCollection;
+      })();
+
+      _export('default', CoverageCollection);
+    }
   };
 });
 
@@ -9613,7 +9206,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     decode: decode
   };
   if (typeof define === "function" && define.amd)
-    define("40", [], obj);
+    define("3d", [], obj);
   else if (!global.CBOR)
     global.CBOR = obj;
 })(this);
@@ -9622,13 +9215,229 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("41", ["40"], function(main) {
+define("3e", ["3d"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.registerDynamic("42", [], true, function(req, exports, module) {
+$__System.register('3f', ['c', '3e', '3c'], function (_export) {
+  var _Promise, cbor, endsWith, MEDIA, ACCEPT, EXT;
+
+  /**
+   * Loads a CoverageJSON document from a given URL and returns a {@link Promise} object
+   * that succeeds with the unmodified CoverageJSON object.
+   * 
+   * @param {string} url
+   * @return {Promise}
+   *   The result is an object {data, headers} where data is the CoverageJSON object
+   *   and headers are the HTTP response headers. The promise fails if the resource at
+   *   the given URL is not a valid JSON or CBOR document. 
+   */
+
+  function load(url) {
+    var responseType = arguments.length <= 1 || arguments[1] === undefined ? 'arraybuffer' : arguments[1];
+
+    if (['arraybuffer', 'text'].indexOf(responseType) === -1) {
+      throw new Error();
+    }
+    return new _Promise(function (resolve, reject) {
+      var req = new XMLHttpRequest();
+      req.open('GET', url);
+      req.responseType = responseType;
+      req.setRequestHeader('Accept', ACCEPT);
+
+      req.addEventListener('load', function () {
+        if (!(req.status >= 200 && req.status < 300 || req.status === 304)) {
+          // as in jquery
+          reject(new Error('Resource "' + url + '" not found, HTTP status code: ' + req.status));
+          return;
+        }
+
+        var type = req.getResponseHeader('Content-Type');
+
+        if (type.indexOf(MEDIA.OCTETSTREAM) === 0 || type.indexOf(MEDIA.TEXT) === 0) {
+          // wrong media type, try to infer type from extension
+          if (endsWith(url, EXT.COVJSON)) {
+            type = MEDIA.COVJSON;
+          } else if (endsWith(url, EXT.COVCBOR)) {
+            type = MEDIA.COVCBOR;
+          }
+        }
+        var data = undefined;
+        if (type === MEDIA.COVCBOR) {
+          var arrayBuffer = req.response;
+          data = cbor.decode(arrayBuffer);
+        } else if ([MEDIA.COVJSON, MEDIA.JSONLD, MEDIA.JSON].indexOf(type) > -1) {
+          if (responseType === 'arraybuffer') {
+            // load again (from cache) to get correct response type
+            // Note we use 'text' and not 'json' as we want to throw parsing errors.
+            // With 'json', the response is just 'null'.
+            reject({ responseType: 'text' });
+            return;
+          }
+          data = JSON.parse(req.response);
+        } else {
+          reject(new Error('Unsupported media type: ' + type));
+          return;
+        }
+        // TODO check if these are the initial response headers
+        //  Mozilla says "For multipart requests, this returns the headers
+        //  from the current part of the request, not from the original channel."
+        // -> is chunked transfer encoding a multipart request?
+        var headers = parseResponseHeaders(req.getAllResponseHeaders());
+        resolve({
+          data: data,
+          headers: headers
+        });
+      });
+      req.addEventListener('error', function () {
+        reject(new Error('Network error loading resource at ' + url));
+      });
+
+      req.send();
+    })['catch'](function (e) {
+      if (e.responseType) {
+        return load(url, e.responseType);
+      } else {
+        throw e;
+      }
+    });
+  }
+
+  /**
+   * XmlHttpRequest's getAllResponseHeaders() method returns a string of response
+   * headers according to the format described here:
+   * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method
+   * This method parses that string into a user-friendly key/value pair object.
+   * 
+   * https://gist.github.com/monsur/706839
+   */
+  function parseResponseHeaders(headerStr) {
+    // FIXME check if this swallows repeated headers
+    var headers = {};
+    if (!headerStr) {
+      return headers;
+    }
+    var headerPairs = headerStr.split('\r\n');
+    for (var i = 0; i < headerPairs.length; i++) {
+      var headerPair = headerPairs[i];
+      // Can't use split() here because it does the wrong thing
+      // if the header value has the string ": " in it.
+      var index = headerPair.indexOf(': ');
+      if (index > 0) {
+        var key = headerPair.substring(0, index);
+        var val = headerPair.substring(index + 2);
+        headers[key] = val;
+      }
+    }
+    return headers;
+  }
+  return {
+    setters: [function (_c) {
+      _Promise = _c['default'];
+    }, function (_e) {
+      cbor = _e['default'];
+    }, function (_c2) {
+      endsWith = _c2.endsWith;
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      _export('load', load);
+
+      MEDIA = {
+        COVCBOR: 'application/prs.coverage+cbor',
+        COVJSON: 'application/prs.coverage+json',
+        JSONLD: 'application/ld+json',
+        JSON: 'application/json',
+        OCTETSTREAM: 'application/octet-stream',
+        TEXT: 'text/plain'
+      };
+      ACCEPT = MEDIA.COVCBOR + '; q=1.0, ' + MEDIA.COVJSON + '; q=0.5, ' + MEDIA.JSONLD + '; q=0.1, ' + MEDIA.JSON + '; q=0.1';
+      EXT = {
+        COVJSON: '.covjson',
+        COVCBOR: '.covcbor'
+      };
+    }
+  };
+});
+
+$__System.register('3c', [], function (_export) {
+  /* */
+  'use strict';
+
+  var PREFIX;
+
+  _export('assert', assert);
+
+  _export('shallowcopy', shallowcopy);
+
+  _export('endsWith', endsWith);
+
+  _export('minMax', minMax);
+
+  function assert(condition, message) {
+    if (!condition) {
+      message = message || 'Assertion failed';
+      throw new Error(message);
+    }
+  }
+
+  function shallowcopy(obj) {
+    var copy = {};
+    for (var prop in obj) {
+      copy[prop] = obj[prop];
+    }
+    return copy;
+  }
+
+  function endsWith(subject, search) {
+    // IE support
+    var position = subject.length - search.length;
+    var lastIndex = subject.indexOf(search, position);
+    return lastIndex !== -1 && lastIndex === position;
+  }
+
+  function minMax(arr) {
+    var len = arr.length;
+    var min = Infinity;
+    var max = -Infinity;
+    while (len--) {
+      var el = arr[len];
+      if (el == null) {
+        // do nothing
+      } else if (el < min) {
+          min = el;
+        } else if (el > max) {
+          max = el;
+        }
+    }
+    if (min === Infinity) {
+      min = max;
+    } else if (max === -Infinity) {
+      max = min;
+    }
+    if (min === Infinity) {
+      // all values were null
+      min = null;
+      max = null;
+    }
+    return [min, max];
+  }
+
+  return {
+    setters: [],
+    execute: function () {
+      PREFIX = 'http://coveragejson.org/def#';
+
+      _export('PREFIX', PREFIX);
+    }
+  };
+});
+
+$__System.registerDynamic("40", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -9642,17 +9451,17 @@ $__System.registerDynamic("42", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("43", ["42"], true, function(req, exports, module) {
+$__System.registerDynamic("41", ["40"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('42');
+  module.exports = req('40');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("44", [], true, function(req, exports, module) {
+$__System.registerDynamic("42", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -9737,17 +9546,17 @@ $__System.registerDynamic("44", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("45", ["44"], true, function(req, exports, module) {
+$__System.registerDynamic("43", ["42"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('44');
+  module.exports = req('42');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("46", [], true, function(req, exports, module) {
+$__System.registerDynamic("44", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -9853,24 +9662,24 @@ $__System.registerDynamic("46", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("47", ["46"], true, function(req, exports, module) {
+$__System.registerDynamic("45", ["44"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('46');
+  module.exports = req('44');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("48", ["47", "45", "43"], true, function(req, exports, module) {
+$__System.registerDynamic("46", ["45", "43", "41"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var base64 = req('47');
-  var ieee754 = req('45');
-  var isArray = req('43');
+  var base64 = req('45');
+  var ieee754 = req('43');
+  var isArray = req('41');
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
   exports.INSPECT_MAX_BYTES = 50;
@@ -11164,6 +10973,26 @@ $__System.registerDynamic("48", ["47", "45", "43"], true, function(req, exports,
   return module.exports;
 });
 
+$__System.registerDynamic("47", ["46"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('46');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("48", ["47"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : req('47');
+  global.define = __define;
+  return module.exports;
+});
+
 $__System.registerDynamic("49", ["48"], true, function(req, exports, module) {
   ;
   var global = this,
@@ -11179,7 +11008,11 @@ $__System.registerDynamic("4a", ["49"], true, function(req, exports, module) {
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : req('49');
+  (function(Buffer) {
+    module.exports = function(obj) {
+      return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
+    };
+  })(req('49').Buffer);
   global.define = __define;
   return module.exports;
 });
@@ -11194,31 +11027,7 @@ $__System.registerDynamic("4b", ["4a"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("4c", ["4b"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(Buffer) {
-    module.exports = function(obj) {
-      return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
-    };
-  })(req('4b').Buffer);
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4d", ["4c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('4c');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4e", [], true, function(req, exports, module) {
+$__System.registerDynamic("4c", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -11236,23 +11045,23 @@ $__System.registerDynamic("4e", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("4f", ["4e"], true, function(req, exports, module) {
+$__System.registerDynamic("4d", ["4c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('4e');
+  module.exports = req('4c');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("50", ["4f", "4d"], true, function(req, exports, module) {
+$__System.registerDynamic("4e", ["4d", "4b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var iota = req('4f');
-  var isBuffer = req('4d');
+  var iota = req('4d');
+  var isBuffer = req('4b');
   var hasTypedArrays = ((typeof Float64Array) !== "undefined");
   function compare1st(a, b) {
     return a[0] - b[0];
@@ -11543,22 +11352,22 @@ b" + i + "*=d\
   return module.exports;
 });
 
-$__System.registerDynamic("25", ["50"], true, function(req, exports, module) {
+$__System.registerDynamic("1f", ["4e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('50');
+  module.exports = req('4e');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("51", ["2d"], true, function(req, exports, module) {
+$__System.registerDynamic("4f", ["27"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $def = req('2d');
+  var $def = req('27');
   $def($def.S, 'Math', {trunc: function trunc(it) {
       return (it > 0 ? Math.floor : Math.ceil)(it);
     }});
@@ -11566,49 +11375,106 @@ $__System.registerDynamic("51", ["2d"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("52", ["51", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("50", ["4f", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('51');
-  module.exports = req('30').Math.trunc;
+  req('4f');
+  module.exports = req('2a').Math.trunc;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("26", ["52"], true, function(req, exports, module) {
+$__System.registerDynamic("20", ["50"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('52'),
+    "default": req('50'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("53", ["2d", "54"], true, function(req, exports, module) {
+$__System.registerDynamic("31", ["27", "2a", "51"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $def = req('2d');
-  $def($def.P, 'Map', {toJSON: req('54')('Map')});
+  module.exports = function(KEY, exec) {
+    var $def = req('27'),
+        fn = (req('2a').Object || {})[KEY] || Object[KEY],
+        exp = {};
+    exp[KEY] = exec(fn);
+    $def($def.S + $def.F * req('51')(function() {
+      fn(1);
+    }), 'Object', exp);
+  };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("55", ["56", "57"], true, function(req, exports, module) {
+$__System.registerDynamic("52", ["53", "31"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toObject = req('53');
+  req('31')('keys', function($keys) {
+    return function keys(it) {
+      return $keys(toObject(it));
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("54", ["52", "2a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('52');
+  module.exports = req('2a').Object.keys;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("35", ["54"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('54'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("55", ["27", "56"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $def = req('27');
+  $def($def.P, 'Map', {toJSON: req('56')('Map')});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("57", ["58", "59"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var strong = req('56');
-  req('57')('Map', function(get) {
+  var strong = req('58');
+  req('59')('Map', function(get) {
     return function Map() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
     };
@@ -11625,92 +11491,1143 @@ $__System.registerDynamic("55", ["56", "57"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("58", ["59", "28", "29", "55", "53", "30"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('59');
-  req('28');
-  req('29');
-  req('55');
-  req('53');
-  module.exports = req('30').Map;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("11", ["58"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('58'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("37", ["2d", "30", "5a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(KEY, exec) {
-    var $def = req('2d'),
-        fn = (req('30').Object || {})[KEY] || Object[KEY],
-        exp = {};
-    exp[KEY] = exec(fn);
-    $def($def.S + $def.F * req('5a')(function() {
-      fn(1);
-    }), 'Object', exp);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5b", ["5c", "37"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toObject = req('5c');
-  req('37')('keys', function($keys) {
-    return function keys(it) {
-      return $keys(toObject(it));
-    };
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5d", ["5b", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("5a", ["5b", "22", "23", "57", "55", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   req('5b');
-  module.exports = req('30').Object.keys;
+  req('22');
+  req('23');
+  req('57');
+  req('55');
+  module.exports = req('2a').Map;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("3b", ["5d"], true, function(req, exports, module) {
+$__System.registerDynamic("11", ["5a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('5d'),
+    "default": req('5a'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("5e", [], true, function(req, exports, module) {
+$__System.registerDynamic("5c", ["5d", "24", "5e", "2a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var classof = req('5d'),
+      ITERATOR = req('24')('iterator'),
+      Iterators = req('5e');
+  module.exports = req('2a').isIterable = function(it) {
+    var O = Object(it);
+    return ITERATOR in O || '@@iterator' in O || Iterators.hasOwnProperty(classof(O));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5f", ["23", "22", "5c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('23');
+  req('22');
+  module.exports = req('5c');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("60", ["5f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('5f'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("13", ["10", "60"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _getIterator = req('10')["default"];
+  var _isIterable = req('60')["default"];
+  exports["default"] = (function() {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+      try {
+        for (var _i = _getIterator(arr),
+            _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+          if (i && _arr.length === i)
+            break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"])
+            _i["return"]();
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+    return function(arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (_isIterable(Object(arr))) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  })();
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('3b', ['9', '10', '11', '13', '20', '35', '61', 'a', '1e', 'c', '1f', '3c', '3f'], function (_export) {
+  var _createClass, _getIterator, _Map, _slicedToArray, _Math$trunc, _Object$keys, _Array$from, _classCallCheck, _toConsumableArray, _Promise, ndarray, shallowcopy, minMax, assert, PREFIX, load, Coverage;
+
+  /**
+   * Currently unused, but may need in future.
+   * This determines the best array type for categorical data which
+   * doesn't have missing values.
+   */
+  /*
+  function arrayType (validMin, validMax) {
+    let type
+    if (validMin !== undefined) {
+      if (validMin >= 0) {
+        if (validMax < Math.pow(2,8)) {
+          type = Uint8Array
+        } else if (validMax < Math.pow(2,16)) {
+          type = Uint16Array
+        } else if (validMax < Math.pow(2,32)) {
+          type = Uint32Array
+        } else {
+          type = Array
+        }
+      } else {
+        let max = Math.max(Math.abs(validMin), validMax)
+        if (max < Math.pow(2,8)) {
+          type = Int8Array
+        } else if (validMax < Math.pow(2,16)) {
+          type = Int16Array
+        } else if (validMax < Math.pow(2,32)) {
+          type = Int32Array
+        } else {
+          type = Array
+        }
+      }
+    } else {
+      type = Array
+    }
+    return type
+  }
+  */
+
+  /**
+   * Transforms a CoverageJSON parameter to the Coverage API format, that is,
+   * language maps become real Maps. Transformation is made in-place.
+   * 
+   * @param {Object} param The original parameter.
+   */
+  function transformParameter(params, key) {
+    var param = params[key];
+    param.key = key;
+    var maps = [[param, 'description'], [param.observedProperty, 'label'], [param.observedProperty, 'description'], [param.unit, 'label']];
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
+
+    try {
+      for (var _iterator6 = _getIterator(param.observedProperty.categories || []), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var cat = _step6.value;
+
+        maps.push([cat, 'label']);
+        maps.push([cat, 'description']);
+      }
+    } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+          _iterator6['return']();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+
+    try {
+      for (var _iterator7 = _getIterator(maps), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var entry = _step7.value;
+
+        transformLanguageMap(entry[0], entry[1]);
+      }
+    } catch (err) {
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+          _iterator7['return']();
+        }
+      } finally {
+        if (_didIteratorError7) {
+          throw _iteratorError7;
+        }
+      }
+    }
+
+    if (param.categoryEncoding) {
+      var map = new _Map();
+      var _iteratorNormalCompletion8 = true;
+      var _didIteratorError8 = false;
+      var _iteratorError8 = undefined;
+
+      try {
+        for (var _iterator8 = _getIterator(_Object$keys(param.categoryEncoding)), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+          var category = _step8.value;
+
+          var vals = param.categoryEncoding[category];
+          if (!Array.isArray(vals)) {
+            vals = [vals];
+          }
+          map.set(category, vals);
+        }
+      } catch (err) {
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+            _iterator8['return']();
+          }
+        } finally {
+          if (_didIteratorError8) {
+            throw _iteratorError8;
+          }
+        }
+      }
+
+      param.categoryEncoding = map;
+    }
+  }
+
+  function transformLanguageMap(obj, key) {
+    if (!obj || !(key in obj) || obj[key] instanceof _Map) {
+      return;
+    }
+    var map = new _Map();
+    var _iteratorNormalCompletion9 = true;
+    var _didIteratorError9 = false;
+    var _iteratorError9 = undefined;
+
+    try {
+      for (var _iterator9 = _getIterator(_Object$keys(obj[key])), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+        var tag = _step9.value;
+
+        map.set(tag, obj[key][tag]);
+      }
+    } catch (err) {
+      _didIteratorError9 = true;
+      _iteratorError9 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion9 && _iterator9['return']) {
+          _iterator9['return']();
+        }
+      } finally {
+        if (_didIteratorError9) {
+          throw _iteratorError9;
+        }
+      }
+    }
+
+    obj[key] = map;
+  }
+
+  /**
+   * Transforms a CoverageJSON range to the Coverage API format, that is,
+   * no special encoding etc. is left. Transformation is made in-place.
+   * 
+   * @param {Object} range The original range.
+   * @param {Object} domain The CoverageJSON domain object. 
+   * @return {Object} The transformed range.
+   */
+  function transformRange(range, domain) {
+    if ('__transformDone' in range) return;
+
+    var values = range.values;
+    var targetDataType = range.dataType; // 'integer', 'float', 'string'
+    var isTyped = ArrayBuffer.isView(values);
+    var missingIsEncoded = range.missing === 'nonvalid';
+    var hasOffsetFactor = ('offset' in range);
+
+    if ('offset' in range) {
+      assert('factor' in range);
+    }
+    var offset = range.offset;
+    var factor = range.factor;
+
+    if (missingIsEncoded) {
+      assert('validMin' in range);
+      assert('validMax' in range);
+    }
+    var validMin = range.validMin;
+    var validMax = range.validMax;
+
+    var vals = undefined;
+    if (!missingIsEncoded && !hasOffsetFactor) {
+      // No transformation necessary.
+      vals = values;
+    } else {
+      // Transformation is necessary.
+      // we use a regular array so that missing values can be represented as null
+      vals = new Array(values.length);
+
+      // TODO can we use typed arrays here without having to scan for missing values first?
+      //  When typed arrays with missing value encoding was used we could keep that and provide
+      //  a higher abstraction on the array similar to an ndarray interface. This means that [] syntax
+      //  would be impossible and change to .get(index).
+
+      if (hasOffsetFactor) {
+        for (var i = 0; i < values.length; i++) {
+          var val = values[i];
+          if (missingIsEncoded && (val < validMin || val > validMax)) {
+            // This is necessary as the default value is "undefined".
+            vals[i] = null;
+          } else if (!missingIsEncoded && val === null) {
+            vals[i] = null;
+          } else {
+            vals[i] = val * factor + offset;
+          }
+        }
+
+        if (validMin !== undefined) {
+          range.validMin = validMin * factor + offset;
+          range.validMax = validMax * factor + offset;
+        }
+      } else {
+        // missingIsEncoded == true
+        for (var i = 0; i < values.length; i++) {
+          var val = values[i];
+          if (val < validMin || val > validMax) {
+            vals[i] = null;
+          } else {
+            vals[i] = val;
+          }
+        }
+      }
+
+      delete range.offset;
+      delete range.factor;
+      delete range.missing;
+    }
+
+    if (validMin === undefined) {
+      var _minMax = minMax(vals);
+
+      var _minMax2 = _slicedToArray(_minMax, 2);
+
+      var min = _minMax2[0];
+      var max = _minMax2[1];
+
+      if (min !== null) {
+        range.validMin = min;
+        range.validMax = max;
+      }
+    }
+
+    var shape = new _Map(); // axis name -> axis size (value count)
+    var _iteratorNormalCompletion10 = true;
+    var _didIteratorError10 = false;
+    var _iteratorError10 = undefined;
+
+    try {
+      for (var _iterator10 = _getIterator(domain.axes.keys()), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+        var axisName = _step10.value;
+
+        shape.set(axisName, domain.axes.get(axisName).values.length);
+      }
+    } catch (err) {
+      _didIteratorError10 = true;
+      _iteratorError10 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion10 && _iterator10['return']) {
+          _iterator10['return']();
+        }
+      } finally {
+        if (_didIteratorError10) {
+          throw _iteratorError10;
+        }
+      }
+    }
+
+    range.shape = shape;
+
+    var ndarr = ndarray(vals, domain._rangeShape);
+    range._ndarr = ndarr;
+    range.get = createRangeGetFunction(ndarr, domain._rangeAxisOrder);
+
+    range.__transformDone = true;
+    return range;
+  }
+
+  /**
+   * 
+   * @param axisOrder An array of axis names.
+   * @returns Function
+   */
+  function createRangeGetFunction(ndarr, axisOrder) {
+    // see below for slower reference version
+    var ndargs = '';
+    for (var i = 0; i < axisOrder.length; i++) {
+      if (ndargs) ndargs += ',';
+      ndargs += '\'' + axisOrder[i] + '\' in obj ? obj[\'' + axisOrder[i] + '\'] : 0';
+    }
+    var fn = new Function('ndarr', 'obj', 'return ndarr.get(' + ndargs + ')');
+    return fn.bind(undefined, ndarr);
+  }
+
+  /*
+   * Reference version of createRangeGetFunction().
+   * Around 50% slower compared to precompiled version.
+   * 
+  function createRangeGetFunction (ndarr, axisOrder) {
+    axisOrder = axisOrder.slice() // help the JIT (possibly..)
+    const axisCount = axisOrder.length
+    return obj => {
+      let indices = new Array(axisCount)
+      for (let i=0; i < axisCount; i++) {
+        indices[i] = axisOrder[i] in obj ? obj[axisOrder[i]] : 0
+      }
+      return ndarr.get(...indices)
+    }
+  }
+  */
+
+  /**
+   * Transforms a CoverageJSON domain to the Coverage API format.
+   * Transformation is made in-place.
+   * 
+   * @param {Object} domain The original domain object.
+   * @return {Object} The transformed domain object.
+   */
+  function transformDomain(domain) {
+    if ('__transformDone' in domain) return;
+
+    var profile = domain.profile || 'Domain';
+    if (profile.substr(0, 4) !== 'http') {
+      profile = PREFIX + profile;
+    }
+    domain.type = profile;
+
+    var axes = new _Map(); // axis name -> axis object
+
+    var _iteratorNormalCompletion11 = true;
+    var _didIteratorError11 = false;
+    var _iteratorError11 = undefined;
+
+    try {
+      for (var _iterator11 = _getIterator(_Object$keys(domain.axes)), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+        var axisName = _step11.value;
+
+        axes.set(axisName, domain.axes[axisName]);
+      }
+    } catch (err) {
+      _didIteratorError11 = true;
+      _iteratorError11 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion11 && _iterator11['return']) {
+          _iterator11['return']();
+        }
+      } finally {
+        if (_didIteratorError11) {
+          throw _iteratorError11;
+        }
+      }
+    }
+
+    domain.axes = axes;
+
+    // expand start/stop/num regular axes
+    // replace 1D numeric axis arrays with typed arrays for efficiency
+    var _iteratorNormalCompletion12 = true;
+    var _didIteratorError12 = false;
+    var _iteratorError12 = undefined;
+
+    try {
+      for (var _iterator12 = _getIterator(axes.values()), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+        var axis = _step12.value;
+
+        if ('start' in axis && 'stop' in axis && 'num' in axis) {
+          var arr = new Float64Array(axis.num);
+          var step = undefined;
+          if (axis.num === 1) {
+            if (axis.start !== axis.stop) {
+              throw new Error('regular axis of length 1 must have equal start/stop values');
+            }
+            step = 0;
+          } else {
+            step = (axis.stop - axis.start) / (axis.num - 1);
+          }
+          for (var i = 0; i < axis.num; i++) {
+            arr[i] = axis.start + i * step;
+          }
+
+          axis.values = arr;
+          delete axis.start;
+          delete axis.stop;
+          delete axis.num;
+        }
+
+        if (ArrayBuffer.isView(axis.values)) {
+          // already a typed array
+          continue;
+        }
+        if (Array.isArray(axis.values) && typeof axis.values[0] === 'number') {
+          var arr = new Float64Array(axis.values.length);
+          for (var i = 0; i < axis.values.length; i++) {
+            arr[i] = axis.values[i];
+          }
+          axis.values = arr;
+        }
+      }
+    } catch (err) {
+      _didIteratorError12 = true;
+      _iteratorError12 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion12 && _iterator12['return']) {
+          _iterator12['return']();
+        }
+      } finally {
+        if (_didIteratorError12) {
+          throw _iteratorError12;
+        }
+      }
+    }
+
+    var needsRangeAxisOrder = [].concat(_toConsumableArray(axes.values())).filter(function (axis) {
+      return axis.values.length > 1;
+    }).length > 1;
+    if (needsRangeAxisOrder && !domain.rangeAxisOrder) {
+      throw new Error('Domain requires "rangeAxisOrder"');
+    }
+
+    domain._rangeAxisOrder = domain.rangeAxisOrder || [].concat(_toConsumableArray(axes.keys()));
+    domain._rangeShape = domain._rangeAxisOrder.map(function (k) {
+      return axes.get(k).values.length;
+    });
+
+    domain.__transformDone = true;
+
+    return domain;
+  }
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_4) {
+      _getIterator = _4['default'];
+    }, function (_3) {
+      _Map = _3['default'];
+    }, function (_2) {
+      _slicedToArray = _2['default'];
+    }, function (_7) {
+      _Math$trunc = _7['default'];
+    }, function (_5) {
+      _Object$keys = _5['default'];
+    }, function (_6) {
+      _Array$from = _6['default'];
+    }, function (_a) {
+      _classCallCheck = _a['default'];
+    }, function (_e) {
+      _toConsumableArray = _e['default'];
+    }, function (_c) {
+      _Promise = _c['default'];
+    }, function (_f) {
+      ndarray = _f['default'];
+    }, function (_c2) {
+      shallowcopy = _c2.shallowcopy;
+      minMax = _c2.minMax;
+      assert = _c2.assert;
+      PREFIX = _c2.PREFIX;
+    }, function (_f2) {
+      load = _f2.load;
+    }],
+    execute: function () {
+      /* */
+
+      /** 
+       * Wraps a CoverageJSON Coverage object as a Coverage API object.
+       * 
+       * @see https://github.com/Reading-eScience-Centre/coverage-jsapi
+       * 
+       */
+      'use strict';
+
+      Coverage = (function () {
+
+        /**
+         * @param {Object} covjson A CoverageJSON Coverage object.
+         * @param {boolean} cacheRanges
+         *   If true, then any range that was loaded remotely is cached.
+         *   (The domain is always cached.)
+         *                           
+         */
+
+        function Coverage(covjson) {
+          var cacheRanges = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+          _classCallCheck(this, Coverage);
+
+          this._covjson = covjson;
+          this._exposeLd(covjson);
+
+          /** @type {boolean} */
+          this.cacheRanges = cacheRanges;
+
+          this.id = covjson.id;
+
+          /** @type {Map} */
+          this.parameters = new _Map();
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = _getIterator(_Object$keys(covjson.parameters)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var key = _step.value;
+
+              transformParameter(covjson.parameters, key);
+              this.parameters.set(key, covjson.parameters[key]);
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator['return']) {
+                _iterator['return']();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          var profile = this._covjson.profile || 'Coverage';
+          if (profile.substr(0, 4) !== 'http') {
+            profile = PREFIX + profile;
+          }
+
+          /** @type {string} */
+          this.type = profile;
+
+          var domainProfile = undefined;
+          if (typeof this._covjson.domain === 'string') {
+            domainProfile = this._covjson.domainProfile || 'Domain';
+          } else {
+            domainProfile = this._covjson.domain.profile || 'Domain';
+          }
+
+          if (domainProfile.substr(0, 4) !== 'http') {
+            domainProfile = PREFIX + domainProfile;
+          }
+
+          /** @type {string} */
+          this.domainType = domainProfile;
+
+          /**
+           * A bounding box array with elements [westLon, southLat, eastLon, northLat].
+           * 
+           * @type {Array|undefined}
+           */
+          this.bbox = this._covjson.bbox;
+        }
+
+        _createClass(Coverage, [{
+          key: '_exposeLd',
+          value: function _exposeLd(covjson) {
+            if (!covjson['@context']) {
+              // no LD love here...
+              this.ld = {};
+              return;
+            }
+            // make a deep copy since the object gets modified in-place later
+            // but first, remove domain and range which may be embedded
+            var copy = shallowcopy(covjson);
+            delete copy.domain;
+            delete copy.ranges;
+            this.ld = JSON.parse(JSON.stringify(copy));
+          }
+
+          /**
+           * @return {Promise}
+           */
+        }, {
+          key: 'loadDomain',
+          value: function loadDomain() {
+            var _this = this;
+
+            var domainOrUrl = this._covjson.domain;
+            if (this._domainPromise) return this._domainPromise;
+            var promise = undefined;
+            if (typeof domainOrUrl === 'object') {
+              var domain = domainOrUrl;
+              transformDomain(domain);
+              promise = _Promise.resolve(domain);
+            } else {
+              var url = domainOrUrl;
+              promise = load(url).then(function (result) {
+                var domain = result.data;
+                transformDomain(domain);
+                _this._covjson.domain = domain;
+                return domain;
+              });
+            }
+            /* The promise gets cached so that the domain is not loaded twice remotely.
+             * This might otherwise happen when loadDomain and loadRange is used
+             * with Promise.all(). Remember that loadRange also invokes loadDomain.
+             */
+            this._domainPromise = promise;
+            return promise;
+          }
+
+          /**
+           * Returns the requested range data as a Promise.
+           * 
+           * Note that this method implicitly loads the domain as well. 
+           * 
+           * @example
+           * cov.loadRange('salinity').then(function (sal) {
+           *   // work with Range object
+           * }).catch(function (e) {
+           *   // there was an error when loading the range
+           *   console.log(e.message)
+           * }) 
+           * @param {string} paramKey The key of the Parameter for which to load the range.
+           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Range object.
+           */
+        }, {
+          key: 'loadRange',
+          value: function loadRange(paramKey) {
+            var _this2 = this;
+
+            // Since the shape of the range array is derived from the domain, it has to be loaded as well.
+            return this.loadDomain().then(function (domain) {
+              var rangeOrUrl = _this2._covjson.ranges[paramKey];
+              if (typeof rangeOrUrl === 'object') {
+                var range = rangeOrUrl;
+                transformRange(range, domain);
+                return _Promise.resolve(range);
+              } else {
+                var url = rangeOrUrl;
+                return load(url).then(function (result) {
+                  var range = result.data;
+                  transformRange(range, domain);
+                  if (_this2.cacheRanges) {
+                    _this2._covjson.ranges[paramKey] = range;
+                  }
+                  return range;
+                });
+              }
+            });
+          }
+
+          /**
+           * Returns the requested range data as a Promise.
+           * 
+           * Note that this method implicitly loads the domain as well. 
+           * 
+           * @example
+           * cov.loadRanges(['salinity','temp']).then(function (ranges) {
+           *   // work with Map object
+           *   console.log(ranges.get('salinity').values)
+           * }).catch(function (e) {
+           *   // there was an error when loading the range data
+           *   console.log(e)
+           * }) 
+           * @param {iterable} [paramKeys] An iterable of parameter keys for which to load the range data. If not given, loads all range data.
+           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Map object.
+           */
+        }, {
+          key: 'loadRanges',
+          value: function loadRanges(paramKeys) {
+            var _this3 = this;
+
+            if (paramKeys === undefined) paramKeys = this.parameters.keys();
+            paramKeys = _Array$from(paramKeys);
+            return _Promise.all(paramKeys.map(function (k) {
+              return _this3.loadRange(k);
+            })).then(function (ranges) {
+              var map = new _Map();
+              for (var i = 0; i < paramKeys.length; i++) {
+                map.set(paramKeys[i], ranges[i]);
+              }
+              return map;
+            });
+          }
+
+          /**
+           * Returns a Promise object which provides a copy of this Coverage object
+           * with the domain subsetted by the given indices specification.
+           * 
+           * Note that the coverage type and/or domain type of the resulting coverage
+           * may be different than in the original coverage.
+           * 
+           * Note that the subsetted ranges are a view over the original ranges, meaning
+           * that no copying is done but also no memory is released if the original
+           * coverage is garbage collected.
+           * 
+           * @example
+           * cov.subsetByIndex({t: 4, z: {start: 10, stop: 20}, x: [0,1,2] }).then(function(subsetCov) {
+           *   // work with subsetted coverage
+           * })
+           * @param {Object} constraints An object which describes the subsetting constraints.
+           *   Every property of it refers to an axis name as defined in Domain.names,
+           *   and its value must either be an integer, an array of integers,
+           *   or an object with start, stop, and optionally step (defaults to 1) properties
+           *   whose values are integers.
+           *   Properties that have the values undefined or null are ignored. 
+           *   All integers must be non-negative, step must not be zero.
+           *   A simple integer constrains the axis to the given index, an array to a list of indices,
+           *   and a start/stop/step object to a range of indices:
+           *   If step=1, this includes all indices starting at start and ending at stop (exclusive);
+           *   if step>1, all indices start, start + step, ..., start + (q + r - 1) step where 
+           *   q and r are the quotient and remainder obtained by dividing stop - start by step.
+           * @returns {Promise} A Promise object with the subsetted coverage object as result.
+           */
+        }, {
+          key: 'subsetByIndex',
+          value: function subsetByIndex(constraints) {
+            var _this4 = this;
+
+            return this.loadDomain().then(function (domain) {
+              // check and normalize constraints to simplify code and to allow more optimization
+              constraints = shallowcopy(constraints);
+              var isConsecutive = function isConsecutive(arr) {
+                var last = arr[0] - 1;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                  for (var _iterator2 = _getIterator(arr), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var el = _step2.value;
+
+                    if (el !== last + 1) {
+                      return false;
+                    }
+                    last = el;
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+
+                return true;
+              };
+              for (var axisName in constraints) {
+                if (!domain.axes.has(axisName)) {
+                  // TODO clarify this behaviour in the JS API spec
+                  delete constraints[axisName];
+                  continue;
+                }
+                if (constraints[axisName] === undefined || constraints[axisName] === null) {
+                  delete constraints[axisName];
+                  continue;
+                }
+                if (Array.isArray(constraints[axisName])) {
+                  var constraint = constraints[axisName];
+                  // range subsetting can be done with fast ndarray views if single indices or slicing objects are used
+                  // therefore, we try to transform some common cases into those forms
+                  if (constraint.length === 1) {
+                    // transform 1-element arrays into a number
+                    constraints[axisName] = constraint[0];
+                  } else if (isConsecutive(constraint)) {
+                    // transform arrays of consecutive indices into start, stop object
+                    constraints[axisName] = { start: constraint[0], stop: constraint[constraint.length - 1] + 1 };
+                  }
+                }
+                if (typeof constraints[axisName] === 'number') {
+                  var constraint = constraints[axisName];
+                  constraints[axisName] = { start: constraint, stop: constraint + 1 };
+                }
+                if (!Array.isArray(constraints[axisName])) {
+                  var _constraints$axisName = constraints[axisName];
+                  var _constraints$axisName$start = _constraints$axisName.start;
+                  var start = _constraints$axisName$start === undefined ? 0 : _constraints$axisName$start;
+                  var _constraints$axisName$stop = _constraints$axisName.stop;
+
+                  var _stop = _constraints$axisName$stop === undefined ? domain.axes.get(axisName).values.length : _constraints$axisName$stop;
+
+                  var _constraints$axisName$step = _constraints$axisName.step;
+                  var step = _constraints$axisName$step === undefined ? 1 : _constraints$axisName$step;
+
+                  if (step <= 0) {
+                    throw new Error('Invalid constraint for ' + axisName + ': step=' + step + ' must be > 0');
+                  }
+                  if (start >= _stop || start < 0) {
+                    throw new Error('Invalid constraint for ' + axisName + ': stop=' + _stop + ' must be > start=' + start + ' and both >= 0');
+                  }
+                  constraints[axisName] = { start: start, stop: _stop, step: step };
+                }
+              }
+              var _iteratorNormalCompletion3 = true;
+              var _didIteratorError3 = false;
+              var _iteratorError3 = undefined;
+
+              try {
+                for (var _iterator3 = _getIterator(domain.axes.keys()), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                  var axisName = _step3.value;
+
+                  if (!(axisName in constraints)) {
+                    var len = domain.axes.get(axisName).values.length;
+                    constraints[axisName] = { start: 0, stop: len, step: 1 };
+                  }
+                }
+
+                // After normalization, all constraints are either arrays or start,stop,step objects.
+                // For all start,stop,step objects, it holds that stop > start, step > 0, start >= 0, stop >= 1.
+                // For each axis, a constraint exists.
+
+                // subset the axis arrays of the domain (immediately + cached)
+              } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                    _iterator3['return']();
+                  }
+                } finally {
+                  if (_didIteratorError3) {
+                    throw _iteratorError3;
+                  }
+                }
+              }
+
+              var newdomain = shallowcopy(domain);
+              newdomain.axes = new _Map(newdomain.axes);
+              newdomain._rangeShape = domain._rangeShape.slice(); // deep copy
+
+              var _iteratorNormalCompletion4 = true;
+              var _didIteratorError4 = false;
+              var _iteratorError4 = undefined;
+
+              try {
+                var _loop = function () {
+                  var axisName = _step4.value;
+
+                  var coords = domain.axes.get(axisName).values;
+                  var isTypedArray = ArrayBuffer.isView(coords);
+                  var constraint = constraints[axisName];
+                  var newcoords = undefined;
+                  if (Array.isArray(constraint)) {
+                    if (isTypedArray) {
+                      newcoords = new coords.constructor(constraint.length);
+                      for (var i = 0; i < constraint.length; i++) {
+                        newcoords[i] = coords[constraint[i]];
+                      }
+                    } else {
+                      newcoords = constraint.map(function (i) {
+                        return coords[i];
+                      });
+                    }
+                  } else {
+                    var start = constraint.start;
+                    var _stop2 = constraint.stop;
+                    var step = constraint.step;
+
+                    if (start === 0 && _stop2 === coords.length && step === 1) {
+                      newcoords = coords;
+                    } else if (step === 1 && isTypedArray) {
+                      newcoords = coords.subarray(start, _stop2);
+                    } else {
+                      var q = _Math$trunc((_stop2 - start) / step);
+                      var r = (_stop2 - start) % step;
+                      var len = start + (q + r - 1);
+                      newcoords = new coords.constructor(len); // array or typed array
+                      for (var i = start, j = 0; i < _stop2; i += step, j++) {
+                        newcoords[j] = coords[i];
+                      }
+                    }
+                  }
+                  var newaxis = shallowcopy(domain.axes.get(axisName));
+                  newaxis.values = newcoords;
+                  newdomain.axes.set(axisName, newaxis);
+                  newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = newcoords.length;
+                };
+
+                for (var _iterator4 = _getIterator(_Object$keys(constraints)), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                  _loop();
+                }
+
+                // subset the ndarrays of the ranges (on request)
+              } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                    _iterator4['return']();
+                  }
+                } finally {
+                  if (_didIteratorError4) {
+                    throw _iteratorError4;
+                  }
+                }
+              }
+
+              var rangeWrapper = function rangeWrapper(range) {
+                var ndarr = range._ndarr;
+
+                var newndarr = undefined;
+                if (_Object$keys(constraints).some(function (ax) {
+                  return Array.isArray(constraints[ax]);
+                })) {
+                  // There is a list of indices for at least one axis.
+                  // In that case we cannot directly use SciJS's slicing operations.
+
+                  // TODO implement
+                  throw new Error('not implemented yet');
+                } else {
+                  var _ndarr$hi$lo, _ndarr$hi;
+
+                  // fast ndarray view
+                  var axisNames = domain._rangeAxisOrder;
+                  var los = axisNames.map(function (name) {
+                    return constraints[name].start;
+                  });
+                  var his = axisNames.map(function (name) {
+                    return constraints[name].stop;
+                  });
+                  var steps = axisNames.map(function (name) {
+                    return constraints[name].steps;
+                  });
+                  newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
+                }
+
+                var newrange = shallowcopy(range);
+                newrange._ndarr = newndarr;
+                newrange.shape = new _Map();
+                var _iteratorNormalCompletion5 = true;
+                var _didIteratorError5 = false;
+                var _iteratorError5 = undefined;
+
+                try {
+                  for (var _iterator5 = _getIterator(domain.axes.keys()), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var axisName = _step5.value;
+
+                    newrange.shape.set(axisName, newdomain.axes.get(axisName).values.length);
+                  }
+                } catch (err) {
+                  _didIteratorError5 = true;
+                  _iteratorError5 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+                      _iterator5['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError5) {
+                      throw _iteratorError5;
+                    }
+                  }
+                }
+
+                newrange.get = createRangeGetFunction(newndarr, domain._rangeAxisOrder);
+
+                return newrange;
+              };
+
+              var loadRange = function loadRange(key) {
+                return _this4.loadRange(key).then(rangeWrapper);
+              };
+
+              // we wrap loadRanges as well in case it was overridden from the outside
+              // (in which case we could not be sure that it invokes loadRange() and uses the wrapper)
+              var loadRanges = function loadRanges(keys) {
+                return _this4.loadRanges(keys).then(function (ranges) {
+                  return new _Map([].concat(_toConsumableArray(ranges)).map(function (_ref) {
+                    var _ref2 = _slicedToArray(_ref, 2);
+
+                    var key = _ref2[0];
+                    var range = _ref2[1];
+                    return [key, rangeWrapper(range)];
+                  }));
+                });
+              };
+
+              // assemble everything to a new coverage
+              var newcov = shallowcopy(_this4);
+              newcov.loadDomain = function () {
+                return _Promise.resolve(newdomain);
+              };
+              newcov.loadRange = loadRange;
+              newcov.loadRanges = loadRanges;
+              return newcov;
+            });
+          }
+        }]);
+
+        return Coverage;
+      })();
+
+      _export('default', Coverage);
+    }
+  };
+});
+
+$__System.registerDynamic("62", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -11802,47 +12719,12 @@ $__System.registerDynamic("5e", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("5f", ["5e"], true, function(req, exports, module) {
+$__System.registerDynamic("63", ["62"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('5e');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("60", ["5f"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__System._nodeRequire ? process : req('5f');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("21", ["60"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('60');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("61", ["62", "63"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('62'),
-      document = req('63').document,
-      is = isObject(document) && isObject(document.createElement);
-  module.exports = function(it) {
-    return is ? document.createElement(it) : {};
-  };
+  module.exports = req('62');
   global.define = __define;
   return module.exports;
 });
@@ -11852,12 +12734,47 @@ $__System.registerDynamic("64", ["63"], true, function(req, exports, module) {
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('63').document && document.documentElement;
+  module.exports = $__System._nodeRequire ? process : req('63');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("65", [], true, function(req, exports, module) {
+$__System.registerDynamic("65", ["64"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('64');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("66", ["67", "68"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('67'),
+      document = req('68').document,
+      is = isObject(document) && isObject(document.createElement);
+  module.exports = function(it) {
+    return is ? document.createElement(it) : {};
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("69", ["68"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('68').document && document.documentElement;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6a", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -11882,18 +12799,18 @@ $__System.registerDynamic("65", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("66", ["67", "65", "64", "61", "63", "68", "21"], true, function(req, exports, module) {
+$__System.registerDynamic("6b", ["6c", "6a", "69", "66", "68", "6d", "65"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
     'use strict';
-    var ctx = req('67'),
-        invoke = req('65'),
-        html = req('64'),
-        cel = req('61'),
-        global = req('63'),
+    var ctx = req('6c'),
+        invoke = req('6a'),
+        html = req('69'),
+        cel = req('66'),
+        global = req('68'),
         process = global.process,
         setTask = global.setImmediate,
         clearTask = global.clearImmediate,
@@ -11930,7 +12847,7 @@ $__System.registerDynamic("66", ["67", "65", "64", "61", "63", "68", "21"], true
       clearTask = function clearImmediate(id) {
         delete queue[id];
       };
-      if (req('68')(process) == 'process') {
+      if (req('6d')(process) == 'process') {
         defer = function(id) {
           process.nextTick(ctx(run, id, 1));
         };
@@ -11961,22 +12878,22 @@ $__System.registerDynamic("66", ["67", "65", "64", "61", "63", "68", "21"], true
       set: setTask,
       clear: clearTask
     };
-  })(req('21'));
+  })(req('65'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("69", ["63", "66", "68", "21"], true, function(req, exports, module) {
+$__System.registerDynamic("6e", ["68", "6b", "6d", "65"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
-    var global = req('63'),
-        macrotask = req('66').set,
+    var global = req('68'),
+        macrotask = req('6b').set,
         Observer = global.MutationObserver || global.WebKitMutationObserver,
         process = global.process,
-        isNode = req('68')(process) == 'process',
+        isNode = req('6d')(process) == 'process',
         head,
         last,
         notify;
@@ -12030,19 +12947,19 @@ $__System.registerDynamic("69", ["63", "66", "68", "21"], true, function(req, ex
       }
       last = task;
     };
-  })(req('21'));
+  })(req('65'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("6a", ["6b", "6c", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("6f", ["70", "71", "24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('6b'),
-      aFunction = req('6c'),
-      SPECIES = req('2a')('species');
+  var anObject = req('70'),
+      aFunction = req('71'),
+      SPECIES = req('24')('species');
   module.exports = function(O, D) {
     var C = anObject(O).constructor,
         S;
@@ -12052,7 +12969,7 @@ $__System.registerDynamic("6a", ["6b", "6c", "2a"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("6d", [], true, function(req, exports, module) {
+$__System.registerDynamic("72", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -12064,14 +12981,14 @@ $__System.registerDynamic("6d", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("2e", ["33", "62", "6b", "67"], true, function(req, exports, module) {
+$__System.registerDynamic("28", ["2d", "67", "70", "6c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var getDesc = req('33').getDesc,
-      isObject = req('62'),
-      anObject = req('6b');
+  var getDesc = req('2d').getDesc,
+      isObject = req('67'),
+      anObject = req('70');
   var check = function(O, proto) {
     anObject(O);
     if (!isObject(proto) && proto !== null)
@@ -12080,7 +12997,7 @@ $__System.registerDynamic("2e", ["33", "62", "6b", "67"], true, function(req, ex
   module.exports = {
     set: Object.setPrototypeOf || ('__proto__' in {} ? function(test, buggy, set) {
       try {
-        set = req('67')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+        set = req('6c')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
         set(test, []);
         buggy = !(test instanceof Array);
       } catch (e) {
@@ -12101,31 +13018,31 @@ $__System.registerDynamic("2e", ["33", "62", "6b", "67"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("6e", ["33", "6f", "63", "67", "70", "2d", "62", "6b", "6c", "71", "72", "2e", "6d", "73", "2a", "6a", "74", "69", "75", "76", "77", "30", "78", "21"], true, function(req, exports, module) {
+$__System.registerDynamic("73", ["2d", "74", "68", "6c", "5d", "27", "67", "70", "71", "75", "76", "28", "72", "77", "24", "6f", "78", "6e", "79", "7a", "7b", "2a", "7c", "65"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
     'use strict';
-    var $ = req('33'),
-        LIBRARY = req('6f'),
-        global = req('63'),
-        ctx = req('67'),
-        classof = req('70'),
-        $def = req('2d'),
-        isObject = req('62'),
-        anObject = req('6b'),
-        aFunction = req('6c'),
-        strictNew = req('71'),
-        forOf = req('72'),
-        setProto = req('2e').set,
-        same = req('6d'),
-        species = req('73'),
-        SPECIES = req('2a')('species'),
-        speciesConstructor = req('6a'),
-        RECORD = req('74')('record'),
-        asap = req('69'),
+    var $ = req('2d'),
+        LIBRARY = req('74'),
+        global = req('68'),
+        ctx = req('6c'),
+        classof = req('5d'),
+        $def = req('27'),
+        isObject = req('67'),
+        anObject = req('70'),
+        aFunction = req('71'),
+        strictNew = req('75'),
+        forOf = req('76'),
+        setProto = req('28').set,
+        same = req('72'),
+        species = req('77'),
+        SPECIES = req('24')('species'),
+        speciesConstructor = req('6f'),
+        RECORD = req('78')('record'),
+        asap = req('6e'),
         PROMISE = 'Promise',
         process = global.process,
         isNode = classof(process) == 'process',
@@ -12151,7 +13068,7 @@ $__System.registerDynamic("6e", ["33", "6f", "63", "67", "70", "2d", "62", "6b",
         if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
           works = false;
         }
-        if (works && req('75')) {
+        if (works && req('79')) {
           var thenableThenGotten = false;
           P.resolve($.setDesc({}, 'then', {get: function() {
               thenableThenGotten = true;
@@ -12311,7 +13228,7 @@ $__System.registerDynamic("6e", ["33", "6f", "63", "67", "70", "2d", "62", "6b",
           $reject.call(record, err);
         }
       };
-      req('76')(P.prototype, {
+      req('7a')(P.prototype, {
         then: function then(onFulfilled, onRejected) {
           var react = {
             ok: typeof onFulfilled == 'function' ? onFulfilled : true,
@@ -12337,9 +13254,9 @@ $__System.registerDynamic("6e", ["33", "6f", "63", "67", "70", "2d", "62", "6b",
       });
     }
     $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
-    req('77')(P, PROMISE);
+    req('7b')(P, PROMISE);
     species(P);
-    species(Wrapper = req('30')[PROMISE]);
+    species(Wrapper = req('2a')[PROMISE]);
     $def($def.S + $def.F * !useNative, PROMISE, {reject: function reject(r) {
         return new this(function(res, rej) {
           rej(r);
@@ -12350,7 +13267,7 @@ $__System.registerDynamic("6e", ["33", "6f", "63", "67", "70", "2d", "62", "6b",
           res(x);
         });
       }});
-    $def($def.S + $def.F * !(useNative && req('78')(function(iter) {
+    $def($def.S + $def.F * !(useNative && req('7c')(function(iter) {
       P.all(iter)['catch'](function() {});
     })), PROMISE, {
       all: function all(iterable) {
@@ -12380,135 +13297,44 @@ $__System.registerDynamic("6e", ["33", "6f", "63", "67", "70", "2d", "62", "6b",
         });
       }
     });
-  })(req('21'));
+  })(req('65'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("79", ["59", "28", "29", "6e", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("7d", ["5b", "22", "23", "73", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('59');
-  req('28');
-  req('29');
-  req('6e');
-  module.exports = req('30').Promise;
+  req('5b');
+  req('22');
+  req('23');
+  req('73');
+  module.exports = req('2a').Promise;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("c", ["79"], true, function(req, exports, module) {
+$__System.registerDynamic("c", ["7d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('79'),
+    "default": req('7d'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7a", ["70", "2a", "7b", "30"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var classof = req('70'),
-      ITERATOR = req('2a')('iterator'),
-      Iterators = req('7b');
-  module.exports = req('30').isIterable = function(it) {
-    var O = Object(it);
-    return ITERATOR in O || '@@iterator' in O || Iterators.hasOwnProperty(classof(O));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7c", ["29", "28", "7a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('29');
-  req('28');
-  module.exports = req('7a');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7d", ["7c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('7c'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("13", ["10", "7d"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _getIterator = req('10')["default"];
-  var _isIterable = req('7d')["default"];
-  exports["default"] = (function() {
-    function sliceIterator(arr, i) {
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-      var _e = undefined;
-      try {
-        for (var _i = _getIterator(arr),
-            _s; !(_n = (_s = _i.next()).done); _n = true) {
-          _arr.push(_s.value);
-          if (i && _arr.length === i)
-            break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
-        try {
-          if (!_n && _i["return"])
-            _i["return"]();
-        } finally {
-          if (_d)
-            throw _e;
-        }
-      }
-      return _arr;
-    }
-    return function(arr, i) {
-      if (Array.isArray(arr)) {
-        return arr;
-      } else if (_isIterable(Object(arr))) {
-        return sliceIterator(arr, i);
-      } else {
-        throw new TypeError("Invalid attempt to destructure non-iterable instance");
-      }
-    };
-  })();
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('7e', ['9', '10', '11', '13', '19', '25', '26', '41', 'a', 'c', '3b', '7f'], function (_export) {
-  var _createClass, _getIterator, _Map, _slicedToArray, _toConsumableArray, ndarray, _Math$trunc, cbor, _classCallCheck, _Promise, _Object$keys, _Array$from, PREFIX, MEDIA, ACCEPT, EXT, Coverage;
+$__System.register('7e', ['c', '3b', '3a', '3c', '3f'], function (_export) {
+  var _Promise, Coverage, CoverageCollection, assert, load;
 
   /**
    * Reads a CoverageJSON document and returns a {@link Promise} that succeeds with
-   * a {@link Coverage} object or an array of such.
+   * a {@link Coverage} or {@link CoverageCollection} object.
    * 
    * Note that if the document references external domain or range documents,
    * then these are not loaded immediately. 
@@ -12532,19 +13358,20 @@ $__System.register('7e', ['9', '10', '11', '13', '19', '25', '26', '41', 'a', 'c
    *    Either a URL pointing to a CoverageJSON Coverage or Coverage Collection document
    *    or a CoverageJSON Coverage or Coverage Collection object.
    * @return {Promise} 
-   *    A promise object having a {@link Coverage} object or, for CoverageJSON Coverage Collections,
-   *    an array of {@link Coverage} objects as data. In the error case, an {@link Error} object is supplied
-   *    from the {@link Promise}.
+   *    A promise object succeeding with a {@link Coverage} or {@link CoverageCollection} object,
+   *    and failing with an {@link Error} object.
    */
 
   function read(input) {
     if (typeof input === 'object') {
-      return new _Promise(function (resolve) {
-        return resolve(transformCovJSON(input));
-      });
+      return _Promise.resolve(transformCovJSON(input));
     } else {
       // it's a URL, load it
-      return load(input).then(transformCovJSON);
+      return load(input).then(function (_ref) {
+        var data = _ref.data;
+        var headers = _ref.headers;
+        return transformCovJSON(data, headers);
+      });
     }
   }
 
@@ -12552,79 +13379,33 @@ $__System.register('7e', ['9', '10', '11', '13', '19', '25', '26', '41', 'a', 'c
    * Transforms a CoverageJSON object into one or more Coverage objects.
    *  
    * @param obj A CoverageJSON object of type Coverage or CoverageCollection.
-   * @return {Coverage|Array of Coverage} 
+   * @param headers An optional array of HTTP headers.
+   * @return {Coverage|Array of Coverage}
    */
-  function transformCovJSON(obj) {
+  function transformCovJSON(obj, headers) {
     checkValidCovJSON(obj);
-    if (!endsWith(obj.type, 'Coverage') && obj.type !== 'CoverageCollection') {
-      throw new Error('CoverageJSON document must be of *Coverage or CoverageCollection type');
+    if (obj.type !== 'Coverage' && obj.type !== 'CoverageCollection') {
+      throw new Error('CoverageJSON document must be of Coverage or CoverageCollection type');
     }
 
-    var cov = undefined;
-    if (endsWith(obj.type, 'Coverage')) {
-      cov = new Coverage(obj);
+    var result = undefined;
+    if (obj.type === 'Coverage') {
+      result = new Coverage(obj);
     } else {
-      // Collection
-      cov = [];
-      var rootParams = obj.parameters ? obj.parameters : {};
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = _getIterator(obj.coverages), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var coverage = _step.value;
-
-          if (coverage.parameters) {
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = _getIterator(_Object$keys(rootParams)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var key = _step2.value;
-
-                if (key in coverage.ranges) {
-                  coverage.parameters[key] = rootParams[key];
-                }
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                  _iterator2['return']();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
-            }
-          } else {
-            coverage.parameters = rootParams;
-          }
-          cov.push(new Coverage(coverage));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator['return']) {
-            _iterator['return']();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      result = new CoverageCollection(obj);
     }
 
-    return cov;
+    addLinkRelations(result, headers);
+
+    return result;
   }
+
+  /**
+   * Scans the supplied HTTP headers for Link relations and adds them
+   * to the .ld property of the Coverage/CoverageCollection.
+   */
+  function addLinkRelations(cov, headers) {}
+  // TODO implement
 
   /**
    * Performs basic structural checks to validate whether a given object is a CoverageJSON object.
@@ -12637,7 +13418,7 @@ $__System.register('7e', ['9', '10', '11', '13', '19', '25', '26', '41', 'a', 'c
    */
   function checkValidCovJSON(obj) {
     assert('type' in obj, '"type" missing');
-    if (endsWith(obj.type, 'Coverage')) {
+    if (obj.type === 'Coverage') {
       assert('parameters' in obj, '"parameters" missing');
       assert('domain' in obj, '"domain" missing');
       assert('ranges' in obj, '"ranges" missing');
@@ -12645,998 +13426,32 @@ $__System.register('7e', ['9', '10', '11', '13', '19', '25', '26', '41', 'a', 'c
       assert(Array.isArray(obj.coverages), '"coverages" must be an array');
     }
   }
-
-  function endsWith(subject, search) {
-    // IE support
-    var position = subject.length - search.length;
-    var lastIndex = subject.indexOf(search, position);
-    return lastIndex !== -1 && lastIndex === position;
-  }
-
-  /**
-   * Loads a CoverageJSON document from a given URL and returns a {@link Promise} object
-   * that succeeds with the unmodified CoverageJSON object.
-   * 
-   * @param {string} url
-   * @return {Promise}
-   *   The data is the CoverageJSON object. The promise fails if the resource at
-   *   the given URL is not a valid JSON or CBOR document. 
-   */
-
-  function load(url) {
-    var responseType = arguments.length <= 1 || arguments[1] === undefined ? 'arraybuffer' : arguments[1];
-
-    if (['arraybuffer', 'text'].indexOf(responseType) === -1) {
-      throw new Error();
-    }
-    return new _Promise(function (resolve, reject) {
-      var req = new XMLHttpRequest();
-      req.open('GET', url);
-      req.responseType = responseType;
-      req.setRequestHeader('Accept', ACCEPT);
-
-      req.addEventListener('load', function () {
-        if (!(req.status >= 200 && req.status < 300 || req.status === 304)) {
-          // as in jquery
-          reject(new Error('Resource "' + url + '" not found, HTTP status code: ' + req.status));
-          return;
-        }
-
-        var type = req.getResponseHeader('Content-Type');
-
-        if (type.indexOf(MEDIA.OCTETSTREAM) === 0 || type.indexOf(MEDIA.TEXT) === 0) {
-          // wrong media type, try to infer type from extension
-          if (endsWith(url, EXT.COVJSON)) {
-            type = MEDIA.COVJSON;
-          } else if (endsWith(url, EXT.COVCBOR)) {
-            type = MEDIA.COVCBOR;
-          }
-        }
-        var data = undefined;
-        if (type === MEDIA.COVCBOR) {
-          var arrayBuffer = req.response;
-          data = cbor.decode(arrayBuffer);
-        } else if ([MEDIA.COVJSON, MEDIA.JSONLD, MEDIA.JSON].indexOf(type) > -1) {
-          if (responseType === 'arraybuffer') {
-            // load again (from cache) to get correct response type
-            // Note we use 'text' and not 'json' as we want to throw parsing errors.
-            // With 'json', the response is just 'null'.
-            reject({ responseType: 'text' });
-            return;
-          }
-          data = JSON.parse(req.response);
-        } else {
-          reject(new Error('Unsupported media type: ' + type));
-          return;
-        }
-        resolve(data);
-      });
-      req.addEventListener('error', function () {
-        reject(new Error('Network error loading resource at ' + url));
-      });
-
-      req.send();
-    })['catch'](function (e) {
-      if (e.responseType) {
-        return load(url, e.responseType);
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  /** 
-   * Wraps a CoverageJSON Coverage object as a Coverage API object.
-   * 
-   * @see https://github.com/Reading-eScience-Centre/coverage-jsapi
-   * 
-   */
-
-  function shallowcopy(obj) {
-    var copy = {};
-    for (var prop in obj) {
-      copy[prop] = obj[prop];
-    }
-    return copy;
-  }
-
-  /**
-   * Currently unused, but may need in future.
-   * This determines the best array type for categorical data which
-   * doesn't have missing values.
-   */
-  /*
-  function arrayType (validMin, validMax) {
-    let type
-    if (validMin !== undefined) {
-      if (validMin >= 0) {
-        if (validMax < Math.pow(2,8)) {
-          type = Uint8Array
-        } else if (validMax < Math.pow(2,16)) {
-          type = Uint16Array
-        } else if (validMax < Math.pow(2,32)) {
-          type = Uint32Array
-        } else {
-          type = Array
-        }
-      } else {
-        let max = Math.max(Math.abs(validMin), validMax)
-        if (max < Math.pow(2,8)) {
-          type = Int8Array
-        } else if (validMax < Math.pow(2,16)) {
-          type = Int16Array
-        } else if (validMax < Math.pow(2,32)) {
-          type = Int32Array
-        } else {
-          type = Array
-        }
-      }
-    } else {
-      type = Array
-    }
-    return type
-  }
-  */
-
-  /**
-   * Transforms a CoverageJSON parameter to the Coverage API format, that is,
-   * language maps become real Maps. Transformation is made in-place.
-   * 
-   * @param {Object} param The original parameter.
-   */
-  function transformParameter(params, key) {
-    var param = params[key];
-    param.key = key;
-    var maps = [[param, 'description'], [param.observedProperty, 'label'], [param.observedProperty, 'description'], [param.unit, 'label']];
-    var _iteratorNormalCompletion7 = true;
-    var _didIteratorError7 = false;
-    var _iteratorError7 = undefined;
-
-    try {
-      for (var _iterator7 = _getIterator(param.categories || []), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-        var cat = _step7.value;
-
-        maps.push([cat, 'label']);
-        maps.push([cat, 'description']);
-      }
-    } catch (err) {
-      _didIteratorError7 = true;
-      _iteratorError7 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
-          _iterator7['return']();
-        }
-      } finally {
-        if (_didIteratorError7) {
-          throw _iteratorError7;
-        }
-      }
-    }
-
-    var _iteratorNormalCompletion8 = true;
-    var _didIteratorError8 = false;
-    var _iteratorError8 = undefined;
-
-    try {
-      for (var _iterator8 = _getIterator(maps), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-        var entry = _step8.value;
-
-        transformLanguageMap(entry[0], entry[1]);
-      }
-    } catch (err) {
-      _didIteratorError8 = true;
-      _iteratorError8 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion8 && _iterator8['return']) {
-          _iterator8['return']();
-        }
-      } finally {
-        if (_didIteratorError8) {
-          throw _iteratorError8;
-        }
-      }
-    }
-  }
-
-  function transformLanguageMap(obj, key) {
-    if (!obj || !(key in obj)) {
-      return;
-    }
-    var map = new _Map();
-    var _iteratorNormalCompletion9 = true;
-    var _didIteratorError9 = false;
-    var _iteratorError9 = undefined;
-
-    try {
-      for (var _iterator9 = _getIterator(_Object$keys(obj[key])), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-        var tag = _step9.value;
-
-        map.set(tag, obj[key][tag]);
-      }
-    } catch (err) {
-      _didIteratorError9 = true;
-      _iteratorError9 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion9 && _iterator9['return']) {
-          _iterator9['return']();
-        }
-      } finally {
-        if (_didIteratorError9) {
-          throw _iteratorError9;
-        }
-      }
-    }
-
-    obj[key] = map;
-  }
-
-  /**
-   * Transforms a CoverageJSON range to the Coverage API format, that is,
-   * no special encoding etc. is left. Transformation is made in-place.
-   * 
-   * @param {Object} range The original range.
-   * @param {Array} shape The array shape of the range values as determined by the domain. 
-   * @param {bool} isCategorical
-   *    Whether the range represents categories and should be treated as integers.
-   *    This hint is currently not used. It may come in handy for typed arrays later.  
-   * @return {Object} The transformed range.
-   */
-  function transformRange(range, shape, isCategorical) {
-    if ('__transformDone' in range) return;
-
-    var values = range.values;
-    var isTyped = ArrayBuffer.isView(values);
-    var missingIsEncoded = range.missing === 'nonvalid';
-    var hasOffsetFactor = ('offset' in range);
-
-    if ('offset' in range) {
-      assert('factor' in range);
-    }
-    var offset = range.offset;
-    var factor = range.factor;
-
-    if (missingIsEncoded) {
-      assert('validMin' in range);
-      assert('validMax' in range);
-    }
-    var validMin = range.validMin;
-    var validMax = range.validMax;
-
-    var vals = undefined;
-    if (!missingIsEncoded && !hasOffsetFactor) {
-      // No transformation necessary.
-      vals = values;
-    } else {
-      // Transformation is necessary.
-      // we use a regular array so that missing values can be represented as null
-      vals = new Array(values.length);
-
-      // TODO can we use typed arrays here without having to scan for missing values first?
-      //  When typed arrays with missing value encoding was used we could keep that and provide
-      //  a higher abstraction on the array similar to an ndarray interface. This means that [] syntax
-      //  would be impossible and change to .get(index).
-
-      if (hasOffsetFactor) {
-        for (var i = 0; i < values.length; i++) {
-          var val = values[i];
-          if (missingIsEncoded && (val < validMin || val > validMax)) {
-            // This is necessary as the default value is "undefined".
-            vals[i] = null;
-          } else if (!missingIsEncoded && val === null) {
-            vals[i] = null;
-          } else {
-            vals[i] = val * factor + offset;
-          }
-        }
-
-        if (validMin !== undefined) {
-          range.validMin = validMin * factor + offset;
-          range.validMax = validMax * factor + offset;
-        }
-      } else {
-        // missingIsEncoded == true
-        for (var i = 0; i < values.length; i++) {
-          var val = values[i];
-          if (val < validMin || val > validMax) {
-            vals[i] = null;
-          } else {
-            vals[i] = val;
-          }
-        }
-      }
-
-      delete range.offset;
-      delete range.factor;
-      delete range.missing;
-    }
-
-    if (validMin === undefined) {
-      var _minMax = minMax(vals);
-
-      var _minMax2 = _slicedToArray(_minMax, 2);
-
-      var min = _minMax2[0];
-      var max = _minMax2[1];
-
-      if (min !== null) {
-        range.validMin = min;
-        range.validMax = max;
-      }
-    }
-
-    range.values = ndarray(vals, shape);
-    range.__transformDone = true;
-
-    return range;
-  }
-
-  function minMax(arr) {
-    var len = arr.length;
-    var min = Infinity;
-    var max = -Infinity;
-    while (len--) {
-      var el = arr[len];
-      if (el == null) {
-        // do nothing
-      } else if (el < min) {
-          min = el;
-        } else if (el > max) {
-          max = el;
-        }
-    }
-    if (min === Infinity) {
-      min = max;
-    } else if (max === -Infinity) {
-      max = min;
-    }
-    if (min === Infinity) {
-      // all values were null
-      min = null;
-      max = null;
-    }
-    return [min, max];
-  }
-
-  /**
-   * Transforms a CoverageJSON domain to the Coverage API format.
-   * Transformation is made in-place.
-   * 
-   * @param {Object} domain The original domain object.
-   * @return {Object} The transformed domain object.
-   */
-  function transformDomain(domain) {
-    if ('__transformDone' in domain) return;
-
-    var type = domain.type;
-    var x = axisSize(domain.x);
-    var y = axisSize(domain.y);
-    var z = axisSize(domain.z);
-    var t = axisSize(domain.t);
-
-    domain.type = PREFIX + type;
-
-    var T = 't';
-    var Z = 'z';
-    var Y = 'y';
-    var X = 'x';
-    var P = 'p';
-    var SEQ = 'seq';
-
-    var shape = undefined;
-    var names = undefined;
-    switch (type) {
-      case 'Grid':
-        shape = [t, z, y, x];names = [T, Z, Y, X];break;
-      case 'Profile':
-        shape = [z];names = [Z];break;
-      case 'PointSeries':
-        shape = [t];names = [T];break;
-      case 'Point':
-        shape = [1];names = [P];break;
-      case 'Trajectory':
-        assert(x === y && y === t, 'Trajectory cannot have x, y, t arrays of different lengths');
-        assert(!Array.isArray(domain.z) || x === z, 'Trajectory z array must be of same length as x, y, t arrays');
-        var seq = domain.sequence.join('');
-        assert(Array.isArray(domain.z) && seq === 'xyzt' || !Array.isArray(domain.z) && seq === 'xyt', 'Trajectory must have "sequence" property ["x","y","t"] or ["x","y","z","t"]');
-        shape = [x];names = [SEQ];break;
-      case 'Section':
-        assert(x === y && y === t, 'Section cannot have x, y, t arrays of different lengths');
-        assert(domain.sequence.join('') === 'xyt', 'Section must have "sequence" property ["x","y","t"]');
-        shape = [z, x];names = [Z, SEQ];break;
-      case 'Polygon':
-        shape = [1];names = [P];break;
-      case 'PolygonSeries':
-        shape = [t];names = [T];break;
-      case 'MultiPolygon':
-        shape = [axisSize(domain.polygon)];names = [P];break;
-      case 'MultiPolygonSeries':
-        shape = [t, axisSize(domain.polygon)];names = [T, P];break;
-      default:
-        throw new Error('Unknown domain type: ' + type);
-    }
-
-    domain.shape = shape;
-    domain.names = names;
-
-    // replace 1D numeric axis arrays with typed arrays for efficiency
-    var _arr = ['x', 'y', 'z', 't'];
-    for (var _i = 0; _i < _arr.length; _i++) {
-      var field = _arr[_i];
-      if (field in domain) {
-        var axis = domain[field];
-        if (ArrayBuffer.isView(axis)) {
-          // already a typed array
-          continue;
-        }
-        if (Array.isArray(axis) && typeof axis[0] === 'number') {
-          var arr = new Float64Array(axis.length);
-          for (var i = 0; i < axis.length; i++) {
-            arr[i] = axis[i];
-          }
-          domain[field] = arr;
-        }
-      }
-    }
-
-    domain.__transformDone = true;
-
-    return domain;
-  }
-
-  /**
-   * 
-   * @param {Array|scalar|undefined} axis
-   * @returns the elements within the axis or 1 if not defined
-   */
-  function axisSize(axis) {
-    if (Array.isArray(axis)) {
-      return axis.length;
-    }
-    return 1;
-  }
-
-  function assert(condition, message) {
-    if (!condition) {
-      message = message || 'Assertion failed';
-      throw new Error(message);
-    }
-  }
   return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_4) {
-      _getIterator = _4['default'];
-    }, function (_5) {
-      _Map = _5['default'];
-    }, function (_3) {
-      _slicedToArray = _3['default'];
-    }, function (_2) {
-      _toConsumableArray = _2['default'];
-    }, function (_7) {
-      ndarray = _7['default'];
-    }, function (_6) {
-      _Math$trunc = _6['default'];
-    }, function (_8) {
-      cbor = _8['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_c) {
+    setters: [function (_c) {
       _Promise = _c['default'];
     }, function (_b) {
-      _Object$keys = _b['default'];
+      Coverage = _b['default'];
+    }, function (_a) {
+      CoverageCollection = _a['default'];
+    }, function (_c2) {
+      assert = _c2.assert;
     }, function (_f) {
-      _Array$from = _f['default'];
+      var _exportObj5 = {};
+      load = _f.load;
+      _exportObj5['load'] = _f.load;
+
+      _export(_exportObj5);
     }],
     execute: function () {
       /* */
       'use strict';
 
       _export('read', read);
-
-      _export('load', load);
-
-      PREFIX = 'http://coveragejson.org/def#';
-
-      _export('PREFIX', PREFIX);
-
-      MEDIA = {
-        COVCBOR: 'application/prs.coverage+cbor',
-        COVJSON: 'application/prs.coverage+json',
-        JSONLD: 'application/ld+json',
-        JSON: 'application/json',
-        OCTETSTREAM: 'application/octet-stream',
-        TEXT: 'text/plain'
-      };
-      ACCEPT = MEDIA.COVCBOR + '; q=1.0, ' + MEDIA.COVJSON + '; q=0.5, ' + MEDIA.JSONLD + '; q=0.1, ' + MEDIA.JSON + '; q=0.1';
-      EXT = {
-        COVJSON: '.covjson',
-        COVCBOR: '.covcbor'
-      };
-
-      Coverage = (function () {
-
-        /**
-         * @param {Object} covjson A CoverageJSON Coverage object.
-         * @param {boolean} cacheRanges
-         *   If true, then any range that was loaded remotely is cached.
-         *   (The domain is always cached.)
-         *                           
-         */
-
-        function Coverage(covjson) {
-          var cacheRanges = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-          _classCallCheck(this, Coverage);
-
-          this._covjson = covjson;
-
-          /** @type {boolean} */
-          this.cacheRanges = cacheRanges;
-
-          /** @type {Map} */
-          this.parameters = new _Map();
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
-
-          try {
-            for (var _iterator3 = _getIterator(_Object$keys(covjson.parameters)), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var key = _step3.value;
-
-              transformParameter(covjson.parameters, key);
-              this.parameters.set(key, covjson.parameters[key]);
-            }
-
-            /** @type {string} */
-          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                _iterator3['return']();
-              }
-            } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
-              }
-            }
-          }
-
-          this.type = PREFIX + this._covjson.type;
-
-          // we extract the domain type from the coverage type
-          // this is possible with CoverageJSON since there is a 1:1 relationship
-          var withoutSuffix = this._covjson.type.substr(0, this._covjson.type.length - 'Coverage'.length);
-          /** @type {string} */
-          this.domainType = PREFIX + withoutSuffix;
-
-          /**
-           * A bounding box array with elements [westLon, southLat, eastLon, northLat].
-           * 
-           * @type {Array|undefined}
-           */
-          this.bbox = this._covjson.bbox;
-        }
-
-        /**
-         * @return {Promise}
-         */
-
-        _createClass(Coverage, [{
-          key: 'loadDomain',
-          value: function loadDomain() {
-            var _this = this;
-
-            var domainOrUrl = this._covjson.domain;
-            if (this._domainPromise) return this._domainPromise;
-            var promise = undefined;
-            if (typeof domainOrUrl === 'object') {
-              transformDomain(domainOrUrl);
-              promise = _Promise.resolve(domainOrUrl);
-            } else {
-              // URL
-              promise = load(domainOrUrl).then(function (domain) {
-                transformDomain(domain);
-                _this._covjson.domain = domain;
-                return domain;
-              });
-            }
-            /* The promise gets cached so that the domain is not loaded twice remotely.
-             * This might otherwise happen when loadDomain and loadRange is used
-             * with Promise.all(). Remember that loadRange also invokes loadDomain.
-             */
-            this._domainPromise = promise;
-            return promise;
-          }
-
-          /**
-           * Returns the requested range data as a Promise.
-           * 
-           * Note that this method implicitly loads the domain as well. 
-           * 
-           * @example
-           * cov.loadRange('salinity').then(function (sal) {
-           *   // work with Range object
-           * }).catch(function (e) {
-           *   // there was an error when loading the range
-           *   console.log(e.message)
-           * }) 
-           * @param {string} paramKey The key of the Parameter for which to load the range.
-           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Range object.
-           */
-        }, {
-          key: 'loadRange',
-          value: function loadRange(paramKey) {
-            var _this2 = this;
-
-            // Since the shape of the range array is derived from the domain, it has to be loaded as well.
-            return this.loadDomain().then(function (domain) {
-              var rangeOrUrl = _this2._covjson.ranges[paramKey];
-              var isCategorical = ('categories' in _this2.parameters.get(paramKey));
-              if (typeof rangeOrUrl === 'object') {
-                transformRange(rangeOrUrl, domain.shape, isCategorical);
-                return _Promise.resolve(rangeOrUrl);
-              } else {
-                // URL
-                return load(rangeOrUrl).then(function (range) {
-                  transformRange(range, domain.shape, isCategorical);
-                  if (_this2.cacheRanges) {
-                    _this2._covjson.ranges[paramKey] = range;
-                  }
-                  return range;
-                });
-              }
-            });
-          }
-
-          /**
-           * Returns the requested range data as a Promise.
-           * 
-           * Note that this method implicitly loads the domain as well. 
-           * 
-           * @example
-           * cov.loadRanges(['salinity','temp']).then(function (ranges) {
-           *   // work with Map object
-           *   console.log(ranges.get('salinity').values)
-           * }).catch(function (e) {
-           *   // there was an error when loading the range data
-           *   console.log(e)
-           * }) 
-           * @param {iterable} [paramKeys] An iterable of parameter keys for which to load the range data. If not given, loads all range data.
-           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Map object.
-           */
-        }, {
-          key: 'loadRanges',
-          value: function loadRanges(paramKeys) {
-            var _this3 = this;
-
-            if (paramKeys === undefined) paramKeys = this.parameters.keys();
-            paramKeys = _Array$from(paramKeys);
-            return _Promise.all(paramKeys.map(function (k) {
-              return _this3.loadRange(k);
-            })).then(function (ranges) {
-              var map = new _Map();
-              for (var i = 0; i < paramKeys.length; i++) {
-                map.set(paramKeys[i], ranges[i]);
-              }
-              return map;
-            });
-          }
-
-          /**
-           * Returns a Promise object which provides a copy of this Coverage object
-           * with the domain subsetted by the given indices specification.
-           * 
-           * Note that the coverage type and/or domain type of the resulting coverage
-           * may be different than in the original coverage.
-           * 
-           * Note that the subsetted ranges are a view over the original ranges, meaning
-           * that no copying is done but also no memory is released if the original
-           * coverage is garbage collected.
-           * 
-           * @example
-           * cov.subsetByIndex({t: 4, z: {start: 10, stop: 20}, x: [0,1,2] }).then(function(subsetCov) {
-           *   // work with subsetted coverage
-           * })
-           * @param {Object} constraints An object which describes the subsetting constraints.
-           *   Every property of it refers to an axis name as defined in Domain.names,
-           *   and its value must either be an integer, an array of integers,
-           *   or an object with start, stop, and optionally step (defaults to 1) properties
-           *   whose values are integers. All integers must be non-negative, step must not be zero.
-           *   A simple integer constrains the axis to the given index, an array to a list of indices,
-           *   and a start/stop/step object to a range of indices:
-           *   If step=1, this includes all indices starting at start and ending at stop (exclusive);
-           *   if step>1, all indices start, start + step, ..., start + (q + r - 1) step where 
-           *   q and r are the quotient and remainder obtained by dividing stop - start by step.
-           * @returns {Promise} A Promise object with the subsetted coverage object as result.
-           */
-        }, {
-          key: 'subsetByIndex',
-          value: function subsetByIndex(constraints) {
-            var _this4 = this;
-
-            return this.loadDomain().then(function (domain) {
-              if ('sequence' in domain) {
-                // TODO supporting this case would be much easier if axes were explicit in CoverageJSON
-                //  -> see also https://github.com/Reading-eScience-Centre/coveragejson/issues/24
-                throw new Error('sequence-type domains currently not supported for subsetting');
-              }
-
-              // check and normalize constraints to simplify code and to allow more optimization
-              constraints = shallowcopy(constraints);
-              var isConsecutive = function isConsecutive(arr) {
-                var last = arr[0] - 1;
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
-
-                try {
-                  for (var _iterator4 = _getIterator(arr), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var el = _step4.value;
-
-                    if (el !== last + 1) {
-                      return false;
-                    }
-                    last = el;
-                  }
-                } catch (err) {
-                  _didIteratorError4 = true;
-                  _iteratorError4 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-                      _iterator4['return']();
-                    }
-                  } finally {
-                    if (_didIteratorError4) {
-                      throw _iteratorError4;
-                    }
-                  }
-                }
-
-                return true;
-              };
-              for (var axisName in constraints) {
-                // TODO rethink this check after integrating an axes structure into CoverageJSON
-                //      should not fail for empty varying axes (which are currently not persisted)
-                if (!(axisName in domain)) {
-                  throw new Error('Coverage domain has no "' + axisName + '" axis to be used for subsetting');
-                }
-                if (typeof domain[axisName] === 'number') {
-                  delete constraints[axisName];
-                  continue;
-                }
-                if (Array.isArray(constraints[axisName])) {
-                  var constraint = constraints[axisName];
-                  // range subsetting can be done with fast ndarray views if single indices or slicing objects are used
-                  // therefore, we try to transform some common cases into those forms
-                  if (constraint.length === 1) {
-                    // transform 1-element arrays into a number
-                    constraints[axisName] = constraint[0];
-                  } else if (isConsecutive(constraint)) {
-                    // transform arrays of consecutive indices into start, stop object
-                    constraints[axisName] = { start: constraint[0], stop: constraint[constraint.length - 1] + 1 };
-                  }
-                }
-                if (typeof constraints[axisName] === 'number') {
-                  var constraint = constraints[axisName];
-                  constraints[axisName] = { start: constraint, stop: constraint + 1 };
-                }
-                if (!Array.isArray(constraints[axisName])) {
-                  var _constraints$axisName = constraints[axisName];
-                  var _constraints$axisName$start = _constraints$axisName.start;
-                  var start = _constraints$axisName$start === undefined ? 0 : _constraints$axisName$start;
-                  var _constraints$axisName$stop = _constraints$axisName.stop;
-
-                  var _stop = _constraints$axisName$stop === undefined ? domain[axisName].length : _constraints$axisName$stop;
-
-                  var _constraints$axisName$step = _constraints$axisName.step;
-                  var step = _constraints$axisName$step === undefined ? 1 : _constraints$axisName$step;
-
-                  if (step <= 0) {
-                    throw new Error('Invalid constraint for ' + axisName + ': step=' + step + ' must be > 0');
-                  }
-                  if (start >= _stop || start < 0) {
-                    throw new Error('Invalid constraint for ' + axisName + ': stop=' + _stop + ' must be > start=' + start + ' and both >= 0');
-                  }
-                  constraints[axisName] = { start: start, stop: _stop, step: step };
-                }
-              }
-              var _iteratorNormalCompletion5 = true;
-              var _didIteratorError5 = false;
-              var _iteratorError5 = undefined;
-
-              try {
-                for (var _iterator5 = _getIterator(domain.names), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                  var axisName = _step5.value;
-
-                  // domain.names currently has all varying axes
-                  // TODO need to rework the naming/structure of domain.names, axes etc.
-                  if (typeof domain[axisName] !== 'number' && !(axisName in constraints)) {
-                    var len = axisName in domain ? domain[axisName].length : 1;
-                    constraints[axisName] = { start: 0, stop: len, step: 1 };
-                  }
-                }
-
-                // After normalization, all constraints are either arrays or start,stop,step objects.
-                // For all start,stop,step objects, it holds that stop > start, step > 0, start >= 0, stop >= 1.
-                // No constraints for non-varying axes exist.
-                // Constraints for varying axes which are empty (no matching domain member) exist (length 1 subset).
-
-                // subset the axis arrays of the domain (immediately + cached)
-              } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-                    _iterator5['return']();
-                  }
-                } finally {
-                  if (_didIteratorError5) {
-                    throw _iteratorError5;
-                  }
-                }
-              }
-
-              var newdomain = shallowcopy(domain);
-              newdomain.shape = domain.shape.slice(); // deep copy
-
-              var _iteratorNormalCompletion6 = true;
-              var _didIteratorError6 = false;
-              var _iteratorError6 = undefined;
-
-              try {
-                var _loop = function () {
-                  var axisName = _step6.value;
-
-                  if (!(axisName in domain)) {
-                    return 'continue'; // empty varying axis, nothing to do
-                  }
-                  var coords = domain[axisName];
-                  var isTypedArray = ArrayBuffer.isView(coords);
-                  var constraint = constraints[axisName];
-                  var newcoords = undefined;
-                  if (Array.isArray(constraint)) {
-                    if (isTypedArray) {
-                      newcoords = new coords.constructor(constraint.length);
-                      for (var i = 0; i < constraint.length; i++) {
-                        newcoords[i] = coords[constraint[i]];
-                      }
-                    } else {
-                      newcoords = constraint.map(function (i) {
-                        return coords[i];
-                      });
-                    }
-                  } else {
-                    var start = constraint.start;
-                    var _stop2 = constraint.stop;
-                    var step = constraint.step;
-
-                    if (start === 0 && _stop2 === coords.length && step === 1) {
-                      newcoords = coords;
-                    } else if (step === 1 && isTypedArray) {
-                      newcoords = coords.subarray(start, _stop2);
-                    } else {
-                      var q = _Math$trunc((_stop2 - start) / step);
-                      var r = (_stop2 - start) % step;
-                      var len = start + (q + r - 1);
-                      newcoords = new coords.constructor(len); // array or typed array
-                      for (var i = start, j = 0; i < _stop2; i += step, j++) {
-                        newcoords[j] = coords[i];
-                      }
-                    }
-                  }
-                  newdomain[axisName] = newcoords;
-                  newdomain.shape[domain.names.indexOf(axisName)] = newcoords.length;
-                };
-
-                for (var _iterator6 = _getIterator(_Object$keys(constraints)), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                  var _ret = _loop();
-
-                  if (_ret === 'continue') continue;
-                }
-
-                // subset the ndarrays of the ranges (on request)
-              } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-                    _iterator6['return']();
-                  }
-                } finally {
-                  if (_didIteratorError6) {
-                    throw _iteratorError6;
-                  }
-                }
-              }
-
-              var axisNames = domain.names; // names of varying axes in correct order
-              var isSciJSndarray = function isSciJSndarray(arr) {
-                return ['hi', 'lo', 'step'].every(function (p) {
-                  return p in arr;
-                });
-              };
-
-              var rangeWrapper = function rangeWrapper(range) {
-                var vals = range.values;
-
-                var newvals = undefined;
-                if (!isSciJSndarray(vals) || _Object$keys(constraints).some(function (ax) {
-                  return Array.isArray(constraints[ax]);
-                })) {
-                  // Either there is a list of indices for at least one axis,
-                  // or the array is not a SciJS ndarray (could be overriden from the outside).
-                  // In those cases we cannot directly use SciJS's slicing operations.
-
-                  // TODO implement
-                  throw new Error('not implemented yet');
-                } else {
-                  var _vals$hi$lo, _vals$hi;
-
-                  // fast ndarray view
-                  var los = axisNames.map(function (name) {
-                    return constraints[name].start;
-                  });
-                  var his = axisNames.map(function (name) {
-                    return constraints[name].stop;
-                  });
-                  var steps = axisNames.map(function (name) {
-                    return constraints[name].steps;
-                  });
-                  newvals = (_vals$hi$lo = (_vals$hi = vals.hi.apply(vals, _toConsumableArray(his))).lo.apply(_vals$hi, _toConsumableArray(los))).step.apply(_vals$hi$lo, _toConsumableArray(steps));
-                }
-
-                var newrange = shallowcopy(range);
-                newrange.values = newvals;
-                return newrange;
-              };
-
-              var loadRange = function loadRange(key) {
-                return _this4.loadRange(key).then(rangeWrapper);
-              };
-
-              // we wrap loadRanges as well in case it was overridden from the outside
-              // (in which case we could not be sure that it invokes loadRange() and uses the wrapper)
-              var loadRanges = function loadRanges(keys) {
-                return _this4.loadRanges(keys).then(function (ranges) {
-                  return new _Map([].concat(_toConsumableArray(ranges)).map(function (_ref) {
-                    var _ref2 = _slicedToArray(_ref, 2);
-
-                    var key = _ref2[0];
-                    var range = _ref2[1];
-                    return [key, rangeWrapper(range)];
-                  }));
-                });
-              };
-
-              // assemble everything to a new coverage
-              var newcov = shallowcopy(_this4);
-              newcov.loadDomain = function () {
-                return _Promise.resolve(newdomain);
-              };
-              newcov.loadRange = loadRange;
-              newcov.loadRanges = loadRanges;
-              return newcov;
-            });
-          }
-        }]);
-
-        return Coverage;
-      })();
-
-      _export('Coverage', Coverage);
     }
   };
 });
 
-$__System.register("80", ["7e"], function (_export) {
+$__System.register("7f", ["7e"], function (_export) {
   "use strict";
 
   return {
@@ -13664,7 +13479,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("81", [], function() {
+}({}), define("80", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -14758,15 +14573,15 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("6", ["81"], function(main) {
+define("6", ["80"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("82", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("81", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic("83", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("82", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     "format global";
@@ -14884,14 +14699,14 @@ $__System.registerDynamic("83", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("84", ["6b", "85", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("83", ["70", "84", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('6b'),
-      get = req('85');
-  module.exports = req('30').getIterator = function(it) {
+  var anObject = req('70'),
+      get = req('84');
+  module.exports = req('2a').getIterator = function(it) {
     var iterFn = get(it);
     if (typeof iterFn != 'function')
       throw TypeError(it + ' is not iterable!');
@@ -14901,38 +14716,38 @@ $__System.registerDynamic("84", ["6b", "85", "30"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("86", ["29", "28", "84"], true, function(req, exports, module) {
+$__System.registerDynamic("85", ["23", "22", "83"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('29');
-  req('28');
-  module.exports = req('84');
+  req('23');
+  req('22');
+  module.exports = req('83');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("10", ["86"], true, function(req, exports, module) {
+$__System.registerDynamic("10", ["85"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('86'),
+    "default": req('85'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("54", ["72", "70"], true, function(req, exports, module) {
+$__System.registerDynamic("56", ["76", "5d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var forOf = req('72'),
-      classof = req('70');
+  var forOf = req('76'),
+      classof = req('5d');
   module.exports = function(NAME) {
     return function toJSON() {
       if (classof(this) != NAME)
@@ -14946,39 +14761,39 @@ $__System.registerDynamic("54", ["72", "70"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("87", ["2d", "54"], true, function(req, exports, module) {
+$__System.registerDynamic("86", ["27", "56"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $def = req('2d');
-  $def($def.P, 'Set', {toJSON: req('54')('Set')});
+  var $def = req('27');
+  $def($def.P, 'Set', {toJSON: req('56')('Set')});
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("57", ["33", "2d", "88", "72", "71", "63", "75", "5a", "76", "77"], true, function(req, exports, module) {
+$__System.registerDynamic("59", ["2d", "27", "87", "76", "75", "68", "79", "51", "7a", "7b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('33'),
-      $def = req('2d'),
-      hide = req('88'),
-      forOf = req('72'),
-      strictNew = req('71');
+  var $ = req('2d'),
+      $def = req('27'),
+      hide = req('87'),
+      forOf = req('76'),
+      strictNew = req('75');
   module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
-    var Base = req('63')[NAME],
+    var Base = req('68')[NAME],
         C = Base,
         ADDER = IS_MAP ? 'set' : 'add',
         proto = C && C.prototype,
         O = {};
-    if (!req('75') || typeof C != 'function' || !(IS_WEAK || proto.forEach && !req('5a')(function() {
+    if (!req('79') || typeof C != 'function' || !(IS_WEAK || proto.forEach && !req('51')(function() {
       new C().entries().next();
     }))) {
       C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
-      req('76')(C.prototype, methods);
+      req('7a')(C.prototype, methods);
     } else {
       C = wrapper(function(target, iterable) {
         strictNew(target, C, NAME);
@@ -14999,7 +14814,7 @@ $__System.registerDynamic("57", ["33", "2d", "88", "72", "71", "63", "75", "5a",
             return this._c.size;
           }});
     }
-    req('77')(C, NAME);
+    req('7b')(C, NAME);
     O[NAME] = C;
     $def($def.G + $def.W + $def.F, O);
     if (!IS_WEAK)
@@ -15010,12 +14825,12 @@ $__System.registerDynamic("57", ["33", "2d", "88", "72", "71", "63", "75", "5a",
   return module.exports;
 });
 
-$__System.registerDynamic("76", ["89"], true, function(req, exports, module) {
+$__System.registerDynamic("7a", ["88"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $redef = req('89');
+  var $redef = req('88');
   module.exports = function(target, src) {
     for (var key in src)
       $redef(target, key, src[key]);
@@ -15025,17 +14840,17 @@ $__System.registerDynamic("76", ["89"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("72", ["67", "8a", "8b", "6b", "8c", "85"], true, function(req, exports, module) {
+$__System.registerDynamic("76", ["6c", "89", "8a", "70", "8b", "84"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ctx = req('67'),
-      call = req('8a'),
-      isArrayIter = req('8b'),
-      anObject = req('6b'),
-      toLength = req('8c'),
-      getIterFn = req('85');
+  var ctx = req('6c'),
+      call = req('89'),
+      isArrayIter = req('8a'),
+      anObject = req('70'),
+      toLength = req('8b'),
+      getIterFn = req('84');
   module.exports = function(iterable, entries, fn, that) {
     var iterFn = getIterFn(iterable),
         f = ctx(fn, that, entries ? 2 : 1),
@@ -15058,7 +14873,7 @@ $__System.registerDynamic("72", ["67", "8a", "8b", "6b", "8c", "85"], true, func
   return module.exports;
 });
 
-$__System.registerDynamic("71", [], true, function(req, exports, module) {
+$__System.registerDynamic("75", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15072,16 +14887,16 @@ $__System.registerDynamic("71", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("73", ["33", "2a", "75"], true, function(req, exports, module) {
+$__System.registerDynamic("77", ["2d", "24", "79"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('33'),
-      SPECIES = req('2a')('species');
+  var $ = req('2d'),
+      SPECIES = req('24')('species');
   module.exports = function(C) {
-    if (req('75') && !(SPECIES in C))
+    if (req('79') && !(SPECIES in C))
       $.setDesc(C, SPECIES, {
         configurable: true,
         get: function() {
@@ -15093,25 +14908,25 @@ $__System.registerDynamic("73", ["33", "2a", "75"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("56", ["33", "88", "67", "73", "71", "8d", "72", "8e", "74", "8f", "62", "75", "76", "90", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("58", ["2d", "87", "6c", "77", "75", "8c", "76", "8d", "78", "8e", "67", "79", "7a", "8f", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('33'),
-      hide = req('88'),
-      ctx = req('67'),
-      species = req('73'),
-      strictNew = req('71'),
-      defined = req('8d'),
-      forOf = req('72'),
-      step = req('8e'),
-      ID = req('74')('id'),
-      $has = req('8f'),
-      isObject = req('62'),
+  var $ = req('2d'),
+      hide = req('87'),
+      ctx = req('6c'),
+      species = req('77'),
+      strictNew = req('75'),
+      defined = req('8c'),
+      forOf = req('76'),
+      step = req('8d'),
+      ID = req('78')('id'),
+      $has = req('8e'),
+      isObject = req('67'),
       isExtensible = Object.isExtensible || isObject,
-      SUPPORT_DESC = req('75'),
+      SUPPORT_DESC = req('79'),
       SIZE = SUPPORT_DESC ? '_s' : 'size',
       id = 0;
   var fastKey = function(it, create) {
@@ -15147,7 +14962,7 @@ $__System.registerDynamic("56", ["33", "88", "67", "73", "71", "8d", "72", "8e",
         if (iterable != undefined)
           forOf(iterable, IS_MAP, that[ADDER], that);
       });
-      req('76')(C.prototype, {
+      req('7a')(C.prototype, {
         clear: function clear() {
           for (var that = this,
               data = that._i,
@@ -15226,7 +15041,7 @@ $__System.registerDynamic("56", ["33", "88", "67", "73", "71", "8d", "72", "8e",
     },
     getEntry: getEntry,
     setStrong: function(C, NAME, IS_MAP) {
-      req('90')(C, NAME, function(iterated, kind) {
+      req('8f')(C, NAME, function(iterated, kind) {
         this._t = iterated;
         this._k = kind;
         this._l = undefined;
@@ -15247,21 +15062,21 @@ $__System.registerDynamic("56", ["33", "88", "67", "73", "71", "8d", "72", "8e",
         return step(0, [entry.k, entry.v]);
       }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
       species(C);
-      species(req('30')[NAME]);
+      species(req('2a')[NAME]);
     }
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("91", ["56", "57"], true, function(req, exports, module) {
+$__System.registerDynamic("90", ["58", "59"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var strong = req('56');
-  req('57')('Set', function(get) {
+  var strong = req('58');
+  req('59')('Set', function(get) {
     return function Set() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
     };
@@ -15272,12 +15087,12 @@ $__System.registerDynamic("91", ["56", "57"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("92", ["68"], true, function(req, exports, module) {
+$__System.registerDynamic("91", ["6d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var cof = req('68');
+  var cof = req('6d');
   module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
     return cof(it) == 'String' ? it.split('') : Object(it);
   };
@@ -15285,13 +15100,13 @@ $__System.registerDynamic("92", ["68"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("36", ["92", "8d"], true, function(req, exports, module) {
+$__System.registerDynamic("30", ["91", "8c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var IObject = req('92'),
-      defined = req('8d');
+  var IObject = req('91'),
+      defined = req('8c');
   module.exports = function(it) {
     return IObject(defined(it));
   };
@@ -15299,7 +15114,7 @@ $__System.registerDynamic("36", ["92", "8d"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("8e", [], true, function(req, exports, module) {
+$__System.registerDynamic("8d", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15314,7 +15129,7 @@ $__System.registerDynamic("8e", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("93", [], true, function(req, exports, module) {
+$__System.registerDynamic("92", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15324,17 +15139,17 @@ $__System.registerDynamic("93", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("94", ["93", "8e", "7b", "36", "90"], true, function(req, exports, module) {
+$__System.registerDynamic("93", ["92", "8d", "5e", "30", "8f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var setUnscope = req('93'),
-      step = req('8e'),
-      Iterators = req('7b'),
-      toIObject = req('36');
-  req('90')(Array, 'Array', function(iterated, kind) {
+  var setUnscope = req('92'),
+      step = req('8d'),
+      Iterators = req('5e'),
+      toIObject = req('30');
+  req('8f')(Array, 'Array', function(iterated, kind) {
     this._t = toIObject(iterated);
     this._i = 0;
     this._k = kind;
@@ -15360,19 +15175,19 @@ $__System.registerDynamic("94", ["93", "8e", "7b", "36", "90"], true, function(r
   return module.exports;
 });
 
-$__System.registerDynamic("29", ["94", "7b"], true, function(req, exports, module) {
+$__System.registerDynamic("23", ["93", "5e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('94');
-  var Iterators = req('7b');
+  req('93');
+  var Iterators = req('5e');
   Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("59", [], true, function(req, exports, module) {
+$__System.registerDynamic("5b", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15382,40 +15197,40 @@ $__System.registerDynamic("59", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("95", ["59", "28", "29", "91", "87", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("94", ["5b", "22", "23", "90", "86", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('59');
-  req('28');
-  req('29');
-  req('91');
-  req('87');
-  module.exports = req('30').Set;
+  req('5b');
+  req('22');
+  req('23');
+  req('90');
+  req('86');
+  module.exports = req('2a').Set;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("96", ["95"], true, function(req, exports, module) {
+$__System.registerDynamic("95", ["94"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('95'),
+    "default": req('94'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("78", ["2a"], true, function(req, exports, module) {
+$__System.registerDynamic("7c", ["24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var SYMBOL_ITERATOR = req('2a')('iterator'),
+  var SYMBOL_ITERATOR = req('24')('iterator'),
       SAFE_CLOSING = false;
   try {
     var riter = [7][SYMBOL_ITERATOR]();
@@ -15447,7 +15262,7 @@ $__System.registerDynamic("78", ["2a"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("68", [], true, function(req, exports, module) {
+$__System.registerDynamic("6d", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15460,13 +15275,13 @@ $__System.registerDynamic("68", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("70", ["68", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("5d", ["6d", "24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var cof = req('68'),
-      TAG = req('2a')('toStringTag'),
+  var cof = req('6d'),
+      TAG = req('24')('toStringTag'),
       ARG = cof(function() {
         return arguments;
       }()) == 'Arguments';
@@ -15480,15 +15295,15 @@ $__System.registerDynamic("70", ["68", "2a"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("85", ["70", "2a", "7b", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("84", ["5d", "24", "5e", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var classof = req('70'),
-      ITERATOR = req('2a')('iterator'),
-      Iterators = req('7b');
-  module.exports = req('30').getIteratorMethod = function(it) {
+  var classof = req('5d'),
+      ITERATOR = req('24')('iterator'),
+      Iterators = req('5e');
+  module.exports = req('2a').getIteratorMethod = function(it) {
     if (it != undefined)
       return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
   };
@@ -15496,12 +15311,12 @@ $__System.registerDynamic("85", ["70", "2a", "7b", "30"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("8c", ["97"], true, function(req, exports, module) {
+$__System.registerDynamic("8b", ["96"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toInteger = req('97'),
+  var toInteger = req('96'),
       min = Math.min;
   module.exports = function(it) {
     return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
@@ -15510,13 +15325,13 @@ $__System.registerDynamic("8c", ["97"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("8b", ["7b", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("8a", ["5e", "24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var Iterators = req('7b'),
-      ITERATOR = req('2a')('iterator');
+  var Iterators = req('5e'),
+      ITERATOR = req('24')('iterator');
   module.exports = function(it) {
     return (Iterators.Array || Array.prototype[ITERATOR]) === it;
   };
@@ -15524,7 +15339,7 @@ $__System.registerDynamic("8b", ["7b", "2a"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("62", [], true, function(req, exports, module) {
+$__System.registerDynamic("67", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15536,12 +15351,12 @@ $__System.registerDynamic("62", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("6b", ["62"], true, function(req, exports, module) {
+$__System.registerDynamic("70", ["67"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var isObject = req('62');
+  var isObject = req('67');
   module.exports = function(it) {
     if (!isObject(it))
       throw TypeError(it + ' is not an object!');
@@ -15551,12 +15366,12 @@ $__System.registerDynamic("6b", ["62"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("8a", ["6b"], true, function(req, exports, module) {
+$__System.registerDynamic("89", ["70"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('6b');
+  var anObject = req('70');
   module.exports = function(iterator, fn, value, entries) {
     try {
       return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -15571,12 +15386,12 @@ $__System.registerDynamic("8a", ["6b"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("5c", ["8d"], true, function(req, exports, module) {
+$__System.registerDynamic("53", ["8c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var defined = req('8d');
+  var defined = req('8c');
   module.exports = function(it) {
     return Object(defined(it));
   };
@@ -15584,7 +15399,7 @@ $__System.registerDynamic("5c", ["8d"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("6c", [], true, function(req, exports, module) {
+$__System.registerDynamic("71", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15598,12 +15413,12 @@ $__System.registerDynamic("6c", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("67", ["6c"], true, function(req, exports, module) {
+$__System.registerDynamic("6c", ["71"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var aFunction = req('6c');
+  var aFunction = req('71');
   module.exports = function(fn, that, length) {
     aFunction(fn);
     if (that === undefined)
@@ -15630,20 +15445,20 @@ $__System.registerDynamic("67", ["6c"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("98", ["67", "2d", "5c", "8a", "8b", "8c", "85", "78"], true, function(req, exports, module) {
+$__System.registerDynamic("97", ["6c", "27", "53", "89", "8a", "8b", "84", "7c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var ctx = req('67'),
-      $def = req('2d'),
-      toObject = req('5c'),
-      call = req('8a'),
-      isArrayIter = req('8b'),
-      toLength = req('8c'),
-      getIterFn = req('85');
-  $def($def.S + $def.F * !req('78')(function(iter) {
+  var ctx = req('6c'),
+      $def = req('27'),
+      toObject = req('53'),
+      call = req('89'),
+      isArrayIter = req('8a'),
+      toLength = req('8b'),
+      getIterFn = req('84');
+  $def($def.S + $def.F * !req('7c')(function(iter) {
     Array.from(iter);
   }), 'Array', {from: function from(arrayLike) {
       var O = toObject(arrayLike),
@@ -15677,14 +15492,14 @@ $__System.registerDynamic("98", ["67", "2d", "5c", "8a", "8b", "8c", "85", "78"]
   return module.exports;
 });
 
-$__System.registerDynamic("77", ["33", "8f", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("7b", ["2d", "8e", "24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var def = req('33').setDesc,
-      has = req('8f'),
-      TAG = req('2a')('toStringTag');
+  var def = req('2d').setDesc,
+      has = req('8e'),
+      TAG = req('24')('toStringTag');
   module.exports = function(it, tag, stat) {
     if (it && !has(it = stat ? it : it.prototype, TAG))
       def(it, TAG, {
@@ -15696,26 +15511,26 @@ $__System.registerDynamic("77", ["33", "8f", "2a"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("99", ["33", "88", "2a", "9a", "77"], true, function(req, exports, module) {
+$__System.registerDynamic("98", ["2d", "87", "24", "99", "7b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('33'),
+  var $ = req('2d'),
       IteratorPrototype = {};
-  req('88')(IteratorPrototype, req('2a')('iterator'), function() {
+  req('87')(IteratorPrototype, req('24')('iterator'), function() {
     return this;
   });
   module.exports = function(Constructor, NAME, next) {
-    Constructor.prototype = $.create(IteratorPrototype, {next: req('9a')(1, next)});
-    req('77')(Constructor, NAME + ' Iterator');
+    Constructor.prototype = $.create(IteratorPrototype, {next: req('99')(1, next)});
+    req('7b')(Constructor, NAME + ' Iterator');
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7b", [], true, function(req, exports, module) {
+$__System.registerDynamic("5e", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15725,7 +15540,7 @@ $__System.registerDynamic("7b", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("74", [], true, function(req, exports, module) {
+$__System.registerDynamic("78", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15739,12 +15554,12 @@ $__System.registerDynamic("74", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("9b", ["63"], true, function(req, exports, module) {
+$__System.registerDynamic("9a", ["68"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var global = req('63'),
+  var global = req('68'),
       SHARED = '__core-js_shared__',
       store = global[SHARED] || (global[SHARED] = {});
   module.exports = function(key) {
@@ -15754,21 +15569,21 @@ $__System.registerDynamic("9b", ["63"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("2a", ["9b", "63", "74"], true, function(req, exports, module) {
+$__System.registerDynamic("24", ["9a", "68", "78"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var store = req('9b')('wks'),
-      Symbol = req('63').Symbol;
+  var store = req('9a')('wks'),
+      Symbol = req('68').Symbol;
   module.exports = function(name) {
-    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || req('74'))('Symbol.' + name));
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || req('78'))('Symbol.' + name));
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8f", [], true, function(req, exports, module) {
+$__System.registerDynamic("8e", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15781,7 +15596,7 @@ $__System.registerDynamic("8f", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("5a", [], true, function(req, exports, module) {
+$__System.registerDynamic("51", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15797,12 +15612,12 @@ $__System.registerDynamic("5a", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("75", ["5a"], true, function(req, exports, module) {
+$__System.registerDynamic("79", ["51"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = !req('5a')(function() {
+  module.exports = !req('51')(function() {
     return Object.defineProperty({}, 'a', {get: function() {
         return 7;
       }}).a != 7;
@@ -15811,7 +15626,7 @@ $__System.registerDynamic("75", ["5a"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("9a", [], true, function(req, exports, module) {
+$__System.registerDynamic("99", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15828,14 +15643,14 @@ $__System.registerDynamic("9a", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("88", ["33", "9a", "75"], true, function(req, exports, module) {
+$__System.registerDynamic("87", ["2d", "99", "79"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('33'),
-      createDesc = req('9a');
-  module.exports = req('75') ? function(object, key, value) {
+  var $ = req('2d'),
+      createDesc = req('99');
+  module.exports = req('79') ? function(object, key, value) {
     return $.setDesc(object, key, createDesc(1, value));
   } : function(object, key, value) {
     object[key] = value;
@@ -15845,17 +15660,17 @@ $__System.registerDynamic("88", ["33", "9a", "75"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("89", ["88"], true, function(req, exports, module) {
+$__System.registerDynamic("88", ["87"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('88');
+  module.exports = req('87');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("30", [], true, function(req, exports, module) {
+$__System.registerDynamic("2a", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15867,7 +15682,7 @@ $__System.registerDynamic("30", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("63", [], true, function(req, exports, module) {
+$__System.registerDynamic("68", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15879,13 +15694,13 @@ $__System.registerDynamic("63", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("2d", ["63", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("27", ["68", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var global = req('63'),
-      core = req('30'),
+  var global = req('68'),
+      core = req('2a'),
       PROTOTYPE = 'prototype';
   var ctx = function(fn, that) {
     return function() {
@@ -15937,7 +15752,7 @@ $__System.registerDynamic("2d", ["63", "30"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("6f", [], true, function(req, exports, module) {
+$__System.registerDynamic("74", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15947,19 +15762,19 @@ $__System.registerDynamic("6f", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("90", ["6f", "2d", "89", "88", "8f", "2a", "7b", "99", "33", "77"], true, function(req, exports, module) {
+$__System.registerDynamic("8f", ["74", "27", "88", "87", "8e", "24", "5e", "98", "2d", "7b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var LIBRARY = req('6f'),
-      $def = req('2d'),
-      $redef = req('89'),
-      hide = req('88'),
-      has = req('8f'),
-      SYMBOL_ITERATOR = req('2a')('iterator'),
-      Iterators = req('7b'),
+  var LIBRARY = req('74'),
+      $def = req('27'),
+      $redef = req('88'),
+      hide = req('87'),
+      has = req('8e'),
+      SYMBOL_ITERATOR = req('24')('iterator'),
+      Iterators = req('5e'),
       BUGGY = !([].keys && 'next' in [].keys()),
       FF_ITERATOR = '@@iterator',
       KEYS = 'keys',
@@ -15968,7 +15783,7 @@ $__System.registerDynamic("90", ["6f", "2d", "89", "88", "8f", "2a", "7b", "99",
     return this;
   };
   module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE) {
-    req('99')(Constructor, NAME, next);
+    req('98')(Constructor, NAME, next);
     var createMethod = function(kind) {
       switch (kind) {
         case KEYS:
@@ -15991,8 +15806,8 @@ $__System.registerDynamic("90", ["6f", "2d", "89", "88", "8f", "2a", "7b", "99",
         methods,
         key;
     if (_native) {
-      var IteratorPrototype = req('33').getProto(_default.call(new Base));
-      req('77')(IteratorPrototype, TAG, true);
+      var IteratorPrototype = req('2d').getProto(_default.call(new Base));
+      req('7b')(IteratorPrototype, TAG, true);
       if (!LIBRARY && has(proto, FF_ITERATOR))
         hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
     }
@@ -16019,7 +15834,7 @@ $__System.registerDynamic("90", ["6f", "2d", "89", "88", "8f", "2a", "7b", "99",
   return module.exports;
 });
 
-$__System.registerDynamic("8d", [], true, function(req, exports, module) {
+$__System.registerDynamic("8c", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -16033,7 +15848,7 @@ $__System.registerDynamic("8d", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("97", [], true, function(req, exports, module) {
+$__System.registerDynamic("96", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -16047,13 +15862,13 @@ $__System.registerDynamic("97", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("9c", ["97", "8d"], true, function(req, exports, module) {
+$__System.registerDynamic("9b", ["96", "8c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toInteger = req('97'),
-      defined = req('8d');
+  var toInteger = req('96'),
+      defined = req('8c');
   module.exports = function(TO_STRING) {
     return function(that, pos) {
       var s = String(defined(that)),
@@ -16071,14 +15886,14 @@ $__System.registerDynamic("9c", ["97", "8d"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("28", ["9c", "90"], true, function(req, exports, module) {
+$__System.registerDynamic("22", ["9b", "8f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $at = req('9c')(true);
-  req('90')(String, 'String', function(iterated) {
+  var $at = req('9b')(true);
+  req('8f')(String, 'String', function(iterated) {
     this._t = String(iterated);
     this._i = 0;
   }, function() {
@@ -16101,38 +15916,38 @@ $__System.registerDynamic("28", ["9c", "90"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("9d", ["28", "98", "30"], true, function(req, exports, module) {
+$__System.registerDynamic("9c", ["22", "97", "2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('28');
-  req('98');
-  module.exports = req('30').Array.from;
+  req('22');
+  req('97');
+  module.exports = req('2a').Array.from;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7f", ["9d"], true, function(req, exports, module) {
+$__System.registerDynamic("61", ["9c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('9d'),
+    "default": req('9c'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("19", ["7f"], true, function(req, exports, module) {
+$__System.registerDynamic("1e", ["61"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Array$from = req('7f')["default"];
+  var _Array$from = req('61')["default"];
   exports["default"] = function(arr) {
     if (Array.isArray(arr)) {
       for (var i = 0,
@@ -16164,7 +15979,7 @@ $__System.registerDynamic("a", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("33", [], true, function(req, exports, module) {
+$__System.registerDynamic("2d", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -16186,12 +16001,12 @@ $__System.registerDynamic("33", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("9e", ["33"], true, function(req, exports, module) {
+$__System.registerDynamic("9d", ["2d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('33');
+  var $ = req('2d');
   module.exports = function defineProperty(it, key, desc) {
     return $.setDesc(it, key, desc);
   };
@@ -16199,26 +16014,26 @@ $__System.registerDynamic("9e", ["33"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("3d", ["9e"], true, function(req, exports, module) {
+$__System.registerDynamic("37", ["9d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('9e'),
+    "default": req('9d'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9", ["3d"], true, function(req, exports, module) {
+$__System.registerDynamic("9", ["37"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$defineProperty = req('3d')["default"];
+  var _Object$defineProperty = req('37')["default"];
   exports["default"] = (function() {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
@@ -16243,8 +16058,8 @@ $__System.registerDynamic("9", ["3d"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83', '96', 'a', 'a0', '3f', 'f', 'b'], function (_export) {
-  var ImageLegend, L, $, HTML, _createClass, _getIterator, CoverageLegend, _toConsumableArray, CovJSON, _Set, _classCallCheck, LayerFactory, dcat, wms, MediaTypes, MappableFormats, DataFormats, templatesHtml, sidebarHtml, Sidebar;
+$__System.register('9e', ['4', '5', '6', '9', '10', '17', '39', '81', '82', '95', 'a', '1e', '9f', '7f', 'f', 'b'], function (_export) {
+  var ImageLegend, L, $, HTML, _createClass, _getIterator, CoverageLegend, LayerFactory, _Set, _classCallCheck, _toConsumableArray, CovJSON, dcat, wms, MediaTypes, MappableFormats, DataFormats, templatesHtml, sidebarHtml, Sidebar;
 
   /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
   function getDistFormat(dist) {
@@ -16272,31 +16087,31 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
     });
   }
   return {
-    setters: [function (_11) {
-      ImageLegend = _11['default'];
-    }, function (_5) {
-      L = _5['default'];
-    }, function (_8) {
-      $ = _8.$;
-      HTML = _8.HTML;
+    setters: [function (_10) {
+      ImageLegend = _10['default'];
+    }, function (_4) {
+      L = _4['default'];
+    }, function (_7) {
+      $ = _7.$;
+      HTML = _7.HTML;
     }, function (_) {
       _createClass = _['default'];
-    }, function (_4) {
-      _getIterator = _4['default'];
-    }, function (_10) {
-      CoverageLegend = _10['default'];
-    }, function (_2) {
-      _toConsumableArray = _2['default'];
+    }, function (_3) {
+      _getIterator = _3['default'];
     }, function (_9) {
-      CovJSON = _9;
-    }, function (_7) {}, function (_6) {}, function (_3) {
-      _Set = _3['default'];
+      CoverageLegend = _9['default'];
+    }, function (_8) {
+      LayerFactory = _8['default'];
+    }, function (_6) {}, function (_5) {}, function (_2) {
+      _Set = _2['default'];
     }, function (_a) {
       _classCallCheck = _a['default'];
-    }, function (_a0) {}, function (_f) {
-      LayerFactory = _f['default'];
-    }, function (_f2) {
-      dcat = _f2;
+    }, function (_e) {
+      _toConsumableArray = _e['default'];
+    }, function (_f) {}, function (_f2) {
+      CovJSON = _f2;
+    }, function (_f3) {
+      dcat = _f3;
     }, function (_b) {
       wms = _b;
     }],
@@ -16824,7 +16639,7 @@ $__System.register('9f', ['4', '5', '6', '9', '10', '17', '19', '80', '82', '83'
   };
 });
 
-$__System.registerDynamic("a1", ["5"], false, function(__require, __exports, __module) {
+$__System.registerDynamic("a0", ["5"], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     "format global";
@@ -17120,17 +16935,17 @@ $__System.registerDynamic("a1", ["5"], false, function(__require, __exports, __m
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("a2", ["a1"], true, function(req, exports, module) {
+$__System.registerDynamic("a1", ["a0"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('a1');
+  module.exports = req('a0');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("a3", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("a2", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -17339,7 +17154,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     };
   }
   if (typeof define === 'function' && define.amd) {
-    define("a4", ["5"], function(L) {
+    define("a3", ["5"], function(L) {
       defineLeafletLoading(L);
     });
   } else {
@@ -17351,7 +17166,7 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("a5", ["a4"], function(main) {
+define("a4", ["a3"], function(main) {
   return main;
 });
 
@@ -17361,7 +17176,7 @@ _removeDefine();
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define("a6", ["5"], factory);
+    define("a5", ["5"], factory);
   } else if (typeof modules === 'object' && module.exports) {
     module.exports = factory(require('leaflet'));
   } else {
@@ -17905,13 +17720,13 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("a7", ["a6"], function(main) {
+define("a6", ["a5"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("a8", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("a7", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -17922,7 +17737,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("a9", [], L);
+    define("a8", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -24420,23 +24235,23 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("5", ["a9"], function(main) {
+define("5", ["a8"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("a0", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("9f", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('1', ['2', '3', '5', 'a0', 'a8', 'a7', 'a5', 'a3', 'a2', '9f'], function (_export) {
+$__System.register('1', ['2', '3', '5', '9f', 'a7', 'a6', 'a4', 'a2', 'a1', '9e'], function (_export) {
   'use strict';
 
   var L, Sidebar, MELODIES_DCAT_CATALOG_URL, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, catalogUrl, sidebar;
   return {
     setters: [function (_3) {}, function (_2) {}, function (_) {
       L = _['default'];
-    }, function (_a0) {}, function (_a8) {}, function (_a7) {}, function (_a5) {}, function (_a3) {}, function (_a2) {}, function (_f) {
-      Sidebar = _f['default'];
+    }, function (_f) {}, function (_a7) {}, function (_a6) {}, function (_a4) {}, function (_a2) {}, function (_a1) {}, function (_e) {
+      Sidebar = _e['default'];
     }],
     execute: function () {
       MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu';
