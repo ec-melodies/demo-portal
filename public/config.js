@@ -38,7 +38,6 @@ System.config({
     "github:Reading-eScience-Centre/leaflet-coverage@master": {
       "c3": "npm:c3@0.4.10",
       "css": "github:systemjs/plugin-css@0.1.19",
-      "cwise-compiler": "npm:cwise-compiler@1.1.2",
       "leaflet": "github:Leaflet/Leaflet@0.7.7",
       "minified": "github:timjansen/minified.js@2015.1.1",
       "ndarray": "npm:ndarray@1.0.18"
@@ -135,10 +134,6 @@ System.config({
     },
     "npm:core-util-is@1.0.1": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
-    },
-    "npm:cwise-compiler@1.1.2": {
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "uniq": "npm:uniq@1.0.1"
     },
     "npm:d3@3.5.0": {
       "jsdom": "npm:jsdom@1.0.0"
