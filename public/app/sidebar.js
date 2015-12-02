@@ -379,7 +379,7 @@ export default class Sidebar {
           })
           let layerName = this._i18n(cov.parameters.get(key).observedProperty.label)
           let datasetTitle = this._i18n(dataset.title)
-          this.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span>: ' + layerName, {groupName: datasetTitle, expanded: true})
+          this.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
       })
