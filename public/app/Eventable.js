@@ -8,6 +8,7 @@ export default class Eventable {
   }
   
   fire (event, data) {
+    console.log('EVENT: ' + event, data)
     for (let fn of this.listeners.get(event)) {
       fn(data)
     }

@@ -1,42 +1,15 @@
-import L from 'leaflet'
-import 'sidebar-v2/js/leaflet-sidebar.js'
-import 'sidebar-v2/css/leaflet-sidebar.css!'
-import 'bootstrap/css/bootstrap.css!'
 import {$, HTML} from 'minified'
+import L from 'leaflet'
 
 import * as CovJSON from 'covjson-reader'
 import LayerFactory from 'leaflet-coverage'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 
-import * as dcat from './dcat.js'
-import * as wms from './wms.js'
-import ImageLegend from './ImageLegend.js'
+import {i18n, fromTemplate, sortByKey} from '../util.js'
+import * as wms from '../wms.js'
+import ImageLegend from '../ImageLegend.js'
 
-// maps short format identifiers to media types
-const MediaTypes = {
-    CovJSON: ['application/prs.coverage+json', 'application/prs.coverage+cbor'],
-    netCDF: ['application/x-netcdf'],
-    GeoJSON: ['application/vnd.geo+json']
-}
-/** Formats we can visualize on a map */
-const MappableFormats = new Set(['WMS', 'GeoJSON', 'CovJSON'])
-
-/** Formats we can do data processing on */
-const DataFormats = new Set(['GeoJSON', 'CovJSON'])
-
-/** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
-function getDistFormat (dist) {
-  let formatOrMediaType = dist.format ? dist.format : dist.mediaType
-  if (!formatOrMediaType) {
-    return 'generic'
-  }
-  for (let key in MediaTypes) {
-    if (MediaTypes[key].indexOf(formatOrMediaType) !== -1) {
-      return key
-    }
-  }
-  return formatOrMediaType
-}
+import {getDistFormat, MappableFormats, DataFormats} from './common.js'
 
 let templatesHtml = `
 <template id="template-dataset-list-item">
@@ -61,84 +34,55 @@ let templatesHtml = `
 .dataset-spatial-minimap {
   margin-bottom: 10px;
 }
-@keyframes flash-red {
-  0%   {color: red}
-  50%  {color: black}
-  100% {color: red}
-}
-.highlight-anim {
-  animation-name: flash-red;
-  animation-duration: 1s;
-  animation-iteration-count: 3;
-  animation-timing-function: ease-in-out;
-}
 </style>
 `
 $('body').add(HTML(templatesHtml))
 
-let sidebarHtml = id => `
-<div id="${id}" class="sidebar collapsed">
-  <!-- Nav tabs -->
-  <div class="sidebar-tabs">
-      <ul role="tablist">
-          <li><a href="#datasets" role="tab" class="sidebar-tab" data-name="datasets"><i class="glyphicon glyphicon-align-justify"></i></a></li>
-          <li><a href="#analyse" role="tab" class="sidebar-tab" data-name="analyse"><i class="glyphicon glyphicon-flash"></i></a></li>
-      </ul>
+let paneHtml = () => `
+<h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
+
+<div class="panel panel-default catalog-url-panel">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <a href="http://json-ld.org/" title="JSON-LD Data"><img width="32" src="http://json-ld.org/images/json-ld-data-32.png" alt="JSON-LD-logo-32"></a>
+      <span style="vertical-align:middle">
+        <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a> Catalogue
+      </span>
+    </h3>
   </div>
-  
-  <!-- Tab panes -->
-  <div class="sidebar-content">
-      <div class="sidebar-pane" id="datasets">
-          <h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
-  
-          <div class="panel panel-default catalog-url-panel">
-            <div class="panel-heading">
-              <h3 class="panel-title">
-                <a href="http://json-ld.org/" title="JSON-LD Data"><img width="32" src="http://json-ld.org/images/json-ld-data-32.png" alt="JSON-LD-logo-32"></a>
-                <span style="vertical-align:middle">
-                  <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a> Catalogue
-                </span>
-              </h3>
-            </div>
-            <div class="panel-body catalog-url-info">
-              <a href="#" class="catalog-url-edit"><i class="glyphicon glyphicon-pencil"></i></a>
-              <a class="catalog-url"></a>
-            </div>
-            <div class="panel-body catalog-url-form" style="display:none">
-              <form>
-                <div class="form-group">
-                  <input type="text" class="form-control" placeholder="http://">
-                </div>
-                <button type="submit" class="btn btn-default">Load</button>
-                <button type="button" name="cancel" class="btn btn-default">Cancel</button>
-              </form>
-            </div>
-          </div>
-          
-          <ul class="list-group dataset-list"></ul>
+  <div class="panel-body catalog-url-info">
+    <a href="#" class="catalog-url-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+    <a class="catalog-url"></a>
+  </div>
+  <div class="panel-body catalog-url-form" style="display:none">
+    <form>
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="http://">
       </div>
-      <div class="sidebar-pane" id="analyse">
-          <h1 class="sidebar-header">Analyse<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
-    
-          
-      </div>
+      <button type="submit" class="btn btn-default">Load</button>
+      <button type="button" name="cancel" class="btn btn-default">Cancel</button>
+    </form>
   </div>
 </div>
+
+<ul class="list-group dataset-list"></ul>
 `
 
-export default class Sidebar {
-  constructor (map, {app, id='sidebar', layerControl=null}={}) {
-    this.map = map
-    this.catalogue = app.catalogue
-    this.analysisCatalogue = app.analysisCatalogue
-    this.id = id
-    this.layerControl = layerControl
-    // has to come before the map div, otherwise it overlays zoom controls
-    $('body').addFront(HTML(sidebarHtml(id)))
+export default class DatasetsPane {
+  constructor (sidebar, paneId) {
+    this.sidebar = sidebar
+    this.id = paneId
     
-    $('#' + map.getContainer().id).set('+sidebar-map')
-    this.control = L.control.sidebar(id).addTo(map)
+    $('#' + paneId).fill(HTML(paneHtml()))
     
+    this.catalogue = sidebar.catalogue
+    this.analysisCatalogue = sidebar.analysisCatalogue
+    
+    this._registerUIListeners()
+    this._registerModelListeners()
+  }
+  
+  _registerUIListeners () {
     let el = $('#' + this.id)
     let input = $('input', $('.catalog-url-form', el))
     $('.catalog-url-edit', el).on('click', () => {
@@ -159,12 +103,10 @@ export default class Sidebar {
       $('.catalog-url-info', el).show()
       $('.catalog-url-form', el).hide()
     })
-    
-    this._registerListeners()
   }
   
-  _registerListeners () {
-    this.catalogue.on('load').then(({url}) => {
+  _registerModelListeners () {
+    this.catalogue.on('load', ({url}) => {
       $('.dataset-list', '#' + this.id).fill()
       
       this._addDatasets(this.catalogue.datasets)
@@ -174,27 +116,12 @@ export default class Sidebar {
         .set('@href', url)
         .fill(url)
     })
-    
-    this.analysisCatalogue.on('add').then(({dataset}) => {
-      console.log('added ' + dataset.id + ' to analysis catalogue')
-    })
-  }
-    
-  _addDatasets (datasets, sortKey='title') {
-    datasets = sortByKey(datasets, sortKey)
-    for (let dataset of datasets) {
-      this._addDataset(dataset)
-    }
   }
   
-  _i18n (prop) {
-    if (!prop) return
-    // TODO be clever and select proper language
-    if (prop.has('en')) {
-      return prop.get('en')
-    } else {
-      // random
-      return prop.values().next().value
+  _addDatasets (datasets, sortKey='title') {
+    datasets = sortByKey(datasets, d => i18n(d[sortKey]))
+    for (let dataset of datasets) {
+      this._addDataset(dataset)
     }
   }
   
@@ -202,8 +129,8 @@ export default class Sidebar {
     let el = fromTemplate('template-dataset-list-item')
     $('.dataset-list', '#' + this.id).add(el)
 
-    let title = this._i18n(dataset.title)
-    let description = this._i18n(dataset.description)
+    let title = i18n(dataset.title)
+    let description = i18n(dataset.description)
     
     // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
     //let landingPage = dataset.landingPage
@@ -310,8 +237,6 @@ export default class Sidebar {
         $('.dataset-analyse-button', el).show()
         $('.dataset-analyse-button', el).on('click', () => {
           this.analysisCatalogue.addDataset(dataset)
-          
-          $('a.sidebar-tab', el).filter(t => t.get('%name') === 'analyse').set('+highlight-anim')
         })
       }
     }
@@ -337,7 +262,7 @@ export default class Sidebar {
             let legendUrl = wms.getLegendUrl(url, wmsLayer.name)
             new ImageLegend(legendUrl, {layer: e.layer, title: wmsLayer.title}).addTo(this.map)
           })
-          let datasetTitle = this._i18n(dataset.title)
+          let datasetTitle = i18n(dataset.title)
           this.layerControl.addOverlay(layer, '<span class="label label-success">WMS</span> ' + wmsLayer.title, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
@@ -364,8 +289,8 @@ export default class Sidebar {
         })
         bounds.push(layer.getBounds())
         layer.addTo(this.map)
-        let distTitle = this._i18n(dist.title)
-        let datasetTitle = this._i18n(dataset.title)
+        let distTitle = i18n(dist.title)
+        let datasetTitle = i18n(dataset.title)
         this.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, {groupName: datasetTitle, expanded: true})
         this.map.fitBounds(bounds)
         this.map.fire('dataload')
@@ -394,8 +319,8 @@ export default class Sidebar {
               }).addTo(this.map)
             }
           })
-          let layerName = this._i18n(cov.parameters.get(key).observedProperty.label)
-          let datasetTitle = this._i18n(dataset.title)
+          let layerName = i18n(cov.parameters.get(key).observedProperty.label)
+          let datasetTitle = i18n(dataset.title)
           this.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, {groupName: datasetTitle, expanded: true})
         }
         this.map.fire('dataload')
@@ -403,19 +328,4 @@ export default class Sidebar {
     }
   }
   
-  open (tabId) {
-    this.control.open(tabId)
-  }
-}
-
-function fromTemplate (id) {
-  return document.importNode($('#' + id)[0].content, true).children[0]
-}
-
-function sortByKey(array, key) {
-  return array.sort((a, b) => {
-    let x = a[key]
-    let y = b[key]
-    return ((x < y) ? -1 : ((x > y) ? 1 : 0))
-  })
 }

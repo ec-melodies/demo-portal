@@ -7,7 +7,7 @@ import 'leaflet-loading/src/Control.Loading.css!'
 import 'leaflet-styledlayercontrol'
 
 import App from './App.js'
-import Sidebar from './sidebar.js'
+import Sidebar from './sidebar/Sidebar.js'
 import './css/style.css!'
 import './css/styledLayerControl/styledLayerControl.css!'
 

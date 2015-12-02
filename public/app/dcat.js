@@ -71,7 +71,8 @@ const DCAT_CATALOG_FRAME = {
         "description": { "@id": "dct:description" },
         "title_i18n": { "@id": "dct:title", "@container": "@language" },
         "description_i18n": { "@id": "dct:description", "@container": "@language" },
-        "@base": null
+        "@base": null,
+        "id": "@id"
       }
     ],
     "@type": "Catalog",
