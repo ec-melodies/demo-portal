@@ -1,20 +1,25 @@
 import {$, HTML} from 'minified'
 
+import {i18n, fromTemplate} from '../util.js'
+
 let paneHtml = () => `
 <h1 class="sidebar-header">Analyse<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
+
+<ul class="list-group analysis-dataset-list"></ul>
 `
 
 let templatesHtml = `
 <template id="template-analysis-dataset-list-item">
   <li class="list-group-item">
     <h4 class="list-group-item-heading dataset-title"></h4>
-    <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>
-    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>
     <p class="dataset-analysis-actions"></p>  
   </li>
 </template>
 
 <style>
+.analysis-dataset-list {
+  margin-top: 20px;
+}
 @keyframes flash-icon {
   0%   {color: black}
   50%  {color: red}
@@ -38,17 +43,30 @@ export default class AnalysePane {
     $('#' + paneId).fill(HTML(paneHtml()))
     
     this.analysisCatalogue = sidebar.analysisCatalogue
+    
+    this._registerModelListeners()
   }
   
   _registerModelListeners () {
     this.analysisCatalogue.on('add', ({dataset}) => {
-      console.log('added ' + dataset.id + ' to analysis catalogue')
-      
       let tab = $('a.sidebar-tab', '#' + this.sidebar.id).filter(t => $(t).get('@href') === '#' + this.id)
       tab.set('-highlight-anim')
       setTimeout(() => { // doesn't work without small delay
         tab.set('+highlight-anim')
       }, 100)
+      
+      this._addDataset(dataset)
     })
+  }
+  
+  _addDataset (dataset) {
+    let el = fromTemplate('template-analysis-dataset-list-item')
+    $('.analysis-dataset-list', '#' + this.id).add(el)
+    
+    let title = i18n(dataset.title)
+    $('.dataset-title', el).fill(title)
+    
+    
+    
   }
 }
