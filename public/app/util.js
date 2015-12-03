@@ -11,7 +11,7 @@ export function i18n (prop) {
   }
 }
 
-export function sortByKey(array, keyFn) {
+export function sortByKey (array, keyFn) {
   return array.sort((a, b) => {
     let x = keyFn(a)
     let y = keyFn(b)
@@ -21,4 +21,15 @@ export function sortByKey(array, keyFn) {
 
 export function fromTemplate (id) {
   return document.importNode($('#' + id)[0].content, true).children[0]
+}
+
+// https://github.com/github/fetch#handling-http-error-statuses
+export function checkStatus (response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response
+  } else {
+    let error = new Error(response.statusText)
+    error.response = response
+    throw error
+  }
 }

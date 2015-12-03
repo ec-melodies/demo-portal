@@ -105,6 +105,19 @@ export function loadCatalog (url) {
           for (let key of ['title', 'description']) {
             transform_i18n(dist, key)
           }
+          // repair CKAN data a bit...
+          if (!dist.mediaType) {
+            if (dist.format === 'GeoJSON') {
+              dist.mediaType = 'application/vnd.geo+json'
+            }
+          }
+          // TODO remove once ckanext-dcat is fixed (properties are of string instead of resource type)
+          if (dist['dcat:downloadURL']) {
+            dist.downloadURL = dist['dcat:downloadURL']
+          }
+          if (dist['dcat:accessURL']) {
+            dist.accessURL = dist['dcat:accessURL']
+          }
         }
       }
       // since this is not a valid JSON-LD doc anymore, we might as well remove the context now

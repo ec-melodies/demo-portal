@@ -21,6 +21,7 @@ System.config({
     "core-js": "npm:core-js@1.2.3",
     "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",
     "css": "github:systemjs/plugin-css@0.1.19",
+    "fetch": "github:github/fetch@0.10.1",
     "jsonld": "github:digitalbazaar/jsonld.js@0.4.2",
     "leaflet": "github:Leaflet/Leaflet@0.7.7",
     "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",

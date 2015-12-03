@@ -72,6 +72,8 @@ export default class DatasetsPane {
   constructor (sidebar, paneId) {
     this.sidebar = sidebar
     this.id = paneId
+    this.map = this.sidebar.map
+    this.layerControl = this.sidebar.layerControl
     
     $('#' + paneId).fill(HTML(paneHtml()))
     
@@ -246,8 +248,7 @@ export default class DatasetsPane {
   // TODO the display code should not be directly in the sidebar module
   _displayWMS (dataset) {
     for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'WMS')) {
-      // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:accessURL'] || dist['accessURL']
+      let url = dist['accessURL']
       this.map.fire('dataloading')
       wms.readLayers(url).then(wmsLayers => {
         for (let wmsLayer of wmsLayers) {
@@ -273,8 +274,7 @@ export default class DatasetsPane {
   _displayGeoJSON (dataset) {
     let bounds = []
     for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'GeoJSON')) {
-      // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:accessURL'] || dist['dcat:downloadURL'] || dist['downloadURL'] || dist['accessURL']
+      let url = dist['downloadURL'] || dist['accessURL']
       this.map.fire('dataloading')
       $.request('get', url, null, {headers: {
         Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5'}})
@@ -301,8 +301,7 @@ export default class DatasetsPane {
   _displayCovJSON (dataset) {
     // TODO check if both CovJSON and CovCBOR exist and prefer CovCBOR in that case (ignore the other)
     for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'CovJSON')) {
-      // TODO remove dcat: once ckanext-dcat is fixed
-      let url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['downloadURL'] || dist['accessURL']
+      let url = dist['downloadURL'] || dist['accessURL']
       this.map.fire('dataloading')
       // FIXME handle collections
       CovJSON.read(url).then(cov => {

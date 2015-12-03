@@ -20,6 +20,7 @@
       "bootstrap": "github:twbs/bootstrap@^3.3.5",
       "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",
       "css": "github:systemjs/plugin-css@^0.1.13",
+      "fetch": "github:github/fetch@^0.10.1",
       "jsonld": "github:digitalbazaar/jsonld.js@^0.4.2",
       "leaflet": "github:Leaflet/Leaflet@^0.7.5",
       "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",
