@@ -1,14 +1,7 @@
 import {$, HTML} from 'minified'
 import L from 'leaflet'
 
-import * as CovJSON from 'covjson-reader'
-import LayerFactory from 'leaflet-coverage'
-import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
-
 import {i18n, fromTemplate, sortByKey} from '../util.js'
-import * as wms from '../wms.js'
-import ImageLegend from '../ImageLegend.js'
-
 import {getDistFormat, MappableFormats, DataFormats} from './common.js'
 
 let templatesHtml = `
@@ -215,20 +208,7 @@ export default class DatasetsPane {
         let glyph = DataFormats.has(format) ? '<span class="glyphicon glyphicon-flash"></span> ' : ''
         let html
         if (MappableFormats.has(format)) {
-          html = HTML(`<a href="#"><span class="label label-success">${glyph}${format}</span></a> `)
-          
-          // hacky, see https://github.com/timjansen/minified.js/issues/68
-          $(html[0]).on('click', () => {
-            if (format === 'WMS') {
-              this._displayWMS(dataset)
-            } else if (format === 'GeoJSON') {
-              this._displayGeoJSON(dataset)
-            } else if (format === 'CovJSON') {
-              this._displayCovJSON(dataset)
-            } else {
-              throw new Error('should not happen')
-            }
-          })
+          html = HTML(`<span class="label label-success">${glyph}${format}</span> `)
         } else {
           html = HTML(`<span class="label label-${color}">${format}</span> `)
         }
@@ -243,88 +223,6 @@ export default class DatasetsPane {
       }
     }
     
-  }
-  
-  // TODO the display code should not be directly in the sidebar module
-  _displayWMS (dataset) {
-    for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'WMS')) {
-      let url = dist['accessURL']
-      this.map.fire('dataloading')
-      wms.readLayers(url).then(wmsLayers => {
-        for (let wmsLayer of wmsLayers) {
-          let layer = L.tileLayer.wms(url, {
-            layers: wmsLayer.name,
-            format: 'image/png',
-            transparent: true
-          })
-          // In leaflet 1.0 every layer will have add/remove events, this is a workaround
-          this.map.on('layeradd', e => {
-            if (e.layer !== layer) return
-            let legendUrl = wms.getLegendUrl(url, wmsLayer.name)
-            new ImageLegend(legendUrl, {layer: e.layer, title: wmsLayer.title}).addTo(this.map)
-          })
-          let datasetTitle = i18n(dataset.title)
-          this.layerControl.addOverlay(layer, '<span class="label label-success">WMS</span> ' + wmsLayer.title, {groupName: datasetTitle, expanded: true})
-        }
-        this.map.fire('dataload')
-      })
-    }
-  }
-  
-  _displayGeoJSON (dataset) {
-    let bounds = []
-    for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'GeoJSON')) {
-      let url = dist['downloadURL'] || dist['accessURL']
-      this.map.fire('dataloading')
-      $.request('get', url, null, {headers: {
-        Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5'}})
-      .then(json => {
-        let layer = L.geoJson(JSON.parse(json), {
-          pointToLayer: (feature, latlng) => L.circleMarker(latlng),
-          onEachFeature: (feature, layer) => {
-            layer.bindPopup(
-                '<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>',
-                { maxWidth: 400, maxHeight: 300 })
-          }
-        })
-        bounds.push(layer.getBounds())
-        layer.addTo(this.map)
-        let distTitle = i18n(dist.title)
-        let datasetTitle = i18n(dataset.title)
-        this.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, {groupName: datasetTitle, expanded: true})
-        this.map.fitBounds(bounds)
-        this.map.fire('dataload')
-      })
-    }
-  }
-  
-  _displayCovJSON (dataset) {
-    // TODO check if both CovJSON and CovCBOR exist and prefer CovCBOR in that case (ignore the other)
-    for (let dist of dataset.distributions.filter(dist => getDistFormat(dist) === 'CovJSON')) {
-      let url = dist['downloadURL'] || dist['accessURL']
-      this.map.fire('dataloading')
-      // FIXME handle collections
-      CovJSON.read(url).then(cov => {
-        // each parameter becomes a layer
-        for (let key of cov.parameters.keys()) {
-          let opts = {keys: [key]}
-          let layer = LayerFactory()(cov, opts).on('add', e => {
-            let covLayer = e.target
-            this.map.fitBounds(covLayer.getBounds())
-            
-            if (covLayer.palette) {
-              CoverageLegend(layer, {
-                position: 'bottomright'
-              }).addTo(this.map)
-            }
-          })
-          let layerName = i18n(cov.parameters.get(key).observedProperty.label)
-          let datasetTitle = i18n(dataset.title)
-          this.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, {groupName: datasetTitle, expanded: true})
-        }
-        this.map.fire('dataload')
-      })
-    }
   }
   
 }

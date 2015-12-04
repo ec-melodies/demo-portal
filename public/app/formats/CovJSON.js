@@ -25,7 +25,7 @@ export default class CovJSON extends Format {
   
   getMetadata (cov) {
     return {
-      format: 'CovJSON',
+      format: 'CoverageJSON',
       type: cov.type
     }
   }

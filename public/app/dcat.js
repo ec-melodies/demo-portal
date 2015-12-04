@@ -144,6 +144,10 @@ export function loadCatalog (url) {
             if (dist.format.toLowerCase() === 'geojson') {
               dist.mediaType = 'application/vnd.geo+json'
             }
+            if (dist.format.toLowerCase() === 'wms') {
+              // this doesn't actually exist, but wms endpoints would deliver application/xml which doesn't say much
+              dist.mediaType = 'application/wms+xml'
+            }
           }
           // TODO remove once ckanext-dcat is fixed (properties are of string instead of resource type)
           if (dist['dcat:downloadURL']) {
