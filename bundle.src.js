@@ -793,23 +793,219 @@ $__System.register("2", [], function() { return { setters: [], execute: function
 
 $__System.register("3", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('4', ['5', '6', '7', '8', '9', 'a'], function (_export) {
-  var L, $, HTML, _get, _inherits, _createClass, _classCallCheck, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, ImageLegend;
+$__System.register('4', ['5', '6', '7', '8'], function (_export) {
+  var $, HTML, i18n, fromTemplate, _createClass, _classCallCheck, paneHtml, templatesHtml, AnalysePane;
 
   return {
-    setters: [function (_4) {
-      L = _4['default'];
-    }, function (_5) {
-      $ = _5.$;
-      HTML = _5.HTML;
+    setters: [function (_3) {
+      $ = _3.$;
+      HTML = _3.HTML;
+    }, function (_4) {
+      i18n = _4.i18n;
+      fromTemplate = _4.fromTemplate;
     }, function (_) {
-      _get = _['default'];
+      _createClass = _['default'];
     }, function (_2) {
-      _inherits = _2['default'];
-    }, function (_3) {
-      _createClass = _3['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
+      _classCallCheck = _2['default'];
+    }],
+    execute: function () {
+      'use strict';
+
+      paneHtml = function paneHtml() {
+        return '\n<h1 class="sidebar-header">Analyse<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>\n\n<div class="analysis-dataset-list"></div>\n';
+      };
+
+      templatesHtml = '\n<template id="template-analysis-dataset">\n  <div class="panel panel-default analysis-dataset">\n    <div class="panel-heading">\n      <h4>\n        <span class="dataset-title"></span>\n        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n      </h4>\n    </div>\n    <div class="panel-body" style="text-align: center">\n      <div class="throbber-loader loader">Loading...</div>\n    </div>\n  \n    <ul class="list-group analysis-dataset-distribution-list"></ul>\n  </div>\n</template>\n<template id="template-analysis-dataset-distribution">\n  <li class="list-group-item analysis-dataset-distribution">\n    <p class="distribution-format"></p>\n    <p class="distribution-metadata"></p>\n  </li>\n</template>\n<template id="template-analysis-dataset-distribution-error">\n<li class="list-group-item analysis-dataset-distribution">\n  <p>Format: <span class="distribution-format"></span></p>\n  <p>Error: <span class="distribution-loading-error"></span></p>\n  <p>Source: <span class="distribution-source"></span></p>\n</li>\n</template>\n\n<style>\n.distribution-source {\n  word-wrap: break-word;\n}\n.analysis-dataset-list {\n  margin-top: 20px;\n}\n@keyframes flash-icon {\n  0%   {color: black}\n  50%  {color: red}\n  100% {color: black}\n}\n.highlight-anim {\n  animation-name: flash-icon;\n  animation-duration: 0.8s;\n  animation-iteration-count: 4;\n  animation-timing-function: ease-in-out;\n}\n/* http://www.css-spinners.com/spinner/throbber */\n@keyframes throbber-loader {\n  0% {\n    background: #dde2e7;\n  }\n  10% {\n    background: #6b9dc8;\n  }\n  40% {\n    background: #dde2e7;\n  }\n}\n/* :not(:required) hides these rules from IE9 and below */\n.throbber-loader:not(:required) {\n  animation: throbber-loader 2000ms 300ms infinite ease-out;\n  background: #dde2e7;\n  display: inline-block;\n  position: relative;\n  text-indent: -9999px;\n  width: 0.9em;\n  height: 1.5em;\n  margin: 0 1.6em;\n}\n.throbber-loader:not(:required):before, .throbber-loader:not(:required):after {\n  background: #dde2e7;\n  content: \' 0B\';\n  display: inline-block;\n  width: 0.9em;\n  height: 1.5em;\n  position: absolute;\n  top: 0;\n}\n.throbber-loader:not(:required):before {\n  animation: throbber-loader 2000ms 150ms infinite ease-out;\n  left: -1.6em;\n}\n.throbber-loader:not(:required):after {\n  animation: throbber-loader 2000ms 450ms infinite ease-out;\n  right: -1.6em;\n}\n</style>\n';
+
+      $('body').add(HTML(templatesHtml));
+
+      AnalysePane = (function () {
+        function AnalysePane(sidebar, paneId) {
+          _classCallCheck(this, AnalysePane);
+
+          this.sidebar = sidebar;
+          this.id = paneId;
+
+          $('#' + paneId).fill(HTML(paneHtml()));
+
+          this.analysisCatalogue = sidebar.analysisCatalogue;
+
+          this._registerModelListeners();
+        }
+
+        _createClass(AnalysePane, [{
+          key: '_registerModelListeners',
+          value: function _registerModelListeners() {
+            var _this = this;
+
+            this.analysisCatalogue.on('add', function (_ref) {
+              var dataset = _ref.dataset;
+
+              var tab = $('a.sidebar-tab', '#' + _this.sidebar.id).filter(function (t) {
+                return $(t).get('@href') === '#' + _this.id;
+              });
+              tab.set('-highlight-anim');
+              setTimeout(function () {
+                // doesn't work without small delay
+                tab.set('+highlight-anim');
+              }, 100);
+
+              _this._addDataset(dataset);
+            });
+
+            this.analysisCatalogue.on('remove', function (_ref2) {
+              var dataset = _ref2.dataset;
+
+              $(dataset.domEl).remove();
+            });
+
+            this.analysisCatalogue.on('distributionsMetadataLoading', function (_ref3) {
+              var dataset = _ref3.dataset;
+
+              $('.panel-body', dataset.domEl).show();
+            });
+
+            this.analysisCatalogue.on('distributionsMetadataLoad', function (_ref4) {
+              var dataset = _ref4.dataset;
+
+              $('.panel-body', dataset.domEl).hide();
+            });
+
+            this.analysisCatalogue.on('distributionMetadataLoad', function (_ref5) {
+              var dataset = _ref5.dataset;
+              var distribution = _ref5.distribution;
+
+              _this._addDistribution(dataset, distribution);
+            });
+
+            this.analysisCatalogue.on('distributionMetadataLoadError', function (_ref6) {
+              var dataset = _ref6.dataset;
+              var distribution = _ref6.distribution;
+              var error = _ref6.error;
+
+              _this._addDistributionLoadError(dataset, distribution, error);
+            });
+          }
+        }, {
+          key: '_addDataset',
+          value: function _addDataset(dataset) {
+            var _this2 = this;
+
+            var el = fromTemplate('template-analysis-dataset');
+            $('.analysis-dataset-list', '#' + this.id).add(el);
+            dataset.domEl = el;
+
+            var title = i18n(dataset.title);
+            $('.dataset-title', el).fill(title);
+
+            $('.close', el).on('click', function () {
+              _this2.analysisCatalogue.removeDataset(dataset);
+            });
+          }
+        }, {
+          key: '_addDistribution',
+          value: function _addDistribution(dataset, distribution) {
+            var el = fromTemplate('template-analysis-dataset-distribution');
+            $('.analysis-dataset-distribution-list', dataset.domEl).add(el);
+            distribution.domEl = el;
+            var meta = distribution.metadata;
+
+            $('.distribution-format', el).fill(meta.format);
+            $('.distribution-metadata', el).fill(meta.type);
+          }
+        }, {
+          key: '_addDistributionLoadError',
+          value: function _addDistributionLoadError(dataset, distribution, error) {
+            var el = fromTemplate('template-analysis-dataset-distribution-error');
+            $('.analysis-dataset-distribution-list', dataset.domEl).add(el);
+            distribution.domEl = el;
+
+            $('.distribution-format', el).fill(distribution.format || distribution.mediaType);
+            $('.distribution-loading-error', el).fill(error.message);
+            var source = undefined;
+            if (error.response) {
+              source = error.response.url;
+            } else {
+              source = 'local';
+            }
+            $('.distribution-source', el).fill(source);
+          }
+        }]);
+
+        return AnalysePane;
+      })();
+
+      _export('default', AnalysePane);
+    }
+  };
+});
+
+$__System.register('9', ['a'], function (_export) {
+  var _Set, MediaTypes, MappableFormats, DataFormats;
+
+  /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
+
+  function getDistFormat(dist) {
+    var formatOrMediaType = dist.format ? dist.format : dist.mediaType;
+    if (!formatOrMediaType) {
+      return 'generic';
+    }
+    for (var key in MediaTypes) {
+      if (MediaTypes[key].indexOf(formatOrMediaType) !== -1) {
+        return key;
+      }
+    }
+    return formatOrMediaType;
+  }
+
+  return {
+    setters: [function (_a) {
+      _Set = _a['default'];
+    }],
+    execute: function () {
+      // maps short format identifiers to media types
+      'use strict';
+
+      _export('getDistFormat', getDistFormat);
+
+      MediaTypes = {
+        CovJSON: ['application/prs.coverage+json', 'application/prs.coverage+cbor'],
+        netCDF: ['application/x-netcdf'],
+        GeoJSON: ['application/vnd.geo+json']
+      };
+
+      _export('MediaTypes', MediaTypes);
+
+      /** Formats we can visualize on a map */
+      MappableFormats = new _Set(['WMS', 'GeoJSON', 'CovJSON']);
+
+      _export('MappableFormats', MappableFormats);
+
+      /** Formats we can do data processing on */
+      DataFormats = new _Set(['GeoJSON', 'CovJSON']);
+
+      _export('DataFormats', DataFormats);
+    }
+  };
+});
+
+$__System.register('b', ['5', '7', '8', 'd', 'e', 'c'], function (_export) {
+  var $, HTML, _createClass, _classCallCheck, _get, _inherits, L, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, ImageLegend;
+
+  return {
+    setters: [function (_3) {
+      $ = _3.$;
+      HTML = _3.HTML;
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_c) {
+      L = _c['default'];
     }],
     execute: function () {
       'use strict';
@@ -885,7 +1081,7 @@ $__System.register('4', ['5', '6', '7', '8', '9', 'a'], function (_export) {
   };
 });
 
-$__System.register('b', ['6', 'c'], function (_export) {
+$__System.register('f', ['5', '10'], function (_export) {
   var $, _Promise;
 
   function readLayers(wmsEndpoint) {
@@ -931,10 +1127,10 @@ $__System.register('b', ['6', 'c'], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      $ = _.$;
-    }, function (_c) {
-      _Promise = _c['default'];
+    setters: [function (_2) {
+      $ = _2.$;
+    }, function (_) {
+      _Promise = _['default'];
     }],
     execute: function () {
       'use strict';
@@ -946,6 +1142,9909 @@ $__System.register('b', ['6', 'c'], function (_export) {
       _export('getLayers', getLayers);
 
       _export('getLegendUrl', getLegendUrl);
+    }
+  };
+});
+
+$__System.register('11', ['5', '7', '8', '12', '13', '14', 'd', 'e', 'c'], function (_export) {
+  var $, _createClass, _classCallCheck, _slicedToArray, inject, i18n, _get, _inherits, L, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, ContinuousLegend;
+
+  return {
+    setters: [function (_4) {
+      $ = _4.$;
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _slicedToArray = _3['default'];
+    }, function (_5) {
+      inject = _5.inject;
+    }, function (_6) {
+      i18n = _6;
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_c) {
+      L = _c['default'];
+    }],
+    execute: function () {
+      /* */
+
+      // TODO the default template should be moved outside this module so that it can be easily skipped
+      'use strict';
+
+      DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend';
+      DEFAULT_TEMPLATE = '\n<template id="' + DEFAULT_TEMPLATE_ID + '">\n  <div class="info legend continuous-legend">\n    <div style="margin-bottom:3px">\n      <strong class="legend-title"></strong>\n    </div>\n    <div style="display: inline-block; height: 144px; float:left">\n      <span style="height: 136px; width: 18px; display: block; margin-top: 9px;" class="legend-palette"></span>\n    </div>\n    <div style="display: inline-block; float:left; height:153px">\n      <table style="height: 100%;">\n        <tr><td style="vertical-align:top"><span class="legend-max"></span> <span class="legend-uom"></span></td></tr>\n        <tr><td><span class="legend-current"></span></td></tr>\n        <tr><td style="vertical-align:bottom"><span class="legend-min"></span> <span class="legend-uom"></span></td></tr>\n      </table>\n    </div>\n  </div>\n</template>\n';
+      DEFAULT_TEMPLATE_CSS = '\n.legend {\n  color: #555;\n}\n';
+
+      /**
+       * Displays a palette legend for the parameter displayed by the given
+       * Coverage layer.
+       */
+
+      ContinuousLegend = (function (_L$Control) {
+        _inherits(ContinuousLegend, _L$Control);
+
+        function ContinuousLegend(covLayer, options) {
+          _classCallCheck(this, ContinuousLegend);
+
+          _get(Object.getPrototypeOf(ContinuousLegend.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : {});
+          this.covLayer = covLayer;
+          this.id = options.id || DEFAULT_TEMPLATE_ID;
+          this.language = options.language || i18n.DEFAULT_LANGUAGE;
+
+          if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
+            inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS);
+          }
+
+          // arrow function is broken here with traceur, this is a workaround
+          // see https://github.com/google/traceur-compiler/issues/1987
+          var self = this;
+          this._remove = function () {
+            self.removeFrom(self._map);
+          };
+          covLayer.on('remove', this._remove);
+        }
+
+        _createClass(ContinuousLegend, [{
+          key: 'updateLegend',
+          value: function updateLegend() {
+            var el = this._el;
+
+            var palette = this.covLayer.palette;
+
+            var _covLayer$paletteExtent = _slicedToArray(this.covLayer.paletteExtent, 2);
+
+            var low = _covLayer$paletteExtent[0];
+            var high = _covLayer$paletteExtent[1];
+
+            $('.legend-min', el).fill(low.toFixed(2));
+            $('.legend-max', el).fill(high.toFixed(2));
+
+            var gradient = '';
+            for (var i = 0; i < palette.steps; i++) {
+              if (i > 0) gradient += ',';
+              gradient += 'rgb(' + palette.red[i] + ',' + palette.green[i] + ',' + palette.blue[i] + ')';
+            }
+
+            $('.legend-palette', el).set('$background', 'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%');
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            var _this = this;
+
+            this.covLayer.off('remove', this._remove);
+            this.covLayer.off('paletteChange', function () {
+              return _this.updateLegend();
+            });
+            this.covLayer.off('paletteExtentChange', function () {
+              return _this.updateLegend();
+            });
+          }
+        }, {
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this2 = this;
+
+            this._map = map;
+
+            this.covLayer.on('paletteChange', function () {
+              return _this2.updateLegend();
+            });
+            this.covLayer.on('paletteExtentChange', function () {
+              return _this2.updateLegend();
+            });
+
+            var param = this.covLayer.parameter;
+            // if requested language doesn't exist, use the returned one for all other labels
+            var language = i18n.getLanguageTag(param.observedProperty.label, this.language);
+            var title = i18n.getLanguageString(param.observedProperty.label, language);
+            var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language) : '';
+
+            var el = document.importNode($('#' + this.id)[0].content, true).children[0];
+            this._el = el;
+            $('.legend-title', el).fill(title);
+            $('.legend-uom', el).fill(unit);
+            this.updateLegend();
+
+            return el;
+          }
+        }]);
+
+        return ContinuousLegend;
+      })(L.Control);
+
+      _export('default', ContinuousLegend);
+    }
+  };
+});
+
+$__System.register('14', [], function (_export) {
+  /* */
+  'use strict';
+
+  var DEFAULT_LANGUAGE;
+
+  _export('getLanguageTag', getLanguageTag);
+
+  _export('getLanguageString', getLanguageString);
+
+  function getLanguageTag(map) {
+    var preferredLanguage = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_LANGUAGE : arguments[1];
+
+    if (map.has(preferredLanguage)) {
+      return preferredLanguage;
+    } else {
+      // could be more clever here for cases like 'de' vs 'de-DE'
+      return map.keys().next().value;
+    }
+  }
+
+  function getLanguageString(map) {
+    var preferredLanguage = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_LANGUAGE : arguments[1];
+
+    if (map.has(preferredLanguage)) {
+      return map.get(preferredLanguage);
+    } else {
+      // random language
+      // this case should not happen as all labels should have common languages
+      return map.values().next().value;
+    }
+  }
+
+  return {
+    setters: [],
+    execute: function () {
+      DEFAULT_LANGUAGE = 'en';
+
+      _export('DEFAULT_LANGUAGE', DEFAULT_LANGUAGE);
+    }
+  };
+});
+
+$__System.register('13', [], function (_export) {
+  /**
+   * Inject HTML and CSS into the DOM.
+   * 
+   * @param html The html to inject at the end of the body element.
+   * @param css The CSS styles to inject at the end of the head element.
+   */
+  'use strict';
+
+  _export('inject', inject);
+
+  function inject(html, css) {
+    // inject default template and CSS into DOM
+    if (html) {
+      var span = document.createElement('span');
+      span.innerHTML = html;
+      document.body.appendChild(span.children[0]);
+    }
+
+    if (css) {
+      var style = document.createElement('style');
+      style.type = 'text/css';
+      if (style.styleSheet) {
+        style.styleSheet.cssText = css;
+      } else {
+        style.appendChild(document.createTextNode(css));
+      }
+      document.head.appendChild(style);
+    }
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+
+$__System.register('15', ['5', '7', '8', '13', '14', 'd', 'e', 'c'], function (_export) {
+  var $, HTML, _createClass, _classCallCheck, inject, i18n, _get, _inherits, L, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, DiscreteLegend;
+
+  return {
+    setters: [function (_3) {
+      $ = _3.$;
+      HTML = _3.HTML;
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_4) {
+      inject = _4.inject;
+    }, function (_5) {
+      i18n = _5;
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_c) {
+      L = _c['default'];
+    }],
+    execute: function () {
+      /* */
+
+      // TODO the default template should be moved outside this module so that it can be easily skipped
+      'use strict';
+
+      DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend';
+      DEFAULT_TEMPLATE = '\n<template id="' + DEFAULT_TEMPLATE_ID + '">\n  <div class="info legend discrete-legend">\n    <strong class="legend-title"></strong><br>\n    <div class="legend-palette discrete-legend-palette"></div>\n  </div>\n</template>\n';
+      DEFAULT_TEMPLATE_CSS = '\n.legend {\n  color: #555;\n}\n.discrete-legend-palette {\n  padding: 2px 1px;\n  line-height: 18px;\n}\n.discrete-legend-palette i {\n  float: left;\n  height: 18px;\n  margin-right: 8px;\n  width: 18px;\n}\n';
+
+      /**
+       * Displays a discrete palette legend for the parameter displayed by the given
+       * Coverage layer. Supports category parameters only at the moment.
+       * 
+       * @example
+       * new DiscreteLegend(covLayer).addTo(map)
+       * 
+       * @example <caption>Fake layer</caption>
+       * var legend = new DiscreteLegend({parameter: {..}, palette: {...}}).addTo(map)
+       * 
+       * // either recreate the legend or update the fake layer in place:
+       * legend.covLayer = {..}
+       * legend.updateLegend()
+       */
+
+      DiscreteLegend = (function (_L$Control) {
+        _inherits(DiscreteLegend, _L$Control);
+
+        function DiscreteLegend(covLayer, options) {
+          var _this = this;
+
+          _classCallCheck(this, DiscreteLegend);
+
+          _get(Object.getPrototypeOf(DiscreteLegend.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : {});
+          this.covLayer = covLayer;
+          this.id = options.id || DEFAULT_TEMPLATE_ID;
+          this.language = options.language || i18n.DEFAULT_LANGUAGE;
+
+          if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
+            inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS);
+          }
+
+          if (covLayer.on) {
+            (function () {
+              // arrow function is broken here with traceur, this is a workaround
+              // see https://github.com/google/traceur-compiler/issues/1987
+              var self = _this;
+              _this._remove = function () {
+                self.removeFrom(self._map);
+              };
+              covLayer.on('remove', _this._remove);
+            })();
+          }
+        }
+
+        _createClass(DiscreteLegend, [{
+          key: 'updateLegend',
+          value: function updateLegend() {
+            var el = this._el;
+
+            var palette = this.covLayer.palette;
+            var param = this.covLayer.parameter;
+
+            var html = '';
+
+            for (var i = 0; i < palette.steps; i++) {
+              var cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this.language);
+              html += '\n        <i style="background:rgb(' + palette.red[i] + ', ' + palette.green[i] + ', ' + palette.blue[i] + ')"></i>\n        ' + cat + '\n        <br>';
+            }
+
+            $('.legend-palette', el).fill(HTML(html));
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            var _this2 = this;
+
+            if (this.covLayer.off) {
+              this.covLayer.off('remove', this._remove);
+              this.covLayer.off('paletteChange', function () {
+                return _this2.updateLegend();
+              });
+            }
+          }
+        }, {
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this3 = this;
+
+            this._map = map;
+
+            if (this.covLayer.on) {
+              this.covLayer.on('paletteChange', function () {
+                return _this3.updateLegend();
+              });
+            }
+
+            var param = this.covLayer.parameter;
+            // if requested language doesn't exist, use the returned one for all other labels
+            this.language = i18n.getLanguageTag(param.observedProperty.label, this.language);
+            var title = i18n.getLanguageString(param.observedProperty.label, this.language);
+
+            var el = document.importNode($('#' + this.id)[0].content, true).children[0];
+            this._el = el;
+            $('.legend-title', el).fill(title);
+            this.updateLegend();
+
+            return el;
+          }
+        }]);
+
+        return DiscreteLegend;
+      })(L.Control);
+
+      _export('default', DiscreteLegend);
+    }
+  };
+});
+
+$__System.register('16', ['11', '15'], function (_export) {
+  /* */
+  'use strict';
+
+  var ContinuousLegend, DiscreteLegend;
+  return {
+    setters: [function (_2) {
+      ContinuousLegend = _2['default'];
+    }, function (_) {
+      DiscreteLegend = _['default'];
+    }],
+    execute: function () {
+      _export('default', function (layer, options) {
+        if (layer.parameter.observedProperty.categories) {
+          return new DiscreteLegend(layer, options);
+        } else {
+          return new ContinuousLegend(layer, options);
+        }
+      });
+    }
+  };
+});
+
+$__System.register('17', ['7', '8', '10', '12', '18', '19', 'd', 'e', 'c', '1a', '1b'], function (_export) {
+  var _createClass, _classCallCheck, _Promise, _slicedToArray, linearPalette, scale, arrays, _get, _inherits, L, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_COLOR, DEFAULT_PALETTE, VerticalProfile;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_4) {
+      _Promise = _4['default'];
+    }, function (_3) {
+      _slicedToArray = _3['default'];
+    }, function (_5) {
+      linearPalette = _5.linearPalette;
+      scale = _5.scale;
+    }, function (_6) {
+      arrays = _6;
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_c) {
+      L = _c['default'];
+    }, function (_a) {
+      rangeutil = _a;
+    }, function (_b) {
+      referencingutil = _b;
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      DOMAIN_TYPE = 'http://coveragejson.org/def#VerticalProfile';
+      DEFAULT_COLOR = 'black';
+      DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
+      // blues
+
+      /**
+       * Renderer for Coverages with domain type Profile.
+       * 
+       * This will simply display a dot on the map and fire a click
+       * event when a user clicks on it.
+       * The dot either has a defined standard color, or it uses
+       * a palette together with a target depth if a parameter is chosen.
+       */
+
+      VerticalProfile = (function (_L$Class) {
+        _inherits(VerticalProfile, _L$Class);
+
+        function VerticalProfile(cov, options) {
+          _classCallCheck(this, VerticalProfile);
+
+          _get(Object.getPrototypeOf(VerticalProfile.prototype), 'constructor', this).call(this);
+          if (cov.domainType !== DOMAIN_TYPE) {
+            throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
+          }
+          this.cov = cov;
+          this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
+          this._targetZ = 'targetZ' in options ? options.targetZ : null;
+          this.defaultColor = options.color ? options.color : DEFAULT_COLOR;
+
+          if (this.param && this.param.categories) {
+            throw new Error('category parameters are currently not support for Profile');
+          }
+
+          this._palette = options.palette || DEFAULT_PALETTE;
+          if (Array.isArray(options.paletteExtent)) {
+            this._paletteExtent = options.paletteExtent;
+          } else {
+            this._paletteExtent = 'full';
+          }
+
+          // TODO remove code duplication
+          switch (options.redraw) {
+            case 'manual':
+              this._autoRedraw = false;break;
+            case undefined:
+            case 'onchange':
+              this._autoRedraw = true;break;
+            default:
+              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
+          }
+        }
+
+        _createClass(VerticalProfile, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this = this;
+
+            this._map = map;
+
+            map.fire('dataloading'); // for supporting loading spinners
+
+            function checkWGS84(domain) {
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+            }
+
+            var promise = undefined;
+            if (this.param) {
+              promise = _Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
+                var _ref2 = _slicedToArray(_ref, 2);
+
+                var domain = _ref2[0];
+                var range = _ref2[1];
+
+                console.log('domain and range loaded');
+                _this.domain = domain;
+                checkWGS84(domain);
+                _this.range = range;
+                _this._updatePaletteExtent(_this._paletteExtent);
+                _this._addMarker();
+                _this.fire('add');
+                map.fire('dataload');
+              });
+            } else {
+              promise = this.cov.loadDomain().then(function (domain) {
+                console.log('domain loaded');
+                _this.domain = domain;
+                checkWGS84(domain);
+                _this._addMarker();
+                _this.fire('add');
+                map.fire('dataload');
+              });
+            }
+
+            promise['catch'](function (e) {
+              console.error(e);
+              _this.fire('error', e);
+
+              map.fire('dataload');
+            });
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            this.fire('remove');
+            this._removeMarker();
+          }
+        }, {
+          key: 'getBounds',
+          value: function getBounds() {
+            return this.marker.getBounds();
+          }
+        }, {
+          key: '_updatePaletteExtent',
+          value: function _updatePaletteExtent(extent) {
+            if (Array.isArray(extent) && extent.length === 2) {
+              this._paletteExtent = extent;
+              return;
+            }
+
+            if (!this.param) {
+              throw new Error('palette extent cannot be set when no profile parameter has been chosen');
+            }
+
+            this._paletteExtent = rangeutil.minMax(this.range);
+          }
+        }, {
+          key: '_addMarker',
+          value: function _addMarker() {
+            var _this2 = this;
+
+            // TODO do coordinate transformation to lat/lon if necessary
+
+            var x = this.domain.axes.get('x').values[0];
+            var y = this.domain.axes.get('y').values[0];
+            this.marker = L.circleMarker(L.latLng(y, x), { color: this._getColor() });
+
+            this.marker.on('click', function () {
+              _this2.fire('click');
+            });
+
+            this.marker.addTo(this._map);
+          }
+        }, {
+          key: '_removeMarker',
+          value: function _removeMarker() {
+            this._map.removeLayer(this.marker);
+            delete this.marker;
+          }
+        }, {
+          key: '_getColor',
+          value: function _getColor() {
+            var z = this.domain.axes.get('z').values.z;
+
+            if (this.param && this.targetZ !== null) {
+              // use a palette
+              // find the value with z nearest to targetZ
+              var val = this.range.get({ z: arrays.indexOfNearest(z, this.targetZ) });
+              if (val !== null) {
+                var valScaled = scale(val, this.palette, this.paletteExtent);
+                var _palette = this.palette;
+                var red = _palette.red;
+                var green = _palette.green;
+                var blue = _palette.blue;
+
+                return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
+              }
+            }
+            return this.defaultColor;
+          }
+        }, {
+          key: '_updateMarker',
+          value: function _updateMarker() {
+            this.marker.options.color = this._getColor();
+          }
+        }, {
+          key: '_doAutoRedraw',
+          value: function _doAutoRedraw() {
+            if (this._autoRedraw) {
+              this.redraw();
+            }
+          }
+        }, {
+          key: 'redraw',
+          value: function redraw() {
+            this._updateMarker();
+            this.marker.redraw();
+          }
+        }, {
+          key: 'parameter',
+          get: function get() {
+            return this.param;
+          }
+        }, {
+          key: 'targetZ',
+          get: function get() {
+            return this._targetZ;
+          },
+          set: function set(z) {
+            this._targetZ = z;
+            this._doAutoRedraw();
+            this.fire('targetZChange');
+          }
+        }, {
+          key: 'palette',
+          set: function set(p) {
+            this._palette = p;
+            this._doAutoRedraw();
+            this.fire('paletteChange');
+          },
+          get: function get() {
+            return this.param && this.targetZ !== null ? this._palette : null;
+          }
+        }, {
+          key: 'paletteExtent',
+          set: function set(extent) {
+            this._updatePaletteExtent(extent);
+            this._doAutoRedraw();
+            this.fire('paletteExtentChange');
+          },
+          get: function get() {
+            return this._paletteExtent;
+          }
+        }]);
+
+        return VerticalProfile;
+      })(L.Class);
+
+      _export('VerticalProfile', VerticalProfile);
+
+      VerticalProfile.include(L.Mixin.Events);
+
+      // work-around for Babel bug, otherwise Profile cannot be referenced here
+
+      _export('default', VerticalProfile);
+    }
+  };
+});
+
+$__System.register('1c', ['7', '8', '10', '12', '18', '19', 'd', 'e', 'c', '1a', '1b'], function (_export) {
+  var _createClass, _classCallCheck, _Promise, _slicedToArray, linearPalette, scale, arrays, _get, _inherits, L, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_PALETTE, Trajectory;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_4) {
+      _Promise = _4['default'];
+    }, function (_3) {
+      _slicedToArray = _3['default'];
+    }, function (_5) {
+      linearPalette = _5.linearPalette;
+      scale = _5.scale;
+    }, function (_6) {
+      arrays = _6;
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_c) {
+      L = _c['default'];
+    }, function (_a) {
+      rangeutil = _a;
+    }, function (_b) {
+      referencingutil = _b;
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory';
+      DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
+      // blues
+
+      /**
+       * Renderer for Coverages with domain type Trajectory.
+       * 
+       * Displays the trajectory as a path with coloured points using
+       * a given palette for a given parameter.
+       * 
+       * Events fired onto the map:
+       * "dataloading" - Data loading has started
+       * "dataload" - Data loading has finished (also in case of errors)
+       * 
+       * Events fired on this layer:
+       * "add" - Layer is initialized and is about to be added to the map
+       * "remove" - Layer is removed from the map
+       * "error" - Error when loading data
+       * "paletteChange" - Palette has changed
+       * "paletteExtentChange" - Palette extent has changed
+       * 
+       */
+
+      Trajectory = (function (_L$FeatureGroup) {
+        _inherits(Trajectory, _L$FeatureGroup);
+
+        // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
+        //    (we use it for now to have getBounds() which LayerGroup misses)
+
+        function Trajectory(cov, options) {
+          _classCallCheck(this, Trajectory);
+
+          _get(Object.getPrototypeOf(Trajectory.prototype), 'constructor', this).call(this);
+          if (cov.domainType !== DOMAIN_TYPE) {
+            throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
+          }
+          this.cov = cov;
+          this.param = cov.parameters.get(options.keys[0]);
+
+          if (this.param.categories) {
+            throw new Error('category parameters are currently not support for Trajectory');
+          }
+
+          this._palette = options.palette || DEFAULT_PALETTE;
+          if (options.paletteExtent === undefined || options.paletteExtent === 'subset') {
+            this._paletteExtent = 'full';
+          } else if (Array.isArray(options.paletteExtent) || ['full', 'fov'].indexOf(options.paletteExtent) !== -1) {
+            this._paletteExtent = options.paletteExtent;
+          } else {
+            throw new Error('paletteExtent must either be a 2-element array, ' + 'one of "full", "subset" (identical to "full" for trajectories) or "fov", or be omitted');
+          }
+          // TODO remove code duplication
+          switch (options.redraw) {
+            case 'manual':
+              this._autoRedraw = false;break;
+            case undefined:
+            case 'onchange':
+              this._autoRedraw = true;break;
+            default:
+              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
+          }
+
+          console.log('Trajectory layer created');
+        }
+
+        _createClass(Trajectory, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this = this;
+
+            console.log('adding trajectory to map');
+            this._map = map;
+            map.fire('dataloading'); // for supporting loading spinners
+            _Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
+              var _ref2 = _slicedToArray(_ref, 2);
+
+              var domain = _ref2[0];
+              var range = _ref2[1];
+
+              console.log('domain and range loaded');
+              _this.domain = domain;
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+
+              _this.range = range;
+              _this._updatePaletteExtent(_this._paletteExtent);
+              _this._addTrajectoryLayers();
+              _this.fire('add');
+              _get(Object.getPrototypeOf(Trajectory.prototype), 'onAdd', _this).call(_this, map);
+              map.fire('dataload');
+            })['catch'](function (e) {
+              console.error(e);
+              _this.fire('error', e);
+
+              map.fire('dataload');
+            });
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            this.fire('remove');
+            console.log('removing trajectory from map');
+            _get(Object.getPrototypeOf(Trajectory.prototype), 'onRemove', this).call(this, map);
+          }
+        }, {
+          key: '_updatePaletteExtent',
+          value: function _updatePaletteExtent(extent) {
+            if (Array.isArray(extent) && extent.length === 2) {
+              this._paletteExtent = extent;
+              return;
+            }
+
+            var range = this.range;
+
+            if (extent === 'full') {
+              // scan the whole range for min/max values
+
+            } else if (extent === 'fov') {
+                // scan the values that are currently in field of view on the map for min/max
+                var bounds = this._map.getBounds();
+
+                // TODO implement
+                throw new Error('NOT IMPLEMENTED YET');
+              } else {
+                throw new Error('Unknown extent specification: ' + extent);
+              }
+
+            this._paletteExtent = rangeutil.minMax(range);
+          }
+        }, {
+          key: '_addTrajectoryLayers',
+          value: function _addTrajectoryLayers() {
+            // add a Polyline in black, and coloured CircleMarker's for each domain point
+            var composite = this.domain.axes.get('composite').values;
+            var range = this.range;
+
+            // TODO do coordinate transformation to lat/lon if necessary
+
+            var palette = this.palette;
+            var _palette = this.palette;
+            var red = _palette.red;
+            var green = _palette.green;
+            var blue = _palette.blue;
+
+            var paletteExtent = this.paletteExtent;
+
+            var coords = [];
+            for (var i = 0; i < composite.length; i++) {
+              var val = range.get({ composite: i });
+              // this always has to be lat/lon, no matter which map projection is used
+              var x = composite[i][1];
+              var y = composite[i][2];
+              var coord = new L.LatLng(y, x);
+              coords.push(coord);
+              if (val !== null) {
+                var valScaled = scale(val, palette, paletteExtent);
+                var marker = new L.CircleMarker(coord, {
+                  color: 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')',
+                  opacity: 1,
+                  fillOpacity: 1
+                });
+                this.addLayer(marker);
+              }
+            }
+
+            var polyline = L.polyline(coords, {
+              color: 'black',
+              weight: 3
+            });
+
+            this.addLayer(polyline);
+          }
+        }, {
+          key: '_doAutoRedraw',
+          value: function _doAutoRedraw() {
+            if (this._autoRedraw) {
+              this.redraw();
+            }
+          }
+        }, {
+          key: 'redraw',
+          value: function redraw() {
+            this.clearLayers();
+            this._addTrajectoryLayers();
+          }
+        }, {
+          key: 'parameter',
+          get: function get() {
+            return this.param;
+          }
+        }, {
+          key: 'palette',
+          set: function set(p) {
+            this._palette = p;
+            this._doAutoRedraw();
+            this.fire('paletteChange');
+          },
+          get: function get() {
+            return this._palette;
+          }
+        }, {
+          key: 'paletteExtent',
+          set: function set(extent) {
+            this._updatePaletteExtent(extent);
+            this._doAutoRedraw();
+            this.fire('paletteExtentChange');
+          },
+          get: function get() {
+            return this._paletteExtent;
+          }
+        }]);
+
+        return Trajectory;
+      })(L.FeatureGroup);
+
+      Trajectory.include(L.Mixin.Events);
+
+      // work-around for Babel bug, otherwise Trajectory cannot be referenced here
+
+      _export('default', Trajectory);
+    }
+  };
+});
+
+$__System.register('1b', [], function (_export) {
+  /** 3D WGS84 in lat-lon-height order */
+  'use strict';
+
+  var EPSG4979, EPSG4326, CRS84, GeodeticWGS84CRS;
+
+  /**
+   * Returns the referencing system matching the given identifiers.
+   * 
+   * Note: If the input identifiers used for searching are associated
+   * to multiple referencing systems, then this function returns `undefined`.
+   */
+
+  _export('isGeodeticWGS84CRS', isGeodeticWGS84CRS);
+
+  _export('getRefSystem', getRefSystem);
+
+  function isGeodeticWGS84CRS(rs) {
+    return GeodeticWGS84CRS.indexOf(rs.id) !== -1;
+  }
+
+  function getRefSystem(domain, identifiers) {
+    var refs = domain.referencing;
+    var ref = refs.find(function (ref) {
+      return identifiers.every(function (id) {
+        return ref.identifiers.indexOf(id) !== -1;
+      });
+    });
+    if (!ref) return;
+    var rs = ref.srs || ref.trs || ref.rs;
+    return rs;
+  }
+
+  return {
+    setters: [],
+    execute: function () {
+      EPSG4979 = 'http://www.opengis.net/def/crs/EPSG/0/4979';
+
+      /** 2D WGS84 in lat-lon order */
+      EPSG4326 = 'http://www.opengis.net/def/crs/EPSG/0/4326';
+
+      /** 2D WGS84 in lon-lat order */
+      CRS84 = 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
+      GeodeticWGS84CRS = [EPSG4979, EPSG4326, CRS84];
+    }
+  };
+});
+
+$__System.register('1a', ['12', '1d', '1e'], function (_export) {
+  var _slicedToArray, _toConsumableArray, _getIterator;
+
+  function minMax(range) {
+    var min = Infinity;
+    var max = -Infinity;
+    var fn = function fn(val) {
+      if (val === null) return;
+      if (val < min) min = val;
+      if (val > max) max = val;
+    };
+    iterate(range, fn);
+    return [min, max];
+  }
+
+  /**
+   * Apply a reduce function over the range values.
+   */
+
+  function reduce(range, fn, start) {
+    var v1 = start;
+    var iterFn = function iterFn(v2) {
+      v1 = fn(v1, v2);
+    };
+    iterate(range, iterFn);
+    return v1;
+  }
+
+  /**
+   * Iterate over all range values and run a function for each value.
+   * No particular iteration order must be assumed.
+   */
+
+  function iterate(range, fn) {
+    // We use a precompiled function here for efficiency.
+    // See below for a slower recursive version.
+
+    // Benchmarks compared to recursive version:
+    // Chrome 46: around 1.03x faster
+    // Firefox 42: around 2x faster (and around 6x faster than Chrome 46!)
+
+    // nest loops from smallest to biggest
+    var shape = [].concat(_toConsumableArray(range.shape));
+    shape.sort(function (_ref, _ref3) {
+      var _ref2 = _slicedToArray(_ref, 2);
+
+      var size1 = _ref2[1];
+
+      var _ref32 = _slicedToArray(_ref3, 2);
+
+      var size2 = _ref32[1];
+      return size1 - size2;
+    });
+
+    var begin = 'var obj = {}';
+    var end = '';
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = _getIterator(shape), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var _step$value = _slicedToArray(_step.value, 2);
+
+        var axis = _step$value[0];
+        var size = _step$value[1];
+
+        begin += '\n      for (var i' + axis + '=0; i' + axis + ' < ' + size + '; ++i' + axis + ') {\n        obj[\'' + axis + '\'] = i' + axis + '\n    ';
+        end += '}';
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator['return']) {
+          _iterator['return']();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    begin += '\n    fn(get(obj))\n  ';
+
+    var iterateLoop = new Function('get', 'fn', begin + end);
+    iterateLoop(range.get, fn);
+  }
+
+  /*
+   * Recursive version of iterate(). For reference only.
+   * 
+  export function iterate (range, fn) {
+    let get = range.get
+    let shape = [...range.shape]
+    // iterate from smallest to biggest dimension
+    shape.sort(([,size1], [,size2]) => size1 - size2)
+    let dims = shape.length
+    
+    function iterateRecurse (obj, axisIdx) {
+      if (dims === axisIdx) {
+        fn(get(obj))
+      } else {
+        let [axis,size] = shape[axisIdx]
+        for (let i=0; i < size; i++) {
+          obj[axis] = i
+          iterateRecurse(obj, axisIdx+1)
+        }
+      }
+    }
+    iterateRecurse({}, 0)
+  }
+  */
+  return {
+    setters: [function (_) {
+      _slicedToArray = _['default'];
+    }, function (_d) {
+      _toConsumableArray = _d['default'];
+    }, function (_e) {
+      _getIterator = _e['default'];
+    }],
+    execute: function () {
+      /**
+       * Return the minimum/maximum across all range values,
+       * ignoring null's.
+       */
+      'use strict';
+
+      _export('minMax', minMax);
+
+      _export('reduce', reduce);
+
+      _export('iterate', iterate);
+    }
+  };
+});
+
+$__System.register('19', ['7', '8', '20', '1f'], function (_export) {
+  var _createClass, _classCallCheck, _Math$trunc, ndarray, Wrapper1D;
+
+  /***
+   * Return the indices of the two neighbors in the a array closest to x.
+   * The array must be sorted (strictly monotone), either ascending or descending.
+   * 
+   * If x exists in the array, both neighbors point to x.
+   * If x is lower (greated if descending) than the first value, both neighbors point to 0.
+   * If x is greater (lower if descending) than the last value, both neighbors point to the last index.
+   * 
+   * Adapted from https://stackoverflow.com/a/4431347
+   */
+
+  function indicesOfNearest(a, x) {
+    if (a.length === 0) {
+      throw new Error('Array must have at least one element');
+    }
+    var lo = -1;
+    var hi = a.length;
+    var ascending = a.length === 1 || a[0] < a[1];
+    // we have two separate code paths to help the runtime optimize the loop
+    if (ascending) {
+      while (hi - lo > 1) {
+        var mid = Math.round((lo + hi) / 2);
+        if (a[mid] <= x) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    } else {
+      while (hi - lo > 1) {
+        var mid = Math.round((lo + hi) / 2);
+        if (a[mid] >= x) {
+          // here's the difference
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    }
+    if (a[lo] === x) hi = lo;
+    if (lo === -1) lo = hi;
+    if (hi === a.length) hi = lo;
+    return [lo, hi];
+  }
+
+  /**
+   * Return the index in a of the value closest to x.
+   * The array a must be sorted, either ascending or descending.
+   * If x happens to be exactly between two values, the one that
+   * appears first is returned.
+   */
+
+  function indexOfNearest(a, x) {
+    var i = indicesOfNearest(a, x);
+    var lo = i[0];
+    var hi = i[1];
+    if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
+      return lo;
+    } else {
+      return hi;
+    }
+  }
+
+  /**
+   * Wraps an object with get(i,j,k,...) method and .shape property
+   * as a SciJS ndarray object (https://github.com/scijs/ndarray).
+   * 
+   * If the object happens to be a SciJS ndarray object already, then this function
+   * just returns the same object.
+   * 
+   * Note that ndarray only accepts 1D-storage in its constructor, which means
+   * we have to map our multi-dim indices to 1D, and get back to multi-dim
+   * again afterwards.
+   * TODO do benchmarks
+   */
+
+  function asSciJSndarray(arr) {
+    if (['data', 'shape', 'stride', 'offset'].every(function (p) {
+      return p in arr;
+    })) {
+      // by existence of these properties we assume it is an ndarray
+      return arr;
+    }
+    var ndarr = ndarray(new Wrapper1D(arr), arr.shape);
+    return ndarr;
+  }
+
+  /**
+   * Wraps an ndarray-like object with get(i,j,...) method and .shape property
+   * as a 1D array object with get(i) and .length properties.
+   * Instances of this class can then be used as array storage for SciJS's ndarray. 
+   */
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _Math$trunc = _3['default'];
+    }, function (_f) {
+      ndarray = _f['default'];
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      _export('indicesOfNearest', indicesOfNearest);
+
+      _export('indexOfNearest', indexOfNearest);
+
+      _export('asSciJSndarray', asSciJSndarray);
+
+      Wrapper1D = (function () {
+        function Wrapper1D(arr) {
+          _classCallCheck(this, Wrapper1D);
+
+          this._arr = arr;
+          this._shape = arr.shape;
+          this._dims = arr.shape.length;
+          this._calculateStrides();
+          this.length = arr.shape.reduce(function (a, b) {
+            return a * b;
+          }, 1);
+        }
+
+        _createClass(Wrapper1D, [{
+          key: '_calculateStrides',
+          value: function _calculateStrides() {
+            var strides = new Uint16Array(this._dims);
+            strides[this._dims - 1] = 1;
+            for (var i = this._dims - 2; i >= 0; i--) {
+              strides[i] = strides[i + 1] * this._shape[i + 1];
+            }
+            this._strides = strides;
+          }
+        }, {
+          key: 'get',
+          value: function get(idx) {
+            var _arr;
+
+            // TODO add optimized versions for dim <= 4
+            var dims = this._dims;
+            var strides = this._strides;
+
+            // convert 1D index to nd-indices
+            var ndidx = new Array(dims);
+            for (var i = 0; i < dims; i++) {
+              ndidx[i] = _Math$trunc(idx / strides[i]);
+              idx -= ndidx[i] * strides[i];
+            }
+            return (_arr = this._arr).get.apply(_arr, ndidx);
+          }
+        }]);
+
+        return Wrapper1D;
+      })();
+    }
+  };
+});
+
+$__System.registerDynamic("21", ["22", "23", "24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('22');
+  req('23');
+  module.exports = req('24')('iterator');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("25", ["21"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('21'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('18', ['7', '8', '20', '25', '26'], function (_export) {
+  var _createClass, _classCallCheck, _Math$trunc, _Symbol$iterator, _Map, PaletteManager;
+
+  function linearPalette(colors) {
+    var steps = arguments.length <= 1 || arguments[1] === undefined ? 256 : arguments[1];
+
+    if (steps === 1) {
+      // work-around, a gradient with 1 pixel becomes black otherwise
+      return directPalette([colors[0]]);
+    }
+    // draw the gradient in a canvas
+    var canvas = document.createElement('canvas');
+    canvas.width = steps;
+    canvas.height = 1;
+    var ctx = canvas.getContext('2d');
+    var gradient = ctx.createLinearGradient(0, 0, steps - 1, 0);
+    var num = colors.length;
+    for (var i = 0; i < num; i++) {
+      gradient.addColorStop(i / (num - 1), colors[i]);
+    }
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, steps, 1);
+
+    // now read back values into arrays
+    var red = new Uint8Array(steps);
+    var green = new Uint8Array(steps);
+    var blue = new Uint8Array(steps);
+
+    var pix = ctx.getImageData(0, 0, steps, 1).data;
+    for (var _i = 0, j = 0; _i < pix.length; _i += 4, j++) {
+      red[j] = pix[_i];
+      green[j] = pix[_i + 1];
+      blue[j] = pix[_i + 2];
+    }
+
+    return {
+      steps: red.length,
+      red: red,
+      green: green,
+      blue: blue
+    };
+  }
+
+  /**
+   * Converts an array of CSS colors to a palette of the same size.
+   */
+
+  function directPalette(colors) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    var ctx = canvas.getContext('2d');
+
+    var steps = colors.length;
+
+    var red = new Uint8Array(steps);
+    var green = new Uint8Array(steps);
+    var blue = new Uint8Array(steps);
+
+    for (var i = 0; i < colors.length; i++) {
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(0, 0, 1, 1);
+      var pix = ctx.getImageData(0, 0, 1, 1).data;
+      red[i] = pix[0];
+      green[i] = pix[1];
+      blue[i] = pix[2];
+    }
+
+    return {
+      steps: red.length,
+      red: red,
+      green: green,
+      blue: blue
+    };
+  }
+
+  function scale(val, palette, extent) {
+    // scale val to [0,paletteSize-1] using the palette extent
+    // (IDL bytscl formula: http://www.exelisvis.com/docs/BYTSCL.html)
+    var scaled = _Math$trunc((palette.steps - 1 + 0.9999) * (val - extent[0]) / (extent[1] - extent[0]));
+    return scaled;
+  }
+
+  /**
+   * Manages palettes under common names.
+   * 
+   * Palettes can have different numbers of steps.
+   * Linear palettes can be conveniently added by supplying an array of CSS color specifications.
+   * Generic palettes can be added by directly supplying the step colors as RGB arrays. 
+   * 
+   * Example:
+   * <pre><code>
+   * var palettes = new PaletteManager({defaultSteps: 10})
+   * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // has 10 steps
+   * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps=1000}) // high-resolution palette
+   * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of exactly those 3 colors
+   * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
+   * </code></pre>
+   * 
+   * Note that Uint8Array typed arrays should be used for custom palettes (added via add()) to avoid
+   * internal transformation.
+   */
+
+  function _asUint8Array(arr) {
+    var ta = new Uint8Array(arr.length);
+    for (var i = 0; i < arr.length; i++) {
+      var val = arr[i];
+      if (val < 0 || val > 255) {
+        throw new Error('Array value must be within [0,255], but is: ' + val);
+      }
+      ta[i] = val;
+    }
+    return ta;
+  }
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _Math$trunc = _3['default'];
+    }, function (_5) {
+      _Symbol$iterator = _5['default'];
+    }, function (_4) {
+      _Map = _4['default'];
+    }],
+    execute: function () {
+      /**
+       * Calculates a linear palette of the given size (default 256) from the given
+       * CSS color specifications.
+       * 
+       * Example:
+       * <pre><code>
+       * var grayscale = linearPalette(['#FFFFFF', '#000000'], 10) // 10-step palette
+       * var rainbow = linearPalette(['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000'])
+       * </code></pre>
+       * 
+       * @param {Array} colors An array of CSS color specifications
+       * @param {number} steps The number of palette colors to calculate
+       * @return An object with members ncolors, red, green, blue, usable with
+       *         the PaletteManager class.
+       */
+      'use strict';
+
+      _export('linearPalette', linearPalette);
+
+      _export('directPalette', directPalette);
+
+      _export('scale', scale);
+
+      PaletteManager = (function () {
+
+        /**
+         * @param {Integer} defaultSteps The default number of steps when adding palettes with addLinear().
+         */
+
+        function PaletteManager() {
+          var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+          var _ref$defaultSteps = _ref.defaultSteps;
+          var defaultSteps = _ref$defaultSteps === undefined ? 256 : _ref$defaultSteps;
+
+          _classCallCheck(this, PaletteManager);
+
+          this._defaultSteps = defaultSteps;
+          this._palettes = new _Map();
+        }
+
+        /**
+         * Store a supplied generic palette under the given name.
+         * 
+         * @param name The unique name of the palette.
+         * @param palette An object with red, green, and blue properties (each an array of [0,255] values),
+         *                or an array of CSS color specifications.
+         */
+
+        _createClass(PaletteManager, [{
+          key: 'add',
+          value: function add(name, palette) {
+            if (this._palettes.has(name)) {
+              console.warn('A palette with name "' + name + '" already exists! Overwriting...');
+            }
+            if (Array.isArray(palette)) {
+              palette = directPalette(palette);
+            }
+
+            if (![palette.red, palette.green, palette.blue].every(function (arr) {
+              return arr.length === palette.red.length;
+            })) {
+              throw new Error('The red, green, blue arrays of the palette must be of equal lengths');
+            }
+            if (!(palette.red instanceof Uint8Array)) {
+              palette.red = _asUint8Array(palette.red);
+              palette.green = _asUint8Array(palette.green);
+              palette.blue = _asUint8Array(palette.blue);
+            }
+            palette.steps = palette.red.length; // for convenience in clients
+            this._palettes.set(name, palette);
+          }
+
+          /**
+           * Store a linear palette under the given name created with the given CSS color specifications.
+           * 
+           * @param {String} name The unique name of the palette
+           * @param {Array} colors An array of CSS color specifications
+           * @param {Integer} steps Use a different number of steps than the default of this manager.
+           */
+        }, {
+          key: 'addLinear',
+          value: function addLinear(name, colors) {
+            var _ref2 = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+            var steps = _ref2.steps;
+
+            this.add(name, linearPalette(colors, steps ? steps : this._defaultSteps));
+          }
+
+          /**
+           * Return the palette stored under the given name, or throws an error if not found.
+           * The palette is an object with properties steps, red, green, and blue.
+           * Each of the color arrays is an Uint8Array of length steps.
+           */
+        }, {
+          key: 'get',
+          value: function get(name) {
+            var palette = this._palettes.get(name);
+            if (palette === undefined) {
+              throw new Error('Palette "' + name + '" not found');
+            }
+            return palette;
+          }
+        }, {
+          key: _Symbol$iterator,
+          get: function get() {
+            return this._palettes[_Symbol$iterator];
+          }
+        }]);
+
+        return PaletteManager;
+      })();
+
+      _export('PaletteManager', PaletteManager);
+    }
+  };
+});
+
+$__System.register('27', ['7', '8', '10', '12', '18', '19', '26', '28', 'd', 'e', '1e', 'c', '1f', '1a', '1b'], function (_export) {
+  var _createClass, _classCallCheck, _Promise, _slicedToArray, linearPalette, scale, arrays, _Map, _Object$keys, _get, _inherits, _getIterator, L, ndarray, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
+
+  function wrapLongitude(lon, range) {
+    return wrapNum(lon, range, true);
+  }
+
+  //stolen from https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
+  //doesn't exist in current release (0.7.3)
+  function wrapNum(x, range, includeMax) {
+    var max = range[1];
+    var min = range[0];
+    var d = max - min;
+    return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
+  }
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_5) {
+      _Promise = _5['default'];
+    }, function (_3) {
+      _slicedToArray = _3['default'];
+    }, function (_7) {
+      linearPalette = _7.linearPalette;
+      scale = _7.scale;
+    }, function (_8) {
+      arrays = _8;
+    }, function (_6) {
+      _Map = _6['default'];
+    }, function (_4) {
+      _Object$keys = _4['default'];
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_e2) {
+      _getIterator = _e2['default'];
+    }, function (_c) {
+      L = _c['default'];
+    }, function (_f) {
+      ndarray = _f['default'];
+    }, function (_a) {
+      rangeutil = _a;
+    }, function (_b) {
+      referencingutil = _b;
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      DOMAIN_TYPE = 'http://coveragejson.org/def#Grid';
+
+      DEFAULT_CONTINUOUS_PALETTE = function DEFAULT_CONTINUOUS_PALETTE() {
+        return linearPalette(['#deebf7', '#3182bd']);
+      };
+
+      // blues
+
+      DEFAULT_CATEGORICAL_PALETTE = function DEFAULT_CATEGORICAL_PALETTE(n) {
+        return linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n);
+      };
+
+      /**
+       * Renderer for Coverages with domain type Grid.
+       * 
+       * Events fired onto the map:
+       * "dataloading" - Data loading has started
+       * "dataload" - Data loading has finished (also in case of errors)
+       * 
+       * Events fired on this layer:
+       * "add" - Layer is initialized and is about to be added to the map
+       * "remove" - Layer is removed from the map
+       * "error" - Error when loading data
+       * "paletteChange" - Palette has changed
+       * "paletteExtentChange" - Palette extent has changed
+       * "axisChange" - Axis coordinate has changed (e.axis === 'time'|'vertical')
+       * "remove" - Layer is removed from the map
+       * 
+       */
+
+      Grid = (function (_L$TileLayer$Canvas) {
+        _inherits(Grid, _L$TileLayer$Canvas);
+
+        /**
+         * The parameter to display must be given as the 'parameter' options property.
+         * 
+         * Optional time and vertical axis target values can be defined with the 'time' and
+         * 'vertical' options properties. The closest values on the respective axes are chosen.
+         * 
+         * Example: 
+         * <pre><code>
+         * var cov = ... // get Coverage data
+         * var layer = new GridCoverage(cov, {
+         *   keys: ['salinity'],
+         *   time: new Date('2015-01-01T12:00:00Z'),
+         *   vertical: 50,
+         *   palette: palettes.get('blues'),
+         *   paletteExtent: 'full' // or 'subset' (time/vertical), 'fov' (map field of view), or specific: [-10,10]
+         * })
+         * </code></pre>
+         */
+
+        function Grid(cov, options) {
+          _classCallCheck(this, Grid);
+
+          _get(Object.getPrototypeOf(Grid.prototype), 'constructor', this).call(this);
+          if (cov.domainType !== DOMAIN_TYPE) {
+            throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
+          }
+          this.cov = cov;
+          this.param = cov.parameters.get(options.keys[0]);
+          this._axesSubset = { // x and y are not subsetted
+            t: { coordPref: options.time },
+            z: { coordPref: options.vertical }
+          };
+
+          var categories = this.param.observedProperty.categories;
+
+          if (options.palette) {
+            this._palette = options.palette;
+          } else if (categories) {
+            this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length);
+          } else {
+            this._palette = DEFAULT_CONTINUOUS_PALETTE();
+          }
+
+          if (categories && categories.length !== this._palette.steps) {
+            throw new Error('Categorical palettes must match the number of categories of the parameter');
+          }
+
+          if (categories) {
+            if (options.paletteExtent) {
+              throw new Error('paletteExtent cannot be given for categorical parameters');
+            }
+          } else {
+            if (options.paletteExtent === undefined) {
+              this._paletteExtent = 'subset';
+            } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
+              this._paletteExtent = options.paletteExtent;
+            } else {
+              throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted');
+            }
+          }
+
+          switch (options.redraw) {
+            case 'manual':
+              this._autoRedraw = false;break;
+            case undefined:
+            case 'onchange':
+              this._autoRedraw = true;break;
+            default:
+              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
+          }
+        }
+
+        _createClass(Grid, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this = this;
+
+            // "loading" and "load" events are provided by the underlying TileLayer class
+
+            // TODO change to subsetCov once that is used in _updatePaletteExtent
+            //  the goal is to avoid reloading data when approximating palette extent via subsetting
+            //  but: memory has to be freed when the layer is removed from the map
+            //      -> therefore cacheRanges should be on subsetCov whose reference is removed on onRemove
+            this.cov.cacheRanges = true;
+
+            this._map = map;
+            map.fire('dataloading'); // for supporting loading spinners
+            this.cov.loadDomain().then(function (domain) {
+              _this.domain = domain;
+
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+            }).then(function () {
+              return _this._subsetByCoordinatePreference();
+            }).then(function () {
+              return _this.subsetCov.loadRange(_this.param.key);
+            }).then(function (subsetRange) {
+              _this.subsetRange = subsetRange;
+              if (!_this.param.observedProperty.categories) {
+                return _this._updatePaletteExtent(_this._paletteExtent);
+              }
+            }).then(function () {
+              _this.fire('add');
+              _get(Object.getPrototypeOf(Grid.prototype), 'onAdd', _this).call(_this, map);
+              map.fire('dataload');
+            })['catch'](function (e) {
+              console.error(e);
+              _this.fire('error', e);
+
+              map.fire('dataload');
+            });
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            delete this._map;
+            // TODO delete references to domain/range, caching logic should happen elsewhere
+            this.fire('remove');
+            _get(Object.getPrototypeOf(Grid.prototype), 'onRemove', this).call(this, map);
+          }
+        }, {
+          key: 'getBounds',
+          value: function getBounds() {
+            var bbox = undefined;
+            if (this.cov.bbox) {
+              bbox = this.cov.bbox;
+            } else if (this._isDomainUsingGeodeticWGS84CRS()) {
+              bbox = this._getDomainBbox();
+            } else {
+              return;
+            }
+            var southWest = L.latLng(bbox[1], bbox[0]);
+            var northEast = L.latLng(bbox[3], bbox[2]);
+            var bounds = new L.LatLngBounds(southWest, northEast);
+            return bounds;
+          }
+
+          /**
+           * Subsets the temporal and vertical axes based on the _axesSubset.*.coordPref property,
+           * which is regarded as a preference and does not have to exactly match a coordinate.
+           * 
+           * The return value is a promise that succeeds with an empty result and
+           * sets this.subsetCov to the subsetted coverage.
+           * The subsetting always fixes a single time and vertical slice, choosing the first
+           * axis value if no preference was given.
+           * 
+           * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
+           * values from the actual axes.
+           */
+        }, {
+          key: '_subsetByCoordinatePreference',
+          value: function _subsetByCoordinatePreference() {
+            var _this2 = this;
+
+            /**
+             * Return the index of the coordinate value closest to the given value
+             * within the given axis. Supports ascending and descending axes.
+             * If the axis does not exist, then undefined is returned.
+             */
+            var getClosestIndex = function getClosestIndex(axis, val) {
+              if (!_this2.domain.axes.has(axis)) {
+                return;
+              }
+              var vals = _this2.domain.axes.get(axis).values;
+              var idx = arrays.indexOfNearest(vals, val);
+              return idx;
+            };
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = _getIterator(_Object$keys(this._axesSubset)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var axis = _step.value;
+
+                var ax = this._axesSubset[axis];
+                if (ax.coordPref == undefined && this.domain.axes.has(axis)) {
+                  // == also handles null
+                  ax.idx = 0;
+                } else {
+                  ax.idx = getClosestIndex(axis, ax.coordPref);
+                }
+                ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null;
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            return this.cov.subsetByIndex({ t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
+              _this2.subsetCov = subsetCov;
+            });
+          }
+        }, {
+          key: '_updatePaletteExtent',
+          value: function _updatePaletteExtent(extent) {
+            var _this3 = this;
+
+            if (Array.isArray(extent) && extent.length === 2) {
+              this._paletteExtent = extent;
+              return _Promise.resolve();
+            }
+
+            if (extent === 'subset') {
+              // scan the current subset for min/max values
+
+              // check if subsetted size is manageable
+              if (this.subsetRange.shape.x * this.subsetRange.shape.y < 10000) {
+                this._paletteExtent = rangeutil.minMax(this.subsetRange);
+                return _Promise.resolve();
+              } else {
+                // subset x and y to get a fast estimate of the palette extent
+                // since it is an estimate, the lower and upper bound needs a small buffer
+                // (to prevent out-of-bounds colours)
+                var xlen = this.subsetRange.shape.get('x');
+                var ylen = this.subsetRange.shape.get('y');
+                var xconstraint = { start: 0, stop: xlen, step: Math.max(Math.round(xlen / 100), 1) };
+                var yconstraint = { start: 0, stop: ylen, step: Math.max(Math.round(ylen / 100), 1) };
+
+                // TODO bug in covjson-reader doesn't expose subsetByIndex for subsetted covs
+                //return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})
+                return this.cov.subsetByIndex({ x: xconstraint, y: yconstraint, t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
+                  return subsetCov.loadRange(_this3.param.key).then(function (subsetRange) {
+                    var _rangeutil$minMax = rangeutil.minMax(subsetRange);
+
+                    var _rangeutil$minMax2 = _slicedToArray(_rangeutil$minMax, 2);
+
+                    var min = _rangeutil$minMax2[0];
+                    var max = _rangeutil$minMax2[1];
+
+                    var buffer = (max - min) * 0.1; // 10% buffer on each side
+                    _this3._paletteExtent = [min - buffer, max + buffer];
+                  });
+                });
+              }
+            } else if (extent === 'fov') {
+              // scan the values that are currently in field of view on the map for min/max
+              // this implies using the current subset
+              var bounds = this._map.getBounds();
+
+              // TODO implement
+              throw new Error('NOT IMPLEMENTED YET');
+            } else {
+              throw new Error('Unknown extent specification: ' + extent);
+            }
+          }
+        }, {
+          key: 'drawTile',
+          value: function drawTile(canvas, tilePoint, zoom) {
+            var _this4 = this;
+
+            var ctx = canvas.getContext('2d');
+            var tileSize = this.options.tileSize;
+
+            var imgData = ctx.getImageData(0, 0, tileSize, tileSize);
+            // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
+            var rgba = ndarray(imgData.data, [tileSize, tileSize, 4]);
+
+            // projection coordinates of top left tile pixel
+            var start = tilePoint.multiplyBy(tileSize);
+            var startX = start.x;
+            var startY = start.y;
+
+            var palette = this.palette;
+            var _palette = this.palette;
+            var red = _palette.red;
+            var green = _palette.green;
+            var blue = _palette.blue;
+
+            var paletteExtent = this.paletteExtent;
+
+            var doSetPixel = function doSetPixel(tileY, tileX, idx) {
+              rgba.set(tileY, tileX, 0, red[idx]);
+              rgba.set(tileY, tileX, 1, green[idx]);
+              rgba.set(tileY, tileX, 2, blue[idx]);
+              rgba.set(tileY, tileX, 3, 255);
+            };
+
+            var setPixel = undefined;
+            if (this.param.categoryEncoding) {
+              var _iteratorNormalCompletion2;
+
+              var _didIteratorError2;
+
+              var _iteratorError2;
+
+              var _iterator2, _step2;
+
+              (function () {
+                // categorical parameter with integer encoding
+                var valIdxMap = new _Map();
+                for (var idx = 0; idx < _this4.param.observedProperty.categories.length; idx++) {
+                  var cat = _this4.param.observedProperty.categories[idx];
+                  _iteratorNormalCompletion2 = true;
+                  _didIteratorError2 = false;
+                  _iteratorError2 = undefined;
+
+                  try {
+                    for (_iterator2 = _getIterator(_this4.param.categoryEncoding.get(cat.id)); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                      var val = _step2.value;
+
+                      valIdxMap.set(val, idx);
+                    }
+                  } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                        _iterator2['return']();
+                      }
+                    } finally {
+                      if (_didIteratorError2) {
+                        throw _iteratorError2;
+                      }
+                    }
+                  }
+                }
+                setPixel = function (tileY, tileX, val) {
+                  if (val === null || !valIdxMap.has(val)) return;
+                  var idx = valIdxMap.get(val);
+                  doSetPixel(tileY, tileX, idx);
+                };
+              })();
+            } else {
+              // continuous parameter
+              setPixel = function (tileY, tileX, val) {
+                if (val === null) return;
+                var idx = scale(val, palette, paletteExtent);
+                doSetPixel(tileY, tileX, idx);
+              };
+            }
+
+            var vals = this.subsetRange.get;
+
+            // FIXME check if "Geodetic WGS84 CRS" as term is enough to describe WGS84 angular
+            //          what about cartesian??
+
+            // TODO check if the domain and map CRS datum match
+            // -> if not, then at least a warning should be shown
+            if (this._isDomainUsingGeodeticWGS84CRS()) {
+              if (this._isRectilinearGeodeticMap()) {
+                // here we can apply heavy optimizations
+                this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals);
+              } else {
+                // this is for any random map projection
+                // here we have to unproject each map pixel individually and find the matching domain coordinates
+                this._drawAnyMapProjection(setPixel, tileSize, startX, startY, vals);
+              }
+            } else {
+              // here we either have a projected CRS with base CRS = CRS84, or
+              // a projected CRS with non-CRS84 base CRS (like British National Grid), or
+              // a geodetic CRS not using a WGS84 datum
+              // FIXME check this, what does geodetic CRS really mean? = lat/lon? = ellipsoid?
+
+              if (this._isGeodeticTransformAvailableForDomain()) {
+                throw new Error('NOT IMPLEMENTED YET');
+                // TODO implement, use 2D coordinate arrays and/or proj4 transforms
+              } else {
+                  // TODO if the map projection base CRS matches the CRS of the domain,
+                  //      could we still draw the grid in projected coordinates?
+                  // -> e.g. UK domain CRS (not projected! easting, northing) and
+                  //         UK basemap in that CRS
+
+                  throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 'and no geodetic transform data is available');
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+          }
+
+          /**
+           * Derives the bounding box of the x,y axes in CRS coordinates.
+           * @returns {Array} [xmin,ymin,xmax,ymax]
+           */
+        }, {
+          key: '_getDomainBbox',
+          value: function _getDomainBbox() {
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
+
+            // TODO use bounds if they are supplied
+            var xend = x.length - 1;
+            var yend = y.length - 1;
+            var xmin = x[0];
+            var xmax = x[xend];
+            var ymin = y[0];
+            var ymax = y[yend];
+
+            // TODO only enlarge when bounds haven't been used above
+            if (x.length > 1) {
+              xmin -= Math.abs(x[0] - x[1]) / 2;
+              xmax += Math.abs(x[xend] - x[xend - 1]) / 2;
+            }
+            if (y.length > 1) {
+              ymin -= Math.abs(y[0] - y[1]) / 2;
+              ymax += Math.abs(y[yend] - y[yend - 1]) / 2;
+            }
+            if (xmin > xmax) {
+              var _ref = [xmax, xmin];
+              xmin = _ref[0];
+              xmax = _ref[1];
+            }
+            if (ymin > ymax) {
+              var _ref2 = [ymax, ymin];
+              ymin = _ref2[0];
+              ymax = _ref2[1];
+            }
+            return [xmin, ymin, xmax, ymax];
+          }
+
+          /**
+           * Draws a geodetic rectilinear domain grid on a map with arbitrary projection.
+           * 
+           * @param {Function} setPixel A function with parameters (y,x,val) which 
+           *                            sets the color of a pixel on a tile.
+           * @param {Integer} tileSize Size of a tile in pixels.
+           * @param {Integer} startX
+           * @param {Integer} startY
+           * @param {ndarray} vals Range values.
+           */
+        }, {
+          key: '_drawAnyMapProjection',
+          value: function _drawAnyMapProjection(setPixel, tileSize, startX, startY, vals) {
+            // usable for any map projection, but computationally more intensive
+            // there are two hotspots in the loops: map.unproject and indexOfNearest
+
+            var map = this._map;
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
+            var bbox = this._getDomainBbox();
+            var lonRange = [bbox[0], bbox[0] + 360];
+
+            for (var tileX = 0; tileX < tileSize; tileX++) {
+              for (var tileY = 0; tileY < tileSize; tileY++) {
+                var _map$unproject = map.unproject(L.point(startX + tileX, startY + tileY));
+
+                var lat = _map$unproject.lat;
+                var lon = _map$unproject.lon;
+
+                // we first check whether the tile pixel is outside the domain bounding box
+                // in that case we skip it as we do not want to extrapolate
+                if (lat < bbox[1] || lat > bbox[3]) {
+                  continue;
+                }
+
+                lon = wrapLongitude(lon, lonRange);
+                if (lon < bbox[0] || lon > bbox[2]) {
+                  continue;
+                }
+
+                // now we find the closest grid cell using simple binary search
+                // for finding the closest latitude/longitude we use a simple binary search
+                // (as there is no discontinuity)
+                var iLat = arrays.indexOfNearest(y, lat);
+                var iLon = arrays.indexOfNearest(x, lon);
+
+                setPixel(tileY, tileX, vals({ y: iLat, x: iLon }));
+              }
+            }
+          }
+
+          /**
+           * Draws a geodetic rectilinear domain grid on a map whose grid is, or can be directly
+           * mapped to, a geodetic rectilinear grid.
+           */
+        }, {
+          key: '_drawRectilinearGeodeticMapProjection',
+          value: function _drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals) {
+            // optimized version for map projections that are equal to a rectilinear geodetic grid
+            // this can be used when lat and lon can be computed independently for a given pixel
+
+            var map = this._map;
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
+            var bbox = this._getDomainBbox();
+            var lonRange = [bbox[0], bbox[0] + 360];
+
+            var latCache = new Float64Array(tileSize);
+            var iLatCache = new Uint32Array(tileSize);
+            for (var tileY = 0; tileY < tileSize; tileY++) {
+              var lat = map.unproject(L.point(startX, startY + tileY)).lat;
+              latCache[tileY] = lat;
+              // find the index of the closest latitude in the grid using simple binary search
+              iLatCache[tileY] = arrays.indexOfNearest(y, lat);
+            }
+
+            for (var tileX = 0; tileX < tileSize; tileX++) {
+              var lon = map.unproject(L.point(startX + tileX, startY)).lng;
+              lon = wrapLongitude(lon, lonRange);
+              if (lon < bbox[0] || lon > bbox[2]) {
+                continue;
+              }
+
+              // find the index of the closest longitude in the grid using simple binary search
+              // (as there is no discontinuity)
+              var iLon = arrays.indexOfNearest(x, lon);
+
+              for (var tileY = 0; tileY < tileSize; tileY++) {
+                // get geographic coordinates of tile pixel
+                var _lat = latCache[tileY];
+
+                // we first check whether the tile pixel is outside the domain bounding box
+                // in that case we skip it as we do not want to extrapolate
+                if (_lat < bbox[1] || _lat > bbox[3]) {
+                  continue;
+                }
+
+                var iLat = iLatCache[tileY];
+
+                setPixel(tileY, tileX, vals({ y: iLat, x: iLon }));
+              }
+            }
+          }
+
+          /**
+           * Return true if the map projection grid can be mapped to a rectilinear
+           * geodetic grid. For that, it must satisfy:
+           * for all x, there is a longitude lon, for all y, unproject(x,y).lon = lon
+           * for all y, there is a latitude lat, for all x, unproject(x,y).lat = lat
+           * 
+           * Returns false if this is not the case or unknown.
+           */
+        }, {
+          key: '_isRectilinearGeodeticMap',
+          value: function _isRectilinearGeodeticMap() {
+            var crs = this._map.options.crs;
+            // these are the ones included in Leaflet
+            var recti = [L.CRS.EPSG3857, L.CRS.EPSG4326, L.CRS.EPSG3395, L.CRS.Simple];
+            var isRecti = recti.indexOf(crs) !== -1;
+            // TODO for unknown ones, how do we test that?
+            return isRecti;
+          }
+
+          /**
+           * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
+           */
+        }, {
+          key: '_isDomainUsingGeodeticWGS84CRS',
+          value: function _isDomainUsingGeodeticWGS84CRS() {
+            var srs = referencingutil.getRefSystem(this.domain, ['x', 'y']);
+            return referencingutil.isGeodeticWGS84CRS(srs);
+          }
+        }, {
+          key: '_isGeodeticTransformAvailableForDomain',
+          value: function _isGeodeticTransformAvailableForDomain() {
+            var srs = referencingutil.getRefSystem(this.domain, ['x', 'y']);
+            // TODO implement
+            return false;
+          }
+        }, {
+          key: '_doAutoRedraw',
+          value: function _doAutoRedraw() {
+            // we check getContainer() to prevent errors when trying to redraw when the layer has not
+            // fully initialized yet
+            if (this._autoRedraw && this.getContainer()) {
+              this.redraw();
+            }
+          }
+        }, {
+          key: 'parameter',
+          get: function get() {
+            return this.param;
+          }
+
+          /**
+           * Sets the currently active time to the one closest to the given Date object.
+           * This has no effect if the grid has no time axis.
+           */
+        }, {
+          key: 'time',
+          set: function set(val) {
+            var _this5 = this;
+
+            if (!this.domain.axes.has('t')) {
+              throw new Error('No time axis found');
+            }
+            var old = this.time;
+            this._axesSubset.t.coordPref = val;
+            this._subsetByCoordinatePreference().then(function () {
+              _this5._doAutoRedraw();
+              if (old !== _this5.time) {
+                _this5.fire('axisChange', { axis: 'time' });
+              }
+            });
+          },
+
+          /**
+           * The currently active time on the temporal axis as Date object, 
+           * or null if the grid has no time axis.
+           */
+          get: function get() {
+            return this._axesSubset.t.coord;
+          }
+
+          /**
+           * Sets the currently active vertical coordinate to the one closest to the given value.
+           * This has no effect if the grid has no vertical axis.
+           */
+        }, {
+          key: 'vertical',
+          set: function set(val) {
+            var _this6 = this;
+
+            if (!this.domain.axes.has('z')) {
+              throw new Error('No vertical axis found');
+            }
+            var old = this.vertical;
+            this._axesSubset.z.coordPref = val;
+            this._subsetByCoordinatePreference().then(function () {
+              _this6._doAutoRedraw();
+              if (old !== _this6.vertical) {
+                _this6.fire('axisChange', { axis: 'vertical' });
+              }
+            });
+          },
+
+          /**
+           * The currently active vertical coordinate as a number, 
+           * or null if the grid has no vertical axis.
+           */
+          get: function get() {
+            return this._axesSubset.z.coord;
+          }
+        }, {
+          key: 'palette',
+          set: function set(p) {
+            this._palette = p;
+            this._doAutoRedraw();
+            this.fire('paletteChange');
+          },
+          get: function get() {
+            return this._palette;
+          }
+        }, {
+          key: 'paletteExtent',
+          set: function set(extent) {
+            var _this7 = this;
+
+            if (this.param.observedProperty.categories) {
+              throw new Error('Cannot set palette extent for categorical parameters');
+            }
+            this._updatePaletteExtent(extent).then(function () {
+              _this7._doAutoRedraw();
+              _this7.fire('paletteExtentChange');
+            });
+          },
+          get: function get() {
+            return this._paletteExtent;
+          }
+        }]);
+
+        return Grid;
+      })(L.TileLayer.Canvas);
+
+      _export('default', Grid);
+    }
+  };
+});
+
+$__System.registerDynamic("29", ["2a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _Object$defineProperty = req('2a')["default"];
+  exports["default"] = function(obj, key, value) {
+    if (key in obj) {
+      _Object$defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+    return obj;
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('2b', ['17', '27', '28', '29', '1c'], function (_export) {
+  var VerticalProfile, Grid, _Object$keys, _defineProperty, Trajectory, _DEFAULT_RENDERERS, pre, DEFAULT_RENDERERS;
+
+  function LayerFactory() {
+    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+    if (options.renderer) {
+      return function (cov, opts) {
+        return new options.renderer(cov, opts);
+      };
+    }
+    if (options.renderers) {
+      return function (cov, opts) {
+        if (options.renderers[cov.type]) {
+          return new options.renderers[cov.type](cov, opts);
+        }
+        if (options.renderers[cov.domainType]) {
+          return new options.renderers[cov.domainType](cov, opts);
+        }
+        throw new Error('No renderer found for type=' + cov.type + ' or domainType=' + cov.domainType + ',\n                       available: ' + _Object$keys(options.renderers));
+      };
+    }
+    return function (cov, opts) {
+      if (!DEFAULT_RENDERERS[cov.domainType]) {
+        throw new Error('No renderer found for domainType=' + cov.domainType + ',\n          available: ' + _Object$keys(DEFAULT_RENDERERS));
+      }
+      return new DEFAULT_RENDERERS[cov.domainType](cov, opts);
+    };
+  }
+
+  return {
+    setters: [function (_4) {
+      VerticalProfile = _4['default'];
+    }, function (_3) {
+      Grid = _3['default'];
+    }, function (_2) {
+      _Object$keys = _2['default'];
+    }, function (_) {
+      _defineProperty = _['default'];
+    }, function (_c) {
+      Trajectory = _c['default'];
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      _export('default', LayerFactory);
+
+      pre = 'http://coveragejson.org/def#';
+      DEFAULT_RENDERERS = (_DEFAULT_RENDERERS = {}, _defineProperty(_DEFAULT_RENDERERS, pre + 'Grid', Grid), _defineProperty(_DEFAULT_RENDERERS, pre + 'VerticalProfile', VerticalProfile), _defineProperty(_DEFAULT_RENDERERS, pre + 'Trajectory', Trajectory), _DEFAULT_RENDERERS);
+
+      _export('DEFAULT_RENDERERS', DEFAULT_RENDERERS);
+    }
+  };
+});
+
+$__System.register("2c", ["2b"], function (_export) {
+  "use strict";
+
+  return {
+    setters: [function (_b) {
+      var _exportObj = {};
+
+      for (var _key in _b) {
+        if (_key !== "default") _exportObj[_key] = _b[_key];
+      }
+
+      _exportObj["default"] = _b["default"];
+
+      _export(_exportObj);
+    }],
+    execute: function () {}
+  };
+});
+
+$__System.registerDynamic("2d", ["2e", "2f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $def = req('2e');
+  $def($def.P, 'Set', {toJSON: req('2f')('Set')});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("30", ["31", "32"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var strong = req('31');
+  req('32')('Set', function(get) {
+    return function Set() {
+      return get(this, arguments.length > 0 ? arguments[0] : undefined);
+    };
+  }, {add: function add(value) {
+      return strong.def(this, value = value === 0 ? 0 : value, value);
+    }}, strong);
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("33", ["34", "22", "23", "30", "2d", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('34');
+  req('22');
+  req('23');
+  req('30');
+  req('2d');
+  module.exports = req('35').Set;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a", ["33"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('33'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('36', ['5', '6', '7', '8', '9', '16', '37', '1d', '1e', 'a', 'c', '2c', 'f', 'b'], function (_export) {
+  var $, HTML, i18n, fromTemplate, sortByKey, _createClass, _classCallCheck, getDistFormat, MappableFormats, DataFormats, CoverageLegend, CovJSON, _toConsumableArray, _getIterator, _Set, L, LayerFactory, wms, ImageLegend, templatesHtml, paneHtml, DatasetsPane;
+
+  return {
+    setters: [function (_3) {
+      $ = _3.$;
+      HTML = _3.HTML;
+    }, function (_6) {
+      i18n = _6.i18n;
+      fromTemplate = _6.fromTemplate;
+      sortByKey = _6.sortByKey;
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_7) {
+      getDistFormat = _7.getDistFormat;
+      MappableFormats = _7.MappableFormats;
+      DataFormats = _7.DataFormats;
+    }, function (_5) {
+      CoverageLegend = _5['default'];
+    }, function (_4) {
+      CovJSON = _4;
+    }, function (_d) {
+      _toConsumableArray = _d['default'];
+    }, function (_e) {
+      _getIterator = _e['default'];
+    }, function (_a) {
+      _Set = _a['default'];
+    }, function (_c) {
+      L = _c['default'];
+    }, function (_c2) {
+      LayerFactory = _c2['default'];
+    }, function (_f) {
+      wms = _f;
+    }, function (_b) {
+      ImageLegend = _b['default'];
+    }],
+    execute: function () {
+      'use strict';
+
+      templatesHtml = '\n<template id="template-dataset-list-item">\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading dataset-title"></h4>\n    <p class="dataset-publisher"></p>\n    <p class="dataset-distribution-labels"></p>\n    <p class="dataset-description"></p>\n    <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>\n    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>\n    <div class="dataset-spatial-minimap"></div>\n    <button type="button" class="btn btn-success dataset-analyse-button" style="display:none">\n      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse\n    </button>\n  </li>\n</template>\n\n<style>\n.catalog-url-panel {\n  margin-top: 20px;\n}\n.dataset-spatial-minimap {\n  margin-bottom: 10px;\n}\n</style>\n';
+
+      $('body').add(HTML(templatesHtml));
+
+      paneHtml = function paneHtml() {
+        return '\n<h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>\n\n<div class="panel panel-default catalog-url-panel">\n  <div class="panel-heading">\n    <h3 class="panel-title">\n      <a href="http://json-ld.org/" title="JSON-LD Data"><img width="32" src="http://json-ld.org/images/json-ld-data-32.png" alt="JSON-LD-logo-32"></a>\n      <span style="vertical-align:middle">\n        <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a> Catalogue\n      </span>\n    </h3>\n  </div>\n  <div class="panel-body catalog-url-info">\n    <a href="#" class="catalog-url-edit"><i class="glyphicon glyphicon-pencil"></i></a>\n    <a class="catalog-url"></a>\n  </div>\n  <div class="panel-body catalog-url-form" style="display:none">\n    <form>\n      <div class="form-group">\n        <input type="text" class="form-control" placeholder="http://">\n      </div>\n      <button type="submit" class="btn btn-default">Load</button>\n      <button type="button" name="cancel" class="btn btn-default">Cancel</button>\n    </form>\n  </div>\n</div>\n\n<ul class="list-group dataset-list"></ul>\n';
+      };
+
+      DatasetsPane = (function () {
+        function DatasetsPane(sidebar, paneId) {
+          _classCallCheck(this, DatasetsPane);
+
+          this.sidebar = sidebar;
+          this.id = paneId;
+          this.map = this.sidebar.map;
+          this.layerControl = this.sidebar.layerControl;
+
+          $('#' + paneId).fill(HTML(paneHtml()));
+
+          this.catalogue = sidebar.catalogue;
+          this.analysisCatalogue = sidebar.analysisCatalogue;
+
+          this._registerUIListeners();
+          this._registerModelListeners();
+        }
+
+        _createClass(DatasetsPane, [{
+          key: '_registerUIListeners',
+          value: function _registerUIListeners() {
+            var _this = this;
+
+            var el = $('#' + this.id);
+            var input = $('input', $('.catalog-url-form', el));
+            $('.catalog-url-edit', el).on('click', function () {
+              $('.catalog-url-info', el).hide();
+              $('.catalog-url-form', el).show();
+              input.set('value', _this.url);
+            });
+            $('form', $('.catalog-url-form', el)).on('submit', function () {
+              _this.catalogue.loadFromDCAT(input.get('value')).then(function () {
+                $('.catalog-url-info', el).show();
+                $('.catalog-url-form', el).hide();
+              })['catch'](function (e) {
+                console.log(e);
+                alert(e);
+              });
+            });
+            $('button', $('.catalog-url-form', el)).filter(function (b) {
+              return b.name === 'cancel';
+            }).on('click', function () {
+              $('.catalog-url-info', el).show();
+              $('.catalog-url-form', el).hide();
+            });
+          }
+        }, {
+          key: '_registerModelListeners',
+          value: function _registerModelListeners() {
+            var _this2 = this;
+
+            this.catalogue.on('load', function (_ref) {
+              var url = _ref.url;
+
+              $('.dataset-list', '#' + _this2.id).fill();
+
+              _this2._addDatasets(_this2.catalogue.datasets);
+
+              _this2.url = url;
+              $('.catalog-url', '#' + _this2.id).set('@href', url).fill(url);
+            });
+          }
+        }, {
+          key: '_addDatasets',
+          value: function _addDatasets(datasets) {
+            var sortKey = arguments.length <= 1 || arguments[1] === undefined ? 'title' : arguments[1];
+
+            datasets = sortByKey(datasets, function (d) {
+              return i18n(d[sortKey]);
+            });
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = _getIterator(datasets), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var dataset = _step.value;
+
+                this._addDataset(dataset);
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          }
+        }, {
+          key: '_addDataset',
+          value: function _addDataset(dataset) {
+            var _this3 = this;
+
+            var el = fromTemplate('template-dataset-list-item');
+            $('.dataset-list', '#' + this.id).add(el);
+
+            var title = i18n(dataset.title);
+            var description = i18n(dataset.description);
+
+            // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
+            //let landingPage = dataset.landingPage
+            var landingPage = dataset['dcat:landingPage'] || dataset['landingPage'];
+            if (landingPage) {
+              $('.dataset-title', el).fill(HTML('<a href="' + landingPage + '" target="_new" class="external dataset-title">' + title + '</a>'));
+            } else {
+              $('.dataset-title', el).fill(title);
+            }
+
+            $('.dataset-description', el).fill(description);
+
+            if (dataset.publisher) {
+              // TODO switch to .homepage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
+              //let homepage = dataset.publisher.homepage
+              var homepage = dataset.publisher['foaf:homepage'];
+              if (homepage) {
+                $('.dataset-publisher', el).fill(HTML('<a class="external" href="' + homepage + '"><em>' + dataset.publisher.name + '</em></a>'));
+              } else {
+                $('.dataset-publisher', el).fill(HTML('<em>' + dataset.publisher.name + '</em>'));
+              }
+            } else {
+              $('.dataset-publisher', el).hide();
+            }
+
+            if (dataset.temporal) {
+              var temporal = dataset.temporal.startDate.substr(0, 10) + ' to ' + dataset.temporal.endDate.substr(0, 10);
+              $('.dataset-temporal-text', el).fill(temporal);
+            } else {
+              $('.dataset-temporal', el).hide();
+            }
+
+            var isGlobal = undefined;
+            var geom = dataset.spatial && dataset.spatial.geometry ? JSON.parse(dataset.spatial.geometry) : null;
+            // check if global bounding box and don't display map in that case
+            if (geom) {
+              var geomLayer = L.geoJson(geom);
+              isGlobal = geomLayer.getBounds().equals([[-90, -180], [90, 180]]);
+            }
+
+            if (geom && !isGlobal) {
+              (function () {
+                $('.dataset-spatial-geometry', el).hide();
+
+                var map = L.map($('.dataset-spatial-minimap', el)[0], {
+                  touchZoom: false,
+                  scrollWheelZoom: false,
+                  doubleClickZoom: false,
+                  boxZoom: false,
+                  zoomControl: false,
+                  attributionControl: false
+                }).on('load', function () {
+                  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                });
+
+                setTimeout(function () {
+                  var geomLayer = L.geoJson(geom, {
+                    style: function style() {
+                      return { color: "#ff7800", weight: 1, clickable: false };
+                    }
+                  });
+                  map.fitBounds(geomLayer.getBounds(), { reset: true });
+                  geomLayer.addTo(map);
+                }, 1000);
+              })();
+            } else {
+              $('.dataset-spatial-minimap', el).hide();
+              if (isGlobal) {
+                $('.dataset-spatial-geometry-text', el).fill('global');
+              } else {
+                $('.dataset-spatial-geometry', el).hide();
+              }
+            }
+
+            if (dataset.distributions) {
+              var formats = new _Set(dataset.distributions.map(getDistFormat));
+              formats = [].concat(_toConsumableArray(formats));
+              formats.sort(function (a, b) {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+              });
+
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                var _loop = function () {
+                  var format = _step2.value;
+
+                  if (!format) return 'continue';
+                  var color = MappableFormats.has(format) ? 'success' : 'default';
+                  var glyph = DataFormats.has(format) ? '<span class="glyphicon glyphicon-flash"></span> ' : '';
+                  var html = undefined;
+                  if (MappableFormats.has(format)) {
+                    html = HTML('<a href="#"><span class="label label-success">' + glyph + format + '</span></a> ');
+
+                    // hacky, see https://github.com/timjansen/minified.js/issues/68
+                    $(html[0]).on('click', function () {
+                      if (format === 'WMS') {
+                        _this3._displayWMS(dataset);
+                      } else if (format === 'GeoJSON') {
+                        _this3._displayGeoJSON(dataset);
+                      } else if (format === 'CovJSON') {
+                        _this3._displayCovJSON(dataset);
+                      } else {
+                        throw new Error('should not happen');
+                      }
+                    });
+                  } else {
+                    html = HTML('<span class="label label-' + color + '">' + format + '</span> ');
+                  }
+                  $('.dataset-distribution-labels', el).add(html);
+                };
+
+                for (var _iterator2 = _getIterator(formats), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var _ret2 = _loop();
+
+                  if (_ret2 === 'continue') continue;
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                    _iterator2['return']();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+
+              if (formats.some(function (t) {
+                return DataFormats.has(t);
+              })) {
+                $('.dataset-analyse-button', el).show();
+                $('.dataset-analyse-button', el).on('click', function () {
+                  _this3.analysisCatalogue.addDataset(dataset);
+                });
+              }
+            }
+          }
+
+          // TODO the display code should not be directly in the sidebar module
+        }, {
+          key: '_displayWMS',
+          value: function _displayWMS(dataset) {
+            var _this4 = this;
+
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+              var _loop2 = function () {
+                var dist = _step3.value;
+
+                var url = dist['accessURL'];
+                _this4.map.fire('dataloading');
+                wms.readLayers(url).then(function (wmsLayers) {
+                  var _iteratorNormalCompletion4 = true;
+                  var _didIteratorError4 = false;
+                  var _iteratorError4 = undefined;
+
+                  try {
+                    var _loop3 = function () {
+                      var wmsLayer = _step4.value;
+
+                      var layer = L.tileLayer.wms(url, {
+                        layers: wmsLayer.name,
+                        format: 'image/png',
+                        transparent: true
+                      });
+                      // In leaflet 1.0 every layer will have add/remove events, this is a workaround
+                      _this4.map.on('layeradd', function (e) {
+                        if (e.layer !== layer) return;
+                        var legendUrl = wms.getLegendUrl(url, wmsLayer.name);
+                        new ImageLegend(legendUrl, { layer: e.layer, title: wmsLayer.title }).addTo(_this4.map);
+                      });
+                      var datasetTitle = i18n(dataset.title);
+                      _this4.layerControl.addOverlay(layer, '<span class="label label-success">WMS</span> ' + wmsLayer.title, { groupName: datasetTitle, expanded: true });
+                    };
+
+                    for (var _iterator4 = _getIterator(wmsLayers), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                      _loop3();
+                    }
+                  } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                        _iterator4['return']();
+                      }
+                    } finally {
+                      if (_didIteratorError4) {
+                        throw _iteratorError4;
+                      }
+                    }
+                  }
+
+                  _this4.map.fire('dataload');
+                });
+              };
+
+              for (var _iterator3 = _getIterator(dataset.distributions.filter(function (dist) {
+                return getDistFormat(dist) === 'WMS';
+              })), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                _loop2();
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                  _iterator3['return']();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+          }
+        }, {
+          key: '_displayGeoJSON',
+          value: function _displayGeoJSON(dataset) {
+            var _this5 = this;
+
+            var bounds = [];
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+              var _loop4 = function () {
+                var dist = _step5.value;
+
+                var url = dist['downloadURL'] || dist['accessURL'];
+                _this5.map.fire('dataloading');
+                $.request('get', url, null, { headers: {
+                    Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5' } }).then(function (json) {
+                  var layer = L.geoJson(JSON.parse(json), {
+                    pointToLayer: function pointToLayer(feature, latlng) {
+                      return L.circleMarker(latlng);
+                    },
+                    onEachFeature: function onEachFeature(feature, layer) {
+                      layer.bindPopup('<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>', { maxWidth: 400, maxHeight: 300 });
+                    }
+                  });
+                  bounds.push(layer.getBounds());
+                  layer.addTo(_this5.map);
+                  var distTitle = i18n(dist.title);
+                  var datasetTitle = i18n(dataset.title);
+                  _this5.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, { groupName: datasetTitle, expanded: true });
+                  _this5.map.fitBounds(bounds);
+                  _this5.map.fire('dataload');
+                });
+              };
+
+              for (var _iterator5 = _getIterator(dataset.distributions.filter(function (dist) {
+                return getDistFormat(dist) === 'GeoJSON';
+              })), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                _loop4();
+              }
+            } catch (err) {
+              _didIteratorError5 = true;
+              _iteratorError5 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+                  _iterator5['return']();
+                }
+              } finally {
+                if (_didIteratorError5) {
+                  throw _iteratorError5;
+                }
+              }
+            }
+          }
+        }, {
+          key: '_displayCovJSON',
+          value: function _displayCovJSON(dataset) {
+            var _this6 = this;
+
+            // TODO check if both CovJSON and CovCBOR exist and prefer CovCBOR in that case (ignore the other)
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+              for (var _iterator6 = _getIterator(dataset.distributions.filter(function (dist) {
+                return getDistFormat(dist) === 'CovJSON';
+              })), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                var dist = _step6.value;
+
+                var url = dist['downloadURL'] || dist['accessURL'];
+                this.map.fire('dataloading');
+                // FIXME handle collections
+                CovJSON.read(url).then(function (cov) {
+                  // each parameter becomes a layer
+                  var _iteratorNormalCompletion7 = true;
+                  var _didIteratorError7 = false;
+                  var _iteratorError7 = undefined;
+
+                  try {
+                    var _loop5 = function () {
+                      var key = _step7.value;
+
+                      var opts = { keys: [key] };
+                      var layer = LayerFactory()(cov, opts).on('add', function (e) {
+                        var covLayer = e.target;
+                        _this6.map.fitBounds(covLayer.getBounds());
+
+                        if (covLayer.palette) {
+                          CoverageLegend(layer, {
+                            position: 'bottomright'
+                          }).addTo(_this6.map);
+                        }
+                      });
+                      var layerName = i18n(cov.parameters.get(key).observedProperty.label);
+                      var datasetTitle = i18n(dataset.title);
+                      _this6.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, { groupName: datasetTitle, expanded: true });
+                    };
+
+                    for (var _iterator7 = _getIterator(cov.parameters.keys()), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                      _loop5();
+                    }
+                  } catch (err) {
+                    _didIteratorError7 = true;
+                    _iteratorError7 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+                        _iterator7['return']();
+                      }
+                    } finally {
+                      if (_didIteratorError7) {
+                        throw _iteratorError7;
+                      }
+                    }
+                  }
+
+                  _this6.map.fire('dataload');
+                });
+              }
+            } catch (err) {
+              _didIteratorError6 = true;
+              _iteratorError6 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+                  _iterator6['return']();
+                }
+              } finally {
+                if (_didIteratorError6) {
+                  throw _iteratorError6;
+                }
+              }
+            }
+          }
+        }]);
+
+        return DatasetsPane;
+      })();
+
+      _export('default', DatasetsPane);
+    }
+  };
+});
+
+$__System.register("38", [], function() { return { setters: [], execute: function() {} } });
+
+$__System.registerDynamic("39", [], false, function(__require, __exports, __module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+  (function() {
+    "format global";
+    L.Control.Sidebar = L.Control.extend({
+      includes: L.Mixin.Events,
+      options: {position: 'left'},
+      initialize: function(id, options) {
+        var i,
+            child;
+        L.setOptions(this, options);
+        this._sidebar = L.DomUtil.get(id);
+        L.DomUtil.addClass(this._sidebar, 'sidebar-' + this.options.position);
+        if (L.Browser.touch)
+          L.DomUtil.addClass(this._sidebar, 'leaflet-touch');
+        for (i = this._sidebar.children.length - 1; i >= 0; i--) {
+          child = this._sidebar.children[i];
+          if (child.tagName == 'DIV' && L.DomUtil.hasClass(child, 'sidebar-content'))
+            this._container = child;
+        }
+        this._tabitems = this._sidebar.querySelectorAll('ul.sidebar-tabs > li, .sidebar-tabs > ul > li');
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          this._tabitems[i]._sidebar = this;
+        }
+        this._panes = [];
+        this._closeButtons = [];
+        for (i = this._container.children.length - 1; i >= 0; i--) {
+          child = this._container.children[i];
+          if (child.tagName == 'DIV' && L.DomUtil.hasClass(child, 'sidebar-pane')) {
+            this._panes.push(child);
+            var closeButtons = child.querySelectorAll('.sidebar-close');
+            for (var j = 0,
+                len = closeButtons.length; j < len; j++)
+              this._closeButtons.push(closeButtons[j]);
+          }
+        }
+      },
+      addTo: function(map) {
+        var i,
+            child;
+        this._map = map;
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          child = this._tabitems[i];
+          L.DomEvent.on(child.querySelector('a'), 'click', L.DomEvent.preventDefault).on(child.querySelector('a'), 'click', this._onClick, child);
+        }
+        for (i = this._closeButtons.length - 1; i >= 0; i--) {
+          child = this._closeButtons[i];
+          L.DomEvent.on(child, 'click', this._onCloseClick, this);
+        }
+        return this;
+      },
+      removeFrom: function(map) {
+        var i,
+            child;
+        this._map = null;
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          child = this._tabitems[i];
+          L.DomEvent.off(child.querySelector('a'), 'click', this._onClick);
+        }
+        for (i = this._closeButtons.length - 1; i >= 0; i--) {
+          child = this._closeButtons[i];
+          L.DomEvent.off(child, 'click', this._onCloseClick, this);
+        }
+        return this;
+      },
+      open: function(id) {
+        var i,
+            child;
+        for (i = this._panes.length - 1; i >= 0; i--) {
+          child = this._panes[i];
+          if (child.id == id)
+            L.DomUtil.addClass(child, 'active');
+          else if (L.DomUtil.hasClass(child, 'active'))
+            L.DomUtil.removeClass(child, 'active');
+        }
+        for (i = this._tabitems.length - 1; i >= 0; i--) {
+          child = this._tabitems[i];
+          if (child.querySelector('a').hash == '#' + id)
+            L.DomUtil.addClass(child, 'active');
+          else if (L.DomUtil.hasClass(child, 'active'))
+            L.DomUtil.removeClass(child, 'active');
+        }
+        this.fire('content', {id: id});
+        if (L.DomUtil.hasClass(this._sidebar, 'collapsed')) {
+          this.fire('opening');
+          L.DomUtil.removeClass(this._sidebar, 'collapsed');
+        }
+        return this;
+      },
+      close: function() {
+        for (var i = this._tabitems.length - 1; i >= 0; i--) {
+          var child = this._tabitems[i];
+          if (L.DomUtil.hasClass(child, 'active'))
+            L.DomUtil.removeClass(child, 'active');
+        }
+        if (!L.DomUtil.hasClass(this._sidebar, 'collapsed')) {
+          this.fire('closing');
+          L.DomUtil.addClass(this._sidebar, 'collapsed');
+        }
+        return this;
+      },
+      _onClick: function() {
+        if (L.DomUtil.hasClass(this, 'active'))
+          this._sidebar.close();
+        else if (!L.DomUtil.hasClass(this, 'disabled'))
+          this._sidebar.open(this.querySelector('a').hash.slice(1));
+      },
+      _onCloseClick: function() {
+        this.close();
+      }
+    });
+    L.control.sidebar = function(id, options) {
+      return new L.Control.Sidebar(id, options);
+    };
+  })();
+  return _retrieveGlobal();
+});
+
+$__System.register('3a', ['4', '5', '7', '8', '36', '38', '39', 'c', '3b'], function (_export) {
+  var AnalysePane, $, HTML, _createClass, _classCallCheck, DatasetsPane, L, sidebarHtml, Sidebar;
+
+  return {
+    setters: [function (_7) {
+      AnalysePane = _7['default'];
+    }, function (_5) {
+      $ = _5.$;
+      HTML = _5.HTML;
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_6) {
+      DatasetsPane = _6['default'];
+    }, function (_4) {}, function (_3) {}, function (_c) {
+      L = _c['default'];
+    }, function (_b) {}],
+    execute: function () {
+      'use strict';
+
+      sidebarHtml = function sidebarHtml(sidebarId, datasetsPaneId, analysePaneId) {
+        return '\n<div id="' + sidebarId + '" class="sidebar collapsed">\n  <!-- Nav tabs -->\n  <div class="sidebar-tabs">\n      <ul role="tablist">\n          <li><a href="#' + datasetsPaneId + '" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>\n          <li><a href="#' + analysePaneId + '" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-flash"></i></a></li>\n      </ul>\n  </div>\n  \n  <!-- Tab panes -->\n  <div class="sidebar-content">\n      <div class="sidebar-pane" id="' + datasetsPaneId + '"></div>\n      <div class="sidebar-pane" id="' + analysePaneId + '"></div>\n  </div>\n</div>\n';
+      };
+
+      Sidebar = (function () {
+        function Sidebar(map) {
+          var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+          var app = _ref.app;
+          var _ref$sidebarId = _ref.sidebarId;
+          var sidebarId = _ref$sidebarId === undefined ? 'sidebar' : _ref$sidebarId;
+          var _ref$datasetsPaneId = _ref.datasetsPaneId;
+          var datasetsPaneId = _ref$datasetsPaneId === undefined ? 'datasets' : _ref$datasetsPaneId;
+          var _ref$analysePaneId = _ref.analysePaneId;
+          var analysePaneId = _ref$analysePaneId === undefined ? 'analyse' : _ref$analysePaneId;
+          var _ref$layerControl = _ref.layerControl;
+          var layerControl = _ref$layerControl === undefined ? null : _ref$layerControl;
+
+          _classCallCheck(this, Sidebar);
+
+          this.map = map;
+          this.catalogue = app.catalogue;
+          this.analysisCatalogue = app.analysisCatalogue;
+          this.id = sidebarId;
+          this.layerControl = layerControl;
+          // has to come before the map div, otherwise it overlays zoom controls
+          $('body').addFront(HTML(sidebarHtml(sidebarId, datasetsPaneId, analysePaneId)));
+
+          $('#' + map.getContainer().id).set('+sidebar-map');
+          this.control = L.control.sidebar(sidebarId).addTo(map);
+
+          this.panes = {
+            Datasets: new DatasetsPane(this, datasetsPaneId),
+            Analyse: new AnalysePane(this, analysePaneId)
+          };
+        }
+
+        _createClass(Sidebar, [{
+          key: 'open',
+          value: function open(tabId) {
+            this.control.open(tabId);
+          }
+        }]);
+
+        return Sidebar;
+      })();
+
+      _export('default', Sidebar);
+    }
+  };
+});
+
+$__System.register('3c', ['7', '8', '3d'], function (_export) {
+  var _createClass, _classCallCheck, jsonld, MEDIA_TYPE, JSONLDLoader;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_d) {
+      jsonld = _d.promises;
+    }],
+    execute: function () {
+      'use strict';
+
+      MEDIA_TYPE = 'application/ld+json';
+
+      JSONLDLoader = (function () {
+        function JSONLDLoader() {
+          _classCallCheck(this, JSONLDLoader);
+        }
+
+        _createClass(JSONLDLoader, [{
+          key: 'supports',
+          value: function supports(mediaType) {
+            return mediaType && mediaType.startsWith(MEDIA_TYPE); // can have parameters
+          }
+
+          /**
+           * @param urlOrObject Either a URL or a GeoJSON object.
+           * @returns {Object} An object with metadata.
+           */
+        }, {
+          key: 'loadMetadata',
+          value: function loadMetadata(urlOrObject) {
+            var _this = this;
+
+            return jsonld.compact(urlOrObject, {}).then(function (data) {
+              return _this._extractMetadata(data);
+            });
+          }
+        }, {
+          key: '_extractMetadata',
+          value: function _extractMetadata(data) {
+            // TODO check if we have a more specialized loader for the root type
+            // TODO are we supporting cases where there is no single root after compaction?
+            return {
+              loader: this,
+              format: 'JSON-LD',
+              type: data['@type']
+            };
+          }
+        }]);
+
+        return JSONLDLoader;
+      })();
+
+      _export('default', JSONLDLoader);
+    }
+  };
+});
+
+$__System.register('3e', ['7', '8', '28', '40', '1e', '3f'], function (_export) {
+  var _createClass, _classCallCheck, _Object$keys, shallowcopy, _getIterator, Coverage, CoverageCollection;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _Object$keys = _3['default'];
+    }, function (_4) {
+      shallowcopy = _4.shallowcopy;
+    }, function (_e) {
+      _getIterator = _e['default'];
+    }, function (_f) {
+      Coverage = _f['default'];
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      CoverageCollection = (function () {
+        function CoverageCollection(covjson) {
+          _classCallCheck(this, CoverageCollection);
+
+          this._exposeLd(covjson);
+          this.id = covjson.id;
+          var covs = [];
+          var rootParams = covjson.parameters ? covjson.parameters : {};
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = _getIterator(covjson.coverages), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var coverage = _step.value;
+
+              if (coverage.parameters) {
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                  for (var _iterator2 = _getIterator(_Object$keys(rootParams)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var key = _step2.value;
+
+                    if (key in coverage.ranges) {
+                      coverage.parameters[key] = rootParams[key];
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+              } else {
+                coverage.parameters = rootParams;
+              }
+              covs.push(new Coverage(coverage));
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator['return']) {
+                _iterator['return']();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          this.coverages = covs;
+          if (covjson.parameters) {
+            this.parameters = covjson.parameters;
+          }
+        }
+
+        _createClass(CoverageCollection, [{
+          key: '_exposeLd',
+          value: function _exposeLd(covjson) {
+            if (!covjson['@context']) {
+              // no LD love here...
+              this.ld = {};
+              return;
+            }
+            // make a deep copy since the object gets modified in-place later
+            // but first, remove the coverages (those have their own .ld property)
+            var copy = shallowcopy(covjson);
+            delete copy.coverages;
+            this.ld = JSON.parse(JSON.stringify(copy));
+          }
+        }]);
+
+        return CoverageCollection;
+      })();
+
+      _export('default', CoverageCollection);
+    }
+  };
+});
+
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+(function(global, undefined) {
+  "use strict";
+  var POW_2_24 = Math.pow(2, -24),
+      POW_2_32 = Math.pow(2, 32),
+      POW_2_53 = Math.pow(2, 53);
+  function encode(value) {
+    var data = new ArrayBuffer(256);
+    var dataView = new DataView(data);
+    var lastLength;
+    var offset = 0;
+    function ensureSpace(length) {
+      var newByteLength = data.byteLength;
+      var requiredLength = offset + length;
+      while (newByteLength < requiredLength)
+        newByteLength *= 2;
+      if (newByteLength !== data.byteLength) {
+        var oldDataView = dataView;
+        data = new ArrayBuffer(newByteLength);
+        dataView = new DataView(data);
+        var uint32count = (offset + 3) >> 2;
+        for (var i = 0; i < uint32count; ++i)
+          dataView.setUint32(i * 4, oldDataView.getUint32(i * 4));
+      }
+      lastLength = length;
+      return dataView;
+    }
+    function write() {
+      offset += lastLength;
+    }
+    function writeFloat64(value) {
+      write(ensureSpace(8).setFloat64(offset, value));
+    }
+    function writeUint8(value) {
+      write(ensureSpace(1).setUint8(offset, value));
+    }
+    function writeUint8Array(value) {
+      var dataView = ensureSpace(value.length);
+      for (var i = 0; i < value.length; ++i)
+        dataView.setUint8(offset + i, value[i]);
+      write();
+    }
+    function writeUint16(value) {
+      write(ensureSpace(2).setUint16(offset, value));
+    }
+    function writeUint32(value) {
+      write(ensureSpace(4).setUint32(offset, value));
+    }
+    function writeUint64(value) {
+      var low = value % POW_2_32;
+      var high = (value - low) / POW_2_32;
+      var dataView = ensureSpace(8);
+      dataView.setUint32(offset, high);
+      dataView.setUint32(offset + 4, low);
+      write();
+    }
+    function writeTypeAndLength(type, length) {
+      if (length < 24) {
+        writeUint8(type << 5 | length);
+      } else if (length < 0x100) {
+        writeUint8(type << 5 | 24);
+        writeUint8(length);
+      } else if (length < 0x10000) {
+        writeUint8(type << 5 | 25);
+        writeUint16(length);
+      } else if (length < 0x100000000) {
+        writeUint8(type << 5 | 26);
+        writeUint32(length);
+      } else {
+        writeUint8(type << 5 | 27);
+        writeUint64(length);
+      }
+    }
+    function encodeItem(value) {
+      var i;
+      if (value === false)
+        return writeUint8(0xf4);
+      if (value === true)
+        return writeUint8(0xf5);
+      if (value === null)
+        return writeUint8(0xf6);
+      if (value === undefined)
+        return writeUint8(0xf7);
+      switch (typeof value) {
+        case "number":
+          if (Math.floor(value) === value) {
+            if (0 <= value && value <= POW_2_53)
+              return writeTypeAndLength(0, value);
+            if (-POW_2_53 <= value && value < 0)
+              return writeTypeAndLength(1, -(value + 1));
+          }
+          writeUint8(0xfb);
+          return writeFloat64(value);
+        case "string":
+          var utf8data = [];
+          for (i = 0; i < value.length; ++i) {
+            var charCode = value.charCodeAt(i);
+            if (charCode < 0x80) {
+              utf8data.push(charCode);
+            } else if (charCode < 0x800) {
+              utf8data.push(0xc0 | charCode >> 6);
+              utf8data.push(0x80 | charCode & 0x3f);
+            } else if (charCode < 0xd800) {
+              utf8data.push(0xe0 | charCode >> 12);
+              utf8data.push(0x80 | (charCode >> 6) & 0x3f);
+              utf8data.push(0x80 | charCode & 0x3f);
+            } else {
+              charCode = (charCode & 0x3ff) << 10;
+              charCode |= value.charCodeAt(++i) & 0x3ff;
+              charCode += 0x10000;
+              utf8data.push(0xf0 | charCode >> 18);
+              utf8data.push(0x80 | (charCode >> 12) & 0x3f);
+              utf8data.push(0x80 | (charCode >> 6) & 0x3f);
+              utf8data.push(0x80 | charCode & 0x3f);
+            }
+          }
+          writeTypeAndLength(3, utf8data.length);
+          return writeUint8Array(utf8data);
+        default:
+          var length;
+          if (Array.isArray(value)) {
+            length = value.length;
+            writeTypeAndLength(4, length);
+            for (i = 0; i < length; ++i)
+              encodeItem(value[i]);
+          } else if (value instanceof Uint8Array) {
+            writeTypeAndLength(2, value.length);
+            writeUint8Array(value);
+          } else {
+            var keys = Object.keys(value);
+            length = keys.length;
+            writeTypeAndLength(5, length);
+            for (i = 0; i < length; ++i) {
+              var key = keys[i];
+              encodeItem(key);
+              encodeItem(value[key]);
+            }
+          }
+      }
+    }
+    encodeItem(value);
+    if ("slice" in data)
+      return data.slice(0, offset);
+    var ret = new ArrayBuffer(offset);
+    var retView = new DataView(ret);
+    for (var i = 0; i < offset; ++i)
+      retView.setUint8(i, dataView.getUint8(i));
+    return ret;
+  }
+  function decode(data, tagger, simpleValue) {
+    var dataView = new DataView(data);
+    var offset = 0;
+    if (typeof tagger !== "function")
+      tagger = function(value) {
+        return value;
+      };
+    if (typeof simpleValue !== "function")
+      simpleValue = function() {
+        return undefined;
+      };
+    function read(value, length) {
+      offset += length;
+      return value;
+    }
+    function readArrayBuffer(length) {
+      return read(new Uint8Array(data, offset, length), length);
+    }
+    function readFloat16() {
+      var tempArrayBuffer = new ArrayBuffer(4);
+      var tempDataView = new DataView(tempArrayBuffer);
+      var value = readUint16();
+      var sign = value & 0x8000;
+      var exponent = value & 0x7c00;
+      var fraction = value & 0x03ff;
+      if (exponent === 0x7c00)
+        exponent = 0xff << 10;
+      else if (exponent !== 0)
+        exponent += (127 - 15) << 10;
+      else if (fraction !== 0)
+        return fraction * POW_2_24;
+      tempDataView.setUint32(0, sign << 16 | exponent << 13 | fraction << 13);
+      return tempDataView.getFloat32(0);
+    }
+    function readFloat32() {
+      return read(dataView.getFloat32(offset), 4);
+    }
+    function readFloat64() {
+      return read(dataView.getFloat64(offset), 8);
+    }
+    function readUint8() {
+      return read(dataView.getUint8(offset), 1);
+    }
+    function readUint16() {
+      return read(dataView.getUint16(offset), 2);
+    }
+    function readUint32() {
+      return read(dataView.getUint32(offset), 4);
+    }
+    function readUint64() {
+      return readUint32() * POW_2_32 + readUint32();
+    }
+    function readBreak() {
+      if (dataView.getUint8(offset) !== 0xff)
+        return false;
+      offset += 1;
+      return true;
+    }
+    function readLength(additionalInformation) {
+      if (additionalInformation < 24)
+        return additionalInformation;
+      if (additionalInformation === 24)
+        return readUint8();
+      if (additionalInformation === 25)
+        return readUint16();
+      if (additionalInformation === 26)
+        return readUint32();
+      if (additionalInformation === 27)
+        return readUint64();
+      if (additionalInformation === 31)
+        return -1;
+      throw "Invalid length encoding";
+    }
+    function readIndefiniteStringLength(majorType) {
+      var initialByte = readUint8();
+      if (initialByte === 0xff)
+        return -1;
+      var length = readLength(initialByte & 0x1f);
+      if (length < 0 || (initialByte >> 5) !== majorType)
+        throw "Invalid indefinite length element";
+      return length;
+    }
+    function appendUtf16data(utf16data, length) {
+      for (var i = 0; i < length; ++i) {
+        var value = readUint8();
+        if (value & 0x80) {
+          if (value < 0xe0) {
+            value = (value & 0x1f) << 6 | (readUint8() & 0x3f);
+            length -= 1;
+          } else if (value < 0xf0) {
+            value = (value & 0x0f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
+            length -= 2;
+          } else {
+            value = (value & 0x0f) << 18 | (readUint8() & 0x3f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
+            length -= 3;
+          }
+        }
+        if (value < 0x10000) {
+          utf16data.push(value);
+        } else {
+          value -= 0x10000;
+          utf16data.push(0xd800 | (value >> 10));
+          utf16data.push(0xdc00 | (value & 0x3ff));
+        }
+      }
+    }
+    function decodeItem() {
+      var initialByte = readUint8();
+      var majorType = initialByte >> 5;
+      var additionalInformation = initialByte & 0x1f;
+      var i;
+      var length;
+      if (majorType === 7) {
+        switch (additionalInformation) {
+          case 25:
+            return readFloat16();
+          case 26:
+            return readFloat32();
+          case 27:
+            return readFloat64();
+        }
+      }
+      length = readLength(additionalInformation);
+      if (length < 0 && (majorType < 2 || 6 < majorType))
+        throw "Invalid length";
+      switch (majorType) {
+        case 0:
+          return length;
+        case 1:
+          return -1 - length;
+        case 2:
+          if (length < 0) {
+            var elements = [];
+            var fullArrayLength = 0;
+            while ((length = readIndefiniteStringLength(majorType)) >= 0) {
+              fullArrayLength += length;
+              elements.push(readArrayBuffer(length));
+            }
+            var fullArray = new Uint8Array(fullArrayLength);
+            var fullArrayOffset = 0;
+            for (i = 0; i < elements.length; ++i) {
+              fullArray.set(elements[i], fullArrayOffset);
+              fullArrayOffset += elements[i].length;
+            }
+            return fullArray;
+          }
+          return readArrayBuffer(length);
+        case 3:
+          var utf16data = [];
+          if (length < 0) {
+            while ((length = readIndefiniteStringLength(majorType)) >= 0)
+              appendUtf16data(utf16data, length);
+          } else
+            appendUtf16data(utf16data, length);
+          return String.fromCharCode.apply(null, utf16data);
+        case 4:
+          var retArray;
+          if (length < 0) {
+            retArray = [];
+            while (!readBreak())
+              retArray.push(decodeItem());
+          } else {
+            retArray = new Array(length);
+            for (i = 0; i < length; ++i)
+              retArray[i] = decodeItem();
+          }
+          return retArray;
+        case 5:
+          var retObject = {};
+          for (i = 0; i < length || length < 0 && !readBreak(); ++i) {
+            var key = decodeItem();
+            retObject[key] = decodeItem();
+          }
+          return retObject;
+        case 6:
+          return tagger(decodeItem(), length);
+        case 7:
+          switch (length) {
+            case 20:
+              return false;
+            case 21:
+              return true;
+            case 22:
+              return null;
+            case 23:
+              return undefined;
+            default:
+              return simpleValue(length);
+          }
+      }
+    }
+    var ret = decodeItem();
+    if (offset !== data.byteLength)
+      throw "Remaining bytes";
+    return ret;
+  }
+  var obj = {
+    encode: encode,
+    decode: decode
+  };
+  if (typeof define === "function" && define.amd)
+    define("41", [], obj);
+  else if (!global.CBOR)
+    global.CBOR = obj;
+})(this);
+
+_removeDefine();
+})();
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+define("42", ["41"], function(main) {
+  return main;
+});
+
+_removeDefine();
+})();
+$__System.register('43', ['10', '40', '42'], function (_export) {
+  var _Promise, endsWith, cbor, MEDIA, ACCEPT, EXT;
+
+  /**
+   * Loads a CoverageJSON document from a given URL and returns a {@link Promise} object
+   * that succeeds with the unmodified CoverageJSON object.
+   * 
+   * @param {string} url
+   * @return {Promise}
+   *   The result is an object {data, headers} where data is the CoverageJSON object
+   *   and headers are the HTTP response headers. The promise fails if the resource at
+   *   the given URL is not a valid JSON or CBOR document. 
+   */
+
+  function load(url) {
+    var responseType = arguments.length <= 1 || arguments[1] === undefined ? 'arraybuffer' : arguments[1];
+
+    if (['arraybuffer', 'text'].indexOf(responseType) === -1) {
+      throw new Error();
+    }
+    return new _Promise(function (resolve, reject) {
+      var req = new XMLHttpRequest();
+      req.open('GET', url);
+      req.responseType = responseType;
+      req.setRequestHeader('Accept', ACCEPT);
+
+      req.addEventListener('load', function () {
+        if (!(req.status >= 200 && req.status < 300 || req.status === 304)) {
+          // as in jquery
+          reject(new Error('Resource "' + url + '" not found, HTTP status code: ' + req.status));
+          return;
+        }
+
+        var type = req.getResponseHeader('Content-Type');
+
+        if (type.indexOf(MEDIA.OCTETSTREAM) === 0 || type.indexOf(MEDIA.TEXT) === 0) {
+          // wrong media type, try to infer type from extension
+          if (endsWith(url, EXT.COVJSON)) {
+            type = MEDIA.COVJSON;
+          } else if (endsWith(url, EXT.COVCBOR)) {
+            type = MEDIA.COVCBOR;
+          }
+        }
+        var data = undefined;
+        if (type === MEDIA.COVCBOR) {
+          var arrayBuffer = req.response;
+          data = cbor.decode(arrayBuffer);
+        } else if ([MEDIA.COVJSON, MEDIA.JSONLD, MEDIA.JSON].indexOf(type) > -1) {
+          if (responseType === 'arraybuffer') {
+            if (window.TextDecoder) {
+              data = JSON.parse(new TextDecoder().decode(new DataView(req.response)));
+            } else {
+              // load again (from cache) to get correct response type
+              // Note we use 'text' and not 'json' as we want to throw parsing errors.
+              // With 'json', the response is just 'null'.
+              reject({ responseType: 'text' });
+              return;
+            }
+          } else {
+            data = JSON.parse(req.response);
+          }
+        } else {
+          reject(new Error('Unsupported media type: ' + type));
+          return;
+        }
+        // TODO check if these are the initial response headers
+        //  Mozilla says "For multipart requests, this returns the headers
+        //  from the current part of the request, not from the original channel."
+        // -> is chunked transfer encoding a multipart request?
+        var headers = parseResponseHeaders(req.getAllResponseHeaders());
+        resolve({
+          data: data,
+          headers: headers
+        });
+      });
+      req.addEventListener('error', function () {
+        reject(new Error('Network error loading resource at ' + url));
+      });
+
+      req.send();
+    })['catch'](function (e) {
+      if (e.responseType) {
+        return load(url, e.responseType);
+      } else {
+        throw e;
+      }
+    });
+  }
+
+  /**
+   * XmlHttpRequest's getAllResponseHeaders() method returns a string of response
+   * headers according to the format described here:
+   * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method
+   * This method parses that string into a user-friendly key/value pair object.
+   * 
+   * https://gist.github.com/monsur/706839
+   */
+  function parseResponseHeaders(headerStr) {
+    // FIXME check if this swallows repeated headers
+    var headers = {};
+    if (!headerStr) {
+      return headers;
+    }
+    var headerPairs = headerStr.split('\r\n');
+    for (var i = 0; i < headerPairs.length; i++) {
+      var headerPair = headerPairs[i];
+      // Can't use split() here because it does the wrong thing
+      // if the header value has the string ": " in it.
+      var index = headerPair.indexOf(': ');
+      if (index > 0) {
+        var key = headerPair.substring(0, index);
+        var val = headerPair.substring(index + 2);
+        headers[key] = val;
+      }
+    }
+    return headers;
+  }
+  return {
+    setters: [function (_) {
+      _Promise = _['default'];
+    }, function (_3) {
+      endsWith = _3.endsWith;
+    }, function (_2) {
+      cbor = _2['default'];
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      _export('load', load);
+
+      MEDIA = {
+        COVCBOR: 'application/prs.coverage+cbor',
+        COVJSON: 'application/prs.coverage+json',
+        JSONLD: 'application/ld+json',
+        JSON: 'application/json',
+        OCTETSTREAM: 'application/octet-stream',
+        TEXT: 'text/plain'
+      };
+      ACCEPT = MEDIA.COVCBOR + '; q=1.0, ' + MEDIA.COVJSON + '; q=0.5, ' + MEDIA.JSONLD + '; q=0.1, ' + MEDIA.JSON + '; q=0.1';
+      EXT = {
+        COVJSON: '.covjson',
+        COVCBOR: '.covcbor'
+      };
+    }
+  };
+});
+
+$__System.register('40', [], function (_export) {
+  /* */
+  'use strict';
+
+  var PREFIX;
+
+  _export('assert', assert);
+
+  _export('shallowcopy', shallowcopy);
+
+  _export('endsWith', endsWith);
+
+  _export('minMax', minMax);
+
+  function assert(condition, message) {
+    if (!condition) {
+      message = message || 'Assertion failed';
+      throw new Error(message);
+    }
+  }
+
+  function shallowcopy(obj) {
+    var copy = {};
+    for (var prop in obj) {
+      copy[prop] = obj[prop];
+    }
+    return copy;
+  }
+
+  function endsWith(subject, search) {
+    // IE support
+    var position = subject.length - search.length;
+    var lastIndex = subject.indexOf(search, position);
+    return lastIndex !== -1 && lastIndex === position;
+  }
+
+  function minMax(arr) {
+    var len = arr.length;
+    var min = Infinity;
+    var max = -Infinity;
+    while (len--) {
+      var el = arr[len];
+      if (el == null) {
+        // do nothing
+      } else if (el < min) {
+          min = el;
+        } else if (el > max) {
+          max = el;
+        }
+    }
+    if (min === Infinity) {
+      min = max;
+    } else if (max === -Infinity) {
+      max = min;
+    }
+    if (min === Infinity) {
+      // all values were null
+      min = null;
+      max = null;
+    }
+    return [min, max];
+  }
+
+  return {
+    setters: [],
+    execute: function () {
+      PREFIX = 'http://coveragejson.org/def#';
+
+      _export('PREFIX', PREFIX);
+    }
+  };
+});
+
+$__System.registerDynamic("44", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isArray = Array.isArray;
+  var str = Object.prototype.toString;
+  module.exports = isArray || function(val) {
+    return !!val && '[object Array]' == str.call(val);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("45", ["44"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('44');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("46", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  exports.read = function(buffer, offset, isLE, mLen, nBytes) {
+    var e,
+        m;
+    var eLen = nBytes * 8 - mLen - 1;
+    var eMax = (1 << eLen) - 1;
+    var eBias = eMax >> 1;
+    var nBits = -7;
+    var i = isLE ? (nBytes - 1) : 0;
+    var d = isLE ? -1 : 1;
+    var s = buffer[offset + i];
+    i += d;
+    e = s & ((1 << (-nBits)) - 1);
+    s >>= (-nBits);
+    nBits += eLen;
+    for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+    m = e & ((1 << (-nBits)) - 1);
+    e >>= (-nBits);
+    nBits += mLen;
+    for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+    if (e === 0) {
+      e = 1 - eBias;
+    } else if (e === eMax) {
+      return m ? NaN : ((s ? -1 : 1) * Infinity);
+    } else {
+      m = m + Math.pow(2, mLen);
+      e = e - eBias;
+    }
+    return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
+  };
+  exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
+    var e,
+        m,
+        c;
+    var eLen = nBytes * 8 - mLen - 1;
+    var eMax = (1 << eLen) - 1;
+    var eBias = eMax >> 1;
+    var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0);
+    var i = isLE ? 0 : (nBytes - 1);
+    var d = isLE ? 1 : -1;
+    var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+    value = Math.abs(value);
+    if (isNaN(value) || value === Infinity) {
+      m = isNaN(value) ? 1 : 0;
+      e = eMax;
+    } else {
+      e = Math.floor(Math.log(value) / Math.LN2);
+      if (value * (c = Math.pow(2, -e)) < 1) {
+        e--;
+        c *= 2;
+      }
+      if (e + eBias >= 1) {
+        value += rt / c;
+      } else {
+        value += rt * Math.pow(2, 1 - eBias);
+      }
+      if (value * c >= 2) {
+        e++;
+        c /= 2;
+      }
+      if (e + eBias >= eMax) {
+        m = 0;
+        e = eMax;
+      } else if (e + eBias >= 1) {
+        m = (value * c - 1) * Math.pow(2, mLen);
+        e = e + eBias;
+      } else {
+        m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+        e = 0;
+      }
+    }
+    for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+    e = (e << mLen) | m;
+    eLen += mLen;
+    for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+    buffer[offset + i - d] |= s * 128;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("47", ["46"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('46');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("48", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  ;
+  (function(exports) {
+    'use strict';
+    var Arr = (typeof Uint8Array !== 'undefined') ? Uint8Array : Array;
+    var PLUS = '+'.charCodeAt(0);
+    var SLASH = '/'.charCodeAt(0);
+    var NUMBER = '0'.charCodeAt(0);
+    var LOWER = 'a'.charCodeAt(0);
+    var UPPER = 'A'.charCodeAt(0);
+    var PLUS_URL_SAFE = '-'.charCodeAt(0);
+    var SLASH_URL_SAFE = '_'.charCodeAt(0);
+    function decode(elt) {
+      var code = elt.charCodeAt(0);
+      if (code === PLUS || code === PLUS_URL_SAFE)
+        return 62;
+      if (code === SLASH || code === SLASH_URL_SAFE)
+        return 63;
+      if (code < NUMBER)
+        return -1;
+      if (code < NUMBER + 10)
+        return code - NUMBER + 26 + 26;
+      if (code < UPPER + 26)
+        return code - UPPER;
+      if (code < LOWER + 26)
+        return code - LOWER + 26;
+    }
+    function b64ToByteArray(b64) {
+      var i,
+          j,
+          l,
+          tmp,
+          placeHolders,
+          arr;
+      if (b64.length % 4 > 0) {
+        throw new Error('Invalid string. Length must be a multiple of 4');
+      }
+      var len = b64.length;
+      placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0;
+      arr = new Arr(b64.length * 3 / 4 - placeHolders);
+      l = placeHolders > 0 ? b64.length - 4 : b64.length;
+      var L = 0;
+      function push(v) {
+        arr[L++] = v;
+      }
+      for (i = 0, j = 0; i < l; i += 4, j += 3) {
+        tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3));
+        push((tmp & 0xFF0000) >> 16);
+        push((tmp & 0xFF00) >> 8);
+        push(tmp & 0xFF);
+      }
+      if (placeHolders === 2) {
+        tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4);
+        push(tmp & 0xFF);
+      } else if (placeHolders === 1) {
+        tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2);
+        push((tmp >> 8) & 0xFF);
+        push(tmp & 0xFF);
+      }
+      return arr;
+    }
+    function uint8ToBase64(uint8) {
+      var i,
+          extraBytes = uint8.length % 3,
+          output = "",
+          temp,
+          length;
+      function encode(num) {
+        return lookup.charAt(num);
+      }
+      function tripletToBase64(num) {
+        return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F);
+      }
+      for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+        temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2]);
+        output += tripletToBase64(temp);
+      }
+      switch (extraBytes) {
+        case 1:
+          temp = uint8[uint8.length - 1];
+          output += encode(temp >> 2);
+          output += encode((temp << 4) & 0x3F);
+          output += '==';
+          break;
+        case 2:
+          temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1]);
+          output += encode(temp >> 10);
+          output += encode((temp >> 4) & 0x3F);
+          output += encode((temp << 2) & 0x3F);
+          output += '=';
+          break;
+      }
+      return output;
+    }
+    exports.toByteArray = b64ToByteArray;
+    exports.fromByteArray = uint8ToBase64;
+  }(typeof exports === 'undefined' ? (this.base64js = {}) : exports));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("49", ["48"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('48');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4a", ["49", "47", "45"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var base64 = req('49');
+  var ieee754 = req('47');
+  var isArray = req('45');
+  exports.Buffer = Buffer;
+  exports.SlowBuffer = SlowBuffer;
+  exports.INSPECT_MAX_BYTES = 50;
+  Buffer.poolSize = 8192;
+  var rootParent = {};
+  Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined ? global.TYPED_ARRAY_SUPPORT : typedArraySupport();
+  function typedArraySupport() {
+    function Bar() {}
+    try {
+      var arr = new Uint8Array(1);
+      arr.foo = function() {
+        return 42;
+      };
+      arr.constructor = Bar;
+      return arr.foo() === 42 && arr.constructor === Bar && typeof arr.subarray === 'function' && arr.subarray(1, 1).byteLength === 0;
+    } catch (e) {
+      return false;
+    }
+  }
+  function kMaxLength() {
+    return Buffer.TYPED_ARRAY_SUPPORT ? 0x7fffffff : 0x3fffffff;
+  }
+  function Buffer(arg) {
+    if (!(this instanceof Buffer)) {
+      if (arguments.length > 1)
+        return new Buffer(arg, arguments[1]);
+      return new Buffer(arg);
+    }
+    this.length = 0;
+    this.parent = undefined;
+    if (typeof arg === 'number') {
+      return fromNumber(this, arg);
+    }
+    if (typeof arg === 'string') {
+      return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8');
+    }
+    return fromObject(this, arg);
+  }
+  function fromNumber(that, length) {
+    that = allocate(that, length < 0 ? 0 : checked(length) | 0);
+    if (!Buffer.TYPED_ARRAY_SUPPORT) {
+      for (var i = 0; i < length; i++) {
+        that[i] = 0;
+      }
+    }
+    return that;
+  }
+  function fromString(that, string, encoding) {
+    if (typeof encoding !== 'string' || encoding === '')
+      encoding = 'utf8';
+    var length = byteLength(string, encoding) | 0;
+    that = allocate(that, length);
+    that.write(string, encoding);
+    return that;
+  }
+  function fromObject(that, object) {
+    if (Buffer.isBuffer(object))
+      return fromBuffer(that, object);
+    if (isArray(object))
+      return fromArray(that, object);
+    if (object == null) {
+      throw new TypeError('must start with number, buffer, array or string');
+    }
+    if (typeof ArrayBuffer !== 'undefined') {
+      if (object.buffer instanceof ArrayBuffer) {
+        return fromTypedArray(that, object);
+      }
+      if (object instanceof ArrayBuffer) {
+        return fromArrayBuffer(that, object);
+      }
+    }
+    if (object.length)
+      return fromArrayLike(that, object);
+    return fromJsonObject(that, object);
+  }
+  function fromBuffer(that, buffer) {
+    var length = checked(buffer.length) | 0;
+    that = allocate(that, length);
+    buffer.copy(that, 0, 0, length);
+    return that;
+  }
+  function fromArray(that, array) {
+    var length = checked(array.length) | 0;
+    that = allocate(that, length);
+    for (var i = 0; i < length; i += 1) {
+      that[i] = array[i] & 255;
+    }
+    return that;
+  }
+  function fromTypedArray(that, array) {
+    var length = checked(array.length) | 0;
+    that = allocate(that, length);
+    for (var i = 0; i < length; i += 1) {
+      that[i] = array[i] & 255;
+    }
+    return that;
+  }
+  function fromArrayBuffer(that, array) {
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      array.byteLength;
+      that = Buffer._augment(new Uint8Array(array));
+    } else {
+      that = fromTypedArray(that, new Uint8Array(array));
+    }
+    return that;
+  }
+  function fromArrayLike(that, array) {
+    var length = checked(array.length) | 0;
+    that = allocate(that, length);
+    for (var i = 0; i < length; i += 1) {
+      that[i] = array[i] & 255;
+    }
+    return that;
+  }
+  function fromJsonObject(that, object) {
+    var array;
+    var length = 0;
+    if (object.type === 'Buffer' && isArray(object.data)) {
+      array = object.data;
+      length = checked(array.length) | 0;
+    }
+    that = allocate(that, length);
+    for (var i = 0; i < length; i += 1) {
+      that[i] = array[i] & 255;
+    }
+    return that;
+  }
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    Buffer.prototype.__proto__ = Uint8Array.prototype;
+    Buffer.__proto__ = Uint8Array;
+  }
+  function allocate(that, length) {
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      that = Buffer._augment(new Uint8Array(length));
+      that.__proto__ = Buffer.prototype;
+    } else {
+      that.length = length;
+      that._isBuffer = true;
+    }
+    var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1;
+    if (fromPool)
+      that.parent = rootParent;
+    return that;
+  }
+  function checked(length) {
+    if (length >= kMaxLength()) {
+      throw new RangeError('Attempt to allocate Buffer larger than maximum ' + 'size: 0x' + kMaxLength().toString(16) + ' bytes');
+    }
+    return length | 0;
+  }
+  function SlowBuffer(subject, encoding) {
+    if (!(this instanceof SlowBuffer))
+      return new SlowBuffer(subject, encoding);
+    var buf = new Buffer(subject, encoding);
+    delete buf.parent;
+    return buf;
+  }
+  Buffer.isBuffer = function isBuffer(b) {
+    return !!(b != null && b._isBuffer);
+  };
+  Buffer.compare = function compare(a, b) {
+    if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
+      throw new TypeError('Arguments must be Buffers');
+    }
+    if (a === b)
+      return 0;
+    var x = a.length;
+    var y = b.length;
+    var i = 0;
+    var len = Math.min(x, y);
+    while (i < len) {
+      if (a[i] !== b[i])
+        break;
+      ++i;
+    }
+    if (i !== len) {
+      x = a[i];
+      y = b[i];
+    }
+    if (x < y)
+      return -1;
+    if (y < x)
+      return 1;
+    return 0;
+  };
+  Buffer.isEncoding = function isEncoding(encoding) {
+    switch (String(encoding).toLowerCase()) {
+      case 'hex':
+      case 'utf8':
+      case 'utf-8':
+      case 'ascii':
+      case 'binary':
+      case 'base64':
+      case 'raw':
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return true;
+      default:
+        return false;
+    }
+  };
+  Buffer.concat = function concat(list, length) {
+    if (!isArray(list))
+      throw new TypeError('list argument must be an Array of Buffers.');
+    if (list.length === 0) {
+      return new Buffer(0);
+    }
+    var i;
+    if (length === undefined) {
+      length = 0;
+      for (i = 0; i < list.length; i++) {
+        length += list[i].length;
+      }
+    }
+    var buf = new Buffer(length);
+    var pos = 0;
+    for (i = 0; i < list.length; i++) {
+      var item = list[i];
+      item.copy(buf, pos);
+      pos += item.length;
+    }
+    return buf;
+  };
+  function byteLength(string, encoding) {
+    if (typeof string !== 'string')
+      string = '' + string;
+    var len = string.length;
+    if (len === 0)
+      return 0;
+    var loweredCase = false;
+    for (; ; ) {
+      switch (encoding) {
+        case 'ascii':
+        case 'binary':
+        case 'raw':
+        case 'raws':
+          return len;
+        case 'utf8':
+        case 'utf-8':
+          return utf8ToBytes(string).length;
+        case 'ucs2':
+        case 'ucs-2':
+        case 'utf16le':
+        case 'utf-16le':
+          return len * 2;
+        case 'hex':
+          return len >>> 1;
+        case 'base64':
+          return base64ToBytes(string).length;
+        default:
+          if (loweredCase)
+            return utf8ToBytes(string).length;
+          encoding = ('' + encoding).toLowerCase();
+          loweredCase = true;
+      }
+    }
+  }
+  Buffer.byteLength = byteLength;
+  Buffer.prototype.length = undefined;
+  Buffer.prototype.parent = undefined;
+  function slowToString(encoding, start, end) {
+    var loweredCase = false;
+    start = start | 0;
+    end = end === undefined || end === Infinity ? this.length : end | 0;
+    if (!encoding)
+      encoding = 'utf8';
+    if (start < 0)
+      start = 0;
+    if (end > this.length)
+      end = this.length;
+    if (end <= start)
+      return '';
+    while (true) {
+      switch (encoding) {
+        case 'hex':
+          return hexSlice(this, start, end);
+        case 'utf8':
+        case 'utf-8':
+          return utf8Slice(this, start, end);
+        case 'ascii':
+          return asciiSlice(this, start, end);
+        case 'binary':
+          return binarySlice(this, start, end);
+        case 'base64':
+          return base64Slice(this, start, end);
+        case 'ucs2':
+        case 'ucs-2':
+        case 'utf16le':
+        case 'utf-16le':
+          return utf16leSlice(this, start, end);
+        default:
+          if (loweredCase)
+            throw new TypeError('Unknown encoding: ' + encoding);
+          encoding = (encoding + '').toLowerCase();
+          loweredCase = true;
+      }
+    }
+  }
+  Buffer.prototype.toString = function toString() {
+    var length = this.length | 0;
+    if (length === 0)
+      return '';
+    if (arguments.length === 0)
+      return utf8Slice(this, 0, length);
+    return slowToString.apply(this, arguments);
+  };
+  Buffer.prototype.equals = function equals(b) {
+    if (!Buffer.isBuffer(b))
+      throw new TypeError('Argument must be a Buffer');
+    if (this === b)
+      return true;
+    return Buffer.compare(this, b) === 0;
+  };
+  Buffer.prototype.inspect = function inspect() {
+    var str = '';
+    var max = exports.INSPECT_MAX_BYTES;
+    if (this.length > 0) {
+      str = this.toString('hex', 0, max).match(/.{2}/g).join(' ');
+      if (this.length > max)
+        str += ' ... ';
+    }
+    return '<Buffer ' + str + '>';
+  };
+  Buffer.prototype.compare = function compare(b) {
+    if (!Buffer.isBuffer(b))
+      throw new TypeError('Argument must be a Buffer');
+    if (this === b)
+      return 0;
+    return Buffer.compare(this, b);
+  };
+  Buffer.prototype.indexOf = function indexOf(val, byteOffset) {
+    if (byteOffset > 0x7fffffff)
+      byteOffset = 0x7fffffff;
+    else if (byteOffset < -0x80000000)
+      byteOffset = -0x80000000;
+    byteOffset >>= 0;
+    if (this.length === 0)
+      return -1;
+    if (byteOffset >= this.length)
+      return -1;
+    if (byteOffset < 0)
+      byteOffset = Math.max(this.length + byteOffset, 0);
+    if (typeof val === 'string') {
+      if (val.length === 0)
+        return -1;
+      return String.prototype.indexOf.call(this, val, byteOffset);
+    }
+    if (Buffer.isBuffer(val)) {
+      return arrayIndexOf(this, val, byteOffset);
+    }
+    if (typeof val === 'number') {
+      if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
+        return Uint8Array.prototype.indexOf.call(this, val, byteOffset);
+      }
+      return arrayIndexOf(this, [val], byteOffset);
+    }
+    function arrayIndexOf(arr, val, byteOffset) {
+      var foundIndex = -1;
+      for (var i = 0; byteOffset + i < arr.length; i++) {
+        if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
+          if (foundIndex === -1)
+            foundIndex = i;
+          if (i - foundIndex + 1 === val.length)
+            return byteOffset + foundIndex;
+        } else {
+          foundIndex = -1;
+        }
+      }
+      return -1;
+    }
+    throw new TypeError('val must be string, number or Buffer');
+  };
+  Buffer.prototype.get = function get(offset) {
+    console.log('.get() is deprecated. Access using array indexes instead.');
+    return this.readUInt8(offset);
+  };
+  Buffer.prototype.set = function set(v, offset) {
+    console.log('.set() is deprecated. Access using array indexes instead.');
+    return this.writeUInt8(v, offset);
+  };
+  function hexWrite(buf, string, offset, length) {
+    offset = Number(offset) || 0;
+    var remaining = buf.length - offset;
+    if (!length) {
+      length = remaining;
+    } else {
+      length = Number(length);
+      if (length > remaining) {
+        length = remaining;
+      }
+    }
+    var strLen = string.length;
+    if (strLen % 2 !== 0)
+      throw new Error('Invalid hex string');
+    if (length > strLen / 2) {
+      length = strLen / 2;
+    }
+    for (var i = 0; i < length; i++) {
+      var parsed = parseInt(string.substr(i * 2, 2), 16);
+      if (isNaN(parsed))
+        throw new Error('Invalid hex string');
+      buf[offset + i] = parsed;
+    }
+    return i;
+  }
+  function utf8Write(buf, string, offset, length) {
+    return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length);
+  }
+  function asciiWrite(buf, string, offset, length) {
+    return blitBuffer(asciiToBytes(string), buf, offset, length);
+  }
+  function binaryWrite(buf, string, offset, length) {
+    return asciiWrite(buf, string, offset, length);
+  }
+  function base64Write(buf, string, offset, length) {
+    return blitBuffer(base64ToBytes(string), buf, offset, length);
+  }
+  function ucs2Write(buf, string, offset, length) {
+    return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length);
+  }
+  Buffer.prototype.write = function write(string, offset, length, encoding) {
+    if (offset === undefined) {
+      encoding = 'utf8';
+      length = this.length;
+      offset = 0;
+    } else if (length === undefined && typeof offset === 'string') {
+      encoding = offset;
+      length = this.length;
+      offset = 0;
+    } else if (isFinite(offset)) {
+      offset = offset | 0;
+      if (isFinite(length)) {
+        length = length | 0;
+        if (encoding === undefined)
+          encoding = 'utf8';
+      } else {
+        encoding = length;
+        length = undefined;
+      }
+    } else {
+      var swap = encoding;
+      encoding = offset;
+      offset = length | 0;
+      length = swap;
+    }
+    var remaining = this.length - offset;
+    if (length === undefined || length > remaining)
+      length = remaining;
+    if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
+      throw new RangeError('attempt to write outside buffer bounds');
+    }
+    if (!encoding)
+      encoding = 'utf8';
+    var loweredCase = false;
+    for (; ; ) {
+      switch (encoding) {
+        case 'hex':
+          return hexWrite(this, string, offset, length);
+        case 'utf8':
+        case 'utf-8':
+          return utf8Write(this, string, offset, length);
+        case 'ascii':
+          return asciiWrite(this, string, offset, length);
+        case 'binary':
+          return binaryWrite(this, string, offset, length);
+        case 'base64':
+          return base64Write(this, string, offset, length);
+        case 'ucs2':
+        case 'ucs-2':
+        case 'utf16le':
+        case 'utf-16le':
+          return ucs2Write(this, string, offset, length);
+        default:
+          if (loweredCase)
+            throw new TypeError('Unknown encoding: ' + encoding);
+          encoding = ('' + encoding).toLowerCase();
+          loweredCase = true;
+      }
+    }
+  };
+  Buffer.prototype.toJSON = function toJSON() {
+    return {
+      type: 'Buffer',
+      data: Array.prototype.slice.call(this._arr || this, 0)
+    };
+  };
+  function base64Slice(buf, start, end) {
+    if (start === 0 && end === buf.length) {
+      return base64.fromByteArray(buf);
+    } else {
+      return base64.fromByteArray(buf.slice(start, end));
+    }
+  }
+  function utf8Slice(buf, start, end) {
+    end = Math.min(buf.length, end);
+    var res = [];
+    var i = start;
+    while (i < end) {
+      var firstByte = buf[i];
+      var codePoint = null;
+      var bytesPerSequence = (firstByte > 0xEF) ? 4 : (firstByte > 0xDF) ? 3 : (firstByte > 0xBF) ? 2 : 1;
+      if (i + bytesPerSequence <= end) {
+        var secondByte,
+            thirdByte,
+            fourthByte,
+            tempCodePoint;
+        switch (bytesPerSequence) {
+          case 1:
+            if (firstByte < 0x80) {
+              codePoint = firstByte;
+            }
+            break;
+          case 2:
+            secondByte = buf[i + 1];
+            if ((secondByte & 0xC0) === 0x80) {
+              tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F);
+              if (tempCodePoint > 0x7F) {
+                codePoint = tempCodePoint;
+              }
+            }
+            break;
+          case 3:
+            secondByte = buf[i + 1];
+            thirdByte = buf[i + 2];
+            if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+              tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F);
+              if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+                codePoint = tempCodePoint;
+              }
+            }
+            break;
+          case 4:
+            secondByte = buf[i + 1];
+            thirdByte = buf[i + 2];
+            fourthByte = buf[i + 3];
+            if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+              tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F);
+              if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+                codePoint = tempCodePoint;
+              }
+            }
+        }
+      }
+      if (codePoint === null) {
+        codePoint = 0xFFFD;
+        bytesPerSequence = 1;
+      } else if (codePoint > 0xFFFF) {
+        codePoint -= 0x10000;
+        res.push(codePoint >>> 10 & 0x3FF | 0xD800);
+        codePoint = 0xDC00 | codePoint & 0x3FF;
+      }
+      res.push(codePoint);
+      i += bytesPerSequence;
+    }
+    return decodeCodePointsArray(res);
+  }
+  var MAX_ARGUMENTS_LENGTH = 0x1000;
+  function decodeCodePointsArray(codePoints) {
+    var len = codePoints.length;
+    if (len <= MAX_ARGUMENTS_LENGTH) {
+      return String.fromCharCode.apply(String, codePoints);
+    }
+    var res = '';
+    var i = 0;
+    while (i < len) {
+      res += String.fromCharCode.apply(String, codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH));
+    }
+    return res;
+  }
+  function asciiSlice(buf, start, end) {
+    var ret = '';
+    end = Math.min(buf.length, end);
+    for (var i = start; i < end; i++) {
+      ret += String.fromCharCode(buf[i] & 0x7F);
+    }
+    return ret;
+  }
+  function binarySlice(buf, start, end) {
+    var ret = '';
+    end = Math.min(buf.length, end);
+    for (var i = start; i < end; i++) {
+      ret += String.fromCharCode(buf[i]);
+    }
+    return ret;
+  }
+  function hexSlice(buf, start, end) {
+    var len = buf.length;
+    if (!start || start < 0)
+      start = 0;
+    if (!end || end < 0 || end > len)
+      end = len;
+    var out = '';
+    for (var i = start; i < end; i++) {
+      out += toHex(buf[i]);
+    }
+    return out;
+  }
+  function utf16leSlice(buf, start, end) {
+    var bytes = buf.slice(start, end);
+    var res = '';
+    for (var i = 0; i < bytes.length; i += 2) {
+      res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256);
+    }
+    return res;
+  }
+  Buffer.prototype.slice = function slice(start, end) {
+    var len = this.length;
+    start = ~~start;
+    end = end === undefined ? len : ~~end;
+    if (start < 0) {
+      start += len;
+      if (start < 0)
+        start = 0;
+    } else if (start > len) {
+      start = len;
+    }
+    if (end < 0) {
+      end += len;
+      if (end < 0)
+        end = 0;
+    } else if (end > len) {
+      end = len;
+    }
+    if (end < start)
+      end = start;
+    var newBuf;
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      newBuf = Buffer._augment(this.subarray(start, end));
+    } else {
+      var sliceLen = end - start;
+      newBuf = new Buffer(sliceLen, undefined);
+      for (var i = 0; i < sliceLen; i++) {
+        newBuf[i] = this[i + start];
+      }
+    }
+    if (newBuf.length)
+      newBuf.parent = this.parent || this;
+    return newBuf;
+  };
+  function checkOffset(offset, ext, length) {
+    if ((offset % 1) !== 0 || offset < 0)
+      throw new RangeError('offset is not uint');
+    if (offset + ext > length)
+      throw new RangeError('Trying to access beyond buffer length');
+  }
+  Buffer.prototype.readUIntLE = function readUIntLE(offset, byteLength, noAssert) {
+    offset = offset | 0;
+    byteLength = byteLength | 0;
+    if (!noAssert)
+      checkOffset(offset, byteLength, this.length);
+    var val = this[offset];
+    var mul = 1;
+    var i = 0;
+    while (++i < byteLength && (mul *= 0x100)) {
+      val += this[offset + i] * mul;
+    }
+    return val;
+  };
+  Buffer.prototype.readUIntBE = function readUIntBE(offset, byteLength, noAssert) {
+    offset = offset | 0;
+    byteLength = byteLength | 0;
+    if (!noAssert) {
+      checkOffset(offset, byteLength, this.length);
+    }
+    var val = this[offset + --byteLength];
+    var mul = 1;
+    while (byteLength > 0 && (mul *= 0x100)) {
+      val += this[offset + --byteLength] * mul;
+    }
+    return val;
+  };
+  Buffer.prototype.readUInt8 = function readUInt8(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 1, this.length);
+    return this[offset];
+  };
+  Buffer.prototype.readUInt16LE = function readUInt16LE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 2, this.length);
+    return this[offset] | (this[offset + 1] << 8);
+  };
+  Buffer.prototype.readUInt16BE = function readUInt16BE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 2, this.length);
+    return (this[offset] << 8) | this[offset + 1];
+  };
+  Buffer.prototype.readUInt32LE = function readUInt32LE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 4, this.length);
+    return ((this[offset]) | (this[offset + 1] << 8) | (this[offset + 2] << 16)) + (this[offset + 3] * 0x1000000);
+  };
+  Buffer.prototype.readUInt32BE = function readUInt32BE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 4, this.length);
+    return (this[offset] * 0x1000000) + ((this[offset + 1] << 16) | (this[offset + 2] << 8) | this[offset + 3]);
+  };
+  Buffer.prototype.readIntLE = function readIntLE(offset, byteLength, noAssert) {
+    offset = offset | 0;
+    byteLength = byteLength | 0;
+    if (!noAssert)
+      checkOffset(offset, byteLength, this.length);
+    var val = this[offset];
+    var mul = 1;
+    var i = 0;
+    while (++i < byteLength && (mul *= 0x100)) {
+      val += this[offset + i] * mul;
+    }
+    mul *= 0x80;
+    if (val >= mul)
+      val -= Math.pow(2, 8 * byteLength);
+    return val;
+  };
+  Buffer.prototype.readIntBE = function readIntBE(offset, byteLength, noAssert) {
+    offset = offset | 0;
+    byteLength = byteLength | 0;
+    if (!noAssert)
+      checkOffset(offset, byteLength, this.length);
+    var i = byteLength;
+    var mul = 1;
+    var val = this[offset + --i];
+    while (i > 0 && (mul *= 0x100)) {
+      val += this[offset + --i] * mul;
+    }
+    mul *= 0x80;
+    if (val >= mul)
+      val -= Math.pow(2, 8 * byteLength);
+    return val;
+  };
+  Buffer.prototype.readInt8 = function readInt8(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 1, this.length);
+    if (!(this[offset] & 0x80))
+      return (this[offset]);
+    return ((0xff - this[offset] + 1) * -1);
+  };
+  Buffer.prototype.readInt16LE = function readInt16LE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 2, this.length);
+    var val = this[offset] | (this[offset + 1] << 8);
+    return (val & 0x8000) ? val | 0xFFFF0000 : val;
+  };
+  Buffer.prototype.readInt16BE = function readInt16BE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 2, this.length);
+    var val = this[offset + 1] | (this[offset] << 8);
+    return (val & 0x8000) ? val | 0xFFFF0000 : val;
+  };
+  Buffer.prototype.readInt32LE = function readInt32LE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 4, this.length);
+    return (this[offset]) | (this[offset + 1] << 8) | (this[offset + 2] << 16) | (this[offset + 3] << 24);
+  };
+  Buffer.prototype.readInt32BE = function readInt32BE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 4, this.length);
+    return (this[offset] << 24) | (this[offset + 1] << 16) | (this[offset + 2] << 8) | (this[offset + 3]);
+  };
+  Buffer.prototype.readFloatLE = function readFloatLE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 4, this.length);
+    return ieee754.read(this, offset, true, 23, 4);
+  };
+  Buffer.prototype.readFloatBE = function readFloatBE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 4, this.length);
+    return ieee754.read(this, offset, false, 23, 4);
+  };
+  Buffer.prototype.readDoubleLE = function readDoubleLE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 8, this.length);
+    return ieee754.read(this, offset, true, 52, 8);
+  };
+  Buffer.prototype.readDoubleBE = function readDoubleBE(offset, noAssert) {
+    if (!noAssert)
+      checkOffset(offset, 8, this.length);
+    return ieee754.read(this, offset, false, 52, 8);
+  };
+  function checkInt(buf, value, offset, ext, max, min) {
+    if (!Buffer.isBuffer(buf))
+      throw new TypeError('buffer must be a Buffer instance');
+    if (value > max || value < min)
+      throw new RangeError('value is out of bounds');
+    if (offset + ext > buf.length)
+      throw new RangeError('index out of range');
+  }
+  Buffer.prototype.writeUIntLE = function writeUIntLE(value, offset, byteLength, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    byteLength = byteLength | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0);
+    var mul = 1;
+    var i = 0;
+    this[offset] = value & 0xFF;
+    while (++i < byteLength && (mul *= 0x100)) {
+      this[offset + i] = (value / mul) & 0xFF;
+    }
+    return offset + byteLength;
+  };
+  Buffer.prototype.writeUIntBE = function writeUIntBE(value, offset, byteLength, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    byteLength = byteLength | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0);
+    var i = byteLength - 1;
+    var mul = 1;
+    this[offset + i] = value & 0xFF;
+    while (--i >= 0 && (mul *= 0x100)) {
+      this[offset + i] = (value / mul) & 0xFF;
+    }
+    return offset + byteLength;
+  };
+  Buffer.prototype.writeUInt8 = function writeUInt8(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 1, 0xff, 0);
+    if (!Buffer.TYPED_ARRAY_SUPPORT)
+      value = Math.floor(value);
+    this[offset] = (value & 0xff);
+    return offset + 1;
+  };
+  function objectWriteUInt16(buf, value, offset, littleEndian) {
+    if (value < 0)
+      value = 0xffff + value + 1;
+    for (var i = 0,
+        j = Math.min(buf.length - offset, 2); i < j; i++) {
+      buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>> (littleEndian ? i : 1 - i) * 8;
+    }
+  }
+  Buffer.prototype.writeUInt16LE = function writeUInt16LE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 2, 0xffff, 0);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value & 0xff);
+      this[offset + 1] = (value >>> 8);
+    } else {
+      objectWriteUInt16(this, value, offset, true);
+    }
+    return offset + 2;
+  };
+  Buffer.prototype.writeUInt16BE = function writeUInt16BE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 2, 0xffff, 0);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value >>> 8);
+      this[offset + 1] = (value & 0xff);
+    } else {
+      objectWriteUInt16(this, value, offset, false);
+    }
+    return offset + 2;
+  };
+  function objectWriteUInt32(buf, value, offset, littleEndian) {
+    if (value < 0)
+      value = 0xffffffff + value + 1;
+    for (var i = 0,
+        j = Math.min(buf.length - offset, 4); i < j; i++) {
+      buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff;
+    }
+  }
+  Buffer.prototype.writeUInt32LE = function writeUInt32LE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 4, 0xffffffff, 0);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset + 3] = (value >>> 24);
+      this[offset + 2] = (value >>> 16);
+      this[offset + 1] = (value >>> 8);
+      this[offset] = (value & 0xff);
+    } else {
+      objectWriteUInt32(this, value, offset, true);
+    }
+    return offset + 4;
+  };
+  Buffer.prototype.writeUInt32BE = function writeUInt32BE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 4, 0xffffffff, 0);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value >>> 24);
+      this[offset + 1] = (value >>> 16);
+      this[offset + 2] = (value >>> 8);
+      this[offset + 3] = (value & 0xff);
+    } else {
+      objectWriteUInt32(this, value, offset, false);
+    }
+    return offset + 4;
+  };
+  Buffer.prototype.writeIntLE = function writeIntLE(value, offset, byteLength, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert) {
+      var limit = Math.pow(2, 8 * byteLength - 1);
+      checkInt(this, value, offset, byteLength, limit - 1, -limit);
+    }
+    var i = 0;
+    var mul = 1;
+    var sub = value < 0 ? 1 : 0;
+    this[offset] = value & 0xFF;
+    while (++i < byteLength && (mul *= 0x100)) {
+      this[offset + i] = ((value / mul) >> 0) - sub & 0xFF;
+    }
+    return offset + byteLength;
+  };
+  Buffer.prototype.writeIntBE = function writeIntBE(value, offset, byteLength, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert) {
+      var limit = Math.pow(2, 8 * byteLength - 1);
+      checkInt(this, value, offset, byteLength, limit - 1, -limit);
+    }
+    var i = byteLength - 1;
+    var mul = 1;
+    var sub = value < 0 ? 1 : 0;
+    this[offset + i] = value & 0xFF;
+    while (--i >= 0 && (mul *= 0x100)) {
+      this[offset + i] = ((value / mul) >> 0) - sub & 0xFF;
+    }
+    return offset + byteLength;
+  };
+  Buffer.prototype.writeInt8 = function writeInt8(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 1, 0x7f, -0x80);
+    if (!Buffer.TYPED_ARRAY_SUPPORT)
+      value = Math.floor(value);
+    if (value < 0)
+      value = 0xff + value + 1;
+    this[offset] = (value & 0xff);
+    return offset + 1;
+  };
+  Buffer.prototype.writeInt16LE = function writeInt16LE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 2, 0x7fff, -0x8000);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value & 0xff);
+      this[offset + 1] = (value >>> 8);
+    } else {
+      objectWriteUInt16(this, value, offset, true);
+    }
+    return offset + 2;
+  };
+  Buffer.prototype.writeInt16BE = function writeInt16BE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 2, 0x7fff, -0x8000);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value >>> 8);
+      this[offset + 1] = (value & 0xff);
+    } else {
+      objectWriteUInt16(this, value, offset, false);
+    }
+    return offset + 2;
+  };
+  Buffer.prototype.writeInt32LE = function writeInt32LE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000);
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value & 0xff);
+      this[offset + 1] = (value >>> 8);
+      this[offset + 2] = (value >>> 16);
+      this[offset + 3] = (value >>> 24);
+    } else {
+      objectWriteUInt32(this, value, offset, true);
+    }
+    return offset + 4;
+  };
+  Buffer.prototype.writeInt32BE = function writeInt32BE(value, offset, noAssert) {
+    value = +value;
+    offset = offset | 0;
+    if (!noAssert)
+      checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000);
+    if (value < 0)
+      value = 0xffffffff + value + 1;
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      this[offset] = (value >>> 24);
+      this[offset + 1] = (value >>> 16);
+      this[offset + 2] = (value >>> 8);
+      this[offset + 3] = (value & 0xff);
+    } else {
+      objectWriteUInt32(this, value, offset, false);
+    }
+    return offset + 4;
+  };
+  function checkIEEE754(buf, value, offset, ext, max, min) {
+    if (value > max || value < min)
+      throw new RangeError('value is out of bounds');
+    if (offset + ext > buf.length)
+      throw new RangeError('index out of range');
+    if (offset < 0)
+      throw new RangeError('index out of range');
+  }
+  function writeFloat(buf, value, offset, littleEndian, noAssert) {
+    if (!noAssert) {
+      checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38);
+    }
+    ieee754.write(buf, value, offset, littleEndian, 23, 4);
+    return offset + 4;
+  }
+  Buffer.prototype.writeFloatLE = function writeFloatLE(value, offset, noAssert) {
+    return writeFloat(this, value, offset, true, noAssert);
+  };
+  Buffer.prototype.writeFloatBE = function writeFloatBE(value, offset, noAssert) {
+    return writeFloat(this, value, offset, false, noAssert);
+  };
+  function writeDouble(buf, value, offset, littleEndian, noAssert) {
+    if (!noAssert) {
+      checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308);
+    }
+    ieee754.write(buf, value, offset, littleEndian, 52, 8);
+    return offset + 8;
+  }
+  Buffer.prototype.writeDoubleLE = function writeDoubleLE(value, offset, noAssert) {
+    return writeDouble(this, value, offset, true, noAssert);
+  };
+  Buffer.prototype.writeDoubleBE = function writeDoubleBE(value, offset, noAssert) {
+    return writeDouble(this, value, offset, false, noAssert);
+  };
+  Buffer.prototype.copy = function copy(target, targetStart, start, end) {
+    if (!start)
+      start = 0;
+    if (!end && end !== 0)
+      end = this.length;
+    if (targetStart >= target.length)
+      targetStart = target.length;
+    if (!targetStart)
+      targetStart = 0;
+    if (end > 0 && end < start)
+      end = start;
+    if (end === start)
+      return 0;
+    if (target.length === 0 || this.length === 0)
+      return 0;
+    if (targetStart < 0) {
+      throw new RangeError('targetStart out of bounds');
+    }
+    if (start < 0 || start >= this.length)
+      throw new RangeError('sourceStart out of bounds');
+    if (end < 0)
+      throw new RangeError('sourceEnd out of bounds');
+    if (end > this.length)
+      end = this.length;
+    if (target.length - targetStart < end - start) {
+      end = target.length - targetStart + start;
+    }
+    var len = end - start;
+    var i;
+    if (this === target && start < targetStart && targetStart < end) {
+      for (i = len - 1; i >= 0; i--) {
+        target[i + targetStart] = this[i + start];
+      }
+    } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+      for (i = 0; i < len; i++) {
+        target[i + targetStart] = this[i + start];
+      }
+    } else {
+      target._set(this.subarray(start, start + len), targetStart);
+    }
+    return len;
+  };
+  Buffer.prototype.fill = function fill(value, start, end) {
+    if (!value)
+      value = 0;
+    if (!start)
+      start = 0;
+    if (!end)
+      end = this.length;
+    if (end < start)
+      throw new RangeError('end < start');
+    if (end === start)
+      return;
+    if (this.length === 0)
+      return;
+    if (start < 0 || start >= this.length)
+      throw new RangeError('start out of bounds');
+    if (end < 0 || end > this.length)
+      throw new RangeError('end out of bounds');
+    var i;
+    if (typeof value === 'number') {
+      for (i = start; i < end; i++) {
+        this[i] = value;
+      }
+    } else {
+      var bytes = utf8ToBytes(value.toString());
+      var len = bytes.length;
+      for (i = start; i < end; i++) {
+        this[i] = bytes[i % len];
+      }
+    }
+    return this;
+  };
+  Buffer.prototype.toArrayBuffer = function toArrayBuffer() {
+    if (typeof Uint8Array !== 'undefined') {
+      if (Buffer.TYPED_ARRAY_SUPPORT) {
+        return (new Buffer(this)).buffer;
+      } else {
+        var buf = new Uint8Array(this.length);
+        for (var i = 0,
+            len = buf.length; i < len; i += 1) {
+          buf[i] = this[i];
+        }
+        return buf.buffer;
+      }
+    } else {
+      throw new TypeError('Buffer.toArrayBuffer not supported in this browser');
+    }
+  };
+  var BP = Buffer.prototype;
+  Buffer._augment = function _augment(arr) {
+    arr.constructor = Buffer;
+    arr._isBuffer = true;
+    arr._set = arr.set;
+    arr.get = BP.get;
+    arr.set = BP.set;
+    arr.write = BP.write;
+    arr.toString = BP.toString;
+    arr.toLocaleString = BP.toString;
+    arr.toJSON = BP.toJSON;
+    arr.equals = BP.equals;
+    arr.compare = BP.compare;
+    arr.indexOf = BP.indexOf;
+    arr.copy = BP.copy;
+    arr.slice = BP.slice;
+    arr.readUIntLE = BP.readUIntLE;
+    arr.readUIntBE = BP.readUIntBE;
+    arr.readUInt8 = BP.readUInt8;
+    arr.readUInt16LE = BP.readUInt16LE;
+    arr.readUInt16BE = BP.readUInt16BE;
+    arr.readUInt32LE = BP.readUInt32LE;
+    arr.readUInt32BE = BP.readUInt32BE;
+    arr.readIntLE = BP.readIntLE;
+    arr.readIntBE = BP.readIntBE;
+    arr.readInt8 = BP.readInt8;
+    arr.readInt16LE = BP.readInt16LE;
+    arr.readInt16BE = BP.readInt16BE;
+    arr.readInt32LE = BP.readInt32LE;
+    arr.readInt32BE = BP.readInt32BE;
+    arr.readFloatLE = BP.readFloatLE;
+    arr.readFloatBE = BP.readFloatBE;
+    arr.readDoubleLE = BP.readDoubleLE;
+    arr.readDoubleBE = BP.readDoubleBE;
+    arr.writeUInt8 = BP.writeUInt8;
+    arr.writeUIntLE = BP.writeUIntLE;
+    arr.writeUIntBE = BP.writeUIntBE;
+    arr.writeUInt16LE = BP.writeUInt16LE;
+    arr.writeUInt16BE = BP.writeUInt16BE;
+    arr.writeUInt32LE = BP.writeUInt32LE;
+    arr.writeUInt32BE = BP.writeUInt32BE;
+    arr.writeIntLE = BP.writeIntLE;
+    arr.writeIntBE = BP.writeIntBE;
+    arr.writeInt8 = BP.writeInt8;
+    arr.writeInt16LE = BP.writeInt16LE;
+    arr.writeInt16BE = BP.writeInt16BE;
+    arr.writeInt32LE = BP.writeInt32LE;
+    arr.writeInt32BE = BP.writeInt32BE;
+    arr.writeFloatLE = BP.writeFloatLE;
+    arr.writeFloatBE = BP.writeFloatBE;
+    arr.writeDoubleLE = BP.writeDoubleLE;
+    arr.writeDoubleBE = BP.writeDoubleBE;
+    arr.fill = BP.fill;
+    arr.inspect = BP.inspect;
+    arr.toArrayBuffer = BP.toArrayBuffer;
+    return arr;
+  };
+  var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g;
+  function base64clean(str) {
+    str = stringtrim(str).replace(INVALID_BASE64_RE, '');
+    if (str.length < 2)
+      return '';
+    while (str.length % 4 !== 0) {
+      str = str + '=';
+    }
+    return str;
+  }
+  function stringtrim(str) {
+    if (str.trim)
+      return str.trim();
+    return str.replace(/^\s+|\s+$/g, '');
+  }
+  function toHex(n) {
+    if (n < 16)
+      return '0' + n.toString(16);
+    return n.toString(16);
+  }
+  function utf8ToBytes(string, units) {
+    units = units || Infinity;
+    var codePoint;
+    var length = string.length;
+    var leadSurrogate = null;
+    var bytes = [];
+    for (var i = 0; i < length; i++) {
+      codePoint = string.charCodeAt(i);
+      if (codePoint > 0xD7FF && codePoint < 0xE000) {
+        if (!leadSurrogate) {
+          if (codePoint > 0xDBFF) {
+            if ((units -= 3) > -1)
+              bytes.push(0xEF, 0xBF, 0xBD);
+            continue;
+          } else if (i + 1 === length) {
+            if ((units -= 3) > -1)
+              bytes.push(0xEF, 0xBF, 0xBD);
+            continue;
+          }
+          leadSurrogate = codePoint;
+          continue;
+        }
+        if (codePoint < 0xDC00) {
+          if ((units -= 3) > -1)
+            bytes.push(0xEF, 0xBF, 0xBD);
+          leadSurrogate = codePoint;
+          continue;
+        }
+        codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000;
+      } else if (leadSurrogate) {
+        if ((units -= 3) > -1)
+          bytes.push(0xEF, 0xBF, 0xBD);
+      }
+      leadSurrogate = null;
+      if (codePoint < 0x80) {
+        if ((units -= 1) < 0)
+          break;
+        bytes.push(codePoint);
+      } else if (codePoint < 0x800) {
+        if ((units -= 2) < 0)
+          break;
+        bytes.push(codePoint >> 0x6 | 0xC0, codePoint & 0x3F | 0x80);
+      } else if (codePoint < 0x10000) {
+        if ((units -= 3) < 0)
+          break;
+        bytes.push(codePoint >> 0xC | 0xE0, codePoint >> 0x6 & 0x3F | 0x80, codePoint & 0x3F | 0x80);
+      } else if (codePoint < 0x110000) {
+        if ((units -= 4) < 0)
+          break;
+        bytes.push(codePoint >> 0x12 | 0xF0, codePoint >> 0xC & 0x3F | 0x80, codePoint >> 0x6 & 0x3F | 0x80, codePoint & 0x3F | 0x80);
+      } else {
+        throw new Error('Invalid code point');
+      }
+    }
+    return bytes;
+  }
+  function asciiToBytes(str) {
+    var byteArray = [];
+    for (var i = 0; i < str.length; i++) {
+      byteArray.push(str.charCodeAt(i) & 0xFF);
+    }
+    return byteArray;
+  }
+  function utf16leToBytes(str, units) {
+    var c,
+        hi,
+        lo;
+    var byteArray = [];
+    for (var i = 0; i < str.length; i++) {
+      if ((units -= 2) < 0)
+        break;
+      c = str.charCodeAt(i);
+      hi = c >> 8;
+      lo = c % 256;
+      byteArray.push(lo);
+      byteArray.push(hi);
+    }
+    return byteArray;
+  }
+  function base64ToBytes(str) {
+    return base64.toByteArray(base64clean(str));
+  }
+  function blitBuffer(src, dst, offset, length) {
+    for (var i = 0; i < length; i++) {
+      if ((i + offset >= dst.length) || (i >= src.length))
+        break;
+      dst[i + offset] = src[i];
+    }
+    return i;
+  }
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4b", ["4a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('4a');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4c", ["4b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : req('4b');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4d", ["4c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('4c');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4e", ["4d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(Buffer) {
+    module.exports = function(obj) {
+      return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
+    };
+  })(req('4d').Buffer);
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4f", ["4e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('4e');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("50", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  function iota(n) {
+    var result = new Array(n);
+    for (var i = 0; i < n; ++i) {
+      result[i] = i;
+    }
+    return result;
+  }
+  module.exports = iota;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("51", ["50"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('50');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("52", ["51", "4f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var iota = req('51');
+  var isBuffer = req('4f');
+  var hasTypedArrays = ((typeof Float64Array) !== "undefined");
+  function compare1st(a, b) {
+    return a[0] - b[0];
+  }
+  function order() {
+    var stride = this.stride;
+    var terms = new Array(stride.length);
+    var i;
+    for (i = 0; i < terms.length; ++i) {
+      terms[i] = [Math.abs(stride[i]), i];
+    }
+    terms.sort(compare1st);
+    var result = new Array(terms.length);
+    for (i = 0; i < result.length; ++i) {
+      result[i] = terms[i][1];
+    }
+    return result;
+  }
+  function compileConstructor(dtype, dimension) {
+    var className = ["View", dimension, "d", dtype].join("");
+    if (dimension < 0) {
+      className = "View_Nil" + dtype;
+    }
+    var useGetters = (dtype === "generic");
+    if (dimension === -1) {
+      var code = "function " + className + "(a){this.data=a;};\
+var proto=" + className + ".prototype;\
+proto.dtype='" + dtype + "';\
+proto.index=function(){return -1};\
+proto.size=0;\
+proto.dimension=-1;\
+proto.shape=proto.stride=proto.order=[];\
+proto.lo=proto.hi=proto.transpose=proto.step=\
+function(){return new " + className + "(this.data);};\
+proto.get=proto.set=function(){};\
+proto.pick=function(){return null};\
+return function construct_" + className + "(a){return new " + className + "(a);}";
+      var procedure = new Function(code);
+      return procedure();
+    } else if (dimension === 0) {
+      var code = "function " + className + "(a,d) {\
+this.data = a;\
+this.offset = d\
+};\
+var proto=" + className + ".prototype;\
+proto.dtype='" + dtype + "';\
+proto.index=function(){return this.offset};\
+proto.dimension=0;\
+proto.size=1;\
+proto.shape=\
+proto.stride=\
+proto.order=[];\
+proto.lo=\
+proto.hi=\
+proto.transpose=\
+proto.step=function " + className + "_copy() {\
+return new " + className + "(this.data,this.offset)\
+};\
+proto.pick=function " + className + "_pick(){\
+return TrivialArray(this.data);\
+};\
+proto.valueOf=proto.get=function " + className + "_get(){\
+return " + (useGetters ? "this.data.get(this.offset)" : "this.data[this.offset]") + "};\
+proto.set=function " + className + "_set(v){\
+return " + (useGetters ? "this.data.set(this.offset,v)" : "this.data[this.offset]=v") + "\
+};\
+return function construct_" + className + "(a,b,c,d){return new " + className + "(a,d)}";
+      var procedure = new Function("TrivialArray", code);
+      return procedure(CACHED_CONSTRUCTORS[dtype][0]);
+    }
+    var code = ["'use strict'"];
+    var indices = iota(dimension);
+    var args = indices.map(function(i) {
+      return "i" + i;
+    });
+    var index_str = "this.offset+" + indices.map(function(i) {
+      return "this.stride[" + i + "]*i" + i;
+    }).join("+");
+    var shapeArg = indices.map(function(i) {
+      return "b" + i;
+    }).join(",");
+    var strideArg = indices.map(function(i) {
+      return "c" + i;
+    }).join(",");
+    code.push("function " + className + "(a," + shapeArg + "," + strideArg + ",d){this.data=a", "this.shape=[" + shapeArg + "]", "this.stride=[" + strideArg + "]", "this.offset=d|0}", "var proto=" + className + ".prototype", "proto.dtype='" + dtype + "'", "proto.dimension=" + dimension);
+    code.push("Object.defineProperty(proto,'size',{get:function " + className + "_size(){\
+return " + indices.map(function(i) {
+      return "this.shape[" + i + "]";
+    }).join("*"), "}})");
+    if (dimension === 1) {
+      code.push("proto.order=[0]");
+    } else {
+      code.push("Object.defineProperty(proto,'order',{get:");
+      if (dimension < 4) {
+        code.push("function " + className + "_order(){");
+        if (dimension === 2) {
+          code.push("return (Math.abs(this.stride[0])>Math.abs(this.stride[1]))?[1,0]:[0,1]}})");
+        } else if (dimension === 3) {
+          code.push("var s0=Math.abs(this.stride[0]),s1=Math.abs(this.stride[1]),s2=Math.abs(this.stride[2]);\
+if(s0>s1){\
+if(s1>s2){\
+return [2,1,0];\
+}else if(s0>s2){\
+return [1,2,0];\
+}else{\
+return [1,0,2];\
+}\
+}else if(s0>s2){\
+return [2,0,1];\
+}else if(s2>s1){\
+return [0,1,2];\
+}else{\
+return [0,2,1];\
+}}})");
+        }
+      } else {
+        code.push("ORDER})");
+      }
+    }
+    code.push("proto.set=function " + className + "_set(" + args.join(",") + ",v){");
+    if (useGetters) {
+      code.push("return this.data.set(" + index_str + ",v)}");
+    } else {
+      code.push("return this.data[" + index_str + "]=v}");
+    }
+    code.push("proto.get=function " + className + "_get(" + args.join(",") + "){");
+    if (useGetters) {
+      code.push("return this.data.get(" + index_str + ")}");
+    } else {
+      code.push("return this.data[" + index_str + "]}");
+    }
+    code.push("proto.index=function " + className + "_index(", args.join(), "){return " + index_str + "}");
+    code.push("proto.hi=function " + className + "_hi(" + args.join(",") + "){return new " + className + "(this.data," + indices.map(function(i) {
+      return ["(typeof i", i, "!=='number'||i", i, "<0)?this.shape[", i, "]:i", i, "|0"].join("");
+    }).join(",") + "," + indices.map(function(i) {
+      return "this.stride[" + i + "]";
+    }).join(",") + ",this.offset)}");
+    var a_vars = indices.map(function(i) {
+      return "a" + i + "=this.shape[" + i + "]";
+    });
+    var c_vars = indices.map(function(i) {
+      return "c" + i + "=this.stride[" + i + "]";
+    });
+    code.push("proto.lo=function " + className + "_lo(" + args.join(",") + "){var b=this.offset,d=0," + a_vars.join(",") + "," + c_vars.join(","));
+    for (var i = 0; i < dimension; ++i) {
+      code.push("if(typeof i" + i + "==='number'&&i" + i + ">=0){\
+d=i" + i + "|0;\
+b+=c" + i + "*d;\
+a" + i + "-=d}");
+    }
+    code.push("return new " + className + "(this.data," + indices.map(function(i) {
+      return "a" + i;
+    }).join(",") + "," + indices.map(function(i) {
+      return "c" + i;
+    }).join(",") + ",b)}");
+    code.push("proto.step=function " + className + "_step(" + args.join(",") + "){var " + indices.map(function(i) {
+      return "a" + i + "=this.shape[" + i + "]";
+    }).join(",") + "," + indices.map(function(i) {
+      return "b" + i + "=this.stride[" + i + "]";
+    }).join(",") + ",c=this.offset,d=0,ceil=Math.ceil");
+    for (var i = 0; i < dimension; ++i) {
+      code.push("if(typeof i" + i + "==='number'){\
+d=i" + i + "|0;\
+if(d<0){\
+c+=b" + i + "*(a" + i + "-1);\
+a" + i + "=ceil(-a" + i + "/d)\
+}else{\
+a" + i + "=ceil(a" + i + "/d)\
+}\
+b" + i + "*=d\
+}");
+    }
+    code.push("return new " + className + "(this.data," + indices.map(function(i) {
+      return "a" + i;
+    }).join(",") + "," + indices.map(function(i) {
+      return "b" + i;
+    }).join(",") + ",c)}");
+    var tShape = new Array(dimension);
+    var tStride = new Array(dimension);
+    for (var i = 0; i < dimension; ++i) {
+      tShape[i] = "a[i" + i + "]";
+      tStride[i] = "b[i" + i + "]";
+    }
+    code.push("proto.transpose=function " + className + "_transpose(" + args + "){" + args.map(function(n, idx) {
+      return n + "=(" + n + "===undefined?" + idx + ":" + n + "|0)";
+    }).join(";"), "var a=this.shape,b=this.stride;return new " + className + "(this.data," + tShape.join(",") + "," + tStride.join(",") + ",this.offset)}");
+    code.push("proto.pick=function " + className + "_pick(" + args + "){var a=[],b=[],c=this.offset");
+    for (var i = 0; i < dimension; ++i) {
+      code.push("if(typeof i" + i + "==='number'&&i" + i + ">=0){c=(c+this.stride[" + i + "]*i" + i + ")|0}else{a.push(this.shape[" + i + "]);b.push(this.stride[" + i + "])}");
+    }
+    code.push("var ctor=CTOR_LIST[a.length+1];return ctor(this.data,a,b,c)}");
+    code.push("return function construct_" + className + "(data,shape,stride,offset){return new " + className + "(data," + indices.map(function(i) {
+      return "shape[" + i + "]";
+    }).join(",") + "," + indices.map(function(i) {
+      return "stride[" + i + "]";
+    }).join(",") + ",offset)}");
+    var procedure = new Function("CTOR_LIST", "ORDER", code.join("\n"));
+    return procedure(CACHED_CONSTRUCTORS[dtype], order);
+  }
+  function arrayDType(data) {
+    if (isBuffer(data)) {
+      return "buffer";
+    }
+    if (hasTypedArrays) {
+      switch (Object.prototype.toString.call(data)) {
+        case "[object Float64Array]":
+          return "float64";
+        case "[object Float32Array]":
+          return "float32";
+        case "[object Int8Array]":
+          return "int8";
+        case "[object Int16Array]":
+          return "int16";
+        case "[object Int32Array]":
+          return "int32";
+        case "[object Uint8Array]":
+          return "uint8";
+        case "[object Uint16Array]":
+          return "uint16";
+        case "[object Uint32Array]":
+          return "uint32";
+        case "[object Uint8ClampedArray]":
+          return "uint8_clamped";
+      }
+    }
+    if (Array.isArray(data)) {
+      return "array";
+    }
+    return "generic";
+  }
+  var CACHED_CONSTRUCTORS = {
+    "float32": [],
+    "float64": [],
+    "int8": [],
+    "int16": [],
+    "int32": [],
+    "uint8": [],
+    "uint16": [],
+    "uint32": [],
+    "array": [],
+    "uint8_clamped": [],
+    "buffer": [],
+    "generic": []
+  };
+  ;
+  (function() {
+    for (var id in CACHED_CONSTRUCTORS) {
+      CACHED_CONSTRUCTORS[id].push(compileConstructor(id, -1));
+    }
+  });
+  function wrappedNDArrayCtor(data, shape, stride, offset) {
+    if (data === undefined) {
+      var ctor = CACHED_CONSTRUCTORS.array[0];
+      return ctor([]);
+    } else if (typeof data === "number") {
+      data = [data];
+    }
+    if (shape === undefined) {
+      shape = [data.length];
+    }
+    var d = shape.length;
+    if (stride === undefined) {
+      stride = new Array(d);
+      for (var i = d - 1,
+          sz = 1; i >= 0; --i) {
+        stride[i] = sz;
+        sz *= shape[i];
+      }
+    }
+    if (offset === undefined) {
+      offset = 0;
+      for (var i = 0; i < d; ++i) {
+        if (stride[i] < 0) {
+          offset -= (shape[i] - 1) * stride[i];
+        }
+      }
+    }
+    var dtype = arrayDType(data);
+    var ctor_list = CACHED_CONSTRUCTORS[dtype];
+    while (ctor_list.length <= d + 1) {
+      ctor_list.push(compileConstructor(dtype, ctor_list.length - 1));
+    }
+    var ctor = ctor_list[d + 1];
+    return ctor(data, shape, stride, offset);
+  }
+  module.exports = wrappedNDArrayCtor;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1f", ["52"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('52');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("53", ["2e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $def = req('2e');
+  $def($def.S, 'Math', {trunc: function trunc(it) {
+      return (it > 0 ? Math.floor : Math.ceil)(it);
+    }});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("54", ["53", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('53');
+  module.exports = req('35').Math.trunc;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("20", ["54"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('54'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("55", ["56", "57"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toObject = req('56');
+  req('57')('keys', function($keys) {
+    return function keys(it) {
+      return $keys(toObject(it));
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("58", ["55", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('55');
+  module.exports = req('35').Object.keys;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("28", ["58"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('58'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("59", ["5a", "24", "5b", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var classof = req('5a'),
+      ITERATOR = req('24')('iterator'),
+      Iterators = req('5b');
+  module.exports = req('35').isIterable = function(it) {
+    var O = Object(it);
+    return ITERATOR in O || '@@iterator' in O || Iterators.hasOwnProperty(classof(O));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5c", ["23", "22", "59"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('23');
+  req('22');
+  module.exports = req('59');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5d", ["5c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('5c'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("12", ["1e", "5d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _getIterator = req('1e')["default"];
+  var _isIterable = req('5d')["default"];
+  exports["default"] = (function() {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+      try {
+        for (var _i = _getIterator(arr),
+            _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+          if (i && _arr.length === i)
+            break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"])
+            _i["return"]();
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+    return function(arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (_isIterable(Object(arr))) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  })();
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('3f', ['7', '8', '10', '12', '20', '26', '28', '40', '43', '1d', '1e', '5e', '1f'], function (_export) {
+  var _createClass, _classCallCheck, _Promise, _slicedToArray, _Math$trunc, _Map, _Object$keys, shallowcopy, minMax, assert, PREFIX, load, _toConsumableArray, _getIterator, _Array$from, ndarray, Coverage;
+
+  /**
+   * Currently unused, but may need in future.
+   * This determines the best array type for categorical data which
+   * doesn't have missing values.
+   */
+  /*
+  function arrayType (validMin, validMax) {
+    let type
+    if (validMin !== undefined) {
+      if (validMin >= 0) {
+        if (validMax < Math.pow(2,8)) {
+          type = Uint8Array
+        } else if (validMax < Math.pow(2,16)) {
+          type = Uint16Array
+        } else if (validMax < Math.pow(2,32)) {
+          type = Uint32Array
+        } else {
+          type = Array
+        }
+      } else {
+        let max = Math.max(Math.abs(validMin), validMax)
+        if (max < Math.pow(2,8)) {
+          type = Int8Array
+        } else if (validMax < Math.pow(2,16)) {
+          type = Int16Array
+        } else if (validMax < Math.pow(2,32)) {
+          type = Int32Array
+        } else {
+          type = Array
+        }
+      }
+    } else {
+      type = Array
+    }
+    return type
+  }
+  */
+
+  /**
+   * Transforms a CoverageJSON parameter to the Coverage API format, that is,
+   * language maps become real Maps. Transformation is made in-place.
+   * 
+   * @param {Object} param The original parameter.
+   */
+  function transformParameter(params, key) {
+    var param = params[key];
+    param.key = key;
+    var maps = [[param, 'description'], [param.observedProperty, 'label'], [param.observedProperty, 'description'], [param.unit, 'label']];
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
+
+    try {
+      for (var _iterator6 = _getIterator(param.observedProperty.categories || []), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var cat = _step6.value;
+
+        maps.push([cat, 'label']);
+        maps.push([cat, 'description']);
+      }
+    } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+          _iterator6['return']();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+
+    try {
+      for (var _iterator7 = _getIterator(maps), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var entry = _step7.value;
+
+        transformLanguageMap(entry[0], entry[1]);
+      }
+    } catch (err) {
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+          _iterator7['return']();
+        }
+      } finally {
+        if (_didIteratorError7) {
+          throw _iteratorError7;
+        }
+      }
+    }
+
+    if (param.categoryEncoding) {
+      var map = new _Map();
+      var _iteratorNormalCompletion8 = true;
+      var _didIteratorError8 = false;
+      var _iteratorError8 = undefined;
+
+      try {
+        for (var _iterator8 = _getIterator(_Object$keys(param.categoryEncoding)), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+          var category = _step8.value;
+
+          var vals = param.categoryEncoding[category];
+          if (!Array.isArray(vals)) {
+            vals = [vals];
+          }
+          map.set(category, vals);
+        }
+      } catch (err) {
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+            _iterator8['return']();
+          }
+        } finally {
+          if (_didIteratorError8) {
+            throw _iteratorError8;
+          }
+        }
+      }
+
+      param.categoryEncoding = map;
+    }
+  }
+
+  function transformLanguageMap(obj, key) {
+    if (!obj || !(key in obj) || obj[key] instanceof _Map) {
+      return;
+    }
+    var map = new _Map();
+    var _iteratorNormalCompletion9 = true;
+    var _didIteratorError9 = false;
+    var _iteratorError9 = undefined;
+
+    try {
+      for (var _iterator9 = _getIterator(_Object$keys(obj[key])), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+        var tag = _step9.value;
+
+        map.set(tag, obj[key][tag]);
+      }
+    } catch (err) {
+      _didIteratorError9 = true;
+      _iteratorError9 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion9 && _iterator9['return']) {
+          _iterator9['return']();
+        }
+      } finally {
+        if (_didIteratorError9) {
+          throw _iteratorError9;
+        }
+      }
+    }
+
+    obj[key] = map;
+  }
+
+  /**
+   * Transforms a CoverageJSON range to the Coverage API format, that is,
+   * no special encoding etc. is left. Transformation is made in-place.
+   * 
+   * @param {Object} range The original range.
+   * @param {Object} domain The CoverageJSON domain object. 
+   * @return {Object} The transformed range.
+   */
+  function transformRange(range, domain) {
+    if ('__transformDone' in range) return;
+
+    var values = range.values;
+    var targetDataType = range.dataType; // 'integer', 'float', 'string'
+    var isTyped = ArrayBuffer.isView(values);
+    var missingIsEncoded = range.missing === 'nonvalid';
+    var hasOffsetFactor = ('offset' in range);
+
+    if ('offset' in range) {
+      assert('factor' in range);
+    }
+    var offset = range.offset;
+    var factor = range.factor;
+
+    if (missingIsEncoded) {
+      assert('validMin' in range);
+      assert('validMax' in range);
+    }
+    var validMin = range.validMin;
+    var validMax = range.validMax;
+
+    var vals = undefined;
+    if (!missingIsEncoded && !hasOffsetFactor) {
+      // No transformation necessary.
+      vals = values;
+    } else {
+      // Transformation is necessary.
+      // we use a regular array so that missing values can be represented as null
+      vals = new Array(values.length);
+
+      // TODO can we use typed arrays here without having to scan for missing values first?
+      //  When typed arrays with missing value encoding was used we could keep that and provide
+      //  a higher abstraction on the array similar to an ndarray interface. This means that [] syntax
+      //  would be impossible and change to .get(index).
+
+      if (hasOffsetFactor) {
+        for (var i = 0; i < values.length; i++) {
+          var val = values[i];
+          if (missingIsEncoded && (val < validMin || val > validMax)) {
+            // This is necessary as the default value is "undefined".
+            vals[i] = null;
+          } else if (!missingIsEncoded && val === null) {
+            vals[i] = null;
+          } else {
+            vals[i] = val * factor + offset;
+          }
+        }
+
+        if (validMin !== undefined) {
+          range.validMin = validMin * factor + offset;
+          range.validMax = validMax * factor + offset;
+        }
+      } else {
+        // missingIsEncoded == true
+        for (var i = 0; i < values.length; i++) {
+          var val = values[i];
+          if (val < validMin || val > validMax) {
+            vals[i] = null;
+          } else {
+            vals[i] = val;
+          }
+        }
+      }
+
+      delete range.offset;
+      delete range.factor;
+      delete range.missing;
+    }
+
+    if (validMin === undefined) {
+      var _minMax = minMax(vals);
+
+      var _minMax2 = _slicedToArray(_minMax, 2);
+
+      var min = _minMax2[0];
+      var max = _minMax2[1];
+
+      if (min !== null) {
+        range.validMin = min;
+        range.validMax = max;
+      }
+    }
+
+    var shape = new _Map(); // axis name -> axis size (value count)
+    var _iteratorNormalCompletion10 = true;
+    var _didIteratorError10 = false;
+    var _iteratorError10 = undefined;
+
+    try {
+      for (var _iterator10 = _getIterator(domain.axes.keys()), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+        var axisName = _step10.value;
+
+        shape.set(axisName, domain.axes.get(axisName).values.length);
+      }
+    } catch (err) {
+      _didIteratorError10 = true;
+      _iteratorError10 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion10 && _iterator10['return']) {
+          _iterator10['return']();
+        }
+      } finally {
+        if (_didIteratorError10) {
+          throw _iteratorError10;
+        }
+      }
+    }
+
+    range.shape = shape;
+
+    var ndarr = ndarray(vals, domain._rangeShape);
+    range._ndarr = ndarr;
+    range.get = createRangeGetFunction(ndarr, domain._rangeAxisOrder);
+
+    range.__transformDone = true;
+    return range;
+  }
+
+  /**
+   * 
+   * @param axisOrder An array of axis names.
+   * @returns Function
+   */
+  function createRangeGetFunction(ndarr, axisOrder) {
+    // see below for slower reference version
+    var ndargs = '';
+    for (var i = 0; i < axisOrder.length; i++) {
+      if (ndargs) ndargs += ',';
+      ndargs += '\'' + axisOrder[i] + '\' in obj ? obj[\'' + axisOrder[i] + '\'] : 0';
+    }
+    var fn = new Function('ndarr', 'obj', 'return ndarr.get(' + ndargs + ')');
+    return fn.bind(undefined, ndarr);
+  }
+
+  /*
+   * Reference version of createRangeGetFunction().
+   * Around 50% slower (on Chrome 46) compared to precompiled version.
+   * 
+  function createRangeGetFunction (ndarr, axisOrder) {
+    axisOrder = axisOrder.slice() // help the JIT (possibly..)
+    const axisCount = axisOrder.length
+    return obj => {
+      let indices = new Array(axisCount)
+      for (let i=0; i < axisCount; i++) {
+        indices[i] = axisOrder[i] in obj ? obj[axisOrder[i]] : 0
+      }
+      return ndarr.get(...indices)
+    }
+  }
+  */
+
+  /**
+   * Transforms a CoverageJSON domain to the Coverage API format.
+   * Transformation is made in-place.
+   * 
+   * @param {Object} domain The original domain object.
+   * @return {Object} The transformed domain object.
+   */
+  function transformDomain(domain) {
+    if ('__transformDone' in domain) return;
+
+    var profile = domain.profile || 'Domain';
+    if (profile.substr(0, 4) !== 'http') {
+      profile = PREFIX + profile;
+    }
+    domain.type = profile;
+
+    var axes = new _Map(); // axis name -> axis object
+
+    var _iteratorNormalCompletion11 = true;
+    var _didIteratorError11 = false;
+    var _iteratorError11 = undefined;
+
+    try {
+      for (var _iterator11 = _getIterator(_Object$keys(domain.axes)), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+        var axisName = _step11.value;
+
+        axes.set(axisName, domain.axes[axisName]);
+      }
+    } catch (err) {
+      _didIteratorError11 = true;
+      _iteratorError11 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion11 && _iterator11['return']) {
+          _iterator11['return']();
+        }
+      } finally {
+        if (_didIteratorError11) {
+          throw _iteratorError11;
+        }
+      }
+    }
+
+    domain.axes = axes;
+
+    // expand start/stop/num regular axes
+    // replace 1D numeric axis arrays with typed arrays for efficiency
+    var _iteratorNormalCompletion12 = true;
+    var _didIteratorError12 = false;
+    var _iteratorError12 = undefined;
+
+    try {
+      for (var _iterator12 = _getIterator(axes.values()), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+        var axis = _step12.value;
+
+        if ('start' in axis && 'stop' in axis && 'num' in axis) {
+          var arr = new Float64Array(axis.num);
+          var step = undefined;
+          if (axis.num === 1) {
+            if (axis.start !== axis.stop) {
+              throw new Error('regular axis of length 1 must have equal start/stop values');
+            }
+            step = 0;
+          } else {
+            step = (axis.stop - axis.start) / (axis.num - 1);
+          }
+          for (var i = 0; i < axis.num; i++) {
+            arr[i] = axis.start + i * step;
+          }
+
+          axis.values = arr;
+          delete axis.start;
+          delete axis.stop;
+          delete axis.num;
+        }
+
+        if (ArrayBuffer.isView(axis.values)) {
+          // already a typed array
+          continue;
+        }
+        if (Array.isArray(axis.values) && typeof axis.values[0] === 'number') {
+          var arr = new Float64Array(axis.values.length);
+          for (var i = 0; i < axis.values.length; i++) {
+            arr[i] = axis.values[i];
+          }
+          axis.values = arr;
+        }
+      }
+    } catch (err) {
+      _didIteratorError12 = true;
+      _iteratorError12 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion12 && _iterator12['return']) {
+          _iterator12['return']();
+        }
+      } finally {
+        if (_didIteratorError12) {
+          throw _iteratorError12;
+        }
+      }
+    }
+
+    var needsRangeAxisOrder = [].concat(_toConsumableArray(axes.values())).filter(function (axis) {
+      return axis.values.length > 1;
+    }).length > 1;
+    if (needsRangeAxisOrder && !domain.rangeAxisOrder) {
+      throw new Error('Domain requires "rangeAxisOrder"');
+    }
+
+    domain._rangeAxisOrder = domain.rangeAxisOrder || [].concat(_toConsumableArray(axes.keys()));
+    domain._rangeShape = domain._rangeAxisOrder.map(function (k) {
+      return axes.get(k).values.length;
+    });
+
+    domain.__transformDone = true;
+
+    return domain;
+  }
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_6) {
+      _Promise = _6['default'];
+    }, function (_3) {
+      _slicedToArray = _3['default'];
+    }, function (_7) {
+      _Math$trunc = _7['default'];
+    }, function (_4) {
+      _Map = _4['default'];
+    }, function (_5) {
+      _Object$keys = _5['default'];
+    }, function (_8) {
+      shallowcopy = _8.shallowcopy;
+      minMax = _8.minMax;
+      assert = _8.assert;
+      PREFIX = _8.PREFIX;
+    }, function (_9) {
+      load = _9.load;
+    }, function (_d) {
+      _toConsumableArray = _d['default'];
+    }, function (_e) {
+      _getIterator = _e['default'];
+    }, function (_e2) {
+      _Array$from = _e2['default'];
+    }, function (_f) {
+      ndarray = _f['default'];
+    }],
+    execute: function () {
+      /* */
+
+      /** 
+       * Wraps a CoverageJSON Coverage object as a Coverage API object.
+       * 
+       * @see https://github.com/Reading-eScience-Centre/coverage-jsapi
+       * 
+       */
+      'use strict';
+
+      Coverage = (function () {
+
+        /**
+         * @param {Object} covjson A CoverageJSON Coverage object.
+         * @param {boolean} cacheRanges
+         *   If true, then any range that was loaded remotely is cached.
+         *   (The domain is always cached.)
+         *                           
+         */
+
+        function Coverage(covjson) {
+          var cacheRanges = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+          _classCallCheck(this, Coverage);
+
+          this._covjson = covjson;
+          this._exposeLd(covjson);
+
+          /** @type {boolean} */
+          this.cacheRanges = cacheRanges;
+
+          this.id = covjson.id;
+
+          /** @type {Map} */
+          this.parameters = new _Map();
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = _getIterator(_Object$keys(covjson.parameters)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var key = _step.value;
+
+              transformParameter(covjson.parameters, key);
+              this.parameters.set(key, covjson.parameters[key]);
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator['return']) {
+                _iterator['return']();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          var profile = this._covjson.profile || 'Coverage';
+          if (profile.substr(0, 4) !== 'http') {
+            profile = PREFIX + profile;
+          }
+
+          /** @type {string} */
+          this.type = profile;
+
+          var domainProfile = undefined;
+          if (typeof this._covjson.domain === 'string') {
+            domainProfile = this._covjson.domainProfile || 'Domain';
+          } else {
+            domainProfile = this._covjson.domain.profile || 'Domain';
+          }
+
+          if (domainProfile.substr(0, 4) !== 'http') {
+            domainProfile = PREFIX + domainProfile;
+          }
+
+          /** @type {string} */
+          this.domainType = domainProfile;
+
+          /**
+           * A bounding box array with elements [westLon, southLat, eastLon, northLat].
+           * 
+           * @type {Array|undefined}
+           */
+          this.bbox = this._covjson.bbox;
+        }
+
+        _createClass(Coverage, [{
+          key: '_exposeLd',
+          value: function _exposeLd(covjson) {
+            if (!covjson['@context']) {
+              // no LD love here...
+              this.ld = {};
+              return;
+            }
+            // make a deep copy since the object gets modified in-place later
+            // but first, remove domain and range which may be embedded
+            var copy = shallowcopy(covjson);
+            delete copy.domain;
+            delete copy.ranges;
+            this.ld = JSON.parse(JSON.stringify(copy));
+          }
+
+          /**
+           * @return {Promise}
+           */
+        }, {
+          key: 'loadDomain',
+          value: function loadDomain() {
+            var _this = this;
+
+            var domainOrUrl = this._covjson.domain;
+            if (this._domainPromise) return this._domainPromise;
+            var promise = undefined;
+            if (typeof domainOrUrl === 'object') {
+              var domain = domainOrUrl;
+              transformDomain(domain);
+              promise = _Promise.resolve(domain);
+            } else {
+              var url = domainOrUrl;
+              promise = load(url).then(function (result) {
+                var domain = result.data;
+                transformDomain(domain);
+                _this._covjson.domain = domain;
+                return domain;
+              });
+            }
+            /* The promise gets cached so that the domain is not loaded twice remotely.
+             * This might otherwise happen when loadDomain and loadRange is used
+             * with Promise.all(). Remember that loadRange also invokes loadDomain.
+             */
+            this._domainPromise = promise;
+            return promise;
+          }
+
+          /**
+           * Returns the requested range data as a Promise.
+           * 
+           * Note that this method implicitly loads the domain as well. 
+           * 
+           * @example
+           * cov.loadRange('salinity').then(function (sal) {
+           *   // work with Range object
+           * }).catch(function (e) {
+           *   // there was an error when loading the range
+           *   console.log(e.message)
+           * }) 
+           * @param {string} paramKey The key of the Parameter for which to load the range.
+           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Range object.
+           */
+        }, {
+          key: 'loadRange',
+          value: function loadRange(paramKey) {
+            var _this2 = this;
+
+            // Since the shape of the range array is derived from the domain, it has to be loaded as well.
+            return this.loadDomain().then(function (domain) {
+              var rangeOrUrl = _this2._covjson.ranges[paramKey];
+              if (typeof rangeOrUrl === 'object') {
+                var range = rangeOrUrl;
+                transformRange(range, domain);
+                return _Promise.resolve(range);
+              } else {
+                var url = rangeOrUrl;
+                return load(url).then(function (result) {
+                  var range = result.data;
+                  transformRange(range, domain);
+                  if (_this2.cacheRanges) {
+                    _this2._covjson.ranges[paramKey] = range;
+                  }
+                  return range;
+                });
+              }
+            });
+          }
+
+          /**
+           * Returns the requested range data as a Promise.
+           * 
+           * Note that this method implicitly loads the domain as well. 
+           * 
+           * @example
+           * cov.loadRanges(['salinity','temp']).then(function (ranges) {
+           *   // work with Map object
+           *   console.log(ranges.get('salinity').values)
+           * }).catch(function (e) {
+           *   // there was an error when loading the range data
+           *   console.log(e)
+           * }) 
+           * @param {iterable} [paramKeys] An iterable of parameter keys for which to load the range data. If not given, loads all range data.
+           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Map object.
+           */
+        }, {
+          key: 'loadRanges',
+          value: function loadRanges(paramKeys) {
+            var _this3 = this;
+
+            if (paramKeys === undefined) paramKeys = this.parameters.keys();
+            paramKeys = _Array$from(paramKeys);
+            return _Promise.all(paramKeys.map(function (k) {
+              return _this3.loadRange(k);
+            })).then(function (ranges) {
+              var map = new _Map();
+              for (var i = 0; i < paramKeys.length; i++) {
+                map.set(paramKeys[i], ranges[i]);
+              }
+              return map;
+            });
+          }
+
+          /**
+           * Returns a Promise object which provides a copy of this Coverage object
+           * with the domain subsetted by the given indices specification.
+           * 
+           * Note that the coverage type and/or domain type of the resulting coverage
+           * may be different than in the original coverage.
+           * 
+           * Note that the subsetted ranges are a view over the original ranges, meaning
+           * that no copying is done but also no memory is released if the original
+           * coverage is garbage collected.
+           * 
+           * @example
+           * cov.subsetByIndex({t: 4, z: {start: 10, stop: 20}, x: [0,1,2] }).then(function(subsetCov) {
+           *   // work with subsetted coverage
+           * })
+           * @param {Object} constraints An object which describes the subsetting constraints.
+           *   Every property of it refers to an axis name as defined in Domain.names,
+           *   and its value must either be an integer, an array of integers,
+           *   or an object with start, stop, and optionally step (defaults to 1) properties
+           *   whose values are integers.
+           *   Properties that have the values undefined or null are ignored. 
+           *   All integers must be non-negative, step must not be zero.
+           *   A simple integer constrains the axis to the given index, an array to a list of indices,
+           *   and a start/stop/step object to a range of indices:
+           *   If step=1, this includes all indices starting at start and ending at stop (exclusive);
+           *   if step>1, all indices start, start + step, ..., start + (q + r - 1) step where 
+           *   q and r are the quotient and remainder obtained by dividing stop - start by step.
+           * @returns {Promise} A Promise object with the subsetted coverage object as result.
+           */
+        }, {
+          key: 'subsetByIndex',
+          value: function subsetByIndex(constraints) {
+            var _this4 = this;
+
+            return this.loadDomain().then(function (domain) {
+              // check and normalize constraints to simplify code and to allow more optimization
+              constraints = shallowcopy(constraints);
+              var isConsecutive = function isConsecutive(arr) {
+                var last = arr[0] - 1;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                  for (var _iterator2 = _getIterator(arr), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var el = _step2.value;
+
+                    if (el !== last + 1) {
+                      return false;
+                    }
+                    last = el;
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+
+                return true;
+              };
+              for (var axisName in constraints) {
+                if (!domain.axes.has(axisName)) {
+                  // TODO clarify this behaviour in the JS API spec
+                  delete constraints[axisName];
+                  continue;
+                }
+                if (constraints[axisName] === undefined || constraints[axisName] === null) {
+                  delete constraints[axisName];
+                  continue;
+                }
+                if (Array.isArray(constraints[axisName])) {
+                  var constraint = constraints[axisName];
+                  // range subsetting can be done with fast ndarray views if single indices or slicing objects are used
+                  // therefore, we try to transform some common cases into those forms
+                  if (constraint.length === 1) {
+                    // transform 1-element arrays into a number
+                    constraints[axisName] = constraint[0];
+                  } else if (isConsecutive(constraint)) {
+                    // transform arrays of consecutive indices into start, stop object
+                    constraints[axisName] = { start: constraint[0], stop: constraint[constraint.length - 1] + 1 };
+                  }
+                }
+                if (typeof constraints[axisName] === 'number') {
+                  var constraint = constraints[axisName];
+                  constraints[axisName] = { start: constraint, stop: constraint + 1 };
+                }
+                if (!Array.isArray(constraints[axisName])) {
+                  var _constraints$axisName = constraints[axisName];
+                  var _constraints$axisName$start = _constraints$axisName.start;
+                  var start = _constraints$axisName$start === undefined ? 0 : _constraints$axisName$start;
+                  var _constraints$axisName$stop = _constraints$axisName.stop;
+
+                  var _stop = _constraints$axisName$stop === undefined ? domain.axes.get(axisName).values.length : _constraints$axisName$stop;
+
+                  var _constraints$axisName$step = _constraints$axisName.step;
+                  var step = _constraints$axisName$step === undefined ? 1 : _constraints$axisName$step;
+
+                  if (step <= 0) {
+                    throw new Error('Invalid constraint for ' + axisName + ': step=' + step + ' must be > 0');
+                  }
+                  if (start >= _stop || start < 0) {
+                    throw new Error('Invalid constraint for ' + axisName + ': stop=' + _stop + ' must be > start=' + start + ' and both >= 0');
+                  }
+                  constraints[axisName] = { start: start, stop: _stop, step: step };
+                }
+              }
+              var _iteratorNormalCompletion3 = true;
+              var _didIteratorError3 = false;
+              var _iteratorError3 = undefined;
+
+              try {
+                for (var _iterator3 = _getIterator(domain.axes.keys()), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                  var axisName = _step3.value;
+
+                  if (!(axisName in constraints)) {
+                    var len = domain.axes.get(axisName).values.length;
+                    constraints[axisName] = { start: 0, stop: len, step: 1 };
+                  }
+                }
+
+                // After normalization, all constraints are either arrays or start,stop,step objects.
+                // For all start,stop,step objects, it holds that stop > start, step > 0, start >= 0, stop >= 1.
+                // For each axis, a constraint exists.
+
+                // subset the axis arrays of the domain (immediately + cached)
+              } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                    _iterator3['return']();
+                  }
+                } finally {
+                  if (_didIteratorError3) {
+                    throw _iteratorError3;
+                  }
+                }
+              }
+
+              var newdomain = shallowcopy(domain);
+              newdomain.axes = new _Map(newdomain.axes);
+              newdomain._rangeShape = domain._rangeShape.slice(); // deep copy
+
+              var _iteratorNormalCompletion4 = true;
+              var _didIteratorError4 = false;
+              var _iteratorError4 = undefined;
+
+              try {
+                var _loop = function () {
+                  var axisName = _step4.value;
+
+                  var coords = domain.axes.get(axisName).values;
+                  var isTypedArray = ArrayBuffer.isView(coords);
+                  var constraint = constraints[axisName];
+                  var newcoords = undefined;
+                  if (Array.isArray(constraint)) {
+                    if (isTypedArray) {
+                      newcoords = new coords.constructor(constraint.length);
+                      for (var i = 0; i < constraint.length; i++) {
+                        newcoords[i] = coords[constraint[i]];
+                      }
+                    } else {
+                      newcoords = constraint.map(function (i) {
+                        return coords[i];
+                      });
+                    }
+                  } else {
+                    var start = constraint.start;
+                    var _stop2 = constraint.stop;
+                    var step = constraint.step;
+
+                    if (start === 0 && _stop2 === coords.length && step === 1) {
+                      newcoords = coords;
+                    } else if (step === 1 && isTypedArray) {
+                      newcoords = coords.subarray(start, _stop2);
+                    } else {
+                      var q = _Math$trunc((_stop2 - start) / step);
+                      var r = (_stop2 - start) % step;
+                      var len = q + r;
+                      newcoords = new coords.constructor(len); // array or typed array
+                      for (var i = start, j = 0; i < _stop2; i += step, j++) {
+                        newcoords[j] = coords[i];
+                      }
+                    }
+                  }
+                  var newaxis = shallowcopy(domain.axes.get(axisName));
+                  newaxis.values = newcoords;
+                  newdomain.axes.set(axisName, newaxis);
+                  newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = newcoords.length;
+                };
+
+                for (var _iterator4 = _getIterator(_Object$keys(constraints)), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                  _loop();
+                }
+
+                // subset the ndarrays of the ranges (on request)
+              } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                    _iterator4['return']();
+                  }
+                } finally {
+                  if (_didIteratorError4) {
+                    throw _iteratorError4;
+                  }
+                }
+              }
+
+              var rangeWrapper = function rangeWrapper(range) {
+                var ndarr = range._ndarr;
+
+                var newndarr = undefined;
+                if (_Object$keys(constraints).some(function (ax) {
+                  return Array.isArray(constraints[ax]);
+                })) {
+                  // There is a list of indices for at least one axis.
+                  // In that case we cannot directly use SciJS's slicing operations.
+
+                  // TODO implement
+                  throw new Error('not implemented yet');
+                } else {
+                  var _ndarr$hi$lo, _ndarr$hi;
+
+                  // fast ndarray view
+                  var axisNames = domain._rangeAxisOrder;
+                  var los = axisNames.map(function (name) {
+                    return constraints[name].start;
+                  });
+                  var his = axisNames.map(function (name) {
+                    return constraints[name].stop;
+                  });
+                  var steps = axisNames.map(function (name) {
+                    return constraints[name].step;
+                  });
+                  newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
+                }
+
+                var newrange = shallowcopy(range);
+                newrange._ndarr = newndarr;
+                newrange.shape = new _Map();
+                var _iteratorNormalCompletion5 = true;
+                var _didIteratorError5 = false;
+                var _iteratorError5 = undefined;
+
+                try {
+                  for (var _iterator5 = _getIterator(domain.axes.keys()), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var axisName = _step5.value;
+
+                    newrange.shape.set(axisName, newdomain.axes.get(axisName).values.length);
+                  }
+                } catch (err) {
+                  _didIteratorError5 = true;
+                  _iteratorError5 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+                      _iterator5['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError5) {
+                      throw _iteratorError5;
+                    }
+                  }
+                }
+
+                newrange.get = createRangeGetFunction(newndarr, domain._rangeAxisOrder);
+
+                return newrange;
+              };
+
+              var loadRange = function loadRange(key) {
+                return _this4.loadRange(key).then(rangeWrapper);
+              };
+
+              // we wrap loadRanges as well in case it was overridden from the outside
+              // (in which case we could not be sure that it invokes loadRange() and uses the wrapper)
+              var loadRanges = function loadRanges(keys) {
+                return _this4.loadRanges(keys).then(function (ranges) {
+                  return new _Map([].concat(_toConsumableArray(ranges)).map(function (_ref) {
+                    var _ref2 = _slicedToArray(_ref, 2);
+
+                    var key = _ref2[0];
+                    var range = _ref2[1];
+                    return [key, rangeWrapper(range)];
+                  }));
+                });
+              };
+
+              // assemble everything to a new coverage
+              var newcov = shallowcopy(_this4);
+              newcov.loadDomain = function () {
+                return _Promise.resolve(newdomain);
+              };
+              newcov.loadRange = loadRange;
+              newcov.loadRanges = loadRanges;
+              // FIXME subsetByIndex does not exist in the subsetted coverage
+              return newcov;
+            });
+          }
+        }]);
+
+        return Coverage;
+      })();
+
+      _export('default', Coverage);
+    }
+  };
+});
+
+$__System.register('5f', ['10', '40', '43', '3f', '3e'], function (_export) {
+  var _Promise, assert, load, Coverage, CoverageCollection;
+
+  /**
+   * Reads a CoverageJSON document and returns a {@link Promise} that succeeds with
+   * a {@link Coverage} or {@link CoverageCollection} object.
+   * 
+   * Note that if the document references external domain or range documents,
+   * then these are not loaded immediately. 
+   * 
+   * 
+   * @example <caption>ES6 module</caption>
+   * read('http://example.com/coverage.covjson').then(cov => {
+   *   // work with Coverage object
+   * }).catch(e => {
+   *   // there was an error when loading the coverage
+   *   console.log(e)
+   * })
+   * @example <caption>ES5 global</caption>
+   * CovJSON.read('http://example.com/coverage.covjson').then(function (cov) {
+   *   // work with Coverage object
+   * }).catch(function (e) {
+   *   // there was an error when loading the coverage
+   *   console.log(e)
+   * })
+   * @param {Object|string} input 
+   *    Either a URL pointing to a CoverageJSON Coverage or Coverage Collection document
+   *    or a CoverageJSON Coverage or Coverage Collection object.
+   * @return {Promise} 
+   *    A promise object succeeding with a {@link Coverage} or {@link CoverageCollection} object,
+   *    and failing with an {@link Error} object.
+   */
+
+  function read(input) {
+    if (typeof input === 'object') {
+      return _Promise.resolve(transformCovJSON(input));
+    } else {
+      // it's a URL, load it
+      return load(input).then(function (_ref) {
+        var data = _ref.data;
+        var headers = _ref.headers;
+        return transformCovJSON(data, headers);
+      });
+    }
+  }
+
+  /**
+   * Transforms a CoverageJSON object into one or more Coverage objects.
+   *  
+   * @param obj A CoverageJSON object of type Coverage or CoverageCollection.
+   * @param headers An optional array of HTTP headers.
+   * @return {Coverage|Array of Coverage}
+   */
+  function transformCovJSON(obj, headers) {
+    checkValidCovJSON(obj);
+    if (obj.type !== 'Coverage' && obj.type !== 'CoverageCollection') {
+      throw new Error('CoverageJSON document must be of Coverage or CoverageCollection type');
+    }
+
+    var result = undefined;
+    if (obj.type === 'Coverage') {
+      result = new Coverage(obj);
+    } else {
+      result = new CoverageCollection(obj);
+    }
+
+    addLinkRelations(result, headers);
+
+    return result;
+  }
+
+  /**
+   * Scans the supplied HTTP headers for Link relations and adds them
+   * to the .ld property of the Coverage/CoverageCollection.
+   */
+  function addLinkRelations(cov, headers) {}
+  // TODO implement
+
+  /**
+   * Performs basic structural checks to validate whether a given object is a CoverageJSON object.
+   * 
+   * Note that this method is not comprehensive and should not be used for checking
+   * whether an object fully conforms to the CoverageJSON specification.
+   * 
+   * @param obj
+   * @throws {Error} when obj is not a valid CoverageJSON document 
+   */
+  function checkValidCovJSON(obj) {
+    assert('type' in obj, '"type" missing');
+    if (obj.type === 'Coverage') {
+      assert('parameters' in obj, '"parameters" missing');
+      assert('domain' in obj, '"domain" missing');
+      assert('ranges' in obj, '"ranges" missing');
+    } else if (obj.type === 'CoverageCollection') {
+      assert(Array.isArray(obj.coverages), '"coverages" must be an array');
+    }
+  }
+  return {
+    setters: [function (_) {
+      _Promise = _['default'];
+    }, function (_2) {
+      assert = _2.assert;
+    }, function (_3) {
+      var _exportObj3 = {};
+      load = _3.load;
+      _exportObj3['load'] = _3.load;
+
+      _export(_exportObj3);
+    }, function (_f) {
+      Coverage = _f['default'];
+    }, function (_e) {
+      CoverageCollection = _e['default'];
+    }],
+    execute: function () {
+      /* */
+      'use strict';
+
+      _export('read', read);
+    }
+  };
+});
+
+$__System.register("37", ["5f"], function (_export) {
+  "use strict";
+
+  return {
+    setters: [function (_f) {
+      var _exportObj = {};
+
+      for (var _key in _f) {
+        if (_key !== "default") _exportObj[_key] = _f[_key];
+      }
+
+      _exportObj["default"] = _f["default"];
+
+      _export(_exportObj);
+    }],
+    execute: function () {}
+  };
+});
+
+$__System.register('60', ['7', '8', '37'], function (_export) {
+  var _createClass, _classCallCheck, CovJSON, MEDIA_TYPES, CovJSONLoader;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      CovJSON = _3;
+    }],
+    execute: function () {
+      'use strict';
+
+      MEDIA_TYPES = ['application/prs.coverage+json', 'application/prs.coverage+cbor'];
+
+      CovJSONLoader = (function () {
+        function CovJSONLoader() {
+          _classCallCheck(this, CovJSONLoader);
+        }
+
+        _createClass(CovJSONLoader, [{
+          key: 'supports',
+          value: function supports(mediaType) {
+            return MEDIA_TYPES.indexOf(mediaType) !== -1;
+          }
+
+          /**
+           * @param urlOrObject Either a URL or a CovJSON object.
+           * @returns {Object} An object with metadata.
+           */
+        }, {
+          key: 'loadMetadata',
+          value: function loadMetadata(urlOrObject) {
+            var _this = this;
+
+            return CovJSON.read(urlOrObject).then(function (cov) {
+              return _this._extractMetadata(cov);
+            });
+          }
+        }, {
+          key: '_extractMetadata',
+          value: function _extractMetadata(cov) {
+            return {
+              loader: this,
+              format: 'CovJSON',
+              type: cov.type
+            };
+          }
+        }]);
+
+        return CovJSONLoader;
+      })();
+
+      _export('default', CovJSONLoader);
+    }
+  };
+});
+
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+/^u/.test(typeof define) && function(a) {
+  var b = this.require = function(b) {
+    return a[b];
+  };
+  this.define = function(c, d) {
+    a[c] = a[c] || d(b);
+  };
+}({}), define("61", [], function() {
+  function a(a) {
+    return a.substr(0, 3);
+  }
+  function b(a) {
+    return a != Fa ? "" + a : "";
+  }
+  function c(a) {
+    return "string" == typeof a;
+  }
+  function d(a) {
+    return !!a && "object" == typeof a;
+  }
+  function e(a) {
+    return a && a.nodeType;
+  }
+  function f(a) {
+    return "number" == typeof a;
+  }
+  function g(a) {
+    return d(a) && !!a.getDay;
+  }
+  function h(a) {
+    return !0 === a || !1 === a;
+  }
+  function i(a) {
+    var b = typeof a;
+    return "object" == b ? !(!a || !a.getDay) : "string" == b || "number" == b || h(a);
+  }
+  function j(a) {
+    return a;
+  }
+  function k(a) {
+    return a + 1;
+  }
+  function l(a, c, d) {
+    return b(a).replace(c, d != Fa ? d : "");
+  }
+  function m(a) {
+    return l(a, /[\\\[\]\/{}()*+?.$|^-]/g, "\\$&");
+  }
+  function n(a) {
+    return l(a, /^\s+|\s+$/g);
+  }
+  function o(a, b, c) {
+    for (var d in a)
+      a.hasOwnProperty(d) && b.call(c || a, d, a[d]);
+    return a;
+  }
+  function p(a, b, c) {
+    if (a)
+      for (var d = 0; d < a.length; d++)
+        b.call(c || a, a[d], d);
+    return a;
+  }
+  function q(a, b, c) {
+    var d = [],
+        e = ea(b) ? b : function(a) {
+          return b != a;
+        };
+    return p(a, function(b, f) {
+      e.call(c || a, b, f) && d.push(b);
+    }), d;
+  }
+  function r(a, b, c, d) {
+    var e = [];
+    return a(b, function(a, f) {
+      fa(a = c.call(d || b, a, f)) ? p(a, function(a) {
+        e.push(a);
+      }) : a != Fa && e.push(a);
+    }), e;
+  }
+  function s(a, b, c) {
+    return r(p, a, b, c);
+  }
+  function t(a) {
+    var b = 0;
+    return o(a, function() {
+      b++;
+    }), b;
+  }
+  function u(a) {
+    var b = [];
+    return o(a, function(a) {
+      b.push(a);
+    }), b;
+  }
+  function v(a, b, c) {
+    var d = [];
+    return p(a, function(e, f) {
+      d.push(b.call(c || a, e, f));
+    }), d;
+  }
+  function w(a, b) {
+    if (fa(a)) {
+      var c = wa(b);
+      return M(G(a, 0, c.length), c);
+    }
+    return b != Fa && a.substr(0, b.length) == b;
+  }
+  function x(a, b) {
+    if (fa(a)) {
+      var c = wa(b);
+      return M(G(a, -c.length), c) || !c.length;
+    }
+    return b != Fa && a.substr(a.length - b.length) == b;
+  }
+  function y(a) {
+    var b = a.length;
+    return fa(a) ? new va(v(a, function() {
+      return a[--b];
+    })) : l(a, /[\s\S]/g, function() {
+      return a.charAt(--b);
+    });
+  }
+  function z(a, b) {
+    var c = {};
+    return p(a, function(a) {
+      c[a] = b;
+    }), c;
+  }
+  function A(a, b) {
+    var c,
+        d = b || {};
+    for (c in a)
+      d[c] = a[c];
+    return d;
+  }
+  function B(a, b) {
+    for (var c = b,
+        d = 0; d < a.length; d++)
+      c = A(a[d], c);
+    return c;
+  }
+  function C(a) {
+    return ea(a) ? a : function(b, c) {
+      return a === b ? c : void 0;
+    };
+  }
+  function D(a, b, c) {
+    return b == Fa ? c : 0 > b ? Math.max(a.length + b, 0) : Math.min(a.length, b);
+  }
+  function E(a, b, c, d) {
+    b = C(b), d = D(a, d, a.length);
+    for (var e = D(a, c, 0); d > e; e++)
+      if ((c = b.call(a, a[e], e)) != Fa)
+        return c;
+  }
+  function F(a, b, c, d) {
+    b = C(b), d = D(a, d, -1);
+    for (var e = D(a, c, a.length - 1); e > d; e--)
+      if ((c = b.call(a, a[e], e)) != Fa)
+        return c;
+  }
+  function G(a, b, c) {
+    var d = [];
+    if (a)
+      for (c = D(a, c, a.length), b = D(a, b, 0); c > b; b++)
+        d.push(a[b]);
+    return d;
+  }
+  function H(a) {
+    return v(a, j);
+  }
+  function I(a) {
+    return function() {
+      return new va(O(a, arguments));
+    };
+  }
+  function J(a) {
+    var b = {};
+    return q(a, function(a) {
+      return b[a] ? !1 : b[a] = 1;
+    });
+  }
+  function K(a, b) {
+    var c = z(b, 1);
+    return q(a, function(a) {
+      var b = c[a];
+      return c[a] = 0, b;
+    });
+  }
+  function L(a, b) {
+    for (var c = 0; c < a.length; c++)
+      if (a[c] == b)
+        return !0;
+    return !1;
+  }
+  function M(a, b) {
+    var c,
+        d = ea(a) ? a() : a,
+        e = ea(b) ? b() : b;
+    return d == e ? !0 : d == Fa || e == Fa ? !1 : i(d) || i(e) ? g(d) && g(e) && +d == +e : fa(d) ? d.length == e.length && !E(d, function(a, b) {
+      return M(a, e[b]) ? void 0 : !0;
+    }) : !fa(e) && (c = u(d)).length == t(e) && !E(c, function(a) {
+      return M(d[a], e[a]) ? void 0 : !0;
+    });
+  }
+  function N(a, b, c) {
+    return ea(a) ? a.apply(c && b, v(c || b, j)) : void 0;
+  }
+  function O(a, b, c) {
+    return v(a, function(a) {
+      return N(a, b, c);
+    });
+  }
+  function P(a, b, c, d) {
+    return function() {
+      return N(a, b, s([c, arguments, d], j));
+    };
+  }
+  function Q(a, b) {
+    for (var c = 0 > b ? "-" : "",
+        d = (c ? -b : b).toFixed(0); d.length < a; )
+      d = "0" + d;
+    return c + d;
+  }
+  function R(a, b, c) {
+    var d,
+        e = 0,
+        f = c ? b : y(b);
+    return a = (c ? a : y(a)).replace(/./g, function(a) {
+      return "0" == a ? (d = !1, f.charAt(e++) || "0") : "#" == a ? (d = !0, f.charAt(e++) || "") : d && !f.charAt(e) ? "" : a;
+    }), c ? a : b.substr(0, b.length - e) + y(a);
+  }
+  function S(a, b, c) {
+    return b != Fa && a ? 60 * parseFloat(a[b] + a[b + 1]) + parseFloat(a[b] + a[b + 2]) + c.getTimezoneOffset() : 0;
+  }
+  function T(a) {
+    return new Date(+a);
+  }
+  function U(a, b, c) {
+    return a["set" + b](a["get" + b]() + c), a;
+  }
+  function V(a, b, c) {
+    return c == Fa ? V(new Date, a, b) : U(T(a), b.charAt(0).toUpperCase() + b.substr(1), c);
+  }
+  function W(a, b, c) {
+    var d = +b,
+        e = +c,
+        f = e - d;
+    if (0 > f)
+      return -W(a, c, b);
+    if (b = {
+      milliseconds: 1,
+      seconds: 1e3,
+      minutes: 6e4,
+      hours: 36e5
+    }[a])
+      return f / b;
+    for (b = a.charAt(0).toUpperCase() + a.substr(1), a = Math.floor(f / {
+      fullYear: 31536e6,
+      month: 2628e6,
+      date: 864e5
+    }[a] - 2), d = U(new Date(d), b, a), f = a; 1.2 * a + 4 > f; f++)
+      if (+U(d, b, 1) > e)
+        return f;
+  }
+  function X(a) {
+    return "\\u" + ("0000" + a.charCodeAt(0).toString(16)).slice(-4);
+  }
+  function Y(a) {
+    return l(a, /[\x00-\x1f'"\u2028\u2029]/g, X);
+  }
+  function Z(a, b) {
+    return a.split(b);
+  }
+  function $(a, b) {
+    function c(a, c) {
+      var d = [];
+      return e.call(c || a, a, function(a, b) {
+        fa(a) ? p(a, function(a, c) {
+          b.call(a, a, c);
+        }) : o(a, function(a, c) {
+          b.call(c, a, c);
+        });
+      }, b || j, function() {
+        N(d.push, d, arguments);
+      }, wa), d.join("");
+    }
+    if (Ma[a])
+      return Ma[a];
+    var d = "with(_.isObject(obj)?obj:{}){" + v(Z(a, /{{|}}}?/g), function(a, b) {
+      var c,
+          d = n(a),
+          e = l(d, /^{/),
+          d = d == e ? "esc(" : "";
+      return b % 2 ? (c = /^each\b(\s+([\w_]+(\s*,\s*[\w_]+)?)\s*:)?(.*)/.exec(e)) ? "each(" + (n(c[4]) ? c[4] : "this") + ", function(" + c[2] + "){" : (c = /^if\b(.*)/.exec(e)) ? "if(" + c[1] + "){" : (c = /^else\b\s*(if\b(.*))?/.exec(e)) ? "}else " + (c[1] ? "if(" + c[2] + ")" : "") + "{" : (c = /^\/(if)?/.exec(e)) ? c[1] ? "}\n" : "});\n" : (c = /^(var\s.*)/.exec(e)) ? c[1] + ";" : (c = /^#(.*)/.exec(e)) ? c[1] : (c = /(.*)::\s*(.*)/.exec(e)) ? "print(" + d + '_.formatValue("' + Y(c[2]) + '",' + (n(c[1]) ? c[1] : "this") + (d && ")") + "));\n" : "print(" + d + (n(e) ? e : "this") + (d && ")") + ");\n" : a ? 'print("' + Y(a) + '");\n' : void 0;
+    }).join("") + "}",
+        e = Function("obj", "each", "esc", "print", "_", d);
+    return 99 < Na.push(c) && delete Ma[Na.shift()], Ma[a] = c;
+  }
+  function _(a) {
+    return l(a, /[<>'"&]/g, function(a) {
+      return "&#" + a.charCodeAt(0) + ";";
+    });
+  }
+  function aa(a, b) {
+    return $(a, _)(b);
+  }
+  function ba(a) {
+    return function(b, c) {
+      return new va(a(this, b, c));
+    };
+  }
+  function ca(a) {
+    return function(b, c, d) {
+      return a(this, b, c, d);
+    };
+  }
+  function da(a) {
+    return function(b, c, d) {
+      return new va(a(b, c, d));
+    };
+  }
+  function ea(a) {
+    return "function" == typeof a && !a.item;
+  }
+  function fa(a) {
+    return a && a.length != Fa && !c(a) && !e(a) && !ea(a) && a !== ya;
+  }
+  function ga(a) {
+    return parseFloat(l(a, /^[^\d-]+/));
+  }
+  function ha(a) {
+    return a.Nia = a.Nia || ++Ba;
+  }
+  function ia(a, b) {
+    var c,
+        d = [],
+        e = {};
+    return sa(a, function(a) {
+      sa(b(a), function(a) {
+        e[c = ha(a)] || (d.push(a), e[c] = !0);
+      });
+    }), d;
+  }
+  function ja(a, b) {
+    var c = {
+      $position: "absolute",
+      $visibility: "hidden",
+      $display: "block",
+      $height: Fa
+    },
+        d = a.get(c),
+        c = a.set(c).get("clientHeight");
+    return a.set(d), c * b + "px";
+  }
+  function ka(a) {
+    Ca ? Ca.push(a) : setTimeout(a, 0);
+  }
+  function la(a, b, c) {
+    return pa(a, b, c)[0];
+  }
+  function ma(a, b, c) {
+    return a = oa(document.createElement(a)), fa(b) || b != Fa && !d(b) ? a.add(b) : a.set(b).add(c);
+  }
+  function na(a) {
+    return r(sa, a, function(a) {
+      return fa(a) ? na(a) : (e(a) && (a = a.cloneNode(!0), a.removeAttribute && a.removeAttribute("id")), a);
+    });
+  }
+  function oa(a, b, c) {
+    return ea(a) ? ka(a) : new va(pa(a, b, c));
+  }
+  function pa(a, b, d) {
+    function f(a) {
+      return fa(a) ? r(sa, a, f) : a;
+    }
+    function g(a) {
+      return q(r(sa, a, f), function(a) {
+        for (; a = a.parentNode; )
+          if (a == b[0] || d)
+            return a == b[0];
+      });
+    }
+    return b ? 1 != (b = pa(b)).length ? ia(b, function(b) {
+      return pa(a, b, d);
+    }) : c(a) ? 1 != e(b[0]) ? [] : d ? g(b[0].querySelectorAll(a)) : b[0].querySelectorAll(a) : g(a) : c(a) ? document.querySelectorAll(a) : r(sa, a, f);
+  }
+  function qa(a, b) {
+    function d(a, b) {
+      var c = RegExp("(^|\\s+)" + a + "(?=$|\\s)", "i");
+      return function(d) {
+        return a ? c.test(d[b]) : !0;
+      };
+    }
+    var g,
+        h,
+        i = {},
+        j = i;
+    return ea(a) ? a : f(a) ? function(b, c) {
+      return c == a;
+    } : !a || "*" == a || c(a) && (j = /^([\w-]*)\.?([\w-]*)$/.exec(a)) ? (g = d(j[1], "tagName"), h = d(j[2], "className"), function(a) {
+      return 1 == e(a) && g(a) && h(a);
+    }) : b ? function(c) {
+      return oa(a, b).find(c) != Fa;
+    } : (oa(a).each(function(a) {
+      i[ha(a)] = !0;
+    }), function(a) {
+      return i[ha(a)];
+    });
+  }
+  function ra(a) {
+    var b = qa(a);
+    return function(a) {
+      return b(a) ? Fa : !0;
+    };
+  }
+  function sa(a, b) {
+    return fa(a) ? p(a, b) : a != Fa && b(a, 0), a;
+  }
+  function ta() {
+    this.state = null, this.values = [], this.parent = null;
+  }
+  function ua() {
+    var a,
+        b,
+        c = [],
+        e = arguments,
+        f = e.length,
+        g = 0,
+        h = 0,
+        i = new ta;
+    return i.errHandled = function() {
+      h++, i.parent && i.parent.errHandled();
+    }, a = i.fire = function(a, b) {
+      return null == i.state && null != a && (i.state = !!a, i.values = fa(b) ? b : [b], setTimeout(function() {
+        p(c, function(a) {
+          a();
+        });
+      }, 0)), i;
+    }, p(e, function j(b, c) {
+      try {
+        b.then ? b.then(function(b) {
+          (d(b) || ea(b)) && ea(b.then) ? j(b, c) : (i.values[c] = H(arguments), ++g == f && a(!0, 2 > f ? i.values[c] : i.values));
+        }, function() {
+          i.values[c] = H(arguments), a(!1, 2 > f ? i.values[c] : [i.values[c][0], i.values, c]);
+        }) : b(function() {
+          a(!0, H(arguments));
+        }, function() {
+          a(!1, H(arguments));
+        });
+      } catch (e) {
+        a(!1, [e, i.values, c]);
+      }
+    }), i.stop = function() {
+      return p(e, function(a) {
+        a.stop && a.stop();
+      }), i.stop0 && N(i.stop0);
+    }, b = i.then = function(a, b) {
+      function e() {
+        try {
+          var c = i.state ? a : b;
+          ea(c) ? function g(a) {
+            try {
+              var b,
+                  c = 0;
+              if ((d(a) || ea(a)) && ea(b = a.then)) {
+                if (a === f)
+                  throw new TypeError;
+                b.call(a, function(a) {
+                  c++ || g(a);
+                }, function(a) {
+                  c++ || f.fire(!1, [a]);
+                }), f.stop0 = a.stop;
+              } else
+                f.fire(!0, [a]);
+            } catch (e) {
+              if (!c++ && (f.fire(!1, [e]), !h))
+                throw e;
+            }
+          }(N(c, xa, i.values)) : f.fire(i.state, i.values);
+        } catch (e) {
+          if (f.fire(!1, [e]), !h)
+            throw e;
+        }
+      }
+      var f = ua();
+      return ea(b) && i.errHandled(), f.stop0 = i.stop, f.parent = i, null != i.state ? setTimeout(e, 0) : c.push(e), f;
+    }, i.always = function(a) {
+      return b(a, a);
+    }, i.error = function(a) {
+      return b(0, a);
+    }, i;
+  }
+  function va(a, b) {
+    var c,
+        d,
+        e,
+        f,
+        g,
+        h = 0;
+    if (a)
+      for (c = 0, d = a.length; d > c; c++)
+        if (e = a[c], b && fa(e))
+          for (f = 0, g = e.length; g > f; f++)
+            this[h++] = e[f];
+        else
+          this[h++] = e;
+    else
+      this[h++] = b;
+    this.length = h, this._ = !0;
+  }
+  function wa() {
+    return new va(arguments, !0);
+  }
+  var xa,
+      ya = window,
+      za = {},
+      Aa = {},
+      Ba = 1,
+      Ca = /^[ic]/.test(document.readyState) ? Fa : [],
+      Da = {},
+      Ea = 0,
+      Fa = null,
+      Ga = Z("January,February,March,April,May,June,July,August,September,October,November,December", /,/g),
+      Ha = v(Ga, a),
+      Ia = Z("Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday", /,/g),
+      Ja = v(Ia, a),
+      Ka = {
+        y: ["FullYear", j],
+        Y: ["FullYear", function(a) {
+          return a % 100;
+        }],
+        M: ["Month", k],
+        n: ["Month", Ha],
+        N: ["Month", Ga],
+        d: ["Date", j],
+        m: ["Minutes", j],
+        H: ["Hours", j],
+        h: ["Hours", function(a) {
+          return a % 12 || 12;
+        }],
+        k: ["Hours", k],
+        K: ["Hours", function(a) {
+          return a % 12;
+        }],
+        s: ["Seconds", j],
+        S: ["Milliseconds", j],
+        a: ["Hours", Z("am,am,am,am,am,am,am,am,am,am,am,am,pm,pm,pm,pm,pm,pm,pm,pm,pm,pm,pm,pm", /,/g)],
+        w: ["Day", Ja],
+        W: ["Day", Ia],
+        z: ["TimezoneOffset", function(a, b, c) {
+          return c ? c : (b = 0 > a ? -a : a, (a > 0 ? "-" : "+") + Q(2, Math.floor(b / 60)) + Q(2, b % 60));
+        }]
+      },
+      La = {
+        y: 0,
+        Y: [0, -2e3],
+        M: [1, 1],
+        n: [1, Ha],
+        N: [1, Ga],
+        d: 2,
+        m: 4,
+        H: 3,
+        h: 3,
+        K: [3, 1],
+        k: [3, 1],
+        s: 5,
+        S: 6,
+        a: [3, Z("am,pm", /,/g)]
+      },
+      Ma = {},
+      Na = [];
+  return A({
+    each: ca(p),
+    filter: ba(q),
+    collect: ba(s),
+    map: ba(v),
+    toObject: ca(z),
+    equals: ca(M),
+    sub: ba(G),
+    reverse: ca(y),
+    find: ca(E),
+    findLast: ca(F),
+    startsWith: ca(w),
+    endsWith: ca(x),
+    contains: ca(L),
+    call: ba(O),
+    array: ca(H),
+    unite: ca(I),
+    merge: ca(B),
+    uniq: ba(J),
+    intersection: ba(K),
+    join: function(a) {
+      return v(this, j).join(a);
+    },
+    reduce: function(a, b) {
+      return p(this, function(c, d) {
+        b = a.call(this, b, c, d);
+      }), b;
+    },
+    sort: function(a) {
+      return new va(v(this, j).sort(a));
+    },
+    remove: function() {
+      sa(this, function(a) {
+        a.parentNode.removeChild(a);
+      });
+    },
+    text: function() {
+      return r(sa, this, function(a) {
+        return a.textContent;
+      }).join("");
+    },
+    trav: function(a, b, c) {
+      var d = f(b),
+          e = qa(d ? Fa : b),
+          g = d ? b : c;
+      return new va(ia(this, function(b) {
+        for (var c = []; (b = b[a]) && c.length != g; )
+          e(b) && c.push(b);
+        return c;
+      }));
+    },
+    next: function(a, b) {
+      return this.trav("nextSibling", a, b || 1);
+    },
+    up: function(a, b) {
+      return this.trav("parentNode", a, b || 1);
+    },
+    select: function(a, b) {
+      return oa(a, this, b);
+    },
+    is: function(a) {
+      return !this.find(ra(a));
+    },
+    only: function(a) {
+      return new va(q(this, qa(a)));
+    },
+    not: function(a) {
+      return new va(q(this, ra(a)));
+    },
+    get: function(a, b) {
+      var d,
+          e,
+          f,
+          g,
+          h = this,
+          i = h[0];
+      return i ? c(a) ? (d = /^(\W*)(.*)/.exec(l(a, /^%/, "@data-")), e = d[1], f = Aa[e] ? Aa[e](this, d[2]) : "$" == a ? h.get("className") : "$$" == a ? h.get("@style") : "$$slide" == a ? h.get("$height") : "$$fade" == a || "$$show" == a ? "hidden" == h.get("$visibility") || "none" == h.get("$display") ? 0 : "$$fade" == a ? isNaN(h.get("$opacity", !0)) ? 1 : h.get("$opacity", !0) : 1 : "$" == e ? ya.getComputedStyle(i, Fa).getPropertyValue(l(d[2], /[A-Z]/g, function(a) {
+        return "-" + a.toLowerCase();
+      })) : "@" == e ? i.getAttribute(d[2]) : i[d[2]], b ? ga(f) : f) : (g = {}, (fa(a) ? sa : o)(a, function(a) {
+        g[a] = h.get(a, b);
+      }), g) : void 0;
+    },
+    set: function(a, b) {
+      var d,
+          e,
+          f = this;
+      return b !== xa ? (d = /^(\W*)(.*)/.exec(l(l(a, /^\$float$/, "cssFloat"), /^%/, "@data-")), e = d[1], za[e] ? za[e](this, d[2], b) : "$$fade" == a ? this.set({
+        $visibility: b ? "visible" : "hidden",
+        $opacity: b
+      }) : "$$slide" == a ? f.set({
+        $visibility: b ? "visible" : "hidden",
+        $overflow: "hidden",
+        $height: /px/.test(b) ? b : function(a, c, d) {
+          return ja(oa(d), b);
+        }
+      }) : "$$show" == a ? b ? f.set({
+        $visibility: b ? "visible" : "hidden",
+        $display: ""
+      }).set({$display: function(a) {
+          return "none" == a ? "block" : a;
+        }}) : f.set({$display: "none"}) : "$$" == a ? f.set("@style", b) : sa(this, function(c, f) {
+        var g = ea(b) ? b(oa(c).get(a), f, c) : b;
+        "$" == e ? d[2] ? c.style[d[2]] = g : sa(g && g.split(/\s+/), function(a) {
+          var b = l(a, /^[+-]/),
+              d = c.className || "",
+              e = l(d, RegExp("(^|\\s+)" + b + "(?=$|\\s)"));
+          (/^\+/.test(a) || b == a && d == e) && (e += " " + b), c.className = n(e);
+        }) : "$$scrollX" == a ? c.scroll(g, oa(c).get("$$scrollY")) : "$$scrollY" == a ? c.scroll(oa(c).get("$$scrollX"), g) : "@" == e ? g == Fa ? c.removeAttribute(d[2]) : c.setAttribute(d[2], g) : c[d[2]] = g;
+      })) : c(a) || ea(a) ? f.set("$", a) : o(a, function(a, b) {
+        f.set(a, b);
+      }), f;
+    },
+    show: function() {
+      return this.set("$$show", 1);
+    },
+    hide: function() {
+      return this.set("$$show", 0);
+    },
+    add: function(a, b) {
+      return this.each(function(c, d) {
+        function f(a) {
+          fa(a) ? sa(a, f) : ea(a) ? f(a(c, d)) : a != Fa && (a = e(a) ? a : document.createTextNode(a), g ? g.parentNode.insertBefore(a, g.nextSibling) : b ? b(a, c, c.parentNode) : c.appendChild(a), g = a);
+        }
+        var g;
+        f(d && !ea(a) ? na(a) : a);
+      });
+    },
+    fill: function(a) {
+      return this.each(function(a) {
+        oa(a.childNodes).remove();
+      }).add(a);
+    },
+    addAfter: function(a) {
+      return this.add(a, function(a, b, c) {
+        c.insertBefore(a, b.nextSibling);
+      });
+    },
+    addBefore: function(a) {
+      return this.add(a, function(a, b, c) {
+        c.insertBefore(a, b);
+      });
+    },
+    addFront: function(a) {
+      return this.add(a, function(a, b) {
+        b.insertBefore(a, b.firstChild);
+      });
+    },
+    replace: function(a) {
+      return this.add(a, function(a, b, c) {
+        c.replaceChild(a, b);
+      });
+    },
+    clone: ba(na),
+    animate: function(a, b, c) {
+      var d,
+          e = ua(),
+          f = this,
+          g = r(sa, this, function(b, d) {
+            var e,
+                f = oa(b),
+                g = {};
+            return o(e = f.get(a), function(c, e) {
+              var h = a[c];
+              g[c] = ea(h) ? h(e, d, b) : "$$slide" == c ? ja(f, h) : h;
+            }), f.dial(e, g, c);
+          }),
+          h = b || 500;
+      return e.stop0 = function() {
+        return e.fire(!1), d();
+      }, d = oa.loop(function(a) {
+        O(g, [a / h]), a >= h && (d(), e.fire(!0, [f]));
+      }), e;
+    },
+    dial: function(a, c, d) {
+      function e(a, b) {
+        return /^#/.test(a) ? parseInt(6 < a.length ? a.substr(2 * b + 1, 2) : (a = a.charAt(b + 1)) + a, 16) : ga(a.split(",")[b]);
+      }
+      var f = this,
+          g = d || 0,
+          h = ea(g) ? g : function(a, b, c) {
+            return c * (b - a) * (g + (1 - g) * c * (3 - 2 * c)) + a;
+          };
+      return function(d) {
+        o(a, function(a, g) {
+          var i = c[a],
+              j = 0;
+          f.set(a, 0 >= d ? g : d >= 1 ? i : /^#|rgb\(/.test(i) ? "rgb(" + Math.round(h(e(g, j), e(i, j++), d)) + "," + Math.round(h(e(g, j), e(i, j++), d)) + "," + Math.round(h(e(g, j), e(i, j++), d)) + ")" : l(i, /-?[\d.]+/, b(h(ga(g), ga(i), d))));
+        });
+      };
+    },
+    toggle: function(a, b, c, d) {
+      var e,
+          f,
+          g = this,
+          h = !1;
+      return b ? (g.set(a), function(i) {
+        i !== h && (f = (h = !0 === i || !1 === i ? i : !h) ? b : a, c ? (e = g.animate(f, e ? e.stop() : c, d)).then(function() {
+          e = Fa;
+        }) : g.set(f));
+      }) : g.toggle(l(a, /\b(?=\w)/g, "-"), l(a, /\b(?=\w)/g, "+"));
+    },
+    values: function(a) {
+      var c = a || {};
+      return this.each(function(a) {
+        var d = a.name || a.id,
+            e = b(a.value);
+        if (/form/i.test(a.tagName))
+          for (d = 0; d < a.elements.length; d++)
+            oa(a.elements[d]).values(c);
+        else
+          !d || /ox|io/i.test(a.type) && !a.checked || (c[d] = c[d] == Fa ? e : r(sa, [c[d], e], j));
+      }), c;
+    },
+    offset: function() {
+      for (var a = this[0],
+          b = {
+            x: 0,
+            y: 0
+          }; a; )
+        b.x += a.offsetLeft, b.y += a.offsetTop, a = a.offsetParent;
+      return b;
+    },
+    on: function(a, d, e, f, g) {
+      return ea(d) ? this.on(Fa, a, d, e, f) : c(f) ? this.on(a, d, e, Fa, f) : this.each(function(c, h) {
+        sa(a ? pa(a, c) : c, function(a) {
+          sa(b(d).split(/\s/), function(b) {
+            function c(b, c, d) {
+              var j,
+                  l = !g;
+              if (d = g ? d : a, g)
+                for (j = qa(g, a); d && d != a && !(l = j(d)); )
+                  d = d.parentNode;
+              return !l || i != b || e.apply(oa(d), f || [c, h]) && "?" == k || "|" == k;
+            }
+            function d(a) {
+              c(i, a, a.target) || (a.preventDefault(), a.stopPropagation());
+            }
+            var i = l(b, /[?|]/g),
+                k = l(b, /[^?|]/g),
+                m = ("blur" == i || "focus" == i) && !!g,
+                n = Ba++;
+            a.addEventListener(i, d, m), a.M || (a.M = {}), a.M[n] = c, e.M = r(sa, [e.M, function() {
+              a.removeEventListener(i, d, m), delete a.M[n];
+            }], j);
+          });
+        });
+      });
+    },
+    onOver: function(a, b) {
+      var c = this,
+          d = [];
+      return ea(b) ? this.on(a, "|mouseover |mouseout", function(a, e) {
+        var f = a.relatedTarget || a.toElement,
+            g = "mouseout" != a.type;
+        d[e] === g || !g && f && (f == c[e] || oa(f).up(c[e]).length) || (d[e] = g, b.call(this, g, a));
+      }) : this.onOver(Fa, a);
+    },
+    onFocus: function(a, b, c) {
+      return ea(b) ? this.on(a, "|blur", b, [!1], c).on(a, "|focus", b, [!0], c) : this.onFocus(Fa, a, b);
+    },
+    onChange: function(a, b, c) {
+      return ea(b) ? this.on(a, "|input |change |click", function(a, c) {
+        var d = this[0],
+            e = /ox|io/i.test(d.type) ? d.checked : d.value;
+        d.NiaP != e && b.call(this, d.NiaP = e, c);
+      }, c) : this.onChange(Fa, a, b);
+    },
+    onClick: function(a, b, c, d) {
+      return ea(b) ? this.on(a, "click", b, c, d) : this.onClick(Fa, a, b, c);
+    },
+    trigger: function(a, b) {
+      return this.each(function(c) {
+        for (var d = !0,
+            e = c; e && d; )
+          o(e.M, function(e, f) {
+            d = d && f(a, b, c);
+          }), e = e.parentNode;
+      });
+    },
+    per: function(a, b) {
+      if (ea(a))
+        for (var c = this.length,
+            d = 0; c > d; d++)
+          a.call(this, new va(Fa, this[d]), d);
+      else
+        oa(a, this).per(b);
+      return this;
+    },
+    ht: function(a, b) {
+      var c = 2 < arguments.length ? B(G(arguments, 1)) : b;
+      return this.set("innerHTML", ea(a) ? a(c) : /{{/.test(a) ? aa(a, c) : /^#\S+$/.test(a) ? aa(la(a).text, c) : a);
+    }
+  }, va.prototype), A({
+    request: function(a, c, d, e) {
+      e = e || {};
+      var f,
+          g = 0,
+          h = ua(),
+          i = d && d.constructor == e.constructor;
+      try {
+        h.xhr = f = new XMLHttpRequest, h.stop0 = function() {
+          f.abort();
+        }, i && (d = r(o, d, function(a, b) {
+          return r(sa, b, function(b) {
+            return encodeURIComponent(a) + (b != Fa ? "=" + encodeURIComponent(b) : "");
+          });
+        }).join("&")), d == Fa || /post/i.test(a) || (c += "?" + d, d = Fa), f.open(a, c, !0, e.user, e.pass), i && /post/i.test(a) && f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), o(e.headers, function(a, b) {
+          f.setRequestHeader(a, b);
+        }), o(e.xhr, function(a, b) {
+          f[a] = b;
+        }), f.onreadystatechange = function() {
+          4 != f.readyState || g++ || (200 <= f.status && 300 > f.status ? h.fire(!0, [f.responseText, f]) : h.fire(!1, [f.status, f.responseText, f]));
+        }, f.send(d);
+      } catch (j) {
+        g || h.fire(!1, [0, Fa, b(j)]);
+      }
+      return h;
+    },
+    toJSON: JSON.stringify,
+    parseJSON: JSON.parse,
+    ready: ka,
+    loop: function(a) {
+      function b(a) {
+        o(Da, function(b, c) {
+          c(a);
+        }), Ea && g(b);
+      }
+      function c() {
+        return Da[f] && (delete Da[f], Ea--), e;
+      }
+      var d,
+          e = 0,
+          f = Ba++,
+          g = ya.requestAnimationFrame || function(a) {
+            setTimeout(function() {
+              a(+new Date);
+            }, 33);
+          };
+      return Da[f] = function(b) {
+        d = d || b, a(e = b - d, c);
+      }, Ea++ || g(b), c;
+    },
+    off: function(a) {
+      O(a.M), a.M = Fa;
+    },
+    setCookie: function(a, b, c, e) {
+      document.cookie = a + "=" + (e ? b : escape(b)) + (c ? "; expires=" + (d(c) ? c : new Date(+new Date + 864e5 * c)).toUTCString() : "");
+    },
+    getCookie: function(a, b) {
+      var c,
+          d = (c = RegExp("(^|;)\\s*" + a + "=([^;]*)").exec(document.cookie)) && c[2];
+      return b ? d : d && unescape(d);
+    },
+    wait: function(a, b) {
+      var c = ua(),
+          d = setTimeout(function() {
+            c.fire(!0, b);
+          }, a);
+      return c.stop0 = function() {
+        c.fire(!1), clearTimeout(d);
+      }, c;
+    }
+  }, oa), A({
+    filter: da(q),
+    collect: da(s),
+    map: da(v),
+    sub: da(G),
+    reverse: y,
+    each: p,
+    toObject: z,
+    find: E,
+    findLast: F,
+    contains: L,
+    startsWith: w,
+    endsWith: x,
+    equals: M,
+    call: da(O),
+    array: H,
+    unite: I,
+    merge: B,
+    uniq: da(J),
+    intersection: da(K),
+    keys: da(u),
+    values: da(function(a, b) {
+      var c = [];
+      return b ? p(b, function(b) {
+        c.push(a[b]);
+      }) : o(a, function(a, b) {
+        c.push(b);
+      }), c;
+    }),
+    copyObj: A,
+    extend: function(a) {
+      return B(G(arguments, 1), a);
+    },
+    range: function(a, b) {
+      for (var c = [],
+          d = b == Fa ? a : b,
+          e = b != Fa ? a : 0; d > e; e++)
+        c.push(e);
+      return new va(c);
+    },
+    bind: P,
+    partial: function(a, b, c) {
+      return P(a, this, b, c);
+    },
+    eachObj: o,
+    mapObj: function(a, b, c) {
+      var d = {};
+      return o(a, function(e, f) {
+        d[e] = b.call(c || a, e, f);
+      }), d;
+    },
+    filterObj: function(a, b, c) {
+      var d = {};
+      return o(a, function(e, f) {
+        b.call(c || a, e, f) && (d[e] = f);
+      }), d;
+    },
+    isList: fa,
+    isFunction: ea,
+    isObject: d,
+    isNumber: f,
+    isBool: h,
+    isDate: g,
+    isValue: i,
+    isString: c,
+    toString: b,
+    dateClone: T,
+    dateAdd: V,
+    dateDiff: W,
+    dateMidnight: function(a) {
+      return a = a || new Date, new Date(a.getFullYear(), a.getMonth(), a.getDate());
+    },
+    pad: Q,
+    formatValue: function(a, d) {
+      var e,
+          h,
+          i = l(a, /^\?/);
+      return g(d) ? ((h = /^\[(([+-])(\d\d)(\d\d))\]\s*(.*)/.exec(i)) && (e = h[1], d = V(d, "minutes", S(h, 2, d)), i = h[5]), l(i, /(\w)(\1*)(?:\[([^\]]+)\])?/g, function(a, b, f, g) {
+        return (b = Ka[b]) && (a = d["get" + b[0]](), g = g && g.split(","), a = fa(b[1]) ? (g || b[1])[a] : b[1](a, g, e), a == Fa || c(a) || (a = Q(f.length + 1, a))), a;
+      })) : E(i.split(/\s*\|\s*/), function(a) {
+        var c,
+            e;
+        if (c = /^([<>]?)(=?)([^:]*?)\s*:\s*(.*)$/.exec(a)) {
+          if (a = d, e = +c[3], (isNaN(e) || !f(a)) && (a = a == Fa ? "null" : b(a), e = c[3]), c[1]) {
+            if (!c[2] && a == e || "<" == c[1] && a > e || ">" == c[1] && e > a)
+              return Fa;
+          } else if (a != e)
+            return Fa;
+          c = c[4];
+        } else
+          c = a;
+        return f(d) ? c.replace(/[0#](.*[0#])?/, function(a) {
+          var b,
+              c = /^([^.]+)(\.)([^.]+)$/.exec(a) || /^([^,]+)(,)([^,]+)$/.exec(a),
+              e = 0 > d ? "-" : "",
+              f = /(\d+)(\.(\d+))?/.exec((e ? -d : d).toFixed(c ? c[3].length : 0));
+          return a = c ? c[1] : a, b = c ? R(c[3], l(f[3], /0+$/), !0) : "", (e ? "-" : "") + ("#" == a ? f[1] : R(a, f[1])) + (b.length ? c[2] : "") + b;
+        }) : c;
+      });
+    },
+    parseDate: function(a, b) {
+      var c,
+          d,
+          e,
+          f,
+          g,
+          h,
+          i,
+          j,
+          k,
+          o = {},
+          p = 1,
+          q = l(a, /^\?/);
+      if (q != a && !n(b))
+        return Fa;
+      if ((e = /^\[([+-])(\d\d)(\d\d)\]\s*(.*)/.exec(q)) && (c = e, q = e[4]), !(e = RegExp(q.replace(/(.)(\1*)(?:\[([^\]]*)\])?/g, function(a, b, c, e) {
+        return /[dmhkyhs]/i.test(b) ? (o[p++] = b, a = c.length + 1, "(\\d" + (2 > a ? "+" : "{1," + a + "}") + ")") : "z" == b ? (d = p, p += 3, "([+-])(\\d\\d)(\\d\\d)") : /[Nna]/.test(b) ? (o[p++] = [b, e && e.split(",")], "([a-zA-Z\\u0080-\\u1fff]+)") : /w/i.test(b) ? "[a-zA-Z\\u0080-\\u1fff]+" : /\s/.test(b) ? "\\s+" : m(a);
+      })).exec(b)))
+        return xa;
+      for (q = [0, 0, 0, 0, 0, 0, 0], f = 1; p > f; f++)
+        if (g = e[f], h = o[f], fa(h)) {
+          if (i = h[0], j = La[i], k = j[0], h = E(h[1] || j[1], function(a, b) {
+            return w(g.toLowerCase(), a.toLowerCase()) ? b : void 0;
+          }), h == Fa)
+            return xa;
+          q[k] = "a" == i ? q[k] + 12 * h : h;
+        } else
+          h && (i = parseFloat(g), j = La[h], fa(j) ? q[j[0]] += i - j[1] : q[j] += i);
+      return q = new Date(q[0], q[1], q[2], q[3], q[4], q[5], q[6]), V(q, "minutes", -S(c, 1, q) - S(e, d, q));
+    },
+    parseNumber: function(a, b) {
+      var c = l(a, /^\?/);
+      return c == a || n(b) ? (c = /(^|[^0#.,])(,|[0#.]*,[0#]+|[0#]+\.[0#]+\.[0#.,]*)($|[^0#.,])/.test(c) ? "," : ".", c = parseFloat(l(l(l(b, "," == c ? /\./g : /,/g), c, "."), /^[^\d-]*(-?\d)/, "$1")), isNaN(c) ? xa : c) : Fa;
+    },
+    trim: n,
+    isEmpty: function(a, b) {
+      return a == Fa || !a.length || b && /^\s*$/.test(a);
+    },
+    escapeRegExp: m,
+    escapeHtml: _,
+    format: function(a, b, c) {
+      return $(a, c)(b);
+    },
+    template: $,
+    formatHtml: aa,
+    promise: ua
+  }, wa), document.addEventListener("DOMContentLoaded", function() {
+    O(Ca), Ca = Fa;
+  }, !1), {
+    HTML: function() {
+      var a = ma("div");
+      return wa(N(a.ht, a, arguments)[0].childNodes);
+    },
+    _: wa,
+    $: oa,
+    $$: la,
+    EE: ma,
+    M: va,
+    getter: Aa,
+    setter: za
+  };
+});
+
+_removeDefine();
+})();
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+define("5", ["61"], function(main) {
+  return main;
+});
+
+_removeDefine();
+})();
+$__System.register('6', ['5'], function (_export) {
+  'use strict';
+
+  var $;
+
+  _export('i18n', i18n);
+
+  _export('sortByKey', sortByKey);
+
+  // https://github.com/github/fetch#handling-http-error-statuses
+
+  _export('fromTemplate', fromTemplate);
+
+  _export('checkStatus', checkStatus);
+
+  function i18n(prop) {
+    if (!prop) return;
+    // TODO be clever and select proper language
+    if (prop.has('en')) {
+      return prop.get('en');
+    } else {
+      // random
+      return prop.values().next().value;
+    }
+  }
+
+  function sortByKey(array, keyFn) {
+    return array.sort(function (a, b) {
+      var x = keyFn(a);
+      var y = keyFn(b);
+      return x < y ? -1 : x > y ? 1 : 0;
+    });
+  }
+
+  function fromTemplate(id) {
+    return document.importNode($('#' + id)[0].content, true).children[0];
+  }
+
+  function checkStatus(response) {
+    if (response.ok) {
+      // status 2xx
+      return response;
+    } else {
+      var error = new Error(response.statusText);
+      error.response = response;
+      throw error;
+    }
+  }
+
+  return {
+    setters: [function (_) {
+      $ = _.$;
+    }],
+    execute: function () {}
+  };
+});
+
+$__System.registerDynamic("62", [], false, function(__require, __exports, __module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+  (function() {
+    (function() {
+      'use strict';
+      if (self.fetch) {
+        return;
+      }
+      function normalizeName(name) {
+        if (typeof name !== 'string') {
+          name = String(name);
+        }
+        if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+          throw new TypeError('Invalid character in header field name');
+        }
+        return name.toLowerCase();
+      }
+      function normalizeValue(value) {
+        if (typeof value !== 'string') {
+          value = String(value);
+        }
+        return value;
+      }
+      function Headers(headers) {
+        this.map = {};
+        if (headers instanceof Headers) {
+          headers.forEach(function(value, name) {
+            this.append(name, value);
+          }, this);
+        } else if (headers) {
+          Object.getOwnPropertyNames(headers).forEach(function(name) {
+            this.append(name, headers[name]);
+          }, this);
+        }
+      }
+      Headers.prototype.append = function(name, value) {
+        name = normalizeName(name);
+        value = normalizeValue(value);
+        var list = this.map[name];
+        if (!list) {
+          list = [];
+          this.map[name] = list;
+        }
+        list.push(value);
+      };
+      Headers.prototype['delete'] = function(name) {
+        delete this.map[normalizeName(name)];
+      };
+      Headers.prototype.get = function(name) {
+        var values = this.map[normalizeName(name)];
+        return values ? values[0] : null;
+      };
+      Headers.prototype.getAll = function(name) {
+        return this.map[normalizeName(name)] || [];
+      };
+      Headers.prototype.has = function(name) {
+        return this.map.hasOwnProperty(normalizeName(name));
+      };
+      Headers.prototype.set = function(name, value) {
+        this.map[normalizeName(name)] = [normalizeValue(value)];
+      };
+      Headers.prototype.forEach = function(callback, thisArg) {
+        Object.getOwnPropertyNames(this.map).forEach(function(name) {
+          this.map[name].forEach(function(value) {
+            callback.call(thisArg, value, name, this);
+          }, this);
+        }, this);
+      };
+      function consumed(body) {
+        if (body.bodyUsed) {
+          return Promise.reject(new TypeError('Already read'));
+        }
+        body.bodyUsed = true;
+      }
+      function fileReaderReady(reader) {
+        return new Promise(function(resolve, reject) {
+          reader.onload = function() {
+            resolve(reader.result);
+          };
+          reader.onerror = function() {
+            reject(reader.error);
+          };
+        });
+      }
+      function readBlobAsArrayBuffer(blob) {
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(blob);
+        return fileReaderReady(reader);
+      }
+      function readBlobAsText(blob) {
+        var reader = new FileReader();
+        reader.readAsText(blob);
+        return fileReaderReady(reader);
+      }
+      var support = {
+        blob: 'FileReader' in self && 'Blob' in self && (function() {
+          try {
+            new Blob();
+            return true;
+          } catch (e) {
+            return false;
+          }
+        })(),
+        formData: 'FormData' in self,
+        arrayBuffer: 'ArrayBuffer' in self
+      };
+      function Body() {
+        this.bodyUsed = false;
+        this._initBody = function(body) {
+          this._bodyInit = body;
+          if (typeof body === 'string') {
+            this._bodyText = body;
+          } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+            this._bodyBlob = body;
+          } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+            this._bodyFormData = body;
+          } else if (!body) {
+            this._bodyText = '';
+          } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {} else {
+            throw new Error('unsupported BodyInit type');
+          }
+        };
+        if (support.blob) {
+          this.blob = function() {
+            var rejected = consumed(this);
+            if (rejected) {
+              return rejected;
+            }
+            if (this._bodyBlob) {
+              return Promise.resolve(this._bodyBlob);
+            } else if (this._bodyFormData) {
+              throw new Error('could not read FormData body as blob');
+            } else {
+              return Promise.resolve(new Blob([this._bodyText]));
+            }
+          };
+          this.arrayBuffer = function() {
+            return this.blob().then(readBlobAsArrayBuffer);
+          };
+          this.text = function() {
+            var rejected = consumed(this);
+            if (rejected) {
+              return rejected;
+            }
+            if (this._bodyBlob) {
+              return readBlobAsText(this._bodyBlob);
+            } else if (this._bodyFormData) {
+              throw new Error('could not read FormData body as text');
+            } else {
+              return Promise.resolve(this._bodyText);
+            }
+          };
+        } else {
+          this.text = function() {
+            var rejected = consumed(this);
+            return rejected ? rejected : Promise.resolve(this._bodyText);
+          };
+        }
+        if (support.formData) {
+          this.formData = function() {
+            return this.text().then(decode);
+          };
+        }
+        this.json = function() {
+          return this.text().then(JSON.parse);
+        };
+        return this;
+      }
+      var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT'];
+      function normalizeMethod(method) {
+        var upcased = method.toUpperCase();
+        return (methods.indexOf(upcased) > -1) ? upcased : method;
+      }
+      function Request(input, options) {
+        options = options || {};
+        var body = options.body;
+        if (Request.prototype.isPrototypeOf(input)) {
+          if (input.bodyUsed) {
+            throw new TypeError('Already read');
+          }
+          this.url = input.url;
+          this.credentials = input.credentials;
+          if (!options.headers) {
+            this.headers = new Headers(input.headers);
+          }
+          this.method = input.method;
+          this.mode = input.mode;
+          if (!body) {
+            body = input._bodyInit;
+            input.bodyUsed = true;
+          }
+        } else {
+          this.url = input;
+        }
+        this.credentials = options.credentials || this.credentials || 'omit';
+        if (options.headers || !this.headers) {
+          this.headers = new Headers(options.headers);
+        }
+        this.method = normalizeMethod(options.method || this.method || 'GET');
+        this.mode = options.mode || this.mode || null;
+        this.referrer = null;
+        if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+          throw new TypeError('Body not allowed for GET or HEAD requests');
+        }
+        this._initBody(body);
+      }
+      Request.prototype.clone = function() {
+        return new Request(this);
+      };
+      function decode(body) {
+        var form = new FormData();
+        body.trim().split('&').forEach(function(bytes) {
+          if (bytes) {
+            var split = bytes.split('=');
+            var name = split.shift().replace(/\+/g, ' ');
+            var value = split.join('=').replace(/\+/g, ' ');
+            form.append(decodeURIComponent(name), decodeURIComponent(value));
+          }
+        });
+        return form;
+      }
+      function headers(xhr) {
+        var head = new Headers();
+        var pairs = xhr.getAllResponseHeaders().trim().split('\n');
+        pairs.forEach(function(header) {
+          var split = header.trim().split(':');
+          var key = split.shift().trim();
+          var value = split.join(':').trim();
+          head.append(key, value);
+        });
+        return head;
+      }
+      Body.call(Request.prototype);
+      function Response(bodyInit, options) {
+        if (!options) {
+          options = {};
+        }
+        this._initBody(bodyInit);
+        this.type = 'default';
+        this.status = options.status;
+        this.ok = this.status >= 200 && this.status < 300;
+        this.statusText = options.statusText;
+        this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers);
+        this.url = options.url || '';
+      }
+      Body.call(Response.prototype);
+      Response.prototype.clone = function() {
+        return new Response(this._bodyInit, {
+          status: this.status,
+          statusText: this.statusText,
+          headers: new Headers(this.headers),
+          url: this.url
+        });
+      };
+      Response.error = function() {
+        var response = new Response(null, {
+          status: 0,
+          statusText: ''
+        });
+        response.type = 'error';
+        return response;
+      };
+      var redirectStatuses = [301, 302, 303, 307, 308];
+      Response.redirect = function(url, status) {
+        if (redirectStatuses.indexOf(status) === -1) {
+          throw new RangeError('Invalid status code');
+        }
+        return new Response(null, {
+          status: status,
+          headers: {location: url}
+        });
+      };
+      self.Headers = Headers;
+      self.Request = Request;
+      self.Response = Response;
+      self.fetch = function(input, init) {
+        return new Promise(function(resolve, reject) {
+          var request;
+          if (Request.prototype.isPrototypeOf(input) && !init) {
+            request = input;
+          } else {
+            request = new Request(input, init);
+          }
+          var xhr = new XMLHttpRequest();
+          function responseURL() {
+            if ('responseURL' in xhr) {
+              return xhr.responseURL;
+            }
+            if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+              return xhr.getResponseHeader('X-Request-URL');
+            }
+            return;
+          }
+          xhr.onload = function() {
+            var status = (xhr.status === 1223) ? 204 : xhr.status;
+            if (status < 100 || status > 599) {
+              reject(new TypeError('Network request failed'));
+              return;
+            }
+            var options = {
+              status: status,
+              statusText: xhr.statusText,
+              headers: headers(xhr),
+              url: responseURL()
+            };
+            var body = 'response' in xhr ? xhr.response : xhr.responseText;
+            resolve(new Response(body, options));
+          };
+          xhr.onerror = function() {
+            reject(new TypeError('Network request failed'));
+          };
+          xhr.open(request.method, request.url, true);
+          if (request.credentials === 'include') {
+            xhr.withCredentials = true;
+          }
+          if ('responseType' in xhr && support.blob) {
+            xhr.responseType = 'blob';
+          }
+          request.headers.forEach(function(value, name) {
+            xhr.setRequestHeader(name, value);
+          });
+          xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit);
+        });
+      };
+      self.fetch.polyfill = true;
+    })();
+  })();
+  return _retrieveGlobal();
+});
+
+$__System.registerDynamic("63", ["62"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('62');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('64', ['6', '7', '8', '10', '63'], function (_export) {
+  var checkStatus, _createClass, _classCallCheck, _Promise, MEDIA_TYPE, GeoJSONLoader;
+
+  return {
+    setters: [function (_5) {
+      checkStatus = _5.checkStatus;
+    }, function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _Promise = _3['default'];
+    }, function (_4) {}],
+    execute: function () {
+      'use strict';
+
+      MEDIA_TYPE = 'application/vnd.geo+json';
+
+      GeoJSONLoader = (function () {
+        function GeoJSONLoader() {
+          _classCallCheck(this, GeoJSONLoader);
+        }
+
+        _createClass(GeoJSONLoader, [{
+          key: 'supports',
+          value: function supports(mediaType) {
+            return mediaType === MEDIA_TYPE;
+          }
+
+          /**
+           * @param urlOrObject Either a URL or a GeoJSON object.
+           * @returns {Object} An object with metadata.
+           */
+        }, {
+          key: 'loadMetadata',
+          value: function loadMetadata(urlOrObject) {
+            var _this = this;
+
+            if (typeof urlOrObject === 'string') {
+              return fetch(urlOrObject, {
+                headers: new Headers({
+                  Accept: MEDIA_TYPE + '; q=1.0,application/json; q=0.5'
+                })
+              })['catch'](function (e) {
+                // we only get a response object if there was no network/CORS error, fall-back
+                e.response = { url: urlOrObject };
+                throw e;
+              }).then(checkStatus).then(function (response) {
+                return response.json();
+              }).then(function (json) {
+                return _this._extractMetadata(json);
+              });
+            } else {
+              return _Promise.resolve(this._extractMetadata(urlOrObject));
+            }
+          }
+        }, {
+          key: '_extractMetadata',
+          value: function _extractMetadata(geojson) {
+            return {
+              loader: this,
+              format: 'GeoJSON',
+              type: geojson.type
+            };
+          }
+        }]);
+
+        return GeoJSONLoader;
+      })();
+
+      _export('default', GeoJSONLoader);
+    }
+  };
+});
+
+$__System.registerDynamic("65", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var process = module.exports = {};
+  var queue = [];
+  var draining = false;
+  var currentQueue;
+  var queueIndex = -1;
+  function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+      queue = currentQueue.concat(queue);
+    } else {
+      queueIndex = -1;
+    }
+    if (queue.length) {
+      drainQueue();
+    }
+  }
+  function drainQueue() {
+    if (draining) {
+      return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+    var len = queue.length;
+    while (len) {
+      currentQueue = queue;
+      queue = [];
+      while (++queueIndex < len) {
+        if (currentQueue) {
+          currentQueue[queueIndex].run();
+        }
+      }
+      queueIndex = -1;
+      len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+  }
+  process.nextTick = function(fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+      for (var i = 1; i < arguments.length; i++) {
+        args[i - 1] = arguments[i];
+      }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+      setTimeout(drainQueue, 0);
+    }
+  };
+  function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+  }
+  Item.prototype.run = function() {
+    this.fun.apply(null, this.array);
+  };
+  process.title = 'browser';
+  process.browser = true;
+  process.env = {};
+  process.argv = [];
+  process.version = '';
+  process.versions = {};
+  function noop() {}
+  process.on = noop;
+  process.addListener = noop;
+  process.once = noop;
+  process.off = noop;
+  process.removeListener = noop;
+  process.removeAllListeners = noop;
+  process.emit = noop;
+  process.binding = function(name) {
+    throw new Error('process.binding is not supported');
+  };
+  process.cwd = function() {
+    return '/';
+  };
+  process.chdir = function(dir) {
+    throw new Error('process.chdir is not supported');
+  };
+  process.umask = function() {
+    return 0;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("66", ["65"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('65');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("67", ["66"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = $__System._nodeRequire ? process : req('66');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("68", ["67"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('67');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("69", ["6a", "6b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('6a'),
+      document = req('6b').document,
+      is = isObject(document) && isObject(document.createElement);
+  module.exports = function(it) {
+    return is ? document.createElement(it) : {};
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6c", ["6b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('6b').document && document.documentElement;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(fn, args, that) {
+    var un = that === undefined;
+    switch (args.length) {
+      case 0:
+        return un ? fn() : fn.call(that);
+      case 1:
+        return un ? fn(args[0]) : fn.call(that, args[0]);
+      case 2:
+        return un ? fn(args[0], args[1]) : fn.call(that, args[0], args[1]);
+      case 3:
+        return un ? fn(args[0], args[1], args[2]) : fn.call(that, args[0], args[1], args[2]);
+      case 4:
+        return un ? fn(args[0], args[1], args[2], args[3]) : fn.call(that, args[0], args[1], args[2], args[3]);
+    }
+    return fn.apply(that, args);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6e", ["6f", "6d", "6c", "69", "6b", "70", "68"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(process) {
+    'use strict';
+    var ctx = req('6f'),
+        invoke = req('6d'),
+        html = req('6c'),
+        cel = req('69'),
+        global = req('6b'),
+        process = global.process,
+        setTask = global.setImmediate,
+        clearTask = global.clearImmediate,
+        MessageChannel = global.MessageChannel,
+        counter = 0,
+        queue = {},
+        ONREADYSTATECHANGE = 'onreadystatechange',
+        defer,
+        channel,
+        port;
+    var run = function() {
+      var id = +this;
+      if (queue.hasOwnProperty(id)) {
+        var fn = queue[id];
+        delete queue[id];
+        fn();
+      }
+    };
+    var listner = function(event) {
+      run.call(event.data);
+    };
+    if (!setTask || !clearTask) {
+      setTask = function setImmediate(fn) {
+        var args = [],
+            i = 1;
+        while (arguments.length > i)
+          args.push(arguments[i++]);
+        queue[++counter] = function() {
+          invoke(typeof fn == 'function' ? fn : Function(fn), args);
+        };
+        defer(counter);
+        return counter;
+      };
+      clearTask = function clearImmediate(id) {
+        delete queue[id];
+      };
+      if (req('70')(process) == 'process') {
+        defer = function(id) {
+          process.nextTick(ctx(run, id, 1));
+        };
+      } else if (MessageChannel) {
+        channel = new MessageChannel;
+        port = channel.port2;
+        channel.port1.onmessage = listner;
+        defer = ctx(port.postMessage, port, 1);
+      } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts) {
+        defer = function(id) {
+          global.postMessage(id + '', '*');
+        };
+        global.addEventListener('message', listner, false);
+      } else if (ONREADYSTATECHANGE in cel('script')) {
+        defer = function(id) {
+          html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function() {
+            html.removeChild(this);
+            run.call(id);
+          };
+        };
+      } else {
+        defer = function(id) {
+          setTimeout(ctx(run, id, 1), 0);
+        };
+      }
+    }
+    module.exports = {
+      set: setTask,
+      clear: clearTask
+    };
+  })(req('68'));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("71", ["6b", "6e", "70", "68"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(process) {
+    var global = req('6b'),
+        macrotask = req('6e').set,
+        Observer = global.MutationObserver || global.WebKitMutationObserver,
+        process = global.process,
+        isNode = req('70')(process) == 'process',
+        head,
+        last,
+        notify;
+    var flush = function() {
+      var parent,
+          domain;
+      if (isNode && (parent = process.domain)) {
+        process.domain = null;
+        parent.exit();
+      }
+      while (head) {
+        domain = head.domain;
+        if (domain)
+          domain.enter();
+        head.fn.call();
+        if (domain)
+          domain.exit();
+        head = head.next;
+      }
+      last = undefined;
+      if (parent)
+        parent.enter();
+    };
+    if (isNode) {
+      notify = function() {
+        process.nextTick(flush);
+      };
+    } else if (Observer) {
+      var toggle = 1,
+          node = document.createTextNode('');
+      new Observer(flush).observe(node, {characterData: true});
+      notify = function() {
+        node.data = toggle = -toggle;
+      };
+    } else {
+      notify = function() {
+        macrotask.call(global, flush);
+      };
+    }
+    module.exports = function asap(fn) {
+      var task = {
+        fn: fn,
+        next: undefined,
+        domain: isNode && process.domain
+      };
+      if (last)
+        last.next = task;
+      if (!head) {
+        head = task;
+        notify();
+      }
+      last = task;
+    };
+  })(req('68'));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("72", ["73", "74", "24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('73'),
+      aFunction = req('74'),
+      SPECIES = req('24')('species');
+  module.exports = function(O, D) {
+    var C = anObject(O).constructor,
+        S;
+    return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("75", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = Object.is || function is(x, y) {
+    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("76", ["77", "78", "6b", "6f", "5a", "2e", "6a", "73", "74", "79", "7a", "7b", "75", "7c", "24", "72", "7d", "71", "7e", "7f", "80", "35", "81", "68"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(process) {
+    'use strict';
+    var $ = req('77'),
+        LIBRARY = req('78'),
+        global = req('6b'),
+        ctx = req('6f'),
+        classof = req('5a'),
+        $def = req('2e'),
+        isObject = req('6a'),
+        anObject = req('73'),
+        aFunction = req('74'),
+        strictNew = req('79'),
+        forOf = req('7a'),
+        setProto = req('7b').set,
+        same = req('75'),
+        species = req('7c'),
+        SPECIES = req('24')('species'),
+        speciesConstructor = req('72'),
+        RECORD = req('7d')('record'),
+        asap = req('71'),
+        PROMISE = 'Promise',
+        process = global.process,
+        isNode = classof(process) == 'process',
+        P = global[PROMISE],
+        Wrapper;
+    var testResolve = function(sub) {
+      var test = new P(function() {});
+      if (sub)
+        test.constructor = Object;
+      return P.resolve(test) === test;
+    };
+    var useNative = function() {
+      var works = false;
+      function P2(x) {
+        var self = new P(x);
+        setProto(self, P2.prototype);
+        return self;
+      }
+      try {
+        works = P && P.resolve && testResolve();
+        setProto(P2, P);
+        P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
+        if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
+          works = false;
+        }
+        if (works && req('7e')) {
+          var thenableThenGotten = false;
+          P.resolve($.setDesc({}, 'then', {get: function() {
+              thenableThenGotten = true;
+            }}));
+          works = thenableThenGotten;
+        }
+      } catch (e) {
+        works = false;
+      }
+      return works;
+    }();
+    var isPromise = function(it) {
+      return isObject(it) && (useNative ? classof(it) == 'Promise' : RECORD in it);
+    };
+    var sameConstructor = function(a, b) {
+      if (LIBRARY && a === P && b === Wrapper)
+        return true;
+      return same(a, b);
+    };
+    var getConstructor = function(C) {
+      var S = anObject(C)[SPECIES];
+      return S != undefined ? S : C;
+    };
+    var isThenable = function(it) {
+      var then;
+      return isObject(it) && typeof(then = it.then) == 'function' ? then : false;
+    };
+    var notify = function(record, isReject) {
+      if (record.n)
+        return;
+      record.n = true;
+      var chain = record.c;
+      asap(function() {
+        var value = record.v,
+            ok = record.s == 1,
+            i = 0;
+        var run = function(react) {
+          var cb = ok ? react.ok : react.fail,
+              ret,
+              then;
+          try {
+            if (cb) {
+              if (!ok)
+                record.h = true;
+              ret = cb === true ? value : cb(value);
+              if (ret === react.P) {
+                react.rej(TypeError('Promise-chain cycle'));
+              } else if (then = isThenable(ret)) {
+                then.call(ret, react.res, react.rej);
+              } else
+                react.res(ret);
+            } else
+              react.rej(value);
+          } catch (err) {
+            react.rej(err);
+          }
+        };
+        while (chain.length > i)
+          run(chain[i++]);
+        chain.length = 0;
+        record.n = false;
+        if (isReject)
+          setTimeout(function() {
+            var promise = record.p,
+                handler,
+                console;
+            if (isUnhandled(promise)) {
+              if (isNode) {
+                process.emit('unhandledRejection', value, promise);
+              } else if (handler = global.onunhandledrejection) {
+                handler({
+                  promise: promise,
+                  reason: value
+                });
+              } else if ((console = global.console) && console.error) {
+                console.error('Unhandled promise rejection', value);
+              }
+            }
+            record.a = undefined;
+          }, 1);
+      });
+    };
+    var isUnhandled = function(promise) {
+      var record = promise[RECORD],
+          chain = record.a || record.c,
+          i = 0,
+          react;
+      if (record.h)
+        return false;
+      while (chain.length > i) {
+        react = chain[i++];
+        if (react.fail || !isUnhandled(react.P))
+          return false;
+      }
+      return true;
+    };
+    var $reject = function(value) {
+      var record = this;
+      if (record.d)
+        return;
+      record.d = true;
+      record = record.r || record;
+      record.v = value;
+      record.s = 2;
+      record.a = record.c.slice();
+      notify(record, true);
+    };
+    var $resolve = function(value) {
+      var record = this,
+          then;
+      if (record.d)
+        return;
+      record.d = true;
+      record = record.r || record;
+      try {
+        if (then = isThenable(value)) {
+          asap(function() {
+            var wrapper = {
+              r: record,
+              d: false
+            };
+            try {
+              then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
+            } catch (e) {
+              $reject.call(wrapper, e);
+            }
+          });
+        } else {
+          record.v = value;
+          record.s = 1;
+          notify(record, false);
+        }
+      } catch (e) {
+        $reject.call({
+          r: record,
+          d: false
+        }, e);
+      }
+    };
+    if (!useNative) {
+      P = function Promise(executor) {
+        aFunction(executor);
+        var record = {
+          p: strictNew(this, P, PROMISE),
+          c: [],
+          a: undefined,
+          s: 0,
+          d: false,
+          v: undefined,
+          h: false,
+          n: false
+        };
+        this[RECORD] = record;
+        try {
+          executor(ctx($resolve, record, 1), ctx($reject, record, 1));
+        } catch (err) {
+          $reject.call(record, err);
+        }
+      };
+      req('7f')(P.prototype, {
+        then: function then(onFulfilled, onRejected) {
+          var react = {
+            ok: typeof onFulfilled == 'function' ? onFulfilled : true,
+            fail: typeof onRejected == 'function' ? onRejected : false
+          };
+          var promise = react.P = new (speciesConstructor(this, P))(function(res, rej) {
+            react.res = res;
+            react.rej = rej;
+          });
+          aFunction(react.res);
+          aFunction(react.rej);
+          var record = this[RECORD];
+          record.c.push(react);
+          if (record.a)
+            record.a.push(react);
+          if (record.s)
+            notify(record, false);
+          return promise;
+        },
+        'catch': function(onRejected) {
+          return this.then(undefined, onRejected);
+        }
+      });
+    }
+    $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
+    req('80')(P, PROMISE);
+    species(P);
+    species(Wrapper = req('35')[PROMISE]);
+    $def($def.S + $def.F * !useNative, PROMISE, {reject: function reject(r) {
+        return new this(function(res, rej) {
+          rej(r);
+        });
+      }});
+    $def($def.S + $def.F * (!useNative || testResolve(true)), PROMISE, {resolve: function resolve(x) {
+        return isPromise(x) && sameConstructor(x.constructor, this) ? x : new this(function(res) {
+          res(x);
+        });
+      }});
+    $def($def.S + $def.F * !(useNative && req('81')(function(iter) {
+      P.all(iter)['catch'](function() {});
+    })), PROMISE, {
+      all: function all(iterable) {
+        var C = getConstructor(this),
+            values = [];
+        return new C(function(res, rej) {
+          forOf(iterable, false, values.push, values);
+          var remaining = values.length,
+              results = Array(remaining);
+          if (remaining)
+            $.each.call(values, function(promise, index) {
+              C.resolve(promise).then(function(value) {
+                results[index] = value;
+                --remaining || res(results);
+              }, rej);
+            });
+          else
+            res(results);
+        });
+      },
+      race: function race(iterable) {
+        var C = getConstructor(this);
+        return new C(function(res, rej) {
+          forOf(iterable, false, function(promise) {
+            C.resolve(promise).then(res, rej);
+          });
+        });
+      }
+    });
+  })(req('68'));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("82", ["34", "22", "23", "76", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('34');
+  req('22');
+  req('23');
+  req('76');
+  module.exports = req('35').Promise;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("10", ["82"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('82'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("81", ["24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var SYMBOL_ITERATOR = req('24')('iterator'),
+      SAFE_CLOSING = false;
+  try {
+    var riter = [7][SYMBOL_ITERATOR]();
+    riter['return'] = function() {
+      SAFE_CLOSING = true;
+    };
+    Array.from(riter, function() {
+      throw 2;
+    });
+  } catch (e) {}
+  module.exports = function(exec, skipClosing) {
+    if (!skipClosing && !SAFE_CLOSING)
+      return false;
+    var safe = false;
+    try {
+      var arr = [7],
+          iter = arr[SYMBOL_ITERATOR]();
+      iter.next = function() {
+        safe = true;
+      };
+      arr[SYMBOL_ITERATOR] = function() {
+        return iter;
+      };
+      exec(arr);
+    } catch (e) {}
+    return safe;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("56", ["83"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var defined = req('83');
+  module.exports = function(it) {
+    return Object(defined(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("84", ["6f", "2e", "56", "85", "86", "87", "88", "81"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var ctx = req('6f'),
+      $def = req('2e'),
+      toObject = req('56'),
+      call = req('85'),
+      isArrayIter = req('86'),
+      toLength = req('87'),
+      getIterFn = req('88');
+  $def($def.S + $def.F * !req('81')(function(iter) {
+    Array.from(iter);
+  }), 'Array', {from: function from(arrayLike) {
+      var O = toObject(arrayLike),
+          C = typeof this == 'function' ? this : Array,
+          $$ = arguments,
+          $$len = $$.length,
+          mapfn = $$len > 1 ? $$[1] : undefined,
+          mapping = mapfn !== undefined,
+          index = 0,
+          iterFn = getIterFn(O),
+          length,
+          result,
+          step,
+          iterator;
+      if (mapping)
+        mapfn = ctx(mapfn, $$len > 2 ? $$[2] : undefined, 2);
+      if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
+        for (iterator = iterFn.call(O), result = new C; !(step = iterator.next()).done; index++) {
+          result[index] = mapping ? call(iterator, mapfn, [step.value, index], true) : step.value;
+        }
+      } else {
+        length = toLength(O.length);
+        for (result = new C(length); length > index; index++) {
+          result[index] = mapping ? mapfn(O[index], index) : O[index];
+        }
+      }
+      result.length = index;
+      return result;
+    }});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("89", ["22", "84", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('22');
+  req('84');
+  module.exports = req('35').Array.from;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5e", ["89"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('89'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1d", ["5e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _Array$from = req('5e')["default"];
+  exports["default"] = function(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0,
+          arr2 = Array(arr.length); i < arr.length; i++)
+        arr2[i] = arr[i];
+      return arr2;
+    } else {
+      return _Array$from(arr);
+    }
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('8a', ['7', '8', '10', '26', '60', '64', 'd', 'e', '1d', '1e', '8b', '3c'], function (_export) {
+  var _createClass, _classCallCheck, _Promise, _Map, CovJSONLoader, GeoJSONLoader, _get, _inherits, _toConsumableArray, _getIterator, Eventable, JSONLDLoader, AnalysisCatalogue;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_4) {
+      _Promise = _4['default'];
+    }, function (_3) {
+      _Map = _3['default'];
+    }, function (_6) {
+      CovJSONLoader = _6['default'];
+    }, function (_5) {
+      GeoJSONLoader = _5['default'];
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_d2) {
+      _toConsumableArray = _d2['default'];
+    }, function (_e2) {
+      _getIterator = _e2['default'];
+    }, function (_b) {
+      Eventable = _b['default'];
+    }, function (_c) {
+      JSONLDLoader = _c['default'];
+    }],
+    execute: function () {
+      'use strict';
+
+      AnalysisCatalogue = (function (_Eventable) {
+        _inherits(AnalysisCatalogue, _Eventable);
+
+        function AnalysisCatalogue() {
+          _classCallCheck(this, AnalysisCatalogue);
+
+          _get(Object.getPrototypeOf(AnalysisCatalogue.prototype), 'constructor', this).call(this);
+          this._datasets = new _Map();
+
+          this._loaders = [new GeoJSONLoader(), new CovJSONLoader(), new JSONLDLoader()];
+        }
+
+        _createClass(AnalysisCatalogue, [{
+          key: 'addDataset',
+          value: function addDataset(dataset) {
+            if (!this._datasets.has(dataset.id)) {
+              this._datasets.set(dataset.id, dataset);
+              this.fire('add', { dataset: dataset });
+              this._loadDistributionMetadata(dataset);
+            }
+          }
+        }, {
+          key: 'removeDataset',
+          value: function removeDataset(dataset) {
+            if (this._datasets.has(dataset.id)) {
+              this._datasets['delete'](dataset.id);
+              this.fire('remove', { dataset: dataset });
+            }
+          }
+        }, {
+          key: '_loadDistributionMetadata',
+
+          /**
+           * Loads analysable distributions of a dataset and stores metadata about them
+           * in their "metadata" field.
+           * If the format/API supports it then only the metadata part (or similar)
+           * of a distribution is loaded.
+           * 
+           * Note that the loaded distributions are not cached or stored in any way
+           * to prevent out-of-memory situations.
+           * 
+           * To support virtual datasets that we derived in some way,
+           * a distribution object can also have a "data" property (which is
+           * a JavaScript object) instead of an accessURL or downloadURL.
+           * It would be infeasible to persist such data somehow into a Blob and
+           * use URL.createObjectURL(blob) just to get a URL.
+           */
+          value: function _loadDistributionMetadata(dataset) {
+            var _this = this;
+
+            this.fire('distributionsMetadataLoading', { dataset: dataset });
+            var promises = [];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              var _loop = function () {
+                var distribution = _step.value;
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
+
+                try {
+                  for (_iterator2 = _getIterator(_this._loaders); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var loader = _step2.value;
+
+                    if (loader.supports(distribution.mediaType)) {
+                      _this.fire('distributionMetadataLoading', { dataset: dataset, distribution: distribution });
+                      var urlOrData = distribution.accessURL || distribution.downloadURL || distribution.data;
+                      var promise = loader.loadMetadata(urlOrData).then(function (meta) {
+                        distribution.metadata = meta;
+                        _this.fire('distributionMetadataLoad', { dataset: dataset, distribution: distribution });
+                      })['catch'](function (e) {
+                        distribution.error = e;
+                        _this.fire('distributionMetadataLoadError', { dataset: dataset, distribution: distribution, error: e });
+                      });
+                      promises.push(promise);
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+              };
+
+              for (var _iterator = _getIterator(dataset.distributions), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var _iteratorNormalCompletion2;
+
+                var _didIteratorError2;
+
+                var _iteratorError2;
+
+                var _iterator2, _step2;
+
+                _loop();
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            _Promise.all(promises).then(function () {
+              _this.fire('distributionsMetadataLoad', { dataset: dataset });
+            });
+          }
+        }, {
+          key: 'datasets',
+          get: function get() {
+            return [].concat(_toConsumableArray(this._datasets.values()));
+          }
+        }]);
+
+        return AnalysisCatalogue;
+      })(Eventable);
+
+      _export('default', AnalysisCatalogue);
+    }
+  };
+});
+
+$__System.register('8b', ['7', '8', '26', 'd', 'e', '1e'], function (_export) {
+  var _createClass, _classCallCheck, _Map2, _get, _inherits, _getIterator, Eventable, DefaultMap;
+
+  return {
+    setters: [function (_) {
+      _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
+    }, function (_3) {
+      _Map2 = _3['default'];
+    }, function (_d) {
+      _get = _d['default'];
+    }, function (_e) {
+      _inherits = _e['default'];
+    }, function (_e2) {
+      _getIterator = _e2['default'];
+    }],
+    execute: function () {
+      'use strict';
+
+      Eventable = (function () {
+        function Eventable() {
+          _classCallCheck(this, Eventable);
+
+          this.listeners = new DefaultMap(function () {
+            return [];
+          });
+        }
+
+        /**
+         * A Map which returns a default value for get(key) if key does not exist.
+         */
+
+        _createClass(Eventable, [{
+          key: 'on',
+          value: function on(event, fn) {
+            this.listeners.get(event).push(fn);
+          }
+        }, {
+          key: 'fire',
+          value: function fire(event, data) {
+            console.log('EVENT: ' + event, data);
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = _getIterator(this.listeners.get(event)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var fn = _step.value;
+
+                fn(data);
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          }
+        }]);
+
+        return Eventable;
+      })();
+
+      _export('default', Eventable);
+
+      DefaultMap = (function (_Map) {
+        _inherits(DefaultMap, _Map);
+
+        function DefaultMap(defaultFactory, iterable) {
+          _classCallCheck(this, DefaultMap);
+
+          _get(Object.getPrototypeOf(DefaultMap.prototype), 'constructor', this).call(this, iterable);
+          this.defaultFactory = defaultFactory;
+        }
+
+        _createClass(DefaultMap, [{
+          key: 'get',
+          value: function get(key) {
+            if (!this.has(key)) {
+              this.set(key, this.defaultFactory());
+            }
+            return _get(Object.getPrototypeOf(DefaultMap.prototype), 'get', this).call(this, key);
+          }
+        }]);
+
+        return DefaultMap;
+      })(_Map2);
     }
   };
 });
@@ -6100,7 +16199,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     });
   };
   if (!_nodejs && (typeof define === 'function' && define.amd)) {
-    define("d", [], function() {
+    define("8c", [], function() {
       wrapper(factory);
       return factory;
     });
@@ -6124,8630 +16223,19 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("e", ["d"], function(main) {
+define("3d", ["8c"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("f", ["10", "11", "e"], function (_export) {
-  var _getIterator, _Map, jsonld, DCAT_CATALOG_FRAME, UNKNOWN_LANG, i18n;
-
-  function loadCatalog(url) {
-    return jsonld.frame(url, DCAT_CATALOG_FRAME).then(function (framed) {
-      return jsonld.compact(framed, framed['@context']);
-    }).then(function (compacted) {
-      // We create our own preferred structure:
-      // title/description is always a language map where an untagged string is stored under the "unknown"
-      // language key. This is not possible with JSON-LD framing alone.
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = _getIterator(compacted.datasets), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var dataset = _step.value;
-          var _arr = ['title', 'description'];
-
-          for (var _i = 0; _i < _arr.length; _i++) {
-            var key = _arr[_i];
-            transform_i18n(dataset, key);
-          }
-          var _iteratorNormalCompletion2 = true;
-          var _didIteratorError2 = false;
-          var _iteratorError2 = undefined;
-
-          try {
-            for (var _iterator2 = _getIterator(dataset.distributions), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-              var dist = _step2.value;
-              var _arr2 = ['title', 'description'];
-
-              for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-                var key = _arr2[_i2];
-                transform_i18n(dist, key);
-              }
-            }
-          } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
-                _iterator2["return"]();
-              }
-            } finally {
-              if (_didIteratorError2) {
-                throw _iteratorError2;
-              }
-            }
-          }
-        }
-        // since this is not a valid JSON-LD doc anymore, we might as well remove the context now
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator["return"]) {
-            _iterator["return"]();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      delete compacted['@context'];
-      return compacted;
-    });
-  }
-
-  /**
-   * Transforms %key% and %key%_i18n into a single %key% language map
-   * where strings with unknown language get the language tag "unknown". 
-   */
-  function transform_i18n(obj, key) {
-    if (obj[key]) {
-      if (!obj[key + i18n]) {
-        obj[key + i18n] = {};
-      }
-      obj[key + i18n][UNKNOWN_LANG] = obj[key];
-    }
-    if (obj[key + i18n]) {
-      var map = new _Map();
-      for (var lang in obj[key + i18n]) {
-        map.set(lang, obj[key + i18n][lang]);
-      }
-      obj[key] = map;
-      delete obj[key + i18n];
-    }
-  }
-  return {
-    setters: [function (_) {
-      _getIterator = _["default"];
-    }, function (_2) {
-      _Map = _2["default"];
-    }, function (_e) {
-      jsonld = _e.promises;
-    }],
-    execute: function () {
-      "use strict";
-
-      _export("loadCatalog", loadCatalog);
-
-      DCAT_CATALOG_FRAME = {
-        "@context": ["https://rawgit.com/ec-melodies/wp02-dcat/master/context.jsonld",
-        // geometry override since we want the GeoJSON geometry, not the WKT one
-        // Also, @language and title/description override is because CKAN
-        // isn't giving us language-tagged strings which means that we
-        // cannot create nice language maps by default.
-        // To support both scenarios (with/without language tags),
-        // there are two properties for each:
-        // title, description - always a string with unknown language
-        // title_i18n, description_i18n - always a language map
-        // If a language map is given, then the simple string property probably doesn't exist.
-        // If *all* DCAT feeds had language tags then we would only need the latter,
-        // but for wider support, we do a little more effort.
-        // Note that these dual fields get collapsed in a post-processing step, see loadCatalog().
-        {
-          "geometry": {
-            "@id": "locn:geometry",
-            "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
-          },
-          "@language": null,
-          "title": { "@id": "dct:title" },
-          "description": { "@id": "dct:description" },
-          "title_i18n": { "@id": "dct:title", "@container": "@language" },
-          "description_i18n": { "@id": "dct:description", "@container": "@language" },
-          "@base": null
-        }],
-        "@type": "Catalog",
-        "datasets": {
-          "@type": "Dataset",
-          "isPartOf": {
-            "@embed": "@never",
-            "@omitDefault": true
-          },
-          "parts": {
-            "@embed": "@never",
-            "@omitDefault": true
-          },
-          "distributions": {}
-        }
-      };
-      UNKNOWN_LANG = 'unknown';
-      i18n = '_i18n';
-    }
-  };
-});
-
-$__System.register('12', ['5', '6', '7', '8', '9', '13', '14', '15', 'a'], function (_export) {
-  var L, $, _get, _inherits, _createClass, _slicedToArray, inject, i18n, _classCallCheck, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, ContinuousLegend;
-
-  return {
-    setters: [function (_5) {
-      L = _5['default'];
-    }, function (_6) {
-      $ = _6.$;
-    }, function (_) {
-      _get = _['default'];
-    }, function (_2) {
-      _inherits = _2['default'];
-    }, function (_3) {
-      _createClass = _3['default'];
-    }, function (_4) {
-      _slicedToArray = _4['default'];
-    }, function (_7) {
-      inject = _7.inject;
-    }, function (_8) {
-      i18n = _8;
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }],
-    execute: function () {
-      /* */
-
-      // TODO the default template should be moved outside this module so that it can be easily skipped
-      'use strict';
-
-      DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend';
-      DEFAULT_TEMPLATE = '\n<template id="' + DEFAULT_TEMPLATE_ID + '">\n  <div class="info legend continuous-legend">\n    <div style="margin-bottom:3px">\n      <strong class="legend-title"></strong>\n    </div>\n    <div style="display: inline-block; height: 144px; float:left">\n      <span style="height: 136px; width: 18px; display: block; margin-top: 9px;" class="legend-palette"></span>\n    </div>\n    <div style="display: inline-block; float:left; height:153px">\n      <table style="height: 100%;">\n        <tr><td style="vertical-align:top"><span class="legend-max"></span> <span class="legend-uom"></span></td></tr>\n        <tr><td><span class="legend-current"></span></td></tr>\n        <tr><td style="vertical-align:bottom"><span class="legend-min"></span> <span class="legend-uom"></span></td></tr>\n      </table>\n    </div>\n  </div>\n</template>\n';
-      DEFAULT_TEMPLATE_CSS = '\n.legend {\n  color: #555;\n}\n';
-
-      /**
-       * Displays a palette legend for the parameter displayed by the given
-       * Coverage layer.
-       */
-
-      ContinuousLegend = (function (_L$Control) {
-        _inherits(ContinuousLegend, _L$Control);
-
-        function ContinuousLegend(covLayer, options) {
-          _classCallCheck(this, ContinuousLegend);
-
-          _get(Object.getPrototypeOf(ContinuousLegend.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : {});
-          this.covLayer = covLayer;
-          this.id = options.id || DEFAULT_TEMPLATE_ID;
-          this.language = options.language || i18n.DEFAULT_LANGUAGE;
-
-          if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
-            inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS);
-          }
-
-          // arrow function is broken here with traceur, this is a workaround
-          // see https://github.com/google/traceur-compiler/issues/1987
-          var self = this;
-          this._remove = function () {
-            self.removeFrom(self._map);
-          };
-          covLayer.on('remove', this._remove);
-        }
-
-        _createClass(ContinuousLegend, [{
-          key: 'updateLegend',
-          value: function updateLegend() {
-            var el = this._el;
-
-            var palette = this.covLayer.palette;
-
-            var _covLayer$paletteExtent = _slicedToArray(this.covLayer.paletteExtent, 2);
-
-            var low = _covLayer$paletteExtent[0];
-            var high = _covLayer$paletteExtent[1];
-
-            $('.legend-min', el).fill(low.toFixed(2));
-            $('.legend-max', el).fill(high.toFixed(2));
-
-            var gradient = '';
-            for (var i = 0; i < palette.steps; i++) {
-              if (i > 0) gradient += ',';
-              gradient += 'rgb(' + palette.red[i] + ',' + palette.green[i] + ',' + palette.blue[i] + ')';
-            }
-
-            $('.legend-palette', el).set('$background', 'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%');
-          }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            var _this = this;
-
-            this.covLayer.off('remove', this._remove);
-            this.covLayer.off('paletteChange', function () {
-              return _this.updateLegend();
-            });
-            this.covLayer.off('paletteExtentChange', function () {
-              return _this.updateLegend();
-            });
-          }
-        }, {
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this2 = this;
-
-            this._map = map;
-
-            this.covLayer.on('paletteChange', function () {
-              return _this2.updateLegend();
-            });
-            this.covLayer.on('paletteExtentChange', function () {
-              return _this2.updateLegend();
-            });
-
-            var param = this.covLayer.parameter;
-            // if requested language doesn't exist, use the returned one for all other labels
-            var language = i18n.getLanguageTag(param.observedProperty.label, this.language);
-            var title = i18n.getLanguageString(param.observedProperty.label, language);
-            var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language) : '';
-
-            var el = document.importNode($('#' + this.id)[0].content, true).children[0];
-            this._el = el;
-            $('.legend-title', el).fill(title);
-            $('.legend-uom', el).fill(unit);
-            this.updateLegend();
-
-            return el;
-          }
-        }]);
-
-        return ContinuousLegend;
-      })(L.Control);
-
-      _export('default', ContinuousLegend);
-    }
-  };
-});
-
-$__System.register('15', [], function (_export) {
-  /* */
-  'use strict';
-
-  var DEFAULT_LANGUAGE;
-
-  _export('getLanguageTag', getLanguageTag);
-
-  _export('getLanguageString', getLanguageString);
-
-  function getLanguageTag(map) {
-    var preferredLanguage = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_LANGUAGE : arguments[1];
-
-    if (map.has(preferredLanguage)) {
-      return preferredLanguage;
-    } else {
-      // could be more clever here for cases like 'de' vs 'de-DE'
-      return map.keys().next().value;
-    }
-  }
-
-  function getLanguageString(map) {
-    var preferredLanguage = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_LANGUAGE : arguments[1];
-
-    if (map.has(preferredLanguage)) {
-      return map.get(preferredLanguage);
-    } else {
-      // random language
-      // this case should not happen as all labels should have common languages
-      return map.values().next().value;
-    }
-  }
-
-  return {
-    setters: [],
-    execute: function () {
-      DEFAULT_LANGUAGE = 'en';
-
-      _export('DEFAULT_LANGUAGE', DEFAULT_LANGUAGE);
-    }
-  };
-});
-
-$__System.register('14', [], function (_export) {
-  /**
-   * Inject HTML and CSS into the DOM.
-   * 
-   * @param html The html to inject at the end of the body element.
-   * @param css The CSS styles to inject at the end of the head element.
-   */
-  'use strict';
-
-  _export('inject', inject);
-
-  function inject(html, css) {
-    // inject default template and CSS into DOM
-    if (html) {
-      var span = document.createElement('span');
-      span.innerHTML = html;
-      document.body.appendChild(span.children[0]);
-    }
-
-    if (css) {
-      var style = document.createElement('style');
-      style.type = 'text/css';
-      if (style.styleSheet) {
-        style.styleSheet.cssText = css;
-      } else {
-        style.appendChild(document.createTextNode(css));
-      }
-      document.head.appendChild(style);
-    }
-  }
-
-  return {
-    setters: [],
-    execute: function () {}
-  };
-});
-
-$__System.register('16', ['5', '6', '7', '8', '9', '14', '15', 'a'], function (_export) {
-  var L, $, HTML, _get, _inherits, _createClass, inject, i18n, _classCallCheck, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, DiscreteLegend;
-
-  return {
-    setters: [function (_4) {
-      L = _4['default'];
-    }, function (_5) {
-      $ = _5.$;
-      HTML = _5.HTML;
-    }, function (_) {
-      _get = _['default'];
-    }, function (_2) {
-      _inherits = _2['default'];
-    }, function (_3) {
-      _createClass = _3['default'];
-    }, function (_6) {
-      inject = _6.inject;
-    }, function (_7) {
-      i18n = _7;
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }],
-    execute: function () {
-      /* */
-
-      // TODO the default template should be moved outside this module so that it can be easily skipped
-      'use strict';
-
-      DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend';
-      DEFAULT_TEMPLATE = '\n<template id="' + DEFAULT_TEMPLATE_ID + '">\n  <div class="info legend discrete-legend">\n    <strong class="legend-title"></strong><br>\n    <div class="legend-palette discrete-legend-palette"></div>\n  </div>\n</template>\n';
-      DEFAULT_TEMPLATE_CSS = '\n.legend {\n  color: #555;\n}\n.discrete-legend-palette {\n  padding: 2px 1px;\n  line-height: 18px;\n}\n.discrete-legend-palette i {\n  float: left;\n  height: 18px;\n  margin-right: 8px;\n  width: 18px;\n}\n';
-
-      /**
-       * Displays a discrete palette legend for the parameter displayed by the given
-       * Coverage layer. Supports category parameters only at the moment.
-       * 
-       * @example
-       * new DiscreteLegend(covLayer).addTo(map)
-       * 
-       * @example <caption>Fake layer</caption>
-       * var legend = new DiscreteLegend({parameter: {..}, palette: {...}}).addTo(map)
-       * 
-       * // either recreate the legend or update the fake layer in place:
-       * legend.covLayer = {..}
-       * legend.updateLegend()
-       */
-
-      DiscreteLegend = (function (_L$Control) {
-        _inherits(DiscreteLegend, _L$Control);
-
-        function DiscreteLegend(covLayer, options) {
-          var _this = this;
-
-          _classCallCheck(this, DiscreteLegend);
-
-          _get(Object.getPrototypeOf(DiscreteLegend.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : {});
-          this.covLayer = covLayer;
-          this.id = options.id || DEFAULT_TEMPLATE_ID;
-          this.language = options.language || i18n.DEFAULT_LANGUAGE;
-
-          if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
-            inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS);
-          }
-
-          if (covLayer.on) {
-            (function () {
-              // arrow function is broken here with traceur, this is a workaround
-              // see https://github.com/google/traceur-compiler/issues/1987
-              var self = _this;
-              _this._remove = function () {
-                self.removeFrom(self._map);
-              };
-              covLayer.on('remove', _this._remove);
-            })();
-          }
-        }
-
-        _createClass(DiscreteLegend, [{
-          key: 'updateLegend',
-          value: function updateLegend() {
-            var el = this._el;
-
-            var palette = this.covLayer.palette;
-            var param = this.covLayer.parameter;
-
-            var html = '';
-
-            for (var i = 0; i < palette.steps; i++) {
-              var cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this.language);
-              html += '\n        <i style="background:rgb(' + palette.red[i] + ', ' + palette.green[i] + ', ' + palette.blue[i] + ')"></i>\n        ' + cat + '\n        <br>';
-            }
-
-            $('.legend-palette', el).fill(HTML(html));
-          }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            var _this2 = this;
-
-            if (this.covLayer.off) {
-              this.covLayer.off('remove', this._remove);
-              this.covLayer.off('paletteChange', function () {
-                return _this2.updateLegend();
-              });
-            }
-          }
-        }, {
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this3 = this;
-
-            this._map = map;
-
-            if (this.covLayer.on) {
-              this.covLayer.on('paletteChange', function () {
-                return _this3.updateLegend();
-              });
-            }
-
-            var param = this.covLayer.parameter;
-            // if requested language doesn't exist, use the returned one for all other labels
-            this.language = i18n.getLanguageTag(param.observedProperty.label, this.language);
-            var title = i18n.getLanguageString(param.observedProperty.label, this.language);
-
-            var el = document.importNode($('#' + this.id)[0].content, true).children[0];
-            this._el = el;
-            $('.legend-title', el).fill(title);
-            this.updateLegend();
-
-            return el;
-          }
-        }]);
-
-        return DiscreteLegend;
-      })(L.Control);
-
-      _export('default', DiscreteLegend);
-    }
-  };
-});
-
-$__System.register('17', ['12', '16'], function (_export) {
-  /* */
-  'use strict';
-
-  var ContinuousLegend, DiscreteLegend;
-  return {
-    setters: [function (_2) {
-      ContinuousLegend = _2['default'];
-    }, function (_) {
-      DiscreteLegend = _['default'];
-    }],
-    execute: function () {
-      _export('default', function (layer, options) {
-        if (layer.parameter.observedProperty.categories) {
-          return new DiscreteLegend(layer, options);
-        } else {
-          return new ContinuousLegend(layer, options);
-        }
-      });
-    }
-  };
-});
-
-$__System.register('18', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', '1c'], function (_export) {
-  var L, _get, _inherits, _createClass, _slicedToArray, linearPalette, scale, _classCallCheck, _Promise, arrays, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_COLOR, DEFAULT_PALETTE, VerticalProfile;
-
-  return {
-    setters: [function (_5) {
-      L = _5['default'];
-    }, function (_) {
-      _get = _['default'];
-    }, function (_2) {
-      _inherits = _2['default'];
-    }, function (_3) {
-      _createClass = _3['default'];
-    }, function (_4) {
-      _slicedToArray = _4['default'];
-    }, function (_6) {
-      linearPalette = _6.linearPalette;
-      scale = _6.scale;
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_c) {
-      _Promise = _c['default'];
-    }, function (_a2) {
-      arrays = _a2;
-    }, function (_b) {
-      rangeutil = _b;
-    }, function (_c2) {
-      referencingutil = _c2;
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      DOMAIN_TYPE = 'http://coveragejson.org/def#VerticalProfile';
-      DEFAULT_COLOR = 'black';
-      DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
-      // blues
-
-      /**
-       * Renderer for Coverages with domain type Profile.
-       * 
-       * This will simply display a dot on the map and fire a click
-       * event when a user clicks on it.
-       * The dot either has a defined standard color, or it uses
-       * a palette together with a target depth if a parameter is chosen.
-       */
-
-      VerticalProfile = (function (_L$Class) {
-        _inherits(VerticalProfile, _L$Class);
-
-        function VerticalProfile(cov, options) {
-          _classCallCheck(this, VerticalProfile);
-
-          _get(Object.getPrototypeOf(VerticalProfile.prototype), 'constructor', this).call(this);
-          if (cov.domainType !== DOMAIN_TYPE) {
-            throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
-          }
-          this.cov = cov;
-          this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
-          this._targetZ = 'targetZ' in options ? options.targetZ : null;
-          this.defaultColor = options.color ? options.color : DEFAULT_COLOR;
-
-          if (this.param && this.param.categories) {
-            throw new Error('category parameters are currently not support for Profile');
-          }
-
-          this._palette = options.palette || DEFAULT_PALETTE;
-          if (Array.isArray(options.paletteExtent)) {
-            this._paletteExtent = options.paletteExtent;
-          } else {
-            this._paletteExtent = 'full';
-          }
-
-          // TODO remove code duplication
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
-          }
-        }
-
-        _createClass(VerticalProfile, [{
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this = this;
-
-            this._map = map;
-
-            map.fire('dataloading'); // for supporting loading spinners
-
-            function checkWGS84(domain) {
-              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
-              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-                throw new Error('Unsupported CRS, must be WGS84');
-              }
-            }
-
-            var promise = undefined;
-            if (this.param) {
-              promise = _Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
-                var _ref2 = _slicedToArray(_ref, 2);
-
-                var domain = _ref2[0];
-                var range = _ref2[1];
-
-                console.log('domain and range loaded');
-                _this.domain = domain;
-                checkWGS84(domain);
-                _this.range = range;
-                _this._updatePaletteExtent(_this._paletteExtent);
-                _this._addMarker();
-                _this.fire('add');
-                map.fire('dataload');
-              });
-            } else {
-              promise = this.cov.loadDomain().then(function (domain) {
-                console.log('domain loaded');
-                _this.domain = domain;
-                checkWGS84(domain);
-                _this._addMarker();
-                _this.fire('add');
-                map.fire('dataload');
-              });
-            }
-
-            promise['catch'](function (e) {
-              console.error(e);
-              _this.fire('error', e);
-
-              map.fire('dataload');
-            });
-          }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            this.fire('remove');
-            this._removeMarker();
-          }
-        }, {
-          key: 'getBounds',
-          value: function getBounds() {
-            return this.marker.getBounds();
-          }
-        }, {
-          key: '_updatePaletteExtent',
-          value: function _updatePaletteExtent(extent) {
-            if (Array.isArray(extent) && extent.length === 2) {
-              this._paletteExtent = extent;
-              return;
-            }
-
-            if (!this.param) {
-              throw new Error('palette extent cannot be set when no profile parameter has been chosen');
-            }
-
-            this._paletteExtent = rangeutil.minMax(this.range);
-          }
-        }, {
-          key: '_addMarker',
-          value: function _addMarker() {
-            var _this2 = this;
-
-            // TODO do coordinate transformation to lat/lon if necessary
-
-            var x = this.domain.axes.get('x').values[0];
-            var y = this.domain.axes.get('y').values[0];
-            this.marker = L.circleMarker(L.latLng(y, x), { color: this._getColor() });
-
-            this.marker.on('click', function () {
-              _this2.fire('click');
-            });
-
-            this.marker.addTo(this._map);
-          }
-        }, {
-          key: '_removeMarker',
-          value: function _removeMarker() {
-            this._map.removeLayer(this.marker);
-            delete this.marker;
-          }
-        }, {
-          key: '_getColor',
-          value: function _getColor() {
-            var z = this.domain.axes.get('z').values.z;
-
-            if (this.param && this.targetZ !== null) {
-              // use a palette
-              // find the value with z nearest to targetZ
-              var val = this.range.get({ z: arrays.indexOfNearest(z, this.targetZ) });
-              if (val !== null) {
-                var valScaled = scale(val, this.palette, this.paletteExtent);
-                var _palette = this.palette;
-                var red = _palette.red;
-                var green = _palette.green;
-                var blue = _palette.blue;
-
-                return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
-              }
-            }
-            return this.defaultColor;
-          }
-        }, {
-          key: '_updateMarker',
-          value: function _updateMarker() {
-            this.marker.options.color = this._getColor();
-          }
-        }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
-            if (this._autoRedraw) {
-              this.redraw();
-            }
-          }
-        }, {
-          key: 'redraw',
-          value: function redraw() {
-            this._updateMarker();
-            this.marker.redraw();
-          }
-        }, {
-          key: 'parameter',
-          get: function get() {
-            return this.param;
-          }
-        }, {
-          key: 'targetZ',
-          get: function get() {
-            return this._targetZ;
-          },
-          set: function set(z) {
-            this._targetZ = z;
-            this._doAutoRedraw();
-            this.fire('targetZChange');
-          }
-        }, {
-          key: 'palette',
-          set: function set(p) {
-            this._palette = p;
-            this._doAutoRedraw();
-            this.fire('paletteChange');
-          },
-          get: function get() {
-            return this.param && this.targetZ !== null ? this._palette : null;
-          }
-        }, {
-          key: 'paletteExtent',
-          set: function set(extent) {
-            this._updatePaletteExtent(extent);
-            this._doAutoRedraw();
-            this.fire('paletteExtentChange');
-          },
-          get: function get() {
-            return this._paletteExtent;
-          }
-        }]);
-
-        return VerticalProfile;
-      })(L.Class);
-
-      _export('VerticalProfile', VerticalProfile);
-
-      VerticalProfile.include(L.Mixin.Events);
-
-      // work-around for Babel bug, otherwise Profile cannot be referenced here
-
-      _export('default', VerticalProfile);
-    }
-  };
-});
-
-$__System.register('1d', ['5', '7', '8', '9', '13', '19', 'a', 'c', '1a', '1b', '1c'], function (_export) {
-  var L, _get, _inherits, _createClass, _slicedToArray, linearPalette, scale, _classCallCheck, _Promise, arrays, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_PALETTE, Trajectory;
-
-  return {
-    setters: [function (_5) {
-      L = _5['default'];
-    }, function (_) {
-      _get = _['default'];
-    }, function (_2) {
-      _inherits = _2['default'];
-    }, function (_3) {
-      _createClass = _3['default'];
-    }, function (_4) {
-      _slicedToArray = _4['default'];
-    }, function (_6) {
-      linearPalette = _6.linearPalette;
-      scale = _6.scale;
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_c) {
-      _Promise = _c['default'];
-    }, function (_a2) {
-      arrays = _a2;
-    }, function (_b) {
-      rangeutil = _b;
-    }, function (_c2) {
-      referencingutil = _c2;
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory';
-      DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
-      // blues
-
-      /**
-       * Renderer for Coverages with domain type Trajectory.
-       * 
-       * Displays the trajectory as a path with coloured points using
-       * a given palette for a given parameter.
-       * 
-       * Events fired onto the map:
-       * "dataloading" - Data loading has started
-       * "dataload" - Data loading has finished (also in case of errors)
-       * 
-       * Events fired on this layer:
-       * "add" - Layer is initialized and is about to be added to the map
-       * "remove" - Layer is removed from the map
-       * "error" - Error when loading data
-       * "paletteChange" - Palette has changed
-       * "paletteExtentChange" - Palette extent has changed
-       * 
-       */
-
-      Trajectory = (function (_L$FeatureGroup) {
-        _inherits(Trajectory, _L$FeatureGroup);
-
-        // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
-        //    (we use it for now to have getBounds() which LayerGroup misses)
-
-        function Trajectory(cov, options) {
-          _classCallCheck(this, Trajectory);
-
-          _get(Object.getPrototypeOf(Trajectory.prototype), 'constructor', this).call(this);
-          if (cov.domainType !== DOMAIN_TYPE) {
-            throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
-          }
-          this.cov = cov;
-          this.param = cov.parameters.get(options.keys[0]);
-
-          if (this.param.categories) {
-            throw new Error('category parameters are currently not support for Trajectory');
-          }
-
-          this._palette = options.palette || DEFAULT_PALETTE;
-          if (options.paletteExtent === undefined || options.paletteExtent === 'subset') {
-            this._paletteExtent = 'full';
-          } else if (Array.isArray(options.paletteExtent) || ['full', 'fov'].indexOf(options.paletteExtent) !== -1) {
-            this._paletteExtent = options.paletteExtent;
-          } else {
-            throw new Error('paletteExtent must either be a 2-element array, ' + 'one of "full", "subset" (identical to "full" for trajectories) or "fov", or be omitted');
-          }
-          // TODO remove code duplication
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
-          }
-
-          console.log('Trajectory layer created');
-        }
-
-        _createClass(Trajectory, [{
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this = this;
-
-            console.log('adding trajectory to map');
-            this._map = map;
-            map.fire('dataloading'); // for supporting loading spinners
-            _Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
-              var _ref2 = _slicedToArray(_ref, 2);
-
-              var domain = _ref2[0];
-              var range = _ref2[1];
-
-              console.log('domain and range loaded');
-              _this.domain = domain;
-              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
-              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-                throw new Error('Unsupported CRS, must be WGS84');
-              }
-
-              _this.range = range;
-              _this._updatePaletteExtent(_this._paletteExtent);
-              _this._addTrajectoryLayers();
-              _this.fire('add');
-              _get(Object.getPrototypeOf(Trajectory.prototype), 'onAdd', _this).call(_this, map);
-              map.fire('dataload');
-            })['catch'](function (e) {
-              console.error(e);
-              _this.fire('error', e);
-
-              map.fire('dataload');
-            });
-          }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            this.fire('remove');
-            console.log('removing trajectory from map');
-            _get(Object.getPrototypeOf(Trajectory.prototype), 'onRemove', this).call(this, map);
-          }
-        }, {
-          key: '_updatePaletteExtent',
-          value: function _updatePaletteExtent(extent) {
-            if (Array.isArray(extent) && extent.length === 2) {
-              this._paletteExtent = extent;
-              return;
-            }
-
-            var range = this.range;
-
-            if (extent === 'full') {
-              // scan the whole range for min/max values
-
-            } else if (extent === 'fov') {
-                // scan the values that are currently in field of view on the map for min/max
-                var bounds = this._map.getBounds();
-
-                // TODO implement
-                throw new Error('NOT IMPLEMENTED YET');
-              } else {
-                throw new Error('Unknown extent specification: ' + extent);
-              }
-
-            this._paletteExtent = rangeutil.minMax(range);
-          }
-        }, {
-          key: '_addTrajectoryLayers',
-          value: function _addTrajectoryLayers() {
-            // add a Polyline in black, and coloured CircleMarker's for each domain point
-            var composite = this.domain.axes.get('composite').values;
-            var range = this.range;
-
-            // TODO do coordinate transformation to lat/lon if necessary
-
-            var palette = this.palette;
-            var _palette = this.palette;
-            var red = _palette.red;
-            var green = _palette.green;
-            var blue = _palette.blue;
-
-            var paletteExtent = this.paletteExtent;
-
-            var coords = [];
-            for (var i = 0; i < composite.length; i++) {
-              var val = range.get({ composite: i });
-              // this always has to be lat/lon, no matter which map projection is used
-              var x = composite[i][1];
-              var y = composite[i][2];
-              var coord = new L.LatLng(y, x);
-              coords.push(coord);
-              if (val !== null) {
-                var valScaled = scale(val, palette, paletteExtent);
-                var marker = new L.CircleMarker(coord, {
-                  color: 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')',
-                  opacity: 1,
-                  fillOpacity: 1
-                });
-                this.addLayer(marker);
-              }
-            }
-
-            var polyline = L.polyline(coords, {
-              color: 'black',
-              weight: 3
-            });
-
-            this.addLayer(polyline);
-          }
-        }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
-            if (this._autoRedraw) {
-              this.redraw();
-            }
-          }
-        }, {
-          key: 'redraw',
-          value: function redraw() {
-            this.clearLayers();
-            this._addTrajectoryLayers();
-          }
-        }, {
-          key: 'parameter',
-          get: function get() {
-            return this.param;
-          }
-        }, {
-          key: 'palette',
-          set: function set(p) {
-            this._palette = p;
-            this._doAutoRedraw();
-            this.fire('paletteChange');
-          },
-          get: function get() {
-            return this._palette;
-          }
-        }, {
-          key: 'paletteExtent',
-          set: function set(extent) {
-            this._updatePaletteExtent(extent);
-            this._doAutoRedraw();
-            this.fire('paletteExtentChange');
-          },
-          get: function get() {
-            return this._paletteExtent;
-          }
-        }]);
-
-        return Trajectory;
-      })(L.FeatureGroup);
-
-      Trajectory.include(L.Mixin.Events);
-
-      // work-around for Babel bug, otherwise Trajectory cannot be referenced here
-
-      _export('default', Trajectory);
-    }
-  };
-});
-
-$__System.register('1c', [], function (_export) {
-  /** 3D WGS84 in lat-lon-height order */
-  'use strict';
-
-  var EPSG4979, EPSG4326, CRS84, GeodeticWGS84CRS;
-
-  /**
-   * Returns the referencing system matching the given identifiers.
-   * 
-   * Note: If the input identifiers used for searching are associated
-   * to multiple referencing systems, then this function returns `undefined`.
-   */
-
-  _export('isGeodeticWGS84CRS', isGeodeticWGS84CRS);
-
-  _export('getRefSystem', getRefSystem);
-
-  function isGeodeticWGS84CRS(rs) {
-    return GeodeticWGS84CRS.indexOf(rs.id) !== -1;
-  }
-
-  function getRefSystem(domain, identifiers) {
-    var refs = domain.referencing;
-    var ref = refs.find(function (ref) {
-      return identifiers.every(function (id) {
-        return ref.identifiers.indexOf(id) !== -1;
-      });
-    });
-    if (!ref) return;
-    var rs = ref.srs || ref.trs || ref.rs;
-    return rs;
-  }
-
-  return {
-    setters: [],
-    execute: function () {
-      EPSG4979 = 'http://www.opengis.net/def/crs/EPSG/0/4979';
-
-      /** 2D WGS84 in lat-lon order */
-      EPSG4326 = 'http://www.opengis.net/def/crs/EPSG/0/4326';
-
-      /** 2D WGS84 in lon-lat order */
-      CRS84 = 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
-      GeodeticWGS84CRS = [EPSG4979, EPSG4326, CRS84];
-    }
-  };
-});
-
-$__System.register("1b", ["13", "1e"], function (_export) {
-  var _slicedToArray, _toConsumableArray;
-
-  function iterate(range, fn) {
-    // TODO create pre-compiled for-loop version to improve speed
-    function iterateRecurse(obj, shape, axisIdx) {
-      if (shape.length === axisIdx) {
-        var val = range.get(obj);
-        fn(val, obj);
-      } else {
-        var _shape$axisIdx = _slicedToArray(shape[axisIdx], 2);
-
-        var axis = _shape$axisIdx[0];
-        var size = _shape$axisIdx[1];
-
-        for (var i = 0; i < size; i++) {
-          obj[axis] = i;
-          iterateRecurse(obj, shape, axisIdx + 1);
-        }
-      }
-    }
-    var shape = [].concat(_toConsumableArray(range.shape));
-    return iterateRecurse({}, shape, 0);
-  }
-
-  /**
-   * Apply a reduce function over the range values.
-   */
-
-  function reduce(range, fn, start) {
-    var v1 = start;
-    var iterFn = function iterFn(v2) {
-      v1 = fn(v1, v2);
-    };
-    iterate(range, iterFn);
-    return v1;
-  }
-
-  /**
-   * Return the minimum/maximum across all range values,
-   * ignoring null's.
-   */
-
-  function minMax(range) {
-    var min = Infinity;
-    var max = -Infinity;
-    var fn = function fn(val) {
-      if (val === null) return;
-      if (val < min) min = val;
-      if (val > max) max = val;
-    };
-    iterate(range, fn);
-    return [min, max];
-  }
-
-  return {
-    setters: [function (_) {
-      _slicedToArray = _["default"];
-    }, function (_e) {
-      _toConsumableArray = _e["default"];
-    }],
-    execute: function () {
-      /**
-       * Iterate over all range values and run a function for each value.
-       */
-      "use strict";
-
-      _export("iterate", iterate);
-
-      _export("reduce", reduce);
-
-      _export("minMax", minMax);
-    }
-  };
-});
-
-$__System.register('1a', ['9', '20', 'a', '1f'], function (_export) {
-  var _createClass, _Math$trunc, _classCallCheck, ndarray, Wrapper1D;
-
-  /***
-   * Return the indices of the two neighbors in the a array closest to x.
-   * The array must be sorted (strictly monotone), either ascending or descending.
-   * 
-   * If x exists in the array, both neighbors point to x.
-   * If x is lower (greated if descending) than the first value, both neighbors point to 0.
-   * If x is greater (lower if descending) than the last value, both neighbors point to the last index.
-   * 
-   * Adapted from https://stackoverflow.com/a/4431347
-   */
-
-  function indicesOfNearest(a, x) {
-    if (a.length === 0) {
-      throw new Error('Array must have at least one element');
-    }
-    var lo = -1;
-    var hi = a.length;
-    var ascending = a.length === 1 || a[0] < a[1];
-    // we have two separate code paths to help the runtime optimize the loop
-    if (ascending) {
-      while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] <= x) {
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    } else {
-      while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] >= x) {
-          // here's the difference
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    }
-    if (a[lo] === x) hi = lo;
-    if (lo === -1) lo = hi;
-    if (hi === a.length) hi = lo;
-    return [lo, hi];
-  }
-
-  /**
-   * Return the index in a of the value closest to x.
-   * The array a must be sorted, either ascending or descending.
-   * If x happens to be exactly between two values, the one that
-   * appears first is returned.
-   */
-
-  function indexOfNearest(a, x) {
-    var i = indicesOfNearest(a, x);
-    var lo = i[0];
-    var hi = i[1];
-    if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
-      return lo;
-    } else {
-      return hi;
-    }
-  }
-
-  /**
-   * Wraps an object with get(i,j,k,...) method and .shape property
-   * as a SciJS ndarray object (https://github.com/scijs/ndarray).
-   * 
-   * If the object happens to be a SciJS ndarray object already, then this function
-   * just returns the same object.
-   * 
-   * Note that ndarray only accepts 1D-storage in its constructor, which means
-   * we have to map our multi-dim indices to 1D, and get back to multi-dim
-   * again afterwards.
-   * TODO do benchmarks
-   */
-
-  function asSciJSndarray(arr) {
-    if (['data', 'shape', 'stride', 'offset'].every(function (p) {
-      return p in arr;
-    })) {
-      // by existence of these properties we assume it is an ndarray
-      return arr;
-    }
-    var ndarr = ndarray(new Wrapper1D(arr), arr.shape);
-    return ndarr;
-  }
-
-  /**
-   * Wraps an ndarray-like object with get(i,j,...) method and .shape property
-   * as a 1D array object with get(i) and .length properties.
-   * Instances of this class can then be used as array storage for SciJS's ndarray. 
-   */
-  return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_2) {
-      _Math$trunc = _2['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_f) {
-      ndarray = _f['default'];
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      _export('indicesOfNearest', indicesOfNearest);
-
-      _export('indexOfNearest', indexOfNearest);
-
-      _export('asSciJSndarray', asSciJSndarray);
-
-      Wrapper1D = (function () {
-        function Wrapper1D(arr) {
-          _classCallCheck(this, Wrapper1D);
-
-          this._arr = arr;
-          this._shape = arr.shape;
-          this._dims = arr.shape.length;
-          this._calculateStrides();
-          this.length = arr.shape.reduce(function (a, b) {
-            return a * b;
-          }, 1);
-        }
-
-        _createClass(Wrapper1D, [{
-          key: '_calculateStrides',
-          value: function _calculateStrides() {
-            var strides = new Uint16Array(this._dims);
-            strides[this._dims - 1] = 1;
-            for (var i = this._dims - 2; i >= 0; i--) {
-              strides[i] = strides[i + 1] * this._shape[i + 1];
-            }
-            this._strides = strides;
-          }
-        }, {
-          key: 'get',
-          value: function get(idx) {
-            var _arr;
-
-            // TODO add optimized versions for dim <= 4
-            var dims = this._dims;
-            var strides = this._strides;
-
-            // convert 1D index to nd-indices
-            var ndidx = new Array(dims);
-            for (var i = 0; i < dims; i++) {
-              ndidx[i] = _Math$trunc(idx / strides[i]);
-              idx -= ndidx[i] * strides[i];
-            }
-            return (_arr = this._arr).get.apply(_arr, ndidx);
-          }
-        }]);
-
-        return Wrapper1D;
-      })();
-    }
-  };
-});
-
-$__System.registerDynamic("21", ["22", "23", "24"], true, function(req, exports, module) {
+$__System.registerDynamic("2f", ["7a", "5a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('22');
-  req('23');
-  module.exports = req('24')('iterator');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("25", ["21"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('21'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('19', ['9', '11', '20', '25', 'a'], function (_export) {
-  var _createClass, _Map, _Math$trunc, _Symbol$iterator, _classCallCheck, PaletteManager;
-
-  function linearPalette(colors) {
-    var steps = arguments.length <= 1 || arguments[1] === undefined ? 256 : arguments[1];
-
-    if (steps === 1) {
-      // work-around, a gradient with 1 pixel becomes black otherwise
-      return directPalette([colors[0]]);
-    }
-    // draw the gradient in a canvas
-    var canvas = document.createElement('canvas');
-    canvas.width = steps;
-    canvas.height = 1;
-    var ctx = canvas.getContext('2d');
-    var gradient = ctx.createLinearGradient(0, 0, steps - 1, 0);
-    var num = colors.length;
-    for (var i = 0; i < num; i++) {
-      gradient.addColorStop(i / (num - 1), colors[i]);
-    }
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, steps, 1);
-
-    // now read back values into arrays
-    var red = new Uint8Array(steps);
-    var green = new Uint8Array(steps);
-    var blue = new Uint8Array(steps);
-
-    var pix = ctx.getImageData(0, 0, steps, 1).data;
-    for (var _i = 0, j = 0; _i < pix.length; _i += 4, j++) {
-      red[j] = pix[_i];
-      green[j] = pix[_i + 1];
-      blue[j] = pix[_i + 2];
-    }
-
-    return {
-      steps: red.length,
-      red: red,
-      green: green,
-      blue: blue
-    };
-  }
-
-  /**
-   * Converts an array of CSS colors to a palette of the same size.
-   */
-
-  function directPalette(colors) {
-    var canvas = document.createElement('canvas');
-    canvas.width = 1;
-    canvas.height = 1;
-    var ctx = canvas.getContext('2d');
-
-    var steps = colors.length;
-
-    var red = new Uint8Array(steps);
-    var green = new Uint8Array(steps);
-    var blue = new Uint8Array(steps);
-
-    for (var i = 0; i < colors.length; i++) {
-      ctx.fillStyle = colors[i];
-      ctx.fillRect(0, 0, 1, 1);
-      var pix = ctx.getImageData(0, 0, 1, 1).data;
-      red[i] = pix[0];
-      green[i] = pix[1];
-      blue[i] = pix[2];
-    }
-
-    return {
-      steps: red.length,
-      red: red,
-      green: green,
-      blue: blue
-    };
-  }
-
-  function scale(val, palette, extent) {
-    // scale val to [0,paletteSize-1] using the palette extent
-    // (IDL bytscl formula: http://www.exelisvis.com/docs/BYTSCL.html)
-    var scaled = _Math$trunc((palette.steps - 1 + 0.9999) * (val - extent[0]) / (extent[1] - extent[0]));
-    return scaled;
-  }
-
-  /**
-   * Manages palettes under common names.
-   * 
-   * Palettes can have different numbers of steps.
-   * Linear palettes can be conveniently added by supplying an array of CSS color specifications.
-   * Generic palettes can be added by directly supplying the step colors as RGB arrays. 
-   * 
-   * Example:
-   * <pre><code>
-   * var palettes = new PaletteManager({defaultSteps: 10})
-   * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // has 10 steps
-   * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps=1000}) // high-resolution palette
-   * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of exactly those 3 colors
-   * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
-   * </code></pre>
-   * 
-   * Note that Uint8Array typed arrays should be used for custom palettes (added via add()) to avoid
-   * internal transformation.
-   */
-
-  function _asUint8Array(arr) {
-    var ta = new Uint8Array(arr.length);
-    for (var i = 0; i < arr.length; i++) {
-      var val = arr[i];
-      if (val < 0 || val > 255) {
-        throw new Error('Array value must be within [0,255], but is: ' + val);
-      }
-      ta[i] = val;
-    }
-    return ta;
-  }
-  return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_3) {
-      _Map = _3['default'];
-    }, function (_2) {
-      _Math$trunc = _2['default'];
-    }, function (_4) {
-      _Symbol$iterator = _4['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }],
-    execute: function () {
-      /**
-       * Calculates a linear palette of the given size (default 256) from the given
-       * CSS color specifications.
-       * 
-       * Example:
-       * <pre><code>
-       * var grayscale = linearPalette(['#FFFFFF', '#000000'], 10) // 10-step palette
-       * var rainbow = linearPalette(['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000'])
-       * </code></pre>
-       * 
-       * @param {Array} colors An array of CSS color specifications
-       * @param {number} steps The number of palette colors to calculate
-       * @return An object with members ncolors, red, green, blue, usable with
-       *         the PaletteManager class.
-       */
-      'use strict';
-
-      _export('linearPalette', linearPalette);
-
-      _export('directPalette', directPalette);
-
-      _export('scale', scale);
-
-      PaletteManager = (function () {
-
-        /**
-         * @param {Integer} defaultSteps The default number of steps when adding palettes with addLinear().
-         */
-
-        function PaletteManager() {
-          var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-          var _ref$defaultSteps = _ref.defaultSteps;
-          var defaultSteps = _ref$defaultSteps === undefined ? 256 : _ref$defaultSteps;
-
-          _classCallCheck(this, PaletteManager);
-
-          this._defaultSteps = defaultSteps;
-          this._palettes = new _Map();
-        }
-
-        /**
-         * Store a supplied generic palette under the given name.
-         * 
-         * @param name The unique name of the palette.
-         * @param palette An object with red, green, and blue properties (each an array of [0,255] values),
-         *                or an array of CSS color specifications.
-         */
-
-        _createClass(PaletteManager, [{
-          key: 'add',
-          value: function add(name, palette) {
-            if (this._palettes.has(name)) {
-              console.warn('A palette with name "' + name + '" already exists! Overwriting...');
-            }
-            if (Array.isArray(palette)) {
-              palette = directPalette(palette);
-            }
-
-            if (![palette.red, palette.green, palette.blue].every(function (arr) {
-              return arr.length === palette.red.length;
-            })) {
-              throw new Error('The red, green, blue arrays of the palette must be of equal lengths');
-            }
-            if (!(palette.red instanceof Uint8Array)) {
-              palette.red = _asUint8Array(palette.red);
-              palette.green = _asUint8Array(palette.green);
-              palette.blue = _asUint8Array(palette.blue);
-            }
-            palette.steps = palette.red.length; // for convenience in clients
-            this._palettes.set(name, palette);
-          }
-
-          /**
-           * Store a linear palette under the given name created with the given CSS color specifications.
-           * 
-           * @param {String} name The unique name of the palette
-           * @param {Array} colors An array of CSS color specifications
-           * @param {Integer} steps Use a different number of steps than the default of this manager.
-           */
-        }, {
-          key: 'addLinear',
-          value: function addLinear(name, colors) {
-            var _ref2 = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-            var steps = _ref2.steps;
-
-            this.add(name, linearPalette(colors, steps ? steps : this._defaultSteps));
-          }
-
-          /**
-           * Return the palette stored under the given name, or throws an error if not found.
-           * The palette is an object with properties steps, red, green, and blue.
-           * Each of the color arrays is an Uint8Array of length steps.
-           */
-        }, {
-          key: 'get',
-          value: function get(name) {
-            var palette = this._palettes.get(name);
-            if (palette === undefined) {
-              throw new Error('Palette "' + name + '" not found');
-            }
-            return palette;
-          }
-        }, {
-          key: _Symbol$iterator,
-          get: function get() {
-            return this._palettes[_Symbol$iterator];
-          }
-        }]);
-
-        return PaletteManager;
-      })();
-
-      _export('PaletteManager', PaletteManager);
-    }
-  };
-});
-
-$__System.registerDynamic("26", ["27", "28"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $def = req('27');
-  $def($def.S, 'Object', {setPrototypeOf: req('28').set});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("29", ["26", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('26');
-  module.exports = req('2a').Object.setPrototypeOf;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2b", ["29"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('29'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2c", ["2d"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = req('2d');
-  module.exports = function create(P, D) {
-    return $.create(P, D);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2e", ["2c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('2c'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("8", ["2e", "2b"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Object$create = req('2e')["default"];
-  var _Object$setPrototypeOf = req('2b')["default"];
-  exports["default"] = function(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-    subClass.prototype = _Object$create(superClass && superClass.prototype, {constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }});
-    if (superClass)
-      _Object$setPrototypeOf ? _Object$setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2f", ["30", "31"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toIObject = req('30');
-  req('31')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
-    return function getOwnPropertyDescriptor(it, key) {
-      return $getOwnPropertyDescriptor(toIObject(it), key);
-    };
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("32", ["2d", "2f"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = req('2d');
-  req('2f');
-  module.exports = function getOwnPropertyDescriptor(it, key) {
-    return $.getDesc(it, key);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("33", ["32"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('32'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7", ["33"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Object$getOwnPropertyDescriptor = req('33')["default"];
-  exports["default"] = function get(_x, _x2, _x3) {
-    var _again = true;
-    _function: while (_again) {
-      var object = _x,
-          property = _x2,
-          receiver = _x3;
-      _again = false;
-      if (object === null)
-        object = Function.prototype;
-      var desc = _Object$getOwnPropertyDescriptor(object, property);
-      if (desc === undefined) {
-        var parent = Object.getPrototypeOf(object);
-        if (parent === null) {
-          return undefined;
-        } else {
-          _x = parent;
-          _x2 = property;
-          _x3 = receiver;
-          _again = true;
-          desc = parent = undefined;
-          continue _function;
-        }
-      } else if ("value" in desc) {
-        return desc.value;
-      } else {
-        var getter = desc.get;
-        if (getter === undefined) {
-          return undefined;
-        }
-        return getter.call(receiver);
-      }
-    }
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('34', ['5', '7', '8', '9', '10', '11', '19', '35', 'a', '1f', '1a', '1b', '1c'], function (_export) {
-  var L, _get, _inherits, _createClass, _getIterator, _Map, linearPalette, scale, _Object$keys, _classCallCheck, ndarray, arrays, rangeutil, referencingutil, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
-
-  function wrapLongitude(lon, range) {
-    return wrapNum(lon, range, true);
-  }
-
-  //stolen from https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
-  //doesn't exist in current release (0.7.3)
-  function wrapNum(x, range, includeMax) {
-    var max = range[1];
-    var min = range[0];
-    var d = max - min;
-    return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
-  }
-  return {
-    setters: [function (_7) {
-      L = _7['default'];
-    }, function (_) {
-      _get = _['default'];
-    }, function (_2) {
-      _inherits = _2['default'];
-    }, function (_3) {
-      _createClass = _3['default'];
-    }, function (_4) {
-      _getIterator = _4['default'];
-    }, function (_6) {
-      _Map = _6['default'];
-    }, function (_8) {
-      linearPalette = _8.linearPalette;
-      scale = _8.scale;
-    }, function (_5) {
-      _Object$keys = _5['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_f) {
-      ndarray = _f['default'];
-    }, function (_a2) {
-      arrays = _a2;
-    }, function (_b) {
-      rangeutil = _b;
-    }, function (_c) {
-      referencingutil = _c;
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      DOMAIN_TYPE = 'http://coveragejson.org/def#Grid';
-
-      DEFAULT_CONTINUOUS_PALETTE = function DEFAULT_CONTINUOUS_PALETTE() {
-        return linearPalette(['#deebf7', '#3182bd']);
-      };
-
-      // blues
-
-      DEFAULT_CATEGORICAL_PALETTE = function DEFAULT_CATEGORICAL_PALETTE(n) {
-        return linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n);
-      };
-
-      /**
-       * Renderer for Coverages with domain type Grid.
-       * 
-       * Events fired onto the map:
-       * "dataloading" - Data loading has started
-       * "dataload" - Data loading has finished (also in case of errors)
-       * 
-       * Events fired on this layer:
-       * "add" - Layer is initialized and is about to be added to the map
-       * "remove" - Layer is removed from the map
-       * "error" - Error when loading data
-       * "paletteChange" - Palette has changed
-       * "paletteExtentChange" - Palette extent has changed
-       * "axisChange" - Axis coordinate has changed (e.axis === 'time'|'vertical')
-       * "remove" - Layer is removed from the map
-       * 
-       */
-
-      Grid = (function (_L$TileLayer$Canvas) {
-        _inherits(Grid, _L$TileLayer$Canvas);
-
-        /**
-         * The parameter to display must be given as the 'parameter' options property.
-         * 
-         * Optional time and vertical axis target values can be defined with the 'time' and
-         * 'vertical' options properties. The closest values on the respective axes are chosen.
-         * 
-         * Example: 
-         * <pre><code>
-         * var cov = ... // get Coverage data
-         * var layer = new GridCoverage(cov, {
-         *   keys: ['salinity'],
-         *   time: new Date('2015-01-01T12:00:00Z'),
-         *   vertical: 50,
-         *   palette: palettes.get('blues'),
-         *   paletteExtent: 'full' // or 'subset' (time/vertical), 'fov' (map field of view), or specific: [-10,10]
-         * })
-         * </code></pre>
-         */
-
-        function Grid(cov, options) {
-          _classCallCheck(this, Grid);
-
-          _get(Object.getPrototypeOf(Grid.prototype), 'constructor', this).call(this);
-          if (cov.domainType !== DOMAIN_TYPE) {
-            throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE);
-          }
-          this.cov = cov;
-          this.param = cov.parameters.get(options.keys[0]);
-          this._axesSubset = { // x and y are not subsetted
-            t: { coordPref: options.time },
-            z: { coordPref: options.vertical }
-          };
-
-          var categories = this.param.observedProperty.categories;
-
-          if (options.palette) {
-            this._palette = options.palette;
-          } else if (categories) {
-            this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length);
-          } else {
-            this._palette = DEFAULT_CONTINUOUS_PALETTE();
-          }
-
-          if (categories && categories.length !== this._palette.steps) {
-            throw new Error('Categorical palettes must match the number of categories of the parameter');
-          }
-
-          if (categories) {
-            if (options.paletteExtent) {
-              throw new Error('paletteExtent cannot be given for categorical parameters');
-            }
-          } else {
-            if (options.paletteExtent === undefined) {
-              this._paletteExtent = 'subset';
-            } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
-              this._paletteExtent = options.paletteExtent;
-            } else {
-              throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted');
-            }
-          }
-
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
-          }
-        }
-
-        _createClass(Grid, [{
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this = this;
-
-            // "loading" and "load" events are provided by the underlying TileLayer class
-
-            this._map = map;
-            map.fire('dataloading'); // for supporting loading spinners
-            this.cov.loadDomain().then(function (domain) {
-              _this.domain = domain;
-
-              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
-              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-                throw new Error('Unsupported CRS, must be WGS84');
-              }
-            }).then(function () {
-              return _this._subsetByCoordinatePreference();
-            }).then(function () {
-              return _this.subsetCov.loadRange(_this.param.key);
-            }).then(function (subsetRange) {
-              _this.subsetRange = subsetRange;
-              if (!_this.param.observedProperty.categories) {
-                _this._updatePaletteExtent(_this._paletteExtent);
-              }
-              _this.fire('add');
-              _get(Object.getPrototypeOf(Grid.prototype), 'onAdd', _this).call(_this, map);
-              map.fire('dataload');
-            })['catch'](function (e) {
-              console.error(e);
-              _this.fire('error', e);
-
-              map.fire('dataload');
-            });
-          }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            delete this._map;
-            this.fire('remove');
-            _get(Object.getPrototypeOf(Grid.prototype), 'onRemove', this).call(this, map);
-          }
-        }, {
-          key: 'getBounds',
-          value: function getBounds() {
-            var bbox = undefined;
-            if (this.cov.bbox) {
-              bbox = this.cov.bbox;
-            } else if (this._isDomainUsingGeodeticWGS84CRS()) {
-              bbox = this._getDomainBbox();
-            } else {
-              return;
-            }
-            var southWest = L.latLng(bbox[1], bbox[0]);
-            var northEast = L.latLng(bbox[3], bbox[2]);
-            var bounds = new L.LatLngBounds(southWest, northEast);
-            return bounds;
-          }
-
-          /**
-           * Subsets the temporal and vertical axes based on the _axesSubset.*.coordPref property,
-           * which is regarded as a preference and does not have to exactly match a coordinate.
-           * 
-           * The return value is a promise that succeeds with an empty result and
-           * sets this.subsetCov to the subsetted coverage.
-           * The subsetting always fixes a single time and vertical slice, choosing the first
-           * axis value if no preference was given.
-           * 
-           * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
-           * values from the actual axes.
-           */
-        }, {
-          key: '_subsetByCoordinatePreference',
-          value: function _subsetByCoordinatePreference() {
-            var _this2 = this;
-
-            /**
-             * Return the index of the coordinate value closest to the given value
-             * within the given axis. Supports ascending and descending axes.
-             * If the axis does not exist, then undefined is returned.
-             */
-            var getClosestIndex = function getClosestIndex(axis, val) {
-              if (!_this2.domain.axes.has(axis)) {
-                return;
-              }
-              var vals = _this2.domain.axes.get(axis).values;
-              var idx = arrays.indexOfNearest(vals, val);
-              return idx;
-            };
-
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-              for (var _iterator = _getIterator(_Object$keys(this._axesSubset)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var axis = _step.value;
-
-                var ax = this._axesSubset[axis];
-                if (ax.coordPref == undefined && this.domain.axes.has(axis)) {
-                  // == also handles null
-                  ax.idx = 0;
-                } else {
-                  ax.idx = getClosestIndex(axis, ax.coordPref);
-                }
-                ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null;
-              }
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
-            }
-
-            return this.cov.subsetByIndex({ t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
-              _this2.subsetCov = subsetCov;
-            });
-          }
-        }, {
-          key: '_updatePaletteExtent',
-          value: function _updatePaletteExtent(extent) {
-            if (Array.isArray(extent) && extent.length === 2) {
-              this._paletteExtent = extent;
-              return;
-            }
-
-            var range = undefined;
-
-            if (extent === 'subset') {
-              // scan the current subset for min/max values
-              range = this.subsetRange;
-            } else if (extent === 'fov') {
-              // scan the values that are currently in field of view on the map for min/max
-              // this implies using the current subset
-              var bounds = this._map.getBounds();
-
-              // TODO implement
-              throw new Error('NOT IMPLEMENTED YET');
-            } else {
-              throw new Error('Unknown extent specification: ' + extent);
-            }
-
-            this._paletteExtent = rangeutil.minMax(range);
-          }
-        }, {
-          key: 'drawTile',
-          value: function drawTile(canvas, tilePoint, zoom) {
-            var _this3 = this;
-
-            var ctx = canvas.getContext('2d');
-            var tileSize = this.options.tileSize;
-
-            var imgData = ctx.getImageData(0, 0, tileSize, tileSize);
-            // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
-            var rgba = ndarray(imgData.data, [tileSize, tileSize, 4]);
-
-            // projection coordinates of top left tile pixel
-            var start = tilePoint.multiplyBy(tileSize);
-            var startX = start.x;
-            var startY = start.y;
-
-            var palette = this.palette;
-            var _palette = this.palette;
-            var red = _palette.red;
-            var green = _palette.green;
-            var blue = _palette.blue;
-
-            var paletteExtent = this.paletteExtent;
-
-            var doSetPixel = function doSetPixel(tileY, tileX, idx) {
-              rgba.set(tileY, tileX, 0, red[idx]);
-              rgba.set(tileY, tileX, 1, green[idx]);
-              rgba.set(tileY, tileX, 2, blue[idx]);
-              rgba.set(tileY, tileX, 3, 255);
-            };
-
-            var setPixel = undefined;
-            if (this.param.categoryEncoding) {
-              var _iteratorNormalCompletion2;
-
-              var _didIteratorError2;
-
-              var _iteratorError2;
-
-              var _iterator2, _step2;
-
-              (function () {
-                // categorical parameter with integer encoding
-                var valIdxMap = new _Map();
-                for (var idx = 0; idx < _this3.param.observedProperty.categories.length; idx++) {
-                  var cat = _this3.param.observedProperty.categories[idx];
-                  _iteratorNormalCompletion2 = true;
-                  _didIteratorError2 = false;
-                  _iteratorError2 = undefined;
-
-                  try {
-                    for (_iterator2 = _getIterator(_this3.param.categoryEncoding.get(cat.id)); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                      var val = _step2.value;
-
-                      valIdxMap.set(val, idx);
-                    }
-                  } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
-                  } finally {
-                    try {
-                      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                        _iterator2['return']();
-                      }
-                    } finally {
-                      if (_didIteratorError2) {
-                        throw _iteratorError2;
-                      }
-                    }
-                  }
-                }
-                setPixel = function (tileY, tileX, val) {
-                  if (val === null || !valIdxMap.has(val)) return;
-                  var idx = valIdxMap.get(val);
-                  doSetPixel(tileY, tileX, idx);
-                };
-              })();
-            } else {
-              // continuous parameter
-              setPixel = function (tileY, tileX, val) {
-                if (val === null) return;
-                var idx = scale(val, palette, paletteExtent);
-                doSetPixel(tileY, tileX, idx);
-              };
-            }
-
-            var vals = this.subsetRange.get;
-
-            // FIXME check if "Geodetic WGS84 CRS" as term is enough to describe WGS84 angular
-            //          what about cartesian??
-
-            // TODO check if the domain and map CRS datum match
-            // -> if not, then at least a warning should be shown
-            if (this._isDomainUsingGeodeticWGS84CRS()) {
-              if (this._isRectilinearGeodeticMap()) {
-                // here we can apply heavy optimizations
-                this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals);
-              } else {
-                // this is for any random map projection
-                // here we have to unproject each map pixel individually and find the matching domain coordinates
-                this._drawAnyMapProjection(setPixel, tileSize, startX, startY, vals);
-              }
-            } else {
-              // here we either have a projected CRS with base CRS = CRS84, or
-              // a projected CRS with non-CRS84 base CRS (like British National Grid), or
-              // a geodetic CRS not using a WGS84 datum
-              // FIXME check this, what does geodetic CRS really mean? = lat/lon? = ellipsoid?
-
-              if (this._isGeodeticTransformAvailableForDomain()) {
-                throw new Error('NOT IMPLEMENTED YET');
-                // TODO implement, use 2D coordinate arrays and/or proj4 transforms
-              } else {
-                  // TODO if the map projection base CRS matches the CRS of the domain,
-                  //      could we still draw the grid in projected coordinates?
-                  // -> e.g. UK domain CRS (not projected! easting, northing) and
-                  //         UK basemap in that CRS
-
-                  throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 'and no geodetic transform data is available');
-                }
-            }
-
-            ctx.putImageData(imgData, 0, 0);
-          }
-
-          /**
-           * Derives the bounding box of the x,y axes in CRS coordinates.
-           * @returns {Array} [xmin,ymin,xmax,ymax]
-           */
-        }, {
-          key: '_getDomainBbox',
-          value: function _getDomainBbox() {
-            var x = this.domain.axes.get('x').values;
-            var y = this.domain.axes.get('y').values;
-
-            // TODO use bounds if they are supplied
-            var xend = x.length - 1;
-            var yend = y.length - 1;
-            var xmin = x[0];
-            var xmax = x[xend];
-            var ymin = y[0];
-            var ymax = y[yend];
-
-            // TODO only enlarge when bounds haven't been used above
-            if (x.length > 1) {
-              xmin -= Math.abs(x[0] - x[1]) / 2;
-              xmax += Math.abs(x[xend] - x[xend - 1]) / 2;
-            }
-            if (y.length > 1) {
-              ymin -= Math.abs(y[0] - y[1]) / 2;
-              ymax += Math.abs(y[yend] - y[yend - 1]) / 2;
-            }
-            if (xmin > xmax) {
-              var _ref = [xmax, xmin];
-              xmin = _ref[0];
-              xmax = _ref[1];
-            }
-            if (ymin > ymax) {
-              var _ref2 = [ymax, ymin];
-              ymin = _ref2[0];
-              ymax = _ref2[1];
-            }
-            return [xmin, ymin, xmax, ymax];
-          }
-
-          /**
-           * Draws a geodetic rectilinear domain grid on a map with arbitrary projection.
-           * 
-           * @param {Function} setPixel A function with parameters (y,x,val) which 
-           *                            sets the color of a pixel on a tile.
-           * @param {Integer} tileSize Size of a tile in pixels.
-           * @param {Integer} startX
-           * @param {Integer} startY
-           * @param {ndarray} vals Range values.
-           */
-        }, {
-          key: '_drawAnyMapProjection',
-          value: function _drawAnyMapProjection(setPixel, tileSize, startX, startY, vals) {
-            // usable for any map projection, but computationally more intensive
-            // there are two hotspots in the loops: map.unproject and indexOfNearest
-
-            var map = this._map;
-            var x = this.domain.axes.get('x').values;
-            var y = this.domain.axes.get('y').values;
-            var bbox = this._getDomainBbox();
-            var lonRange = [bbox[0], bbox[0] + 360];
-
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              for (var tileY = 0; tileY < tileSize; tileY++) {
-                var _map$unproject = map.unproject(L.point(startX + tileX, startY + tileY));
-
-                var lat = _map$unproject.lat;
-                var lon = _map$unproject.lon;
-
-                // we first check whether the tile pixel is outside the domain bounding box
-                // in that case we skip it as we do not want to extrapolate
-                if (lat < bbox[1] || lat > bbox[3]) {
-                  continue;
-                }
-
-                lon = wrapLongitude(lon, lonRange);
-                if (lon < bbox[0] || lon > bbox[2]) {
-                  continue;
-                }
-
-                // now we find the closest grid cell using simple binary search
-                // for finding the closest latitude/longitude we use a simple binary search
-                // (as there is no discontinuity)
-                var iLat = arrays.indexOfNearest(y, lat);
-                var iLon = arrays.indexOfNearest(x, lon);
-
-                setPixel(tileY, tileX, vals({ y: iLat, x: iLon }));
-              }
-            }
-          }
-
-          /**
-           * Draws a geodetic rectilinear domain grid on a map whose grid is, or can be directly
-           * mapped to, a geodetic rectilinear grid.
-           */
-        }, {
-          key: '_drawRectilinearGeodeticMapProjection',
-          value: function _drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals) {
-            // optimized version for map projections that are equal to a rectilinear geodetic grid
-            // this can be used when lat and lon can be computed independently for a given pixel
-
-            var map = this._map;
-            var x = this.domain.axes.get('x').values;
-            var y = this.domain.axes.get('y').values;
-            var bbox = this._getDomainBbox();
-            var lonRange = [bbox[0], bbox[0] + 360];
-
-            var latCache = new Float64Array(tileSize);
-            var iLatCache = new Uint32Array(tileSize);
-            for (var tileY = 0; tileY < tileSize; tileY++) {
-              var lat = map.unproject(L.point(startX, startY + tileY)).lat;
-              latCache[tileY] = lat;
-              // find the index of the closest latitude in the grid using simple binary search
-              iLatCache[tileY] = arrays.indexOfNearest(y, lat);
-            }
-
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              var lon = map.unproject(L.point(startX + tileX, startY)).lng;
-              lon = wrapLongitude(lon, lonRange);
-              if (lon < bbox[0] || lon > bbox[2]) {
-                continue;
-              }
-
-              // find the index of the closest longitude in the grid using simple binary search
-              // (as there is no discontinuity)
-              var iLon = arrays.indexOfNearest(x, lon);
-
-              for (var tileY = 0; tileY < tileSize; tileY++) {
-                // get geographic coordinates of tile pixel
-                var _lat = latCache[tileY];
-
-                // we first check whether the tile pixel is outside the domain bounding box
-                // in that case we skip it as we do not want to extrapolate
-                if (_lat < bbox[1] || _lat > bbox[3]) {
-                  continue;
-                }
-
-                var iLat = iLatCache[tileY];
-
-                setPixel(tileY, tileX, vals({ y: iLat, x: iLon }));
-              }
-            }
-          }
-
-          /**
-           * Return true if the map projection grid can be mapped to a rectilinear
-           * geodetic grid. For that, it must satisfy:
-           * for all x, there is a longitude lon, for all y, unproject(x,y).lon = lon
-           * for all y, there is a latitude lat, for all x, unproject(x,y).lat = lat
-           * 
-           * Returns false if this is not the case or unknown.
-           */
-        }, {
-          key: '_isRectilinearGeodeticMap',
-          value: function _isRectilinearGeodeticMap() {
-            var crs = this._map.options.crs;
-            // these are the ones included in Leaflet
-            var recti = [L.CRS.EPSG3857, L.CRS.EPSG4326, L.CRS.EPSG3395, L.CRS.Simple];
-            var isRecti = recti.indexOf(crs) !== -1;
-            // TODO for unknown ones, how do we test that?
-            return isRecti;
-          }
-
-          /**
-           * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
-           */
-        }, {
-          key: '_isDomainUsingGeodeticWGS84CRS',
-          value: function _isDomainUsingGeodeticWGS84CRS() {
-            var srs = referencingutil.getRefSystem(this.domain, ['x', 'y']);
-            return referencingutil.isGeodeticWGS84CRS(srs);
-          }
-        }, {
-          key: '_isGeodeticTransformAvailableForDomain',
-          value: function _isGeodeticTransformAvailableForDomain() {
-            var srs = referencingutil.getRefSystem(this.domain, ['x', 'y']);
-            // TODO implement
-            return false;
-          }
-        }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
-            // we check getContainer() to prevent errors when trying to redraw when the layer has not
-            // fully initialized yet
-            if (this._autoRedraw && this.getContainer()) {
-              this.redraw();
-            }
-          }
-        }, {
-          key: 'parameter',
-          get: function get() {
-            return this.param;
-          }
-
-          /**
-           * Sets the currently active time to the one closest to the given Date object.
-           * This has no effect if the grid has no time axis.
-           */
-        }, {
-          key: 'time',
-          set: function set(val) {
-            var _this4 = this;
-
-            if (!this.domain.axes.has('t')) {
-              throw new Error('No time axis found');
-            }
-            var old = this.time;
-            this._axesSubset.t.coordPref = val;
-            this._subsetByCoordinatePreference().then(function () {
-              _this4._doAutoRedraw();
-              if (old !== _this4.time) {
-                _this4.fire('axisChange', { axis: 'time' });
-              }
-            });
-          },
-
-          /**
-           * The currently active time on the temporal axis as Date object, 
-           * or null if the grid has no time axis.
-           */
-          get: function get() {
-            return this._axesSubset.t.coord;
-          }
-
-          /**
-           * Sets the currently active vertical coordinate to the one closest to the given value.
-           * This has no effect if the grid has no vertical axis.
-           */
-        }, {
-          key: 'vertical',
-          set: function set(val) {
-            var _this5 = this;
-
-            if (!this.domain.axes.has('z')) {
-              throw new Error('No vertical axis found');
-            }
-            var old = this.vertical;
-            this._axesSubset.z.coordPref = val;
-            this._subsetByCoordinatePreference().then(function () {
-              _this5._doAutoRedraw();
-              if (old !== _this5.vertical) {
-                _this5.fire('axisChange', { axis: 'vertical' });
-              }
-            });
-          },
-
-          /**
-           * The currently active vertical coordinate as a number, 
-           * or null if the grid has no vertical axis.
-           */
-          get: function get() {
-            return this._axesSubset.z.coord;
-          }
-        }, {
-          key: 'palette',
-          set: function set(p) {
-            this._palette = p;
-            this._doAutoRedraw();
-            this.fire('paletteChange');
-          },
-          get: function get() {
-            return this._palette;
-          }
-        }, {
-          key: 'paletteExtent',
-          set: function set(extent) {
-            if (this.param.observedProperty.categories) {
-              throw new Error('Cannot set palette extent for categorical parameters');
-            }
-            this._updatePaletteExtent(extent);
-            this._doAutoRedraw();
-            this.fire('paletteExtentChange');
-          },
-          get: function get() {
-            return this._paletteExtent;
-          }
-        }]);
-
-        return Grid;
-      })(L.TileLayer.Canvas);
-
-      _export('default', Grid);
-    }
-  };
-});
-
-$__System.registerDynamic("36", ["37"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Object$defineProperty = req('37')["default"];
-  exports["default"] = function(obj, key, value) {
-    if (key in obj) {
-      _Object$defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-    return obj;
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('38', ['18', '34', '35', '36', '1d'], function (_export) {
-  var VerticalProfile, Grid, _Object$keys, _defineProperty, Trajectory, _DEFAULT_RENDERERS, pre, DEFAULT_RENDERERS;
-
-  function LayerFactory() {
-    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-    if (options.renderer) {
-      return function (cov, opts) {
-        return new options.renderer(cov, opts);
-      };
-    }
-    if (options.renderers) {
-      return function (cov, opts) {
-        if (options.renderers[cov.type]) {
-          return new options.renderers[cov.type](cov, opts);
-        }
-        if (options.renderers[cov.domainType]) {
-          return new options.renderers[cov.domainType](cov, opts);
-        }
-        throw new Error('No renderer found for type=' + cov.type + ' or domainType=' + cov.domainType + ',\n                       available: ' + _Object$keys(options.renderers));
-      };
-    }
-    return function (cov, opts) {
-      if (!DEFAULT_RENDERERS[cov.domainType]) {
-        throw new Error('No renderer found for domainType=' + cov.domainType + ',\n          available: ' + _Object$keys(DEFAULT_RENDERERS));
-      }
-      return new DEFAULT_RENDERERS[cov.domainType](cov, opts);
-    };
-  }
-
-  return {
-    setters: [function (_4) {
-      VerticalProfile = _4['default'];
-    }, function (_3) {
-      Grid = _3['default'];
-    }, function (_2) {
-      _Object$keys = _2['default'];
-    }, function (_) {
-      _defineProperty = _['default'];
-    }, function (_d) {
-      Trajectory = _d['default'];
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      _export('default', LayerFactory);
-
-      pre = 'http://coveragejson.org/def#';
-      DEFAULT_RENDERERS = (_DEFAULT_RENDERERS = {}, _defineProperty(_DEFAULT_RENDERERS, pre + 'Grid', Grid), _defineProperty(_DEFAULT_RENDERERS, pre + 'VerticalProfile', VerticalProfile), _defineProperty(_DEFAULT_RENDERERS, pre + 'Trajectory', Trajectory), _DEFAULT_RENDERERS);
-
-      _export('DEFAULT_RENDERERS', DEFAULT_RENDERERS);
-    }
-  };
-});
-
-$__System.register("39", ["38"], function (_export) {
-  "use strict";
-
-  return {
-    setters: [function (_) {
-      var _exportObj = {};
-
-      for (var _key in _) {
-        if (_key !== "default") _exportObj[_key] = _[_key];
-      }
-
-      _exportObj["default"] = _["default"];
-
-      _export(_exportObj);
-    }],
-    execute: function () {}
-  };
-});
-
-$__System.register('3a', ['9', '10', '35', 'a', '3b', '3c'], function (_export) {
-  var _createClass, _getIterator, _Object$keys, _classCallCheck, Coverage, shallowcopy, CoverageCollection;
-
-  return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_2) {
-      _getIterator = _2['default'];
-    }, function (_3) {
-      _Object$keys = _3['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_b) {
-      Coverage = _b['default'];
-    }, function (_c) {
-      shallowcopy = _c.shallowcopy;
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      CoverageCollection = (function () {
-        function CoverageCollection(covjson) {
-          _classCallCheck(this, CoverageCollection);
-
-          this._exposeLd(covjson);
-          this.id = covjson.id;
-          var covs = [];
-          var rootParams = covjson.parameters ? covjson.parameters : {};
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = _getIterator(covjson.coverages), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var coverage = _step.value;
-
-              if (coverage.parameters) {
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
-
-                try {
-                  for (var _iterator2 = _getIterator(_Object$keys(rootParams)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var key = _step2.value;
-
-                    if (key in coverage.ranges) {
-                      coverage.parameters[key] = rootParams[key];
-                    }
-                  }
-                } catch (err) {
-                  _didIteratorError2 = true;
-                  _iteratorError2 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                      _iterator2['return']();
-                    }
-                  } finally {
-                    if (_didIteratorError2) {
-                      throw _iteratorError2;
-                    }
-                  }
-                }
-              } else {
-                coverage.parameters = rootParams;
-              }
-              covs.push(new Coverage(coverage));
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator['return']) {
-                _iterator['return']();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          this.coverages = covs;
-          if (covjson.parameters) {
-            this.parameters = covjson.parameters;
-          }
-        }
-
-        _createClass(CoverageCollection, [{
-          key: '_exposeLd',
-          value: function _exposeLd(covjson) {
-            if (!covjson['@context']) {
-              // no LD love here...
-              this.ld = {};
-              return;
-            }
-            // make a deep copy since the object gets modified in-place later
-            // but first, remove the coverages (those have their own .ld property)
-            var copy = shallowcopy(covjson);
-            delete copy.coverages;
-            this.ld = JSON.parse(JSON.stringify(copy));
-          }
-        }]);
-
-        return CoverageCollection;
-      })();
-
-      _export('default', CoverageCollection);
-    }
-  };
-});
-
-(function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-(function(global, undefined) {
-  "use strict";
-  var POW_2_24 = Math.pow(2, -24),
-      POW_2_32 = Math.pow(2, 32),
-      POW_2_53 = Math.pow(2, 53);
-  function encode(value) {
-    var data = new ArrayBuffer(256);
-    var dataView = new DataView(data);
-    var lastLength;
-    var offset = 0;
-    function ensureSpace(length) {
-      var newByteLength = data.byteLength;
-      var requiredLength = offset + length;
-      while (newByteLength < requiredLength)
-        newByteLength *= 2;
-      if (newByteLength !== data.byteLength) {
-        var oldDataView = dataView;
-        data = new ArrayBuffer(newByteLength);
-        dataView = new DataView(data);
-        var uint32count = (offset + 3) >> 2;
-        for (var i = 0; i < uint32count; ++i)
-          dataView.setUint32(i * 4, oldDataView.getUint32(i * 4));
-      }
-      lastLength = length;
-      return dataView;
-    }
-    function write() {
-      offset += lastLength;
-    }
-    function writeFloat64(value) {
-      write(ensureSpace(8).setFloat64(offset, value));
-    }
-    function writeUint8(value) {
-      write(ensureSpace(1).setUint8(offset, value));
-    }
-    function writeUint8Array(value) {
-      var dataView = ensureSpace(value.length);
-      for (var i = 0; i < value.length; ++i)
-        dataView.setUint8(offset + i, value[i]);
-      write();
-    }
-    function writeUint16(value) {
-      write(ensureSpace(2).setUint16(offset, value));
-    }
-    function writeUint32(value) {
-      write(ensureSpace(4).setUint32(offset, value));
-    }
-    function writeUint64(value) {
-      var low = value % POW_2_32;
-      var high = (value - low) / POW_2_32;
-      var dataView = ensureSpace(8);
-      dataView.setUint32(offset, high);
-      dataView.setUint32(offset + 4, low);
-      write();
-    }
-    function writeTypeAndLength(type, length) {
-      if (length < 24) {
-        writeUint8(type << 5 | length);
-      } else if (length < 0x100) {
-        writeUint8(type << 5 | 24);
-        writeUint8(length);
-      } else if (length < 0x10000) {
-        writeUint8(type << 5 | 25);
-        writeUint16(length);
-      } else if (length < 0x100000000) {
-        writeUint8(type << 5 | 26);
-        writeUint32(length);
-      } else {
-        writeUint8(type << 5 | 27);
-        writeUint64(length);
-      }
-    }
-    function encodeItem(value) {
-      var i;
-      if (value === false)
-        return writeUint8(0xf4);
-      if (value === true)
-        return writeUint8(0xf5);
-      if (value === null)
-        return writeUint8(0xf6);
-      if (value === undefined)
-        return writeUint8(0xf7);
-      switch (typeof value) {
-        case "number":
-          if (Math.floor(value) === value) {
-            if (0 <= value && value <= POW_2_53)
-              return writeTypeAndLength(0, value);
-            if (-POW_2_53 <= value && value < 0)
-              return writeTypeAndLength(1, -(value + 1));
-          }
-          writeUint8(0xfb);
-          return writeFloat64(value);
-        case "string":
-          var utf8data = [];
-          for (i = 0; i < value.length; ++i) {
-            var charCode = value.charCodeAt(i);
-            if (charCode < 0x80) {
-              utf8data.push(charCode);
-            } else if (charCode < 0x800) {
-              utf8data.push(0xc0 | charCode >> 6);
-              utf8data.push(0x80 | charCode & 0x3f);
-            } else if (charCode < 0xd800) {
-              utf8data.push(0xe0 | charCode >> 12);
-              utf8data.push(0x80 | (charCode >> 6) & 0x3f);
-              utf8data.push(0x80 | charCode & 0x3f);
-            } else {
-              charCode = (charCode & 0x3ff) << 10;
-              charCode |= value.charCodeAt(++i) & 0x3ff;
-              charCode += 0x10000;
-              utf8data.push(0xf0 | charCode >> 18);
-              utf8data.push(0x80 | (charCode >> 12) & 0x3f);
-              utf8data.push(0x80 | (charCode >> 6) & 0x3f);
-              utf8data.push(0x80 | charCode & 0x3f);
-            }
-          }
-          writeTypeAndLength(3, utf8data.length);
-          return writeUint8Array(utf8data);
-        default:
-          var length;
-          if (Array.isArray(value)) {
-            length = value.length;
-            writeTypeAndLength(4, length);
-            for (i = 0; i < length; ++i)
-              encodeItem(value[i]);
-          } else if (value instanceof Uint8Array) {
-            writeTypeAndLength(2, value.length);
-            writeUint8Array(value);
-          } else {
-            var keys = Object.keys(value);
-            length = keys.length;
-            writeTypeAndLength(5, length);
-            for (i = 0; i < length; ++i) {
-              var key = keys[i];
-              encodeItem(key);
-              encodeItem(value[key]);
-            }
-          }
-      }
-    }
-    encodeItem(value);
-    if ("slice" in data)
-      return data.slice(0, offset);
-    var ret = new ArrayBuffer(offset);
-    var retView = new DataView(ret);
-    for (var i = 0; i < offset; ++i)
-      retView.setUint8(i, dataView.getUint8(i));
-    return ret;
-  }
-  function decode(data, tagger, simpleValue) {
-    var dataView = new DataView(data);
-    var offset = 0;
-    if (typeof tagger !== "function")
-      tagger = function(value) {
-        return value;
-      };
-    if (typeof simpleValue !== "function")
-      simpleValue = function() {
-        return undefined;
-      };
-    function read(value, length) {
-      offset += length;
-      return value;
-    }
-    function readArrayBuffer(length) {
-      return read(new Uint8Array(data, offset, length), length);
-    }
-    function readFloat16() {
-      var tempArrayBuffer = new ArrayBuffer(4);
-      var tempDataView = new DataView(tempArrayBuffer);
-      var value = readUint16();
-      var sign = value & 0x8000;
-      var exponent = value & 0x7c00;
-      var fraction = value & 0x03ff;
-      if (exponent === 0x7c00)
-        exponent = 0xff << 10;
-      else if (exponent !== 0)
-        exponent += (127 - 15) << 10;
-      else if (fraction !== 0)
-        return fraction * POW_2_24;
-      tempDataView.setUint32(0, sign << 16 | exponent << 13 | fraction << 13);
-      return tempDataView.getFloat32(0);
-    }
-    function readFloat32() {
-      return read(dataView.getFloat32(offset), 4);
-    }
-    function readFloat64() {
-      return read(dataView.getFloat64(offset), 8);
-    }
-    function readUint8() {
-      return read(dataView.getUint8(offset), 1);
-    }
-    function readUint16() {
-      return read(dataView.getUint16(offset), 2);
-    }
-    function readUint32() {
-      return read(dataView.getUint32(offset), 4);
-    }
-    function readUint64() {
-      return readUint32() * POW_2_32 + readUint32();
-    }
-    function readBreak() {
-      if (dataView.getUint8(offset) !== 0xff)
-        return false;
-      offset += 1;
-      return true;
-    }
-    function readLength(additionalInformation) {
-      if (additionalInformation < 24)
-        return additionalInformation;
-      if (additionalInformation === 24)
-        return readUint8();
-      if (additionalInformation === 25)
-        return readUint16();
-      if (additionalInformation === 26)
-        return readUint32();
-      if (additionalInformation === 27)
-        return readUint64();
-      if (additionalInformation === 31)
-        return -1;
-      throw "Invalid length encoding";
-    }
-    function readIndefiniteStringLength(majorType) {
-      var initialByte = readUint8();
-      if (initialByte === 0xff)
-        return -1;
-      var length = readLength(initialByte & 0x1f);
-      if (length < 0 || (initialByte >> 5) !== majorType)
-        throw "Invalid indefinite length element";
-      return length;
-    }
-    function appendUtf16data(utf16data, length) {
-      for (var i = 0; i < length; ++i) {
-        var value = readUint8();
-        if (value & 0x80) {
-          if (value < 0xe0) {
-            value = (value & 0x1f) << 6 | (readUint8() & 0x3f);
-            length -= 1;
-          } else if (value < 0xf0) {
-            value = (value & 0x0f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
-            length -= 2;
-          } else {
-            value = (value & 0x0f) << 18 | (readUint8() & 0x3f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
-            length -= 3;
-          }
-        }
-        if (value < 0x10000) {
-          utf16data.push(value);
-        } else {
-          value -= 0x10000;
-          utf16data.push(0xd800 | (value >> 10));
-          utf16data.push(0xdc00 | (value & 0x3ff));
-        }
-      }
-    }
-    function decodeItem() {
-      var initialByte = readUint8();
-      var majorType = initialByte >> 5;
-      var additionalInformation = initialByte & 0x1f;
-      var i;
-      var length;
-      if (majorType === 7) {
-        switch (additionalInformation) {
-          case 25:
-            return readFloat16();
-          case 26:
-            return readFloat32();
-          case 27:
-            return readFloat64();
-        }
-      }
-      length = readLength(additionalInformation);
-      if (length < 0 && (majorType < 2 || 6 < majorType))
-        throw "Invalid length";
-      switch (majorType) {
-        case 0:
-          return length;
-        case 1:
-          return -1 - length;
-        case 2:
-          if (length < 0) {
-            var elements = [];
-            var fullArrayLength = 0;
-            while ((length = readIndefiniteStringLength(majorType)) >= 0) {
-              fullArrayLength += length;
-              elements.push(readArrayBuffer(length));
-            }
-            var fullArray = new Uint8Array(fullArrayLength);
-            var fullArrayOffset = 0;
-            for (i = 0; i < elements.length; ++i) {
-              fullArray.set(elements[i], fullArrayOffset);
-              fullArrayOffset += elements[i].length;
-            }
-            return fullArray;
-          }
-          return readArrayBuffer(length);
-        case 3:
-          var utf16data = [];
-          if (length < 0) {
-            while ((length = readIndefiniteStringLength(majorType)) >= 0)
-              appendUtf16data(utf16data, length);
-          } else
-            appendUtf16data(utf16data, length);
-          return String.fromCharCode.apply(null, utf16data);
-        case 4:
-          var retArray;
-          if (length < 0) {
-            retArray = [];
-            while (!readBreak())
-              retArray.push(decodeItem());
-          } else {
-            retArray = new Array(length);
-            for (i = 0; i < length; ++i)
-              retArray[i] = decodeItem();
-          }
-          return retArray;
-        case 5:
-          var retObject = {};
-          for (i = 0; i < length || length < 0 && !readBreak(); ++i) {
-            var key = decodeItem();
-            retObject[key] = decodeItem();
-          }
-          return retObject;
-        case 6:
-          return tagger(decodeItem(), length);
-        case 7:
-          switch (length) {
-            case 20:
-              return false;
-            case 21:
-              return true;
-            case 22:
-              return null;
-            case 23:
-              return undefined;
-            default:
-              return simpleValue(length);
-          }
-      }
-    }
-    var ret = decodeItem();
-    if (offset !== data.byteLength)
-      throw "Remaining bytes";
-    return ret;
-  }
-  var obj = {
-    encode: encode,
-    decode: decode
-  };
-  if (typeof define === "function" && define.amd)
-    define("3d", [], obj);
-  else if (!global.CBOR)
-    global.CBOR = obj;
-})(this);
-
-_removeDefine();
-})();
-(function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("3e", ["3d"], function(main) {
-  return main;
-});
-
-_removeDefine();
-})();
-$__System.register('3f', ['c', '3e', '3c'], function (_export) {
-  var _Promise, cbor, endsWith, MEDIA, ACCEPT, EXT;
-
-  /**
-   * Loads a CoverageJSON document from a given URL and returns a {@link Promise} object
-   * that succeeds with the unmodified CoverageJSON object.
-   * 
-   * @param {string} url
-   * @return {Promise}
-   *   The result is an object {data, headers} where data is the CoverageJSON object
-   *   and headers are the HTTP response headers. The promise fails if the resource at
-   *   the given URL is not a valid JSON or CBOR document. 
-   */
-
-  function load(url) {
-    var responseType = arguments.length <= 1 || arguments[1] === undefined ? 'arraybuffer' : arguments[1];
-
-    if (['arraybuffer', 'text'].indexOf(responseType) === -1) {
-      throw new Error();
-    }
-    return new _Promise(function (resolve, reject) {
-      var req = new XMLHttpRequest();
-      req.open('GET', url);
-      req.responseType = responseType;
-      req.setRequestHeader('Accept', ACCEPT);
-
-      req.addEventListener('load', function () {
-        if (!(req.status >= 200 && req.status < 300 || req.status === 304)) {
-          // as in jquery
-          reject(new Error('Resource "' + url + '" not found, HTTP status code: ' + req.status));
-          return;
-        }
-
-        var type = req.getResponseHeader('Content-Type');
-
-        if (type.indexOf(MEDIA.OCTETSTREAM) === 0 || type.indexOf(MEDIA.TEXT) === 0) {
-          // wrong media type, try to infer type from extension
-          if (endsWith(url, EXT.COVJSON)) {
-            type = MEDIA.COVJSON;
-          } else if (endsWith(url, EXT.COVCBOR)) {
-            type = MEDIA.COVCBOR;
-          }
-        }
-        var data = undefined;
-        if (type === MEDIA.COVCBOR) {
-          var arrayBuffer = req.response;
-          data = cbor.decode(arrayBuffer);
-        } else if ([MEDIA.COVJSON, MEDIA.JSONLD, MEDIA.JSON].indexOf(type) > -1) {
-          if (responseType === 'arraybuffer') {
-            // load again (from cache) to get correct response type
-            // Note we use 'text' and not 'json' as we want to throw parsing errors.
-            // With 'json', the response is just 'null'.
-            reject({ responseType: 'text' });
-            return;
-          }
-          data = JSON.parse(req.response);
-        } else {
-          reject(new Error('Unsupported media type: ' + type));
-          return;
-        }
-        // TODO check if these are the initial response headers
-        //  Mozilla says "For multipart requests, this returns the headers
-        //  from the current part of the request, not from the original channel."
-        // -> is chunked transfer encoding a multipart request?
-        var headers = parseResponseHeaders(req.getAllResponseHeaders());
-        resolve({
-          data: data,
-          headers: headers
-        });
-      });
-      req.addEventListener('error', function () {
-        reject(new Error('Network error loading resource at ' + url));
-      });
-
-      req.send();
-    })['catch'](function (e) {
-      if (e.responseType) {
-        return load(url, e.responseType);
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  /**
-   * XmlHttpRequest's getAllResponseHeaders() method returns a string of response
-   * headers according to the format described here:
-   * http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method
-   * This method parses that string into a user-friendly key/value pair object.
-   * 
-   * https://gist.github.com/monsur/706839
-   */
-  function parseResponseHeaders(headerStr) {
-    // FIXME check if this swallows repeated headers
-    var headers = {};
-    if (!headerStr) {
-      return headers;
-    }
-    var headerPairs = headerStr.split('\r\n');
-    for (var i = 0; i < headerPairs.length; i++) {
-      var headerPair = headerPairs[i];
-      // Can't use split() here because it does the wrong thing
-      // if the header value has the string ": " in it.
-      var index = headerPair.indexOf(': ');
-      if (index > 0) {
-        var key = headerPair.substring(0, index);
-        var val = headerPair.substring(index + 2);
-        headers[key] = val;
-      }
-    }
-    return headers;
-  }
-  return {
-    setters: [function (_c) {
-      _Promise = _c['default'];
-    }, function (_e) {
-      cbor = _e['default'];
-    }, function (_c2) {
-      endsWith = _c2.endsWith;
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      _export('load', load);
-
-      MEDIA = {
-        COVCBOR: 'application/prs.coverage+cbor',
-        COVJSON: 'application/prs.coverage+json',
-        JSONLD: 'application/ld+json',
-        JSON: 'application/json',
-        OCTETSTREAM: 'application/octet-stream',
-        TEXT: 'text/plain'
-      };
-      ACCEPT = MEDIA.COVCBOR + '; q=1.0, ' + MEDIA.COVJSON + '; q=0.5, ' + MEDIA.JSONLD + '; q=0.1, ' + MEDIA.JSON + '; q=0.1';
-      EXT = {
-        COVJSON: '.covjson',
-        COVCBOR: '.covcbor'
-      };
-    }
-  };
-});
-
-$__System.register('3c', [], function (_export) {
-  /* */
-  'use strict';
-
-  var PREFIX;
-
-  _export('assert', assert);
-
-  _export('shallowcopy', shallowcopy);
-
-  _export('endsWith', endsWith);
-
-  _export('minMax', minMax);
-
-  function assert(condition, message) {
-    if (!condition) {
-      message = message || 'Assertion failed';
-      throw new Error(message);
-    }
-  }
-
-  function shallowcopy(obj) {
-    var copy = {};
-    for (var prop in obj) {
-      copy[prop] = obj[prop];
-    }
-    return copy;
-  }
-
-  function endsWith(subject, search) {
-    // IE support
-    var position = subject.length - search.length;
-    var lastIndex = subject.indexOf(search, position);
-    return lastIndex !== -1 && lastIndex === position;
-  }
-
-  function minMax(arr) {
-    var len = arr.length;
-    var min = Infinity;
-    var max = -Infinity;
-    while (len--) {
-      var el = arr[len];
-      if (el == null) {
-        // do nothing
-      } else if (el < min) {
-          min = el;
-        } else if (el > max) {
-          max = el;
-        }
-    }
-    if (min === Infinity) {
-      min = max;
-    } else if (max === -Infinity) {
-      max = min;
-    }
-    if (min === Infinity) {
-      // all values were null
-      min = null;
-      max = null;
-    }
-    return [min, max];
-  }
-
-  return {
-    setters: [],
-    execute: function () {
-      PREFIX = 'http://coveragejson.org/def#';
-
-      _export('PREFIX', PREFIX);
-    }
-  };
-});
-
-$__System.registerDynamic("40", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isArray = Array.isArray;
-  var str = Object.prototype.toString;
-  module.exports = isArray || function(val) {
-    return !!val && '[object Array]' == str.call(val);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("41", ["40"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('40');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("42", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  exports.read = function(buffer, offset, isLE, mLen, nBytes) {
-    var e,
-        m;
-    var eLen = nBytes * 8 - mLen - 1;
-    var eMax = (1 << eLen) - 1;
-    var eBias = eMax >> 1;
-    var nBits = -7;
-    var i = isLE ? (nBytes - 1) : 0;
-    var d = isLE ? -1 : 1;
-    var s = buffer[offset + i];
-    i += d;
-    e = s & ((1 << (-nBits)) - 1);
-    s >>= (-nBits);
-    nBits += eLen;
-    for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-    m = e & ((1 << (-nBits)) - 1);
-    e >>= (-nBits);
-    nBits += mLen;
-    for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-    if (e === 0) {
-      e = 1 - eBias;
-    } else if (e === eMax) {
-      return m ? NaN : ((s ? -1 : 1) * Infinity);
-    } else {
-      m = m + Math.pow(2, mLen);
-      e = e - eBias;
-    }
-    return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-  };
-  exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
-    var e,
-        m,
-        c;
-    var eLen = nBytes * 8 - mLen - 1;
-    var eMax = (1 << eLen) - 1;
-    var eBias = eMax >> 1;
-    var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0);
-    var i = isLE ? 0 : (nBytes - 1);
-    var d = isLE ? 1 : -1;
-    var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
-    value = Math.abs(value);
-    if (isNaN(value) || value === Infinity) {
-      m = isNaN(value) ? 1 : 0;
-      e = eMax;
-    } else {
-      e = Math.floor(Math.log(value) / Math.LN2);
-      if (value * (c = Math.pow(2, -e)) < 1) {
-        e--;
-        c *= 2;
-      }
-      if (e + eBias >= 1) {
-        value += rt / c;
-      } else {
-        value += rt * Math.pow(2, 1 - eBias);
-      }
-      if (value * c >= 2) {
-        e++;
-        c /= 2;
-      }
-      if (e + eBias >= eMax) {
-        m = 0;
-        e = eMax;
-      } else if (e + eBias >= 1) {
-        m = (value * c - 1) * Math.pow(2, mLen);
-        e = e + eBias;
-      } else {
-        m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-        e = 0;
-      }
-    }
-    for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-    e = (e << mLen) | m;
-    eLen += mLen;
-    for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-    buffer[offset + i - d] |= s * 128;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("43", ["42"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('42');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("44", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  ;
-  (function(exports) {
-    'use strict';
-    var Arr = (typeof Uint8Array !== 'undefined') ? Uint8Array : Array;
-    var PLUS = '+'.charCodeAt(0);
-    var SLASH = '/'.charCodeAt(0);
-    var NUMBER = '0'.charCodeAt(0);
-    var LOWER = 'a'.charCodeAt(0);
-    var UPPER = 'A'.charCodeAt(0);
-    var PLUS_URL_SAFE = '-'.charCodeAt(0);
-    var SLASH_URL_SAFE = '_'.charCodeAt(0);
-    function decode(elt) {
-      var code = elt.charCodeAt(0);
-      if (code === PLUS || code === PLUS_URL_SAFE)
-        return 62;
-      if (code === SLASH || code === SLASH_URL_SAFE)
-        return 63;
-      if (code < NUMBER)
-        return -1;
-      if (code < NUMBER + 10)
-        return code - NUMBER + 26 + 26;
-      if (code < UPPER + 26)
-        return code - UPPER;
-      if (code < LOWER + 26)
-        return code - LOWER + 26;
-    }
-    function b64ToByteArray(b64) {
-      var i,
-          j,
-          l,
-          tmp,
-          placeHolders,
-          arr;
-      if (b64.length % 4 > 0) {
-        throw new Error('Invalid string. Length must be a multiple of 4');
-      }
-      var len = b64.length;
-      placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0;
-      arr = new Arr(b64.length * 3 / 4 - placeHolders);
-      l = placeHolders > 0 ? b64.length - 4 : b64.length;
-      var L = 0;
-      function push(v) {
-        arr[L++] = v;
-      }
-      for (i = 0, j = 0; i < l; i += 4, j += 3) {
-        tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3));
-        push((tmp & 0xFF0000) >> 16);
-        push((tmp & 0xFF00) >> 8);
-        push(tmp & 0xFF);
-      }
-      if (placeHolders === 2) {
-        tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4);
-        push(tmp & 0xFF);
-      } else if (placeHolders === 1) {
-        tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2);
-        push((tmp >> 8) & 0xFF);
-        push(tmp & 0xFF);
-      }
-      return arr;
-    }
-    function uint8ToBase64(uint8) {
-      var i,
-          extraBytes = uint8.length % 3,
-          output = "",
-          temp,
-          length;
-      function encode(num) {
-        return lookup.charAt(num);
-      }
-      function tripletToBase64(num) {
-        return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F);
-      }
-      for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-        temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2]);
-        output += tripletToBase64(temp);
-      }
-      switch (extraBytes) {
-        case 1:
-          temp = uint8[uint8.length - 1];
-          output += encode(temp >> 2);
-          output += encode((temp << 4) & 0x3F);
-          output += '==';
-          break;
-        case 2:
-          temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1]);
-          output += encode(temp >> 10);
-          output += encode((temp >> 4) & 0x3F);
-          output += encode((temp << 2) & 0x3F);
-          output += '=';
-          break;
-      }
-      return output;
-    }
-    exports.toByteArray = b64ToByteArray;
-    exports.fromByteArray = uint8ToBase64;
-  }(typeof exports === 'undefined' ? (this.base64js = {}) : exports));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("45", ["44"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('44');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("46", ["45", "43", "41"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var base64 = req('45');
-  var ieee754 = req('43');
-  var isArray = req('41');
-  exports.Buffer = Buffer;
-  exports.SlowBuffer = SlowBuffer;
-  exports.INSPECT_MAX_BYTES = 50;
-  Buffer.poolSize = 8192;
-  var rootParent = {};
-  Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined ? global.TYPED_ARRAY_SUPPORT : typedArraySupport();
-  function typedArraySupport() {
-    function Bar() {}
-    try {
-      var arr = new Uint8Array(1);
-      arr.foo = function() {
-        return 42;
-      };
-      arr.constructor = Bar;
-      return arr.foo() === 42 && arr.constructor === Bar && typeof arr.subarray === 'function' && arr.subarray(1, 1).byteLength === 0;
-    } catch (e) {
-      return false;
-    }
-  }
-  function kMaxLength() {
-    return Buffer.TYPED_ARRAY_SUPPORT ? 0x7fffffff : 0x3fffffff;
-  }
-  function Buffer(arg) {
-    if (!(this instanceof Buffer)) {
-      if (arguments.length > 1)
-        return new Buffer(arg, arguments[1]);
-      return new Buffer(arg);
-    }
-    this.length = 0;
-    this.parent = undefined;
-    if (typeof arg === 'number') {
-      return fromNumber(this, arg);
-    }
-    if (typeof arg === 'string') {
-      return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8');
-    }
-    return fromObject(this, arg);
-  }
-  function fromNumber(that, length) {
-    that = allocate(that, length < 0 ? 0 : checked(length) | 0);
-    if (!Buffer.TYPED_ARRAY_SUPPORT) {
-      for (var i = 0; i < length; i++) {
-        that[i] = 0;
-      }
-    }
-    return that;
-  }
-  function fromString(that, string, encoding) {
-    if (typeof encoding !== 'string' || encoding === '')
-      encoding = 'utf8';
-    var length = byteLength(string, encoding) | 0;
-    that = allocate(that, length);
-    that.write(string, encoding);
-    return that;
-  }
-  function fromObject(that, object) {
-    if (Buffer.isBuffer(object))
-      return fromBuffer(that, object);
-    if (isArray(object))
-      return fromArray(that, object);
-    if (object == null) {
-      throw new TypeError('must start with number, buffer, array or string');
-    }
-    if (typeof ArrayBuffer !== 'undefined') {
-      if (object.buffer instanceof ArrayBuffer) {
-        return fromTypedArray(that, object);
-      }
-      if (object instanceof ArrayBuffer) {
-        return fromArrayBuffer(that, object);
-      }
-    }
-    if (object.length)
-      return fromArrayLike(that, object);
-    return fromJsonObject(that, object);
-  }
-  function fromBuffer(that, buffer) {
-    var length = checked(buffer.length) | 0;
-    that = allocate(that, length);
-    buffer.copy(that, 0, 0, length);
-    return that;
-  }
-  function fromArray(that, array) {
-    var length = checked(array.length) | 0;
-    that = allocate(that, length);
-    for (var i = 0; i < length; i += 1) {
-      that[i] = array[i] & 255;
-    }
-    return that;
-  }
-  function fromTypedArray(that, array) {
-    var length = checked(array.length) | 0;
-    that = allocate(that, length);
-    for (var i = 0; i < length; i += 1) {
-      that[i] = array[i] & 255;
-    }
-    return that;
-  }
-  function fromArrayBuffer(that, array) {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      array.byteLength;
-      that = Buffer._augment(new Uint8Array(array));
-    } else {
-      that = fromTypedArray(that, new Uint8Array(array));
-    }
-    return that;
-  }
-  function fromArrayLike(that, array) {
-    var length = checked(array.length) | 0;
-    that = allocate(that, length);
-    for (var i = 0; i < length; i += 1) {
-      that[i] = array[i] & 255;
-    }
-    return that;
-  }
-  function fromJsonObject(that, object) {
-    var array;
-    var length = 0;
-    if (object.type === 'Buffer' && isArray(object.data)) {
-      array = object.data;
-      length = checked(array.length) | 0;
-    }
-    that = allocate(that, length);
-    for (var i = 0; i < length; i += 1) {
-      that[i] = array[i] & 255;
-    }
-    return that;
-  }
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    Buffer.prototype.__proto__ = Uint8Array.prototype;
-    Buffer.__proto__ = Uint8Array;
-  }
-  function allocate(that, length) {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      that = Buffer._augment(new Uint8Array(length));
-      that.__proto__ = Buffer.prototype;
-    } else {
-      that.length = length;
-      that._isBuffer = true;
-    }
-    var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1;
-    if (fromPool)
-      that.parent = rootParent;
-    return that;
-  }
-  function checked(length) {
-    if (length >= kMaxLength()) {
-      throw new RangeError('Attempt to allocate Buffer larger than maximum ' + 'size: 0x' + kMaxLength().toString(16) + ' bytes');
-    }
-    return length | 0;
-  }
-  function SlowBuffer(subject, encoding) {
-    if (!(this instanceof SlowBuffer))
-      return new SlowBuffer(subject, encoding);
-    var buf = new Buffer(subject, encoding);
-    delete buf.parent;
-    return buf;
-  }
-  Buffer.isBuffer = function isBuffer(b) {
-    return !!(b != null && b._isBuffer);
-  };
-  Buffer.compare = function compare(a, b) {
-    if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
-      throw new TypeError('Arguments must be Buffers');
-    }
-    if (a === b)
-      return 0;
-    var x = a.length;
-    var y = b.length;
-    var i = 0;
-    var len = Math.min(x, y);
-    while (i < len) {
-      if (a[i] !== b[i])
-        break;
-      ++i;
-    }
-    if (i !== len) {
-      x = a[i];
-      y = b[i];
-    }
-    if (x < y)
-      return -1;
-    if (y < x)
-      return 1;
-    return 0;
-  };
-  Buffer.isEncoding = function isEncoding(encoding) {
-    switch (String(encoding).toLowerCase()) {
-      case 'hex':
-      case 'utf8':
-      case 'utf-8':
-      case 'ascii':
-      case 'binary':
-      case 'base64':
-      case 'raw':
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return true;
-      default:
-        return false;
-    }
-  };
-  Buffer.concat = function concat(list, length) {
-    if (!isArray(list))
-      throw new TypeError('list argument must be an Array of Buffers.');
-    if (list.length === 0) {
-      return new Buffer(0);
-    }
-    var i;
-    if (length === undefined) {
-      length = 0;
-      for (i = 0; i < list.length; i++) {
-        length += list[i].length;
-      }
-    }
-    var buf = new Buffer(length);
-    var pos = 0;
-    for (i = 0; i < list.length; i++) {
-      var item = list[i];
-      item.copy(buf, pos);
-      pos += item.length;
-    }
-    return buf;
-  };
-  function byteLength(string, encoding) {
-    if (typeof string !== 'string')
-      string = '' + string;
-    var len = string.length;
-    if (len === 0)
-      return 0;
-    var loweredCase = false;
-    for (; ; ) {
-      switch (encoding) {
-        case 'ascii':
-        case 'binary':
-        case 'raw':
-        case 'raws':
-          return len;
-        case 'utf8':
-        case 'utf-8':
-          return utf8ToBytes(string).length;
-        case 'ucs2':
-        case 'ucs-2':
-        case 'utf16le':
-        case 'utf-16le':
-          return len * 2;
-        case 'hex':
-          return len >>> 1;
-        case 'base64':
-          return base64ToBytes(string).length;
-        default:
-          if (loweredCase)
-            return utf8ToBytes(string).length;
-          encoding = ('' + encoding).toLowerCase();
-          loweredCase = true;
-      }
-    }
-  }
-  Buffer.byteLength = byteLength;
-  Buffer.prototype.length = undefined;
-  Buffer.prototype.parent = undefined;
-  function slowToString(encoding, start, end) {
-    var loweredCase = false;
-    start = start | 0;
-    end = end === undefined || end === Infinity ? this.length : end | 0;
-    if (!encoding)
-      encoding = 'utf8';
-    if (start < 0)
-      start = 0;
-    if (end > this.length)
-      end = this.length;
-    if (end <= start)
-      return '';
-    while (true) {
-      switch (encoding) {
-        case 'hex':
-          return hexSlice(this, start, end);
-        case 'utf8':
-        case 'utf-8':
-          return utf8Slice(this, start, end);
-        case 'ascii':
-          return asciiSlice(this, start, end);
-        case 'binary':
-          return binarySlice(this, start, end);
-        case 'base64':
-          return base64Slice(this, start, end);
-        case 'ucs2':
-        case 'ucs-2':
-        case 'utf16le':
-        case 'utf-16le':
-          return utf16leSlice(this, start, end);
-        default:
-          if (loweredCase)
-            throw new TypeError('Unknown encoding: ' + encoding);
-          encoding = (encoding + '').toLowerCase();
-          loweredCase = true;
-      }
-    }
-  }
-  Buffer.prototype.toString = function toString() {
-    var length = this.length | 0;
-    if (length === 0)
-      return '';
-    if (arguments.length === 0)
-      return utf8Slice(this, 0, length);
-    return slowToString.apply(this, arguments);
-  };
-  Buffer.prototype.equals = function equals(b) {
-    if (!Buffer.isBuffer(b))
-      throw new TypeError('Argument must be a Buffer');
-    if (this === b)
-      return true;
-    return Buffer.compare(this, b) === 0;
-  };
-  Buffer.prototype.inspect = function inspect() {
-    var str = '';
-    var max = exports.INSPECT_MAX_BYTES;
-    if (this.length > 0) {
-      str = this.toString('hex', 0, max).match(/.{2}/g).join(' ');
-      if (this.length > max)
-        str += ' ... ';
-    }
-    return '<Buffer ' + str + '>';
-  };
-  Buffer.prototype.compare = function compare(b) {
-    if (!Buffer.isBuffer(b))
-      throw new TypeError('Argument must be a Buffer');
-    if (this === b)
-      return 0;
-    return Buffer.compare(this, b);
-  };
-  Buffer.prototype.indexOf = function indexOf(val, byteOffset) {
-    if (byteOffset > 0x7fffffff)
-      byteOffset = 0x7fffffff;
-    else if (byteOffset < -0x80000000)
-      byteOffset = -0x80000000;
-    byteOffset >>= 0;
-    if (this.length === 0)
-      return -1;
-    if (byteOffset >= this.length)
-      return -1;
-    if (byteOffset < 0)
-      byteOffset = Math.max(this.length + byteOffset, 0);
-    if (typeof val === 'string') {
-      if (val.length === 0)
-        return -1;
-      return String.prototype.indexOf.call(this, val, byteOffset);
-    }
-    if (Buffer.isBuffer(val)) {
-      return arrayIndexOf(this, val, byteOffset);
-    }
-    if (typeof val === 'number') {
-      if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
-        return Uint8Array.prototype.indexOf.call(this, val, byteOffset);
-      }
-      return arrayIndexOf(this, [val], byteOffset);
-    }
-    function arrayIndexOf(arr, val, byteOffset) {
-      var foundIndex = -1;
-      for (var i = 0; byteOffset + i < arr.length; i++) {
-        if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
-          if (foundIndex === -1)
-            foundIndex = i;
-          if (i - foundIndex + 1 === val.length)
-            return byteOffset + foundIndex;
-        } else {
-          foundIndex = -1;
-        }
-      }
-      return -1;
-    }
-    throw new TypeError('val must be string, number or Buffer');
-  };
-  Buffer.prototype.get = function get(offset) {
-    console.log('.get() is deprecated. Access using array indexes instead.');
-    return this.readUInt8(offset);
-  };
-  Buffer.prototype.set = function set(v, offset) {
-    console.log('.set() is deprecated. Access using array indexes instead.');
-    return this.writeUInt8(v, offset);
-  };
-  function hexWrite(buf, string, offset, length) {
-    offset = Number(offset) || 0;
-    var remaining = buf.length - offset;
-    if (!length) {
-      length = remaining;
-    } else {
-      length = Number(length);
-      if (length > remaining) {
-        length = remaining;
-      }
-    }
-    var strLen = string.length;
-    if (strLen % 2 !== 0)
-      throw new Error('Invalid hex string');
-    if (length > strLen / 2) {
-      length = strLen / 2;
-    }
-    for (var i = 0; i < length; i++) {
-      var parsed = parseInt(string.substr(i * 2, 2), 16);
-      if (isNaN(parsed))
-        throw new Error('Invalid hex string');
-      buf[offset + i] = parsed;
-    }
-    return i;
-  }
-  function utf8Write(buf, string, offset, length) {
-    return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length);
-  }
-  function asciiWrite(buf, string, offset, length) {
-    return blitBuffer(asciiToBytes(string), buf, offset, length);
-  }
-  function binaryWrite(buf, string, offset, length) {
-    return asciiWrite(buf, string, offset, length);
-  }
-  function base64Write(buf, string, offset, length) {
-    return blitBuffer(base64ToBytes(string), buf, offset, length);
-  }
-  function ucs2Write(buf, string, offset, length) {
-    return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length);
-  }
-  Buffer.prototype.write = function write(string, offset, length, encoding) {
-    if (offset === undefined) {
-      encoding = 'utf8';
-      length = this.length;
-      offset = 0;
-    } else if (length === undefined && typeof offset === 'string') {
-      encoding = offset;
-      length = this.length;
-      offset = 0;
-    } else if (isFinite(offset)) {
-      offset = offset | 0;
-      if (isFinite(length)) {
-        length = length | 0;
-        if (encoding === undefined)
-          encoding = 'utf8';
-      } else {
-        encoding = length;
-        length = undefined;
-      }
-    } else {
-      var swap = encoding;
-      encoding = offset;
-      offset = length | 0;
-      length = swap;
-    }
-    var remaining = this.length - offset;
-    if (length === undefined || length > remaining)
-      length = remaining;
-    if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
-      throw new RangeError('attempt to write outside buffer bounds');
-    }
-    if (!encoding)
-      encoding = 'utf8';
-    var loweredCase = false;
-    for (; ; ) {
-      switch (encoding) {
-        case 'hex':
-          return hexWrite(this, string, offset, length);
-        case 'utf8':
-        case 'utf-8':
-          return utf8Write(this, string, offset, length);
-        case 'ascii':
-          return asciiWrite(this, string, offset, length);
-        case 'binary':
-          return binaryWrite(this, string, offset, length);
-        case 'base64':
-          return base64Write(this, string, offset, length);
-        case 'ucs2':
-        case 'ucs-2':
-        case 'utf16le':
-        case 'utf-16le':
-          return ucs2Write(this, string, offset, length);
-        default:
-          if (loweredCase)
-            throw new TypeError('Unknown encoding: ' + encoding);
-          encoding = ('' + encoding).toLowerCase();
-          loweredCase = true;
-      }
-    }
-  };
-  Buffer.prototype.toJSON = function toJSON() {
-    return {
-      type: 'Buffer',
-      data: Array.prototype.slice.call(this._arr || this, 0)
-    };
-  };
-  function base64Slice(buf, start, end) {
-    if (start === 0 && end === buf.length) {
-      return base64.fromByteArray(buf);
-    } else {
-      return base64.fromByteArray(buf.slice(start, end));
-    }
-  }
-  function utf8Slice(buf, start, end) {
-    end = Math.min(buf.length, end);
-    var res = [];
-    var i = start;
-    while (i < end) {
-      var firstByte = buf[i];
-      var codePoint = null;
-      var bytesPerSequence = (firstByte > 0xEF) ? 4 : (firstByte > 0xDF) ? 3 : (firstByte > 0xBF) ? 2 : 1;
-      if (i + bytesPerSequence <= end) {
-        var secondByte,
-            thirdByte,
-            fourthByte,
-            tempCodePoint;
-        switch (bytesPerSequence) {
-          case 1:
-            if (firstByte < 0x80) {
-              codePoint = firstByte;
-            }
-            break;
-          case 2:
-            secondByte = buf[i + 1];
-            if ((secondByte & 0xC0) === 0x80) {
-              tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F);
-              if (tempCodePoint > 0x7F) {
-                codePoint = tempCodePoint;
-              }
-            }
-            break;
-          case 3:
-            secondByte = buf[i + 1];
-            thirdByte = buf[i + 2];
-            if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
-              tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F);
-              if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
-                codePoint = tempCodePoint;
-              }
-            }
-            break;
-          case 4:
-            secondByte = buf[i + 1];
-            thirdByte = buf[i + 2];
-            fourthByte = buf[i + 3];
-            if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
-              tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F);
-              if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
-                codePoint = tempCodePoint;
-              }
-            }
-        }
-      }
-      if (codePoint === null) {
-        codePoint = 0xFFFD;
-        bytesPerSequence = 1;
-      } else if (codePoint > 0xFFFF) {
-        codePoint -= 0x10000;
-        res.push(codePoint >>> 10 & 0x3FF | 0xD800);
-        codePoint = 0xDC00 | codePoint & 0x3FF;
-      }
-      res.push(codePoint);
-      i += bytesPerSequence;
-    }
-    return decodeCodePointsArray(res);
-  }
-  var MAX_ARGUMENTS_LENGTH = 0x1000;
-  function decodeCodePointsArray(codePoints) {
-    var len = codePoints.length;
-    if (len <= MAX_ARGUMENTS_LENGTH) {
-      return String.fromCharCode.apply(String, codePoints);
-    }
-    var res = '';
-    var i = 0;
-    while (i < len) {
-      res += String.fromCharCode.apply(String, codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH));
-    }
-    return res;
-  }
-  function asciiSlice(buf, start, end) {
-    var ret = '';
-    end = Math.min(buf.length, end);
-    for (var i = start; i < end; i++) {
-      ret += String.fromCharCode(buf[i] & 0x7F);
-    }
-    return ret;
-  }
-  function binarySlice(buf, start, end) {
-    var ret = '';
-    end = Math.min(buf.length, end);
-    for (var i = start; i < end; i++) {
-      ret += String.fromCharCode(buf[i]);
-    }
-    return ret;
-  }
-  function hexSlice(buf, start, end) {
-    var len = buf.length;
-    if (!start || start < 0)
-      start = 0;
-    if (!end || end < 0 || end > len)
-      end = len;
-    var out = '';
-    for (var i = start; i < end; i++) {
-      out += toHex(buf[i]);
-    }
-    return out;
-  }
-  function utf16leSlice(buf, start, end) {
-    var bytes = buf.slice(start, end);
-    var res = '';
-    for (var i = 0; i < bytes.length; i += 2) {
-      res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256);
-    }
-    return res;
-  }
-  Buffer.prototype.slice = function slice(start, end) {
-    var len = this.length;
-    start = ~~start;
-    end = end === undefined ? len : ~~end;
-    if (start < 0) {
-      start += len;
-      if (start < 0)
-        start = 0;
-    } else if (start > len) {
-      start = len;
-    }
-    if (end < 0) {
-      end += len;
-      if (end < 0)
-        end = 0;
-    } else if (end > len) {
-      end = len;
-    }
-    if (end < start)
-      end = start;
-    var newBuf;
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      newBuf = Buffer._augment(this.subarray(start, end));
-    } else {
-      var sliceLen = end - start;
-      newBuf = new Buffer(sliceLen, undefined);
-      for (var i = 0; i < sliceLen; i++) {
-        newBuf[i] = this[i + start];
-      }
-    }
-    if (newBuf.length)
-      newBuf.parent = this.parent || this;
-    return newBuf;
-  };
-  function checkOffset(offset, ext, length) {
-    if ((offset % 1) !== 0 || offset < 0)
-      throw new RangeError('offset is not uint');
-    if (offset + ext > length)
-      throw new RangeError('Trying to access beyond buffer length');
-  }
-  Buffer.prototype.readUIntLE = function readUIntLE(offset, byteLength, noAssert) {
-    offset = offset | 0;
-    byteLength = byteLength | 0;
-    if (!noAssert)
-      checkOffset(offset, byteLength, this.length);
-    var val = this[offset];
-    var mul = 1;
-    var i = 0;
-    while (++i < byteLength && (mul *= 0x100)) {
-      val += this[offset + i] * mul;
-    }
-    return val;
-  };
-  Buffer.prototype.readUIntBE = function readUIntBE(offset, byteLength, noAssert) {
-    offset = offset | 0;
-    byteLength = byteLength | 0;
-    if (!noAssert) {
-      checkOffset(offset, byteLength, this.length);
-    }
-    var val = this[offset + --byteLength];
-    var mul = 1;
-    while (byteLength > 0 && (mul *= 0x100)) {
-      val += this[offset + --byteLength] * mul;
-    }
-    return val;
-  };
-  Buffer.prototype.readUInt8 = function readUInt8(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 1, this.length);
-    return this[offset];
-  };
-  Buffer.prototype.readUInt16LE = function readUInt16LE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 2, this.length);
-    return this[offset] | (this[offset + 1] << 8);
-  };
-  Buffer.prototype.readUInt16BE = function readUInt16BE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 2, this.length);
-    return (this[offset] << 8) | this[offset + 1];
-  };
-  Buffer.prototype.readUInt32LE = function readUInt32LE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 4, this.length);
-    return ((this[offset]) | (this[offset + 1] << 8) | (this[offset + 2] << 16)) + (this[offset + 3] * 0x1000000);
-  };
-  Buffer.prototype.readUInt32BE = function readUInt32BE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 4, this.length);
-    return (this[offset] * 0x1000000) + ((this[offset + 1] << 16) | (this[offset + 2] << 8) | this[offset + 3]);
-  };
-  Buffer.prototype.readIntLE = function readIntLE(offset, byteLength, noAssert) {
-    offset = offset | 0;
-    byteLength = byteLength | 0;
-    if (!noAssert)
-      checkOffset(offset, byteLength, this.length);
-    var val = this[offset];
-    var mul = 1;
-    var i = 0;
-    while (++i < byteLength && (mul *= 0x100)) {
-      val += this[offset + i] * mul;
-    }
-    mul *= 0x80;
-    if (val >= mul)
-      val -= Math.pow(2, 8 * byteLength);
-    return val;
-  };
-  Buffer.prototype.readIntBE = function readIntBE(offset, byteLength, noAssert) {
-    offset = offset | 0;
-    byteLength = byteLength | 0;
-    if (!noAssert)
-      checkOffset(offset, byteLength, this.length);
-    var i = byteLength;
-    var mul = 1;
-    var val = this[offset + --i];
-    while (i > 0 && (mul *= 0x100)) {
-      val += this[offset + --i] * mul;
-    }
-    mul *= 0x80;
-    if (val >= mul)
-      val -= Math.pow(2, 8 * byteLength);
-    return val;
-  };
-  Buffer.prototype.readInt8 = function readInt8(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 1, this.length);
-    if (!(this[offset] & 0x80))
-      return (this[offset]);
-    return ((0xff - this[offset] + 1) * -1);
-  };
-  Buffer.prototype.readInt16LE = function readInt16LE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 2, this.length);
-    var val = this[offset] | (this[offset + 1] << 8);
-    return (val & 0x8000) ? val | 0xFFFF0000 : val;
-  };
-  Buffer.prototype.readInt16BE = function readInt16BE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 2, this.length);
-    var val = this[offset + 1] | (this[offset] << 8);
-    return (val & 0x8000) ? val | 0xFFFF0000 : val;
-  };
-  Buffer.prototype.readInt32LE = function readInt32LE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 4, this.length);
-    return (this[offset]) | (this[offset + 1] << 8) | (this[offset + 2] << 16) | (this[offset + 3] << 24);
-  };
-  Buffer.prototype.readInt32BE = function readInt32BE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 4, this.length);
-    return (this[offset] << 24) | (this[offset + 1] << 16) | (this[offset + 2] << 8) | (this[offset + 3]);
-  };
-  Buffer.prototype.readFloatLE = function readFloatLE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 4, this.length);
-    return ieee754.read(this, offset, true, 23, 4);
-  };
-  Buffer.prototype.readFloatBE = function readFloatBE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 4, this.length);
-    return ieee754.read(this, offset, false, 23, 4);
-  };
-  Buffer.prototype.readDoubleLE = function readDoubleLE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 8, this.length);
-    return ieee754.read(this, offset, true, 52, 8);
-  };
-  Buffer.prototype.readDoubleBE = function readDoubleBE(offset, noAssert) {
-    if (!noAssert)
-      checkOffset(offset, 8, this.length);
-    return ieee754.read(this, offset, false, 52, 8);
-  };
-  function checkInt(buf, value, offset, ext, max, min) {
-    if (!Buffer.isBuffer(buf))
-      throw new TypeError('buffer must be a Buffer instance');
-    if (value > max || value < min)
-      throw new RangeError('value is out of bounds');
-    if (offset + ext > buf.length)
-      throw new RangeError('index out of range');
-  }
-  Buffer.prototype.writeUIntLE = function writeUIntLE(value, offset, byteLength, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    byteLength = byteLength | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0);
-    var mul = 1;
-    var i = 0;
-    this[offset] = value & 0xFF;
-    while (++i < byteLength && (mul *= 0x100)) {
-      this[offset + i] = (value / mul) & 0xFF;
-    }
-    return offset + byteLength;
-  };
-  Buffer.prototype.writeUIntBE = function writeUIntBE(value, offset, byteLength, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    byteLength = byteLength | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0);
-    var i = byteLength - 1;
-    var mul = 1;
-    this[offset + i] = value & 0xFF;
-    while (--i >= 0 && (mul *= 0x100)) {
-      this[offset + i] = (value / mul) & 0xFF;
-    }
-    return offset + byteLength;
-  };
-  Buffer.prototype.writeUInt8 = function writeUInt8(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 1, 0xff, 0);
-    if (!Buffer.TYPED_ARRAY_SUPPORT)
-      value = Math.floor(value);
-    this[offset] = (value & 0xff);
-    return offset + 1;
-  };
-  function objectWriteUInt16(buf, value, offset, littleEndian) {
-    if (value < 0)
-      value = 0xffff + value + 1;
-    for (var i = 0,
-        j = Math.min(buf.length - offset, 2); i < j; i++) {
-      buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>> (littleEndian ? i : 1 - i) * 8;
-    }
-  }
-  Buffer.prototype.writeUInt16LE = function writeUInt16LE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 2, 0xffff, 0);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value & 0xff);
-      this[offset + 1] = (value >>> 8);
-    } else {
-      objectWriteUInt16(this, value, offset, true);
-    }
-    return offset + 2;
-  };
-  Buffer.prototype.writeUInt16BE = function writeUInt16BE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 2, 0xffff, 0);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value >>> 8);
-      this[offset + 1] = (value & 0xff);
-    } else {
-      objectWriteUInt16(this, value, offset, false);
-    }
-    return offset + 2;
-  };
-  function objectWriteUInt32(buf, value, offset, littleEndian) {
-    if (value < 0)
-      value = 0xffffffff + value + 1;
-    for (var i = 0,
-        j = Math.min(buf.length - offset, 4); i < j; i++) {
-      buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff;
-    }
-  }
-  Buffer.prototype.writeUInt32LE = function writeUInt32LE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 4, 0xffffffff, 0);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset + 3] = (value >>> 24);
-      this[offset + 2] = (value >>> 16);
-      this[offset + 1] = (value >>> 8);
-      this[offset] = (value & 0xff);
-    } else {
-      objectWriteUInt32(this, value, offset, true);
-    }
-    return offset + 4;
-  };
-  Buffer.prototype.writeUInt32BE = function writeUInt32BE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 4, 0xffffffff, 0);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value >>> 24);
-      this[offset + 1] = (value >>> 16);
-      this[offset + 2] = (value >>> 8);
-      this[offset + 3] = (value & 0xff);
-    } else {
-      objectWriteUInt32(this, value, offset, false);
-    }
-    return offset + 4;
-  };
-  Buffer.prototype.writeIntLE = function writeIntLE(value, offset, byteLength, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert) {
-      var limit = Math.pow(2, 8 * byteLength - 1);
-      checkInt(this, value, offset, byteLength, limit - 1, -limit);
-    }
-    var i = 0;
-    var mul = 1;
-    var sub = value < 0 ? 1 : 0;
-    this[offset] = value & 0xFF;
-    while (++i < byteLength && (mul *= 0x100)) {
-      this[offset + i] = ((value / mul) >> 0) - sub & 0xFF;
-    }
-    return offset + byteLength;
-  };
-  Buffer.prototype.writeIntBE = function writeIntBE(value, offset, byteLength, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert) {
-      var limit = Math.pow(2, 8 * byteLength - 1);
-      checkInt(this, value, offset, byteLength, limit - 1, -limit);
-    }
-    var i = byteLength - 1;
-    var mul = 1;
-    var sub = value < 0 ? 1 : 0;
-    this[offset + i] = value & 0xFF;
-    while (--i >= 0 && (mul *= 0x100)) {
-      this[offset + i] = ((value / mul) >> 0) - sub & 0xFF;
-    }
-    return offset + byteLength;
-  };
-  Buffer.prototype.writeInt8 = function writeInt8(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 1, 0x7f, -0x80);
-    if (!Buffer.TYPED_ARRAY_SUPPORT)
-      value = Math.floor(value);
-    if (value < 0)
-      value = 0xff + value + 1;
-    this[offset] = (value & 0xff);
-    return offset + 1;
-  };
-  Buffer.prototype.writeInt16LE = function writeInt16LE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 2, 0x7fff, -0x8000);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value & 0xff);
-      this[offset + 1] = (value >>> 8);
-    } else {
-      objectWriteUInt16(this, value, offset, true);
-    }
-    return offset + 2;
-  };
-  Buffer.prototype.writeInt16BE = function writeInt16BE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 2, 0x7fff, -0x8000);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value >>> 8);
-      this[offset + 1] = (value & 0xff);
-    } else {
-      objectWriteUInt16(this, value, offset, false);
-    }
-    return offset + 2;
-  };
-  Buffer.prototype.writeInt32LE = function writeInt32LE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000);
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value & 0xff);
-      this[offset + 1] = (value >>> 8);
-      this[offset + 2] = (value >>> 16);
-      this[offset + 3] = (value >>> 24);
-    } else {
-      objectWriteUInt32(this, value, offset, true);
-    }
-    return offset + 4;
-  };
-  Buffer.prototype.writeInt32BE = function writeInt32BE(value, offset, noAssert) {
-    value = +value;
-    offset = offset | 0;
-    if (!noAssert)
-      checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000);
-    if (value < 0)
-      value = 0xffffffff + value + 1;
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      this[offset] = (value >>> 24);
-      this[offset + 1] = (value >>> 16);
-      this[offset + 2] = (value >>> 8);
-      this[offset + 3] = (value & 0xff);
-    } else {
-      objectWriteUInt32(this, value, offset, false);
-    }
-    return offset + 4;
-  };
-  function checkIEEE754(buf, value, offset, ext, max, min) {
-    if (value > max || value < min)
-      throw new RangeError('value is out of bounds');
-    if (offset + ext > buf.length)
-      throw new RangeError('index out of range');
-    if (offset < 0)
-      throw new RangeError('index out of range');
-  }
-  function writeFloat(buf, value, offset, littleEndian, noAssert) {
-    if (!noAssert) {
-      checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38);
-    }
-    ieee754.write(buf, value, offset, littleEndian, 23, 4);
-    return offset + 4;
-  }
-  Buffer.prototype.writeFloatLE = function writeFloatLE(value, offset, noAssert) {
-    return writeFloat(this, value, offset, true, noAssert);
-  };
-  Buffer.prototype.writeFloatBE = function writeFloatBE(value, offset, noAssert) {
-    return writeFloat(this, value, offset, false, noAssert);
-  };
-  function writeDouble(buf, value, offset, littleEndian, noAssert) {
-    if (!noAssert) {
-      checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308);
-    }
-    ieee754.write(buf, value, offset, littleEndian, 52, 8);
-    return offset + 8;
-  }
-  Buffer.prototype.writeDoubleLE = function writeDoubleLE(value, offset, noAssert) {
-    return writeDouble(this, value, offset, true, noAssert);
-  };
-  Buffer.prototype.writeDoubleBE = function writeDoubleBE(value, offset, noAssert) {
-    return writeDouble(this, value, offset, false, noAssert);
-  };
-  Buffer.prototype.copy = function copy(target, targetStart, start, end) {
-    if (!start)
-      start = 0;
-    if (!end && end !== 0)
-      end = this.length;
-    if (targetStart >= target.length)
-      targetStart = target.length;
-    if (!targetStart)
-      targetStart = 0;
-    if (end > 0 && end < start)
-      end = start;
-    if (end === start)
-      return 0;
-    if (target.length === 0 || this.length === 0)
-      return 0;
-    if (targetStart < 0) {
-      throw new RangeError('targetStart out of bounds');
-    }
-    if (start < 0 || start >= this.length)
-      throw new RangeError('sourceStart out of bounds');
-    if (end < 0)
-      throw new RangeError('sourceEnd out of bounds');
-    if (end > this.length)
-      end = this.length;
-    if (target.length - targetStart < end - start) {
-      end = target.length - targetStart + start;
-    }
-    var len = end - start;
-    var i;
-    if (this === target && start < targetStart && targetStart < end) {
-      for (i = len - 1; i >= 0; i--) {
-        target[i + targetStart] = this[i + start];
-      }
-    } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
-      for (i = 0; i < len; i++) {
-        target[i + targetStart] = this[i + start];
-      }
-    } else {
-      target._set(this.subarray(start, start + len), targetStart);
-    }
-    return len;
-  };
-  Buffer.prototype.fill = function fill(value, start, end) {
-    if (!value)
-      value = 0;
-    if (!start)
-      start = 0;
-    if (!end)
-      end = this.length;
-    if (end < start)
-      throw new RangeError('end < start');
-    if (end === start)
-      return;
-    if (this.length === 0)
-      return;
-    if (start < 0 || start >= this.length)
-      throw new RangeError('start out of bounds');
-    if (end < 0 || end > this.length)
-      throw new RangeError('end out of bounds');
-    var i;
-    if (typeof value === 'number') {
-      for (i = start; i < end; i++) {
-        this[i] = value;
-      }
-    } else {
-      var bytes = utf8ToBytes(value.toString());
-      var len = bytes.length;
-      for (i = start; i < end; i++) {
-        this[i] = bytes[i % len];
-      }
-    }
-    return this;
-  };
-  Buffer.prototype.toArrayBuffer = function toArrayBuffer() {
-    if (typeof Uint8Array !== 'undefined') {
-      if (Buffer.TYPED_ARRAY_SUPPORT) {
-        return (new Buffer(this)).buffer;
-      } else {
-        var buf = new Uint8Array(this.length);
-        for (var i = 0,
-            len = buf.length; i < len; i += 1) {
-          buf[i] = this[i];
-        }
-        return buf.buffer;
-      }
-    } else {
-      throw new TypeError('Buffer.toArrayBuffer not supported in this browser');
-    }
-  };
-  var BP = Buffer.prototype;
-  Buffer._augment = function _augment(arr) {
-    arr.constructor = Buffer;
-    arr._isBuffer = true;
-    arr._set = arr.set;
-    arr.get = BP.get;
-    arr.set = BP.set;
-    arr.write = BP.write;
-    arr.toString = BP.toString;
-    arr.toLocaleString = BP.toString;
-    arr.toJSON = BP.toJSON;
-    arr.equals = BP.equals;
-    arr.compare = BP.compare;
-    arr.indexOf = BP.indexOf;
-    arr.copy = BP.copy;
-    arr.slice = BP.slice;
-    arr.readUIntLE = BP.readUIntLE;
-    arr.readUIntBE = BP.readUIntBE;
-    arr.readUInt8 = BP.readUInt8;
-    arr.readUInt16LE = BP.readUInt16LE;
-    arr.readUInt16BE = BP.readUInt16BE;
-    arr.readUInt32LE = BP.readUInt32LE;
-    arr.readUInt32BE = BP.readUInt32BE;
-    arr.readIntLE = BP.readIntLE;
-    arr.readIntBE = BP.readIntBE;
-    arr.readInt8 = BP.readInt8;
-    arr.readInt16LE = BP.readInt16LE;
-    arr.readInt16BE = BP.readInt16BE;
-    arr.readInt32LE = BP.readInt32LE;
-    arr.readInt32BE = BP.readInt32BE;
-    arr.readFloatLE = BP.readFloatLE;
-    arr.readFloatBE = BP.readFloatBE;
-    arr.readDoubleLE = BP.readDoubleLE;
-    arr.readDoubleBE = BP.readDoubleBE;
-    arr.writeUInt8 = BP.writeUInt8;
-    arr.writeUIntLE = BP.writeUIntLE;
-    arr.writeUIntBE = BP.writeUIntBE;
-    arr.writeUInt16LE = BP.writeUInt16LE;
-    arr.writeUInt16BE = BP.writeUInt16BE;
-    arr.writeUInt32LE = BP.writeUInt32LE;
-    arr.writeUInt32BE = BP.writeUInt32BE;
-    arr.writeIntLE = BP.writeIntLE;
-    arr.writeIntBE = BP.writeIntBE;
-    arr.writeInt8 = BP.writeInt8;
-    arr.writeInt16LE = BP.writeInt16LE;
-    arr.writeInt16BE = BP.writeInt16BE;
-    arr.writeInt32LE = BP.writeInt32LE;
-    arr.writeInt32BE = BP.writeInt32BE;
-    arr.writeFloatLE = BP.writeFloatLE;
-    arr.writeFloatBE = BP.writeFloatBE;
-    arr.writeDoubleLE = BP.writeDoubleLE;
-    arr.writeDoubleBE = BP.writeDoubleBE;
-    arr.fill = BP.fill;
-    arr.inspect = BP.inspect;
-    arr.toArrayBuffer = BP.toArrayBuffer;
-    return arr;
-  };
-  var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g;
-  function base64clean(str) {
-    str = stringtrim(str).replace(INVALID_BASE64_RE, '');
-    if (str.length < 2)
-      return '';
-    while (str.length % 4 !== 0) {
-      str = str + '=';
-    }
-    return str;
-  }
-  function stringtrim(str) {
-    if (str.trim)
-      return str.trim();
-    return str.replace(/^\s+|\s+$/g, '');
-  }
-  function toHex(n) {
-    if (n < 16)
-      return '0' + n.toString(16);
-    return n.toString(16);
-  }
-  function utf8ToBytes(string, units) {
-    units = units || Infinity;
-    var codePoint;
-    var length = string.length;
-    var leadSurrogate = null;
-    var bytes = [];
-    for (var i = 0; i < length; i++) {
-      codePoint = string.charCodeAt(i);
-      if (codePoint > 0xD7FF && codePoint < 0xE000) {
-        if (!leadSurrogate) {
-          if (codePoint > 0xDBFF) {
-            if ((units -= 3) > -1)
-              bytes.push(0xEF, 0xBF, 0xBD);
-            continue;
-          } else if (i + 1 === length) {
-            if ((units -= 3) > -1)
-              bytes.push(0xEF, 0xBF, 0xBD);
-            continue;
-          }
-          leadSurrogate = codePoint;
-          continue;
-        }
-        if (codePoint < 0xDC00) {
-          if ((units -= 3) > -1)
-            bytes.push(0xEF, 0xBF, 0xBD);
-          leadSurrogate = codePoint;
-          continue;
-        }
-        codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000;
-      } else if (leadSurrogate) {
-        if ((units -= 3) > -1)
-          bytes.push(0xEF, 0xBF, 0xBD);
-      }
-      leadSurrogate = null;
-      if (codePoint < 0x80) {
-        if ((units -= 1) < 0)
-          break;
-        bytes.push(codePoint);
-      } else if (codePoint < 0x800) {
-        if ((units -= 2) < 0)
-          break;
-        bytes.push(codePoint >> 0x6 | 0xC0, codePoint & 0x3F | 0x80);
-      } else if (codePoint < 0x10000) {
-        if ((units -= 3) < 0)
-          break;
-        bytes.push(codePoint >> 0xC | 0xE0, codePoint >> 0x6 & 0x3F | 0x80, codePoint & 0x3F | 0x80);
-      } else if (codePoint < 0x110000) {
-        if ((units -= 4) < 0)
-          break;
-        bytes.push(codePoint >> 0x12 | 0xF0, codePoint >> 0xC & 0x3F | 0x80, codePoint >> 0x6 & 0x3F | 0x80, codePoint & 0x3F | 0x80);
-      } else {
-        throw new Error('Invalid code point');
-      }
-    }
-    return bytes;
-  }
-  function asciiToBytes(str) {
-    var byteArray = [];
-    for (var i = 0; i < str.length; i++) {
-      byteArray.push(str.charCodeAt(i) & 0xFF);
-    }
-    return byteArray;
-  }
-  function utf16leToBytes(str, units) {
-    var c,
-        hi,
-        lo;
-    var byteArray = [];
-    for (var i = 0; i < str.length; i++) {
-      if ((units -= 2) < 0)
-        break;
-      c = str.charCodeAt(i);
-      hi = c >> 8;
-      lo = c % 256;
-      byteArray.push(lo);
-      byteArray.push(hi);
-    }
-    return byteArray;
-  }
-  function base64ToBytes(str) {
-    return base64.toByteArray(base64clean(str));
-  }
-  function blitBuffer(src, dst, offset, length) {
-    for (var i = 0; i < length; i++) {
-      if ((i + offset >= dst.length) || (i >= src.length))
-        break;
-      dst[i + offset] = src[i];
-    }
-    return i;
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("47", ["46"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('46');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("48", ["47"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : req('47');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("49", ["48"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('48');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4a", ["49"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(Buffer) {
-    module.exports = function(obj) {
-      return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
-    };
-  })(req('49').Buffer);
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4b", ["4a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('4a');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4c", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  function iota(n) {
-    var result = new Array(n);
-    for (var i = 0; i < n; ++i) {
-      result[i] = i;
-    }
-    return result;
-  }
-  module.exports = iota;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4d", ["4c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('4c');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4e", ["4d", "4b"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var iota = req('4d');
-  var isBuffer = req('4b');
-  var hasTypedArrays = ((typeof Float64Array) !== "undefined");
-  function compare1st(a, b) {
-    return a[0] - b[0];
-  }
-  function order() {
-    var stride = this.stride;
-    var terms = new Array(stride.length);
-    var i;
-    for (i = 0; i < terms.length; ++i) {
-      terms[i] = [Math.abs(stride[i]), i];
-    }
-    terms.sort(compare1st);
-    var result = new Array(terms.length);
-    for (i = 0; i < result.length; ++i) {
-      result[i] = terms[i][1];
-    }
-    return result;
-  }
-  function compileConstructor(dtype, dimension) {
-    var className = ["View", dimension, "d", dtype].join("");
-    if (dimension < 0) {
-      className = "View_Nil" + dtype;
-    }
-    var useGetters = (dtype === "generic");
-    if (dimension === -1) {
-      var code = "function " + className + "(a){this.data=a;};\
-var proto=" + className + ".prototype;\
-proto.dtype='" + dtype + "';\
-proto.index=function(){return -1};\
-proto.size=0;\
-proto.dimension=-1;\
-proto.shape=proto.stride=proto.order=[];\
-proto.lo=proto.hi=proto.transpose=proto.step=\
-function(){return new " + className + "(this.data);};\
-proto.get=proto.set=function(){};\
-proto.pick=function(){return null};\
-return function construct_" + className + "(a){return new " + className + "(a);}";
-      var procedure = new Function(code);
-      return procedure();
-    } else if (dimension === 0) {
-      var code = "function " + className + "(a,d) {\
-this.data = a;\
-this.offset = d\
-};\
-var proto=" + className + ".prototype;\
-proto.dtype='" + dtype + "';\
-proto.index=function(){return this.offset};\
-proto.dimension=0;\
-proto.size=1;\
-proto.shape=\
-proto.stride=\
-proto.order=[];\
-proto.lo=\
-proto.hi=\
-proto.transpose=\
-proto.step=function " + className + "_copy() {\
-return new " + className + "(this.data,this.offset)\
-};\
-proto.pick=function " + className + "_pick(){\
-return TrivialArray(this.data);\
-};\
-proto.valueOf=proto.get=function " + className + "_get(){\
-return " + (useGetters ? "this.data.get(this.offset)" : "this.data[this.offset]") + "};\
-proto.set=function " + className + "_set(v){\
-return " + (useGetters ? "this.data.set(this.offset,v)" : "this.data[this.offset]=v") + "\
-};\
-return function construct_" + className + "(a,b,c,d){return new " + className + "(a,d)}";
-      var procedure = new Function("TrivialArray", code);
-      return procedure(CACHED_CONSTRUCTORS[dtype][0]);
-    }
-    var code = ["'use strict'"];
-    var indices = iota(dimension);
-    var args = indices.map(function(i) {
-      return "i" + i;
-    });
-    var index_str = "this.offset+" + indices.map(function(i) {
-      return "this.stride[" + i + "]*i" + i;
-    }).join("+");
-    var shapeArg = indices.map(function(i) {
-      return "b" + i;
-    }).join(",");
-    var strideArg = indices.map(function(i) {
-      return "c" + i;
-    }).join(",");
-    code.push("function " + className + "(a," + shapeArg + "," + strideArg + ",d){this.data=a", "this.shape=[" + shapeArg + "]", "this.stride=[" + strideArg + "]", "this.offset=d|0}", "var proto=" + className + ".prototype", "proto.dtype='" + dtype + "'", "proto.dimension=" + dimension);
-    code.push("Object.defineProperty(proto,'size',{get:function " + className + "_size(){\
-return " + indices.map(function(i) {
-      return "this.shape[" + i + "]";
-    }).join("*"), "}})");
-    if (dimension === 1) {
-      code.push("proto.order=[0]");
-    } else {
-      code.push("Object.defineProperty(proto,'order',{get:");
-      if (dimension < 4) {
-        code.push("function " + className + "_order(){");
-        if (dimension === 2) {
-          code.push("return (Math.abs(this.stride[0])>Math.abs(this.stride[1]))?[1,0]:[0,1]}})");
-        } else if (dimension === 3) {
-          code.push("var s0=Math.abs(this.stride[0]),s1=Math.abs(this.stride[1]),s2=Math.abs(this.stride[2]);\
-if(s0>s1){\
-if(s1>s2){\
-return [2,1,0];\
-}else if(s0>s2){\
-return [1,2,0];\
-}else{\
-return [1,0,2];\
-}\
-}else if(s0>s2){\
-return [2,0,1];\
-}else if(s2>s1){\
-return [0,1,2];\
-}else{\
-return [0,2,1];\
-}}})");
-        }
-      } else {
-        code.push("ORDER})");
-      }
-    }
-    code.push("proto.set=function " + className + "_set(" + args.join(",") + ",v){");
-    if (useGetters) {
-      code.push("return this.data.set(" + index_str + ",v)}");
-    } else {
-      code.push("return this.data[" + index_str + "]=v}");
-    }
-    code.push("proto.get=function " + className + "_get(" + args.join(",") + "){");
-    if (useGetters) {
-      code.push("return this.data.get(" + index_str + ")}");
-    } else {
-      code.push("return this.data[" + index_str + "]}");
-    }
-    code.push("proto.index=function " + className + "_index(", args.join(), "){return " + index_str + "}");
-    code.push("proto.hi=function " + className + "_hi(" + args.join(",") + "){return new " + className + "(this.data," + indices.map(function(i) {
-      return ["(typeof i", i, "!=='number'||i", i, "<0)?this.shape[", i, "]:i", i, "|0"].join("");
-    }).join(",") + "," + indices.map(function(i) {
-      return "this.stride[" + i + "]";
-    }).join(",") + ",this.offset)}");
-    var a_vars = indices.map(function(i) {
-      return "a" + i + "=this.shape[" + i + "]";
-    });
-    var c_vars = indices.map(function(i) {
-      return "c" + i + "=this.stride[" + i + "]";
-    });
-    code.push("proto.lo=function " + className + "_lo(" + args.join(",") + "){var b=this.offset,d=0," + a_vars.join(",") + "," + c_vars.join(","));
-    for (var i = 0; i < dimension; ++i) {
-      code.push("if(typeof i" + i + "==='number'&&i" + i + ">=0){\
-d=i" + i + "|0;\
-b+=c" + i + "*d;\
-a" + i + "-=d}");
-    }
-    code.push("return new " + className + "(this.data," + indices.map(function(i) {
-      return "a" + i;
-    }).join(",") + "," + indices.map(function(i) {
-      return "c" + i;
-    }).join(",") + ",b)}");
-    code.push("proto.step=function " + className + "_step(" + args.join(",") + "){var " + indices.map(function(i) {
-      return "a" + i + "=this.shape[" + i + "]";
-    }).join(",") + "," + indices.map(function(i) {
-      return "b" + i + "=this.stride[" + i + "]";
-    }).join(",") + ",c=this.offset,d=0,ceil=Math.ceil");
-    for (var i = 0; i < dimension; ++i) {
-      code.push("if(typeof i" + i + "==='number'){\
-d=i" + i + "|0;\
-if(d<0){\
-c+=b" + i + "*(a" + i + "-1);\
-a" + i + "=ceil(-a" + i + "/d)\
-}else{\
-a" + i + "=ceil(a" + i + "/d)\
-}\
-b" + i + "*=d\
-}");
-    }
-    code.push("return new " + className + "(this.data," + indices.map(function(i) {
-      return "a" + i;
-    }).join(",") + "," + indices.map(function(i) {
-      return "b" + i;
-    }).join(",") + ",c)}");
-    var tShape = new Array(dimension);
-    var tStride = new Array(dimension);
-    for (var i = 0; i < dimension; ++i) {
-      tShape[i] = "a[i" + i + "]";
-      tStride[i] = "b[i" + i + "]";
-    }
-    code.push("proto.transpose=function " + className + "_transpose(" + args + "){" + args.map(function(n, idx) {
-      return n + "=(" + n + "===undefined?" + idx + ":" + n + "|0)";
-    }).join(";"), "var a=this.shape,b=this.stride;return new " + className + "(this.data," + tShape.join(",") + "," + tStride.join(",") + ",this.offset)}");
-    code.push("proto.pick=function " + className + "_pick(" + args + "){var a=[],b=[],c=this.offset");
-    for (var i = 0; i < dimension; ++i) {
-      code.push("if(typeof i" + i + "==='number'&&i" + i + ">=0){c=(c+this.stride[" + i + "]*i" + i + ")|0}else{a.push(this.shape[" + i + "]);b.push(this.stride[" + i + "])}");
-    }
-    code.push("var ctor=CTOR_LIST[a.length+1];return ctor(this.data,a,b,c)}");
-    code.push("return function construct_" + className + "(data,shape,stride,offset){return new " + className + "(data," + indices.map(function(i) {
-      return "shape[" + i + "]";
-    }).join(",") + "," + indices.map(function(i) {
-      return "stride[" + i + "]";
-    }).join(",") + ",offset)}");
-    var procedure = new Function("CTOR_LIST", "ORDER", code.join("\n"));
-    return procedure(CACHED_CONSTRUCTORS[dtype], order);
-  }
-  function arrayDType(data) {
-    if (isBuffer(data)) {
-      return "buffer";
-    }
-    if (hasTypedArrays) {
-      switch (Object.prototype.toString.call(data)) {
-        case "[object Float64Array]":
-          return "float64";
-        case "[object Float32Array]":
-          return "float32";
-        case "[object Int8Array]":
-          return "int8";
-        case "[object Int16Array]":
-          return "int16";
-        case "[object Int32Array]":
-          return "int32";
-        case "[object Uint8Array]":
-          return "uint8";
-        case "[object Uint16Array]":
-          return "uint16";
-        case "[object Uint32Array]":
-          return "uint32";
-        case "[object Uint8ClampedArray]":
-          return "uint8_clamped";
-      }
-    }
-    if (Array.isArray(data)) {
-      return "array";
-    }
-    return "generic";
-  }
-  var CACHED_CONSTRUCTORS = {
-    "float32": [],
-    "float64": [],
-    "int8": [],
-    "int16": [],
-    "int32": [],
-    "uint8": [],
-    "uint16": [],
-    "uint32": [],
-    "array": [],
-    "uint8_clamped": [],
-    "buffer": [],
-    "generic": []
-  };
-  ;
-  (function() {
-    for (var id in CACHED_CONSTRUCTORS) {
-      CACHED_CONSTRUCTORS[id].push(compileConstructor(id, -1));
-    }
-  });
-  function wrappedNDArrayCtor(data, shape, stride, offset) {
-    if (data === undefined) {
-      var ctor = CACHED_CONSTRUCTORS.array[0];
-      return ctor([]);
-    } else if (typeof data === "number") {
-      data = [data];
-    }
-    if (shape === undefined) {
-      shape = [data.length];
-    }
-    var d = shape.length;
-    if (stride === undefined) {
-      stride = new Array(d);
-      for (var i = d - 1,
-          sz = 1; i >= 0; --i) {
-        stride[i] = sz;
-        sz *= shape[i];
-      }
-    }
-    if (offset === undefined) {
-      offset = 0;
-      for (var i = 0; i < d; ++i) {
-        if (stride[i] < 0) {
-          offset -= (shape[i] - 1) * stride[i];
-        }
-      }
-    }
-    var dtype = arrayDType(data);
-    var ctor_list = CACHED_CONSTRUCTORS[dtype];
-    while (ctor_list.length <= d + 1) {
-      ctor_list.push(compileConstructor(dtype, ctor_list.length - 1));
-    }
-    var ctor = ctor_list[d + 1];
-    return ctor(data, shape, stride, offset);
-  }
-  module.exports = wrappedNDArrayCtor;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1f", ["4e"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('4e');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4f", ["27"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $def = req('27');
-  $def($def.S, 'Math', {trunc: function trunc(it) {
-      return (it > 0 ? Math.floor : Math.ceil)(it);
-    }});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("50", ["4f", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('4f');
-  module.exports = req('2a').Math.trunc;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("20", ["50"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('50'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("31", ["27", "2a", "51"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(KEY, exec) {
-    var $def = req('27'),
-        fn = (req('2a').Object || {})[KEY] || Object[KEY],
-        exp = {};
-    exp[KEY] = exec(fn);
-    $def($def.S + $def.F * req('51')(function() {
-      fn(1);
-    }), 'Object', exp);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("52", ["53", "31"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toObject = req('53');
-  req('31')('keys', function($keys) {
-    return function keys(it) {
-      return $keys(toObject(it));
-    };
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("54", ["52", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('52');
-  module.exports = req('2a').Object.keys;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("35", ["54"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('54'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("55", ["27", "56"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $def = req('27');
-  $def($def.P, 'Map', {toJSON: req('56')('Map')});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("57", ["58", "59"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var strong = req('58');
-  req('59')('Map', function(get) {
-    return function Map() {
-      return get(this, arguments.length > 0 ? arguments[0] : undefined);
-    };
-  }, {
-    get: function get(key) {
-      var entry = strong.getEntry(this, key);
-      return entry && entry.v;
-    },
-    set: function set(key, value) {
-      return strong.def(this, key === 0 ? 0 : key, value);
-    }
-  }, strong, true);
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5a", ["5b", "22", "23", "57", "55", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('5b');
-  req('22');
-  req('23');
-  req('57');
-  req('55');
-  module.exports = req('2a').Map;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("11", ["5a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('5a'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5c", ["5d", "24", "5e", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var classof = req('5d'),
-      ITERATOR = req('24')('iterator'),
-      Iterators = req('5e');
-  module.exports = req('2a').isIterable = function(it) {
-    var O = Object(it);
-    return ITERATOR in O || '@@iterator' in O || Iterators.hasOwnProperty(classof(O));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5f", ["23", "22", "5c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('23');
-  req('22');
-  module.exports = req('5c');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("60", ["5f"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('5f'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("13", ["10", "60"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _getIterator = req('10')["default"];
-  var _isIterable = req('60')["default"];
-  exports["default"] = (function() {
-    function sliceIterator(arr, i) {
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-      var _e = undefined;
-      try {
-        for (var _i = _getIterator(arr),
-            _s; !(_n = (_s = _i.next()).done); _n = true) {
-          _arr.push(_s.value);
-          if (i && _arr.length === i)
-            break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
-        try {
-          if (!_n && _i["return"])
-            _i["return"]();
-        } finally {
-          if (_d)
-            throw _e;
-        }
-      }
-      return _arr;
-    }
-    return function(arr, i) {
-      if (Array.isArray(arr)) {
-        return arr;
-      } else if (_isIterable(Object(arr))) {
-        return sliceIterator(arr, i);
-      } else {
-        throw new TypeError("Invalid attempt to destructure non-iterable instance");
-      }
-    };
-  })();
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('3b', ['9', '10', '11', '13', '20', '35', '61', 'a', '1e', 'c', '1f', '3c', '3f'], function (_export) {
-  var _createClass, _getIterator, _Map, _slicedToArray, _Math$trunc, _Object$keys, _Array$from, _classCallCheck, _toConsumableArray, _Promise, ndarray, shallowcopy, minMax, assert, PREFIX, load, Coverage;
-
-  /**
-   * Currently unused, but may need in future.
-   * This determines the best array type for categorical data which
-   * doesn't have missing values.
-   */
-  /*
-  function arrayType (validMin, validMax) {
-    let type
-    if (validMin !== undefined) {
-      if (validMin >= 0) {
-        if (validMax < Math.pow(2,8)) {
-          type = Uint8Array
-        } else if (validMax < Math.pow(2,16)) {
-          type = Uint16Array
-        } else if (validMax < Math.pow(2,32)) {
-          type = Uint32Array
-        } else {
-          type = Array
-        }
-      } else {
-        let max = Math.max(Math.abs(validMin), validMax)
-        if (max < Math.pow(2,8)) {
-          type = Int8Array
-        } else if (validMax < Math.pow(2,16)) {
-          type = Int16Array
-        } else if (validMax < Math.pow(2,32)) {
-          type = Int32Array
-        } else {
-          type = Array
-        }
-      }
-    } else {
-      type = Array
-    }
-    return type
-  }
-  */
-
-  /**
-   * Transforms a CoverageJSON parameter to the Coverage API format, that is,
-   * language maps become real Maps. Transformation is made in-place.
-   * 
-   * @param {Object} param The original parameter.
-   */
-  function transformParameter(params, key) {
-    var param = params[key];
-    param.key = key;
-    var maps = [[param, 'description'], [param.observedProperty, 'label'], [param.observedProperty, 'description'], [param.unit, 'label']];
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
-
-    try {
-      for (var _iterator6 = _getIterator(param.observedProperty.categories || []), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-        var cat = _step6.value;
-
-        maps.push([cat, 'label']);
-        maps.push([cat, 'description']);
-      }
-    } catch (err) {
-      _didIteratorError6 = true;
-      _iteratorError6 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-          _iterator6['return']();
-        }
-      } finally {
-        if (_didIteratorError6) {
-          throw _iteratorError6;
-        }
-      }
-    }
-
-    var _iteratorNormalCompletion7 = true;
-    var _didIteratorError7 = false;
-    var _iteratorError7 = undefined;
-
-    try {
-      for (var _iterator7 = _getIterator(maps), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-        var entry = _step7.value;
-
-        transformLanguageMap(entry[0], entry[1]);
-      }
-    } catch (err) {
-      _didIteratorError7 = true;
-      _iteratorError7 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
-          _iterator7['return']();
-        }
-      } finally {
-        if (_didIteratorError7) {
-          throw _iteratorError7;
-        }
-      }
-    }
-
-    if (param.categoryEncoding) {
-      var map = new _Map();
-      var _iteratorNormalCompletion8 = true;
-      var _didIteratorError8 = false;
-      var _iteratorError8 = undefined;
-
-      try {
-        for (var _iterator8 = _getIterator(_Object$keys(param.categoryEncoding)), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-          var category = _step8.value;
-
-          var vals = param.categoryEncoding[category];
-          if (!Array.isArray(vals)) {
-            vals = [vals];
-          }
-          map.set(category, vals);
-        }
-      } catch (err) {
-        _didIteratorError8 = true;
-        _iteratorError8 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion8 && _iterator8['return']) {
-            _iterator8['return']();
-          }
-        } finally {
-          if (_didIteratorError8) {
-            throw _iteratorError8;
-          }
-        }
-      }
-
-      param.categoryEncoding = map;
-    }
-  }
-
-  function transformLanguageMap(obj, key) {
-    if (!obj || !(key in obj) || obj[key] instanceof _Map) {
-      return;
-    }
-    var map = new _Map();
-    var _iteratorNormalCompletion9 = true;
-    var _didIteratorError9 = false;
-    var _iteratorError9 = undefined;
-
-    try {
-      for (var _iterator9 = _getIterator(_Object$keys(obj[key])), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-        var tag = _step9.value;
-
-        map.set(tag, obj[key][tag]);
-      }
-    } catch (err) {
-      _didIteratorError9 = true;
-      _iteratorError9 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion9 && _iterator9['return']) {
-          _iterator9['return']();
-        }
-      } finally {
-        if (_didIteratorError9) {
-          throw _iteratorError9;
-        }
-      }
-    }
-
-    obj[key] = map;
-  }
-
-  /**
-   * Transforms a CoverageJSON range to the Coverage API format, that is,
-   * no special encoding etc. is left. Transformation is made in-place.
-   * 
-   * @param {Object} range The original range.
-   * @param {Object} domain The CoverageJSON domain object. 
-   * @return {Object} The transformed range.
-   */
-  function transformRange(range, domain) {
-    if ('__transformDone' in range) return;
-
-    var values = range.values;
-    var targetDataType = range.dataType; // 'integer', 'float', 'string'
-    var isTyped = ArrayBuffer.isView(values);
-    var missingIsEncoded = range.missing === 'nonvalid';
-    var hasOffsetFactor = ('offset' in range);
-
-    if ('offset' in range) {
-      assert('factor' in range);
-    }
-    var offset = range.offset;
-    var factor = range.factor;
-
-    if (missingIsEncoded) {
-      assert('validMin' in range);
-      assert('validMax' in range);
-    }
-    var validMin = range.validMin;
-    var validMax = range.validMax;
-
-    var vals = undefined;
-    if (!missingIsEncoded && !hasOffsetFactor) {
-      // No transformation necessary.
-      vals = values;
-    } else {
-      // Transformation is necessary.
-      // we use a regular array so that missing values can be represented as null
-      vals = new Array(values.length);
-
-      // TODO can we use typed arrays here without having to scan for missing values first?
-      //  When typed arrays with missing value encoding was used we could keep that and provide
-      //  a higher abstraction on the array similar to an ndarray interface. This means that [] syntax
-      //  would be impossible and change to .get(index).
-
-      if (hasOffsetFactor) {
-        for (var i = 0; i < values.length; i++) {
-          var val = values[i];
-          if (missingIsEncoded && (val < validMin || val > validMax)) {
-            // This is necessary as the default value is "undefined".
-            vals[i] = null;
-          } else if (!missingIsEncoded && val === null) {
-            vals[i] = null;
-          } else {
-            vals[i] = val * factor + offset;
-          }
-        }
-
-        if (validMin !== undefined) {
-          range.validMin = validMin * factor + offset;
-          range.validMax = validMax * factor + offset;
-        }
-      } else {
-        // missingIsEncoded == true
-        for (var i = 0; i < values.length; i++) {
-          var val = values[i];
-          if (val < validMin || val > validMax) {
-            vals[i] = null;
-          } else {
-            vals[i] = val;
-          }
-        }
-      }
-
-      delete range.offset;
-      delete range.factor;
-      delete range.missing;
-    }
-
-    if (validMin === undefined) {
-      var _minMax = minMax(vals);
-
-      var _minMax2 = _slicedToArray(_minMax, 2);
-
-      var min = _minMax2[0];
-      var max = _minMax2[1];
-
-      if (min !== null) {
-        range.validMin = min;
-        range.validMax = max;
-      }
-    }
-
-    var shape = new _Map(); // axis name -> axis size (value count)
-    var _iteratorNormalCompletion10 = true;
-    var _didIteratorError10 = false;
-    var _iteratorError10 = undefined;
-
-    try {
-      for (var _iterator10 = _getIterator(domain.axes.keys()), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-        var axisName = _step10.value;
-
-        shape.set(axisName, domain.axes.get(axisName).values.length);
-      }
-    } catch (err) {
-      _didIteratorError10 = true;
-      _iteratorError10 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion10 && _iterator10['return']) {
-          _iterator10['return']();
-        }
-      } finally {
-        if (_didIteratorError10) {
-          throw _iteratorError10;
-        }
-      }
-    }
-
-    range.shape = shape;
-
-    var ndarr = ndarray(vals, domain._rangeShape);
-    range._ndarr = ndarr;
-    range.get = createRangeGetFunction(ndarr, domain._rangeAxisOrder);
-
-    range.__transformDone = true;
-    return range;
-  }
-
-  /**
-   * 
-   * @param axisOrder An array of axis names.
-   * @returns Function
-   */
-  function createRangeGetFunction(ndarr, axisOrder) {
-    // see below for slower reference version
-    var ndargs = '';
-    for (var i = 0; i < axisOrder.length; i++) {
-      if (ndargs) ndargs += ',';
-      ndargs += '\'' + axisOrder[i] + '\' in obj ? obj[\'' + axisOrder[i] + '\'] : 0';
-    }
-    var fn = new Function('ndarr', 'obj', 'return ndarr.get(' + ndargs + ')');
-    return fn.bind(undefined, ndarr);
-  }
-
-  /*
-   * Reference version of createRangeGetFunction().
-   * Around 50% slower compared to precompiled version.
-   * 
-  function createRangeGetFunction (ndarr, axisOrder) {
-    axisOrder = axisOrder.slice() // help the JIT (possibly..)
-    const axisCount = axisOrder.length
-    return obj => {
-      let indices = new Array(axisCount)
-      for (let i=0; i < axisCount; i++) {
-        indices[i] = axisOrder[i] in obj ? obj[axisOrder[i]] : 0
-      }
-      return ndarr.get(...indices)
-    }
-  }
-  */
-
-  /**
-   * Transforms a CoverageJSON domain to the Coverage API format.
-   * Transformation is made in-place.
-   * 
-   * @param {Object} domain The original domain object.
-   * @return {Object} The transformed domain object.
-   */
-  function transformDomain(domain) {
-    if ('__transformDone' in domain) return;
-
-    var profile = domain.profile || 'Domain';
-    if (profile.substr(0, 4) !== 'http') {
-      profile = PREFIX + profile;
-    }
-    domain.type = profile;
-
-    var axes = new _Map(); // axis name -> axis object
-
-    var _iteratorNormalCompletion11 = true;
-    var _didIteratorError11 = false;
-    var _iteratorError11 = undefined;
-
-    try {
-      for (var _iterator11 = _getIterator(_Object$keys(domain.axes)), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-        var axisName = _step11.value;
-
-        axes.set(axisName, domain.axes[axisName]);
-      }
-    } catch (err) {
-      _didIteratorError11 = true;
-      _iteratorError11 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion11 && _iterator11['return']) {
-          _iterator11['return']();
-        }
-      } finally {
-        if (_didIteratorError11) {
-          throw _iteratorError11;
-        }
-      }
-    }
-
-    domain.axes = axes;
-
-    // expand start/stop/num regular axes
-    // replace 1D numeric axis arrays with typed arrays for efficiency
-    var _iteratorNormalCompletion12 = true;
-    var _didIteratorError12 = false;
-    var _iteratorError12 = undefined;
-
-    try {
-      for (var _iterator12 = _getIterator(axes.values()), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-        var axis = _step12.value;
-
-        if ('start' in axis && 'stop' in axis && 'num' in axis) {
-          var arr = new Float64Array(axis.num);
-          var step = undefined;
-          if (axis.num === 1) {
-            if (axis.start !== axis.stop) {
-              throw new Error('regular axis of length 1 must have equal start/stop values');
-            }
-            step = 0;
-          } else {
-            step = (axis.stop - axis.start) / (axis.num - 1);
-          }
-          for (var i = 0; i < axis.num; i++) {
-            arr[i] = axis.start + i * step;
-          }
-
-          axis.values = arr;
-          delete axis.start;
-          delete axis.stop;
-          delete axis.num;
-        }
-
-        if (ArrayBuffer.isView(axis.values)) {
-          // already a typed array
-          continue;
-        }
-        if (Array.isArray(axis.values) && typeof axis.values[0] === 'number') {
-          var arr = new Float64Array(axis.values.length);
-          for (var i = 0; i < axis.values.length; i++) {
-            arr[i] = axis.values[i];
-          }
-          axis.values = arr;
-        }
-      }
-    } catch (err) {
-      _didIteratorError12 = true;
-      _iteratorError12 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion12 && _iterator12['return']) {
-          _iterator12['return']();
-        }
-      } finally {
-        if (_didIteratorError12) {
-          throw _iteratorError12;
-        }
-      }
-    }
-
-    var needsRangeAxisOrder = [].concat(_toConsumableArray(axes.values())).filter(function (axis) {
-      return axis.values.length > 1;
-    }).length > 1;
-    if (needsRangeAxisOrder && !domain.rangeAxisOrder) {
-      throw new Error('Domain requires "rangeAxisOrder"');
-    }
-
-    domain._rangeAxisOrder = domain.rangeAxisOrder || [].concat(_toConsumableArray(axes.keys()));
-    domain._rangeShape = domain._rangeAxisOrder.map(function (k) {
-      return axes.get(k).values.length;
-    });
-
-    domain.__transformDone = true;
-
-    return domain;
-  }
-  return {
-    setters: [function (_) {
-      _createClass = _['default'];
-    }, function (_4) {
-      _getIterator = _4['default'];
-    }, function (_3) {
-      _Map = _3['default'];
-    }, function (_2) {
-      _slicedToArray = _2['default'];
-    }, function (_7) {
-      _Math$trunc = _7['default'];
-    }, function (_5) {
-      _Object$keys = _5['default'];
-    }, function (_6) {
-      _Array$from = _6['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
-    }, function (_e) {
-      _toConsumableArray = _e['default'];
-    }, function (_c) {
-      _Promise = _c['default'];
-    }, function (_f) {
-      ndarray = _f['default'];
-    }, function (_c2) {
-      shallowcopy = _c2.shallowcopy;
-      minMax = _c2.minMax;
-      assert = _c2.assert;
-      PREFIX = _c2.PREFIX;
-    }, function (_f2) {
-      load = _f2.load;
-    }],
-    execute: function () {
-      /* */
-
-      /** 
-       * Wraps a CoverageJSON Coverage object as a Coverage API object.
-       * 
-       * @see https://github.com/Reading-eScience-Centre/coverage-jsapi
-       * 
-       */
-      'use strict';
-
-      Coverage = (function () {
-
-        /**
-         * @param {Object} covjson A CoverageJSON Coverage object.
-         * @param {boolean} cacheRanges
-         *   If true, then any range that was loaded remotely is cached.
-         *   (The domain is always cached.)
-         *                           
-         */
-
-        function Coverage(covjson) {
-          var cacheRanges = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-          _classCallCheck(this, Coverage);
-
-          this._covjson = covjson;
-          this._exposeLd(covjson);
-
-          /** @type {boolean} */
-          this.cacheRanges = cacheRanges;
-
-          this.id = covjson.id;
-
-          /** @type {Map} */
-          this.parameters = new _Map();
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = _getIterator(_Object$keys(covjson.parameters)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var key = _step.value;
-
-              transformParameter(covjson.parameters, key);
-              this.parameters.set(key, covjson.parameters[key]);
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator['return']) {
-                _iterator['return']();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          var profile = this._covjson.profile || 'Coverage';
-          if (profile.substr(0, 4) !== 'http') {
-            profile = PREFIX + profile;
-          }
-
-          /** @type {string} */
-          this.type = profile;
-
-          var domainProfile = undefined;
-          if (typeof this._covjson.domain === 'string') {
-            domainProfile = this._covjson.domainProfile || 'Domain';
-          } else {
-            domainProfile = this._covjson.domain.profile || 'Domain';
-          }
-
-          if (domainProfile.substr(0, 4) !== 'http') {
-            domainProfile = PREFIX + domainProfile;
-          }
-
-          /** @type {string} */
-          this.domainType = domainProfile;
-
-          /**
-           * A bounding box array with elements [westLon, southLat, eastLon, northLat].
-           * 
-           * @type {Array|undefined}
-           */
-          this.bbox = this._covjson.bbox;
-        }
-
-        _createClass(Coverage, [{
-          key: '_exposeLd',
-          value: function _exposeLd(covjson) {
-            if (!covjson['@context']) {
-              // no LD love here...
-              this.ld = {};
-              return;
-            }
-            // make a deep copy since the object gets modified in-place later
-            // but first, remove domain and range which may be embedded
-            var copy = shallowcopy(covjson);
-            delete copy.domain;
-            delete copy.ranges;
-            this.ld = JSON.parse(JSON.stringify(copy));
-          }
-
-          /**
-           * @return {Promise}
-           */
-        }, {
-          key: 'loadDomain',
-          value: function loadDomain() {
-            var _this = this;
-
-            var domainOrUrl = this._covjson.domain;
-            if (this._domainPromise) return this._domainPromise;
-            var promise = undefined;
-            if (typeof domainOrUrl === 'object') {
-              var domain = domainOrUrl;
-              transformDomain(domain);
-              promise = _Promise.resolve(domain);
-            } else {
-              var url = domainOrUrl;
-              promise = load(url).then(function (result) {
-                var domain = result.data;
-                transformDomain(domain);
-                _this._covjson.domain = domain;
-                return domain;
-              });
-            }
-            /* The promise gets cached so that the domain is not loaded twice remotely.
-             * This might otherwise happen when loadDomain and loadRange is used
-             * with Promise.all(). Remember that loadRange also invokes loadDomain.
-             */
-            this._domainPromise = promise;
-            return promise;
-          }
-
-          /**
-           * Returns the requested range data as a Promise.
-           * 
-           * Note that this method implicitly loads the domain as well. 
-           * 
-           * @example
-           * cov.loadRange('salinity').then(function (sal) {
-           *   // work with Range object
-           * }).catch(function (e) {
-           *   // there was an error when loading the range
-           *   console.log(e.message)
-           * }) 
-           * @param {string} paramKey The key of the Parameter for which to load the range.
-           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Range object.
-           */
-        }, {
-          key: 'loadRange',
-          value: function loadRange(paramKey) {
-            var _this2 = this;
-
-            // Since the shape of the range array is derived from the domain, it has to be loaded as well.
-            return this.loadDomain().then(function (domain) {
-              var rangeOrUrl = _this2._covjson.ranges[paramKey];
-              if (typeof rangeOrUrl === 'object') {
-                var range = rangeOrUrl;
-                transformRange(range, domain);
-                return _Promise.resolve(range);
-              } else {
-                var url = rangeOrUrl;
-                return load(url).then(function (result) {
-                  var range = result.data;
-                  transformRange(range, domain);
-                  if (_this2.cacheRanges) {
-                    _this2._covjson.ranges[paramKey] = range;
-                  }
-                  return range;
-                });
-              }
-            });
-          }
-
-          /**
-           * Returns the requested range data as a Promise.
-           * 
-           * Note that this method implicitly loads the domain as well. 
-           * 
-           * @example
-           * cov.loadRanges(['salinity','temp']).then(function (ranges) {
-           *   // work with Map object
-           *   console.log(ranges.get('salinity').values)
-           * }).catch(function (e) {
-           *   // there was an error when loading the range data
-           *   console.log(e)
-           * }) 
-           * @param {iterable} [paramKeys] An iterable of parameter keys for which to load the range data. If not given, loads all range data.
-           * @return {Promise} A Promise object which loads the requested range data and succeeds with a Map object.
-           */
-        }, {
-          key: 'loadRanges',
-          value: function loadRanges(paramKeys) {
-            var _this3 = this;
-
-            if (paramKeys === undefined) paramKeys = this.parameters.keys();
-            paramKeys = _Array$from(paramKeys);
-            return _Promise.all(paramKeys.map(function (k) {
-              return _this3.loadRange(k);
-            })).then(function (ranges) {
-              var map = new _Map();
-              for (var i = 0; i < paramKeys.length; i++) {
-                map.set(paramKeys[i], ranges[i]);
-              }
-              return map;
-            });
-          }
-
-          /**
-           * Returns a Promise object which provides a copy of this Coverage object
-           * with the domain subsetted by the given indices specification.
-           * 
-           * Note that the coverage type and/or domain type of the resulting coverage
-           * may be different than in the original coverage.
-           * 
-           * Note that the subsetted ranges are a view over the original ranges, meaning
-           * that no copying is done but also no memory is released if the original
-           * coverage is garbage collected.
-           * 
-           * @example
-           * cov.subsetByIndex({t: 4, z: {start: 10, stop: 20}, x: [0,1,2] }).then(function(subsetCov) {
-           *   // work with subsetted coverage
-           * })
-           * @param {Object} constraints An object which describes the subsetting constraints.
-           *   Every property of it refers to an axis name as defined in Domain.names,
-           *   and its value must either be an integer, an array of integers,
-           *   or an object with start, stop, and optionally step (defaults to 1) properties
-           *   whose values are integers.
-           *   Properties that have the values undefined or null are ignored. 
-           *   All integers must be non-negative, step must not be zero.
-           *   A simple integer constrains the axis to the given index, an array to a list of indices,
-           *   and a start/stop/step object to a range of indices:
-           *   If step=1, this includes all indices starting at start and ending at stop (exclusive);
-           *   if step>1, all indices start, start + step, ..., start + (q + r - 1) step where 
-           *   q and r are the quotient and remainder obtained by dividing stop - start by step.
-           * @returns {Promise} A Promise object with the subsetted coverage object as result.
-           */
-        }, {
-          key: 'subsetByIndex',
-          value: function subsetByIndex(constraints) {
-            var _this4 = this;
-
-            return this.loadDomain().then(function (domain) {
-              // check and normalize constraints to simplify code and to allow more optimization
-              constraints = shallowcopy(constraints);
-              var isConsecutive = function isConsecutive(arr) {
-                var last = arr[0] - 1;
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
-
-                try {
-                  for (var _iterator2 = _getIterator(arr), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var el = _step2.value;
-
-                    if (el !== last + 1) {
-                      return false;
-                    }
-                    last = el;
-                  }
-                } catch (err) {
-                  _didIteratorError2 = true;
-                  _iteratorError2 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                      _iterator2['return']();
-                    }
-                  } finally {
-                    if (_didIteratorError2) {
-                      throw _iteratorError2;
-                    }
-                  }
-                }
-
-                return true;
-              };
-              for (var axisName in constraints) {
-                if (!domain.axes.has(axisName)) {
-                  // TODO clarify this behaviour in the JS API spec
-                  delete constraints[axisName];
-                  continue;
-                }
-                if (constraints[axisName] === undefined || constraints[axisName] === null) {
-                  delete constraints[axisName];
-                  continue;
-                }
-                if (Array.isArray(constraints[axisName])) {
-                  var constraint = constraints[axisName];
-                  // range subsetting can be done with fast ndarray views if single indices or slicing objects are used
-                  // therefore, we try to transform some common cases into those forms
-                  if (constraint.length === 1) {
-                    // transform 1-element arrays into a number
-                    constraints[axisName] = constraint[0];
-                  } else if (isConsecutive(constraint)) {
-                    // transform arrays of consecutive indices into start, stop object
-                    constraints[axisName] = { start: constraint[0], stop: constraint[constraint.length - 1] + 1 };
-                  }
-                }
-                if (typeof constraints[axisName] === 'number') {
-                  var constraint = constraints[axisName];
-                  constraints[axisName] = { start: constraint, stop: constraint + 1 };
-                }
-                if (!Array.isArray(constraints[axisName])) {
-                  var _constraints$axisName = constraints[axisName];
-                  var _constraints$axisName$start = _constraints$axisName.start;
-                  var start = _constraints$axisName$start === undefined ? 0 : _constraints$axisName$start;
-                  var _constraints$axisName$stop = _constraints$axisName.stop;
-
-                  var _stop = _constraints$axisName$stop === undefined ? domain.axes.get(axisName).values.length : _constraints$axisName$stop;
-
-                  var _constraints$axisName$step = _constraints$axisName.step;
-                  var step = _constraints$axisName$step === undefined ? 1 : _constraints$axisName$step;
-
-                  if (step <= 0) {
-                    throw new Error('Invalid constraint for ' + axisName + ': step=' + step + ' must be > 0');
-                  }
-                  if (start >= _stop || start < 0) {
-                    throw new Error('Invalid constraint for ' + axisName + ': stop=' + _stop + ' must be > start=' + start + ' and both >= 0');
-                  }
-                  constraints[axisName] = { start: start, stop: _stop, step: step };
-                }
-              }
-              var _iteratorNormalCompletion3 = true;
-              var _didIteratorError3 = false;
-              var _iteratorError3 = undefined;
-
-              try {
-                for (var _iterator3 = _getIterator(domain.axes.keys()), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                  var axisName = _step3.value;
-
-                  if (!(axisName in constraints)) {
-                    var len = domain.axes.get(axisName).values.length;
-                    constraints[axisName] = { start: 0, stop: len, step: 1 };
-                  }
-                }
-
-                // After normalization, all constraints are either arrays or start,stop,step objects.
-                // For all start,stop,step objects, it holds that stop > start, step > 0, start >= 0, stop >= 1.
-                // For each axis, a constraint exists.
-
-                // subset the axis arrays of the domain (immediately + cached)
-              } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                    _iterator3['return']();
-                  }
-                } finally {
-                  if (_didIteratorError3) {
-                    throw _iteratorError3;
-                  }
-                }
-              }
-
-              var newdomain = shallowcopy(domain);
-              newdomain.axes = new _Map(newdomain.axes);
-              newdomain._rangeShape = domain._rangeShape.slice(); // deep copy
-
-              var _iteratorNormalCompletion4 = true;
-              var _didIteratorError4 = false;
-              var _iteratorError4 = undefined;
-
-              try {
-                var _loop = function () {
-                  var axisName = _step4.value;
-
-                  var coords = domain.axes.get(axisName).values;
-                  var isTypedArray = ArrayBuffer.isView(coords);
-                  var constraint = constraints[axisName];
-                  var newcoords = undefined;
-                  if (Array.isArray(constraint)) {
-                    if (isTypedArray) {
-                      newcoords = new coords.constructor(constraint.length);
-                      for (var i = 0; i < constraint.length; i++) {
-                        newcoords[i] = coords[constraint[i]];
-                      }
-                    } else {
-                      newcoords = constraint.map(function (i) {
-                        return coords[i];
-                      });
-                    }
-                  } else {
-                    var start = constraint.start;
-                    var _stop2 = constraint.stop;
-                    var step = constraint.step;
-
-                    if (start === 0 && _stop2 === coords.length && step === 1) {
-                      newcoords = coords;
-                    } else if (step === 1 && isTypedArray) {
-                      newcoords = coords.subarray(start, _stop2);
-                    } else {
-                      var q = _Math$trunc((_stop2 - start) / step);
-                      var r = (_stop2 - start) % step;
-                      var len = start + (q + r - 1);
-                      newcoords = new coords.constructor(len); // array or typed array
-                      for (var i = start, j = 0; i < _stop2; i += step, j++) {
-                        newcoords[j] = coords[i];
-                      }
-                    }
-                  }
-                  var newaxis = shallowcopy(domain.axes.get(axisName));
-                  newaxis.values = newcoords;
-                  newdomain.axes.set(axisName, newaxis);
-                  newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = newcoords.length;
-                };
-
-                for (var _iterator4 = _getIterator(_Object$keys(constraints)), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                  _loop();
-                }
-
-                // subset the ndarrays of the ranges (on request)
-              } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-                    _iterator4['return']();
-                  }
-                } finally {
-                  if (_didIteratorError4) {
-                    throw _iteratorError4;
-                  }
-                }
-              }
-
-              var rangeWrapper = function rangeWrapper(range) {
-                var ndarr = range._ndarr;
-
-                var newndarr = undefined;
-                if (_Object$keys(constraints).some(function (ax) {
-                  return Array.isArray(constraints[ax]);
-                })) {
-                  // There is a list of indices for at least one axis.
-                  // In that case we cannot directly use SciJS's slicing operations.
-
-                  // TODO implement
-                  throw new Error('not implemented yet');
-                } else {
-                  var _ndarr$hi$lo, _ndarr$hi;
-
-                  // fast ndarray view
-                  var axisNames = domain._rangeAxisOrder;
-                  var los = axisNames.map(function (name) {
-                    return constraints[name].start;
-                  });
-                  var his = axisNames.map(function (name) {
-                    return constraints[name].stop;
-                  });
-                  var steps = axisNames.map(function (name) {
-                    return constraints[name].steps;
-                  });
-                  newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
-                }
-
-                var newrange = shallowcopy(range);
-                newrange._ndarr = newndarr;
-                newrange.shape = new _Map();
-                var _iteratorNormalCompletion5 = true;
-                var _didIteratorError5 = false;
-                var _iteratorError5 = undefined;
-
-                try {
-                  for (var _iterator5 = _getIterator(domain.axes.keys()), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var axisName = _step5.value;
-
-                    newrange.shape.set(axisName, newdomain.axes.get(axisName).values.length);
-                  }
-                } catch (err) {
-                  _didIteratorError5 = true;
-                  _iteratorError5 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-                      _iterator5['return']();
-                    }
-                  } finally {
-                    if (_didIteratorError5) {
-                      throw _iteratorError5;
-                    }
-                  }
-                }
-
-                newrange.get = createRangeGetFunction(newndarr, domain._rangeAxisOrder);
-
-                return newrange;
-              };
-
-              var loadRange = function loadRange(key) {
-                return _this4.loadRange(key).then(rangeWrapper);
-              };
-
-              // we wrap loadRanges as well in case it was overridden from the outside
-              // (in which case we could not be sure that it invokes loadRange() and uses the wrapper)
-              var loadRanges = function loadRanges(keys) {
-                return _this4.loadRanges(keys).then(function (ranges) {
-                  return new _Map([].concat(_toConsumableArray(ranges)).map(function (_ref) {
-                    var _ref2 = _slicedToArray(_ref, 2);
-
-                    var key = _ref2[0];
-                    var range = _ref2[1];
-                    return [key, rangeWrapper(range)];
-                  }));
-                });
-              };
-
-              // assemble everything to a new coverage
-              var newcov = shallowcopy(_this4);
-              newcov.loadDomain = function () {
-                return _Promise.resolve(newdomain);
-              };
-              newcov.loadRange = loadRange;
-              newcov.loadRanges = loadRanges;
-              return newcov;
-            });
-          }
-        }]);
-
-        return Coverage;
-      })();
-
-      _export('default', Coverage);
-    }
-  };
-});
-
-$__System.registerDynamic("62", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var process = module.exports = {};
-  var queue = [];
-  var draining = false;
-  var currentQueue;
-  var queueIndex = -1;
-  function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-      queue = currentQueue.concat(queue);
-    } else {
-      queueIndex = -1;
-    }
-    if (queue.length) {
-      drainQueue();
-    }
-  }
-  function drainQueue() {
-    if (draining) {
-      return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-    var len = queue.length;
-    while (len) {
-      currentQueue = queue;
-      queue = [];
-      while (++queueIndex < len) {
-        if (currentQueue) {
-          currentQueue[queueIndex].run();
-        }
-      }
-      queueIndex = -1;
-      len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-  }
-  process.nextTick = function(fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-      for (var i = 1; i < arguments.length; i++) {
-        args[i - 1] = arguments[i];
-      }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-      setTimeout(drainQueue, 0);
-    }
-  };
-  function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-  }
-  Item.prototype.run = function() {
-    this.fun.apply(null, this.array);
-  };
-  process.title = 'browser';
-  process.browser = true;
-  process.env = {};
-  process.argv = [];
-  process.version = '';
-  process.versions = {};
-  function noop() {}
-  process.on = noop;
-  process.addListener = noop;
-  process.once = noop;
-  process.off = noop;
-  process.removeListener = noop;
-  process.removeAllListeners = noop;
-  process.emit = noop;
-  process.binding = function(name) {
-    throw new Error('process.binding is not supported');
-  };
-  process.cwd = function() {
-    return '/';
-  };
-  process.chdir = function(dir) {
-    throw new Error('process.chdir is not supported');
-  };
-  process.umask = function() {
-    return 0;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("63", ["62"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('62');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("64", ["63"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__System._nodeRequire ? process : req('63');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("65", ["64"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('64');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("66", ["67", "68"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('67'),
-      document = req('68').document,
-      is = isObject(document) && isObject(document.createElement);
-  module.exports = function(it) {
-    return is ? document.createElement(it) : {};
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("69", ["68"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('68').document && document.documentElement;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("6a", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(fn, args, that) {
-    var un = that === undefined;
-    switch (args.length) {
-      case 0:
-        return un ? fn() : fn.call(that);
-      case 1:
-        return un ? fn(args[0]) : fn.call(that, args[0]);
-      case 2:
-        return un ? fn(args[0], args[1]) : fn.call(that, args[0], args[1]);
-      case 3:
-        return un ? fn(args[0], args[1], args[2]) : fn.call(that, args[0], args[1], args[2]);
-      case 4:
-        return un ? fn(args[0], args[1], args[2], args[3]) : fn.call(that, args[0], args[1], args[2], args[3]);
-    }
-    return fn.apply(that, args);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("6b", ["6c", "6a", "69", "66", "68", "6d", "65"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(process) {
-    'use strict';
-    var ctx = req('6c'),
-        invoke = req('6a'),
-        html = req('69'),
-        cel = req('66'),
-        global = req('68'),
-        process = global.process,
-        setTask = global.setImmediate,
-        clearTask = global.clearImmediate,
-        MessageChannel = global.MessageChannel,
-        counter = 0,
-        queue = {},
-        ONREADYSTATECHANGE = 'onreadystatechange',
-        defer,
-        channel,
-        port;
-    var run = function() {
-      var id = +this;
-      if (queue.hasOwnProperty(id)) {
-        var fn = queue[id];
-        delete queue[id];
-        fn();
-      }
-    };
-    var listner = function(event) {
-      run.call(event.data);
-    };
-    if (!setTask || !clearTask) {
-      setTask = function setImmediate(fn) {
-        var args = [],
-            i = 1;
-        while (arguments.length > i)
-          args.push(arguments[i++]);
-        queue[++counter] = function() {
-          invoke(typeof fn == 'function' ? fn : Function(fn), args);
-        };
-        defer(counter);
-        return counter;
-      };
-      clearTask = function clearImmediate(id) {
-        delete queue[id];
-      };
-      if (req('6d')(process) == 'process') {
-        defer = function(id) {
-          process.nextTick(ctx(run, id, 1));
-        };
-      } else if (MessageChannel) {
-        channel = new MessageChannel;
-        port = channel.port2;
-        channel.port1.onmessage = listner;
-        defer = ctx(port.postMessage, port, 1);
-      } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts) {
-        defer = function(id) {
-          global.postMessage(id + '', '*');
-        };
-        global.addEventListener('message', listner, false);
-      } else if (ONREADYSTATECHANGE in cel('script')) {
-        defer = function(id) {
-          html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function() {
-            html.removeChild(this);
-            run.call(id);
-          };
-        };
-      } else {
-        defer = function(id) {
-          setTimeout(ctx(run, id, 1), 0);
-        };
-      }
-    }
-    module.exports = {
-      set: setTask,
-      clear: clearTask
-    };
-  })(req('65'));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("6e", ["68", "6b", "6d", "65"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(process) {
-    var global = req('68'),
-        macrotask = req('6b').set,
-        Observer = global.MutationObserver || global.WebKitMutationObserver,
-        process = global.process,
-        isNode = req('6d')(process) == 'process',
-        head,
-        last,
-        notify;
-    var flush = function() {
-      var parent,
-          domain;
-      if (isNode && (parent = process.domain)) {
-        process.domain = null;
-        parent.exit();
-      }
-      while (head) {
-        domain = head.domain;
-        if (domain)
-          domain.enter();
-        head.fn.call();
-        if (domain)
-          domain.exit();
-        head = head.next;
-      }
-      last = undefined;
-      if (parent)
-        parent.enter();
-    };
-    if (isNode) {
-      notify = function() {
-        process.nextTick(flush);
-      };
-    } else if (Observer) {
-      var toggle = 1,
-          node = document.createTextNode('');
-      new Observer(flush).observe(node, {characterData: true});
-      notify = function() {
-        node.data = toggle = -toggle;
-      };
-    } else {
-      notify = function() {
-        macrotask.call(global, flush);
-      };
-    }
-    module.exports = function asap(fn) {
-      var task = {
-        fn: fn,
-        next: undefined,
-        domain: isNode && process.domain
-      };
-      if (last)
-        last.next = task;
-      if (!head) {
-        head = task;
-        notify();
-      }
-      last = task;
-    };
-  })(req('65'));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("6f", ["70", "71", "24"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var anObject = req('70'),
-      aFunction = req('71'),
-      SPECIES = req('24')('species');
-  module.exports = function(O, D) {
-    var C = anObject(O).constructor,
-        S;
-    return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("72", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = Object.is || function is(x, y) {
-    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("28", ["2d", "67", "70", "6c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var getDesc = req('2d').getDesc,
-      isObject = req('67'),
-      anObject = req('70');
-  var check = function(O, proto) {
-    anObject(O);
-    if (!isObject(proto) && proto !== null)
-      throw TypeError(proto + ": can't set as prototype!");
-  };
-  module.exports = {
-    set: Object.setPrototypeOf || ('__proto__' in {} ? function(test, buggy, set) {
-      try {
-        set = req('6c')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
-        set(test, []);
-        buggy = !(test instanceof Array);
-      } catch (e) {
-        buggy = true;
-      }
-      return function setPrototypeOf(O, proto) {
-        check(O, proto);
-        if (buggy)
-          O.__proto__ = proto;
-        else
-          set(O, proto);
-        return O;
-      };
-    }({}, false) : undefined),
-    check: check
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("73", ["2d", "74", "68", "6c", "5d", "27", "67", "70", "71", "75", "76", "28", "72", "77", "24", "6f", "78", "6e", "79", "7a", "7b", "2a", "7c", "65"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(process) {
-    'use strict';
-    var $ = req('2d'),
-        LIBRARY = req('74'),
-        global = req('68'),
-        ctx = req('6c'),
-        classof = req('5d'),
-        $def = req('27'),
-        isObject = req('67'),
-        anObject = req('70'),
-        aFunction = req('71'),
-        strictNew = req('75'),
-        forOf = req('76'),
-        setProto = req('28').set,
-        same = req('72'),
-        species = req('77'),
-        SPECIES = req('24')('species'),
-        speciesConstructor = req('6f'),
-        RECORD = req('78')('record'),
-        asap = req('6e'),
-        PROMISE = 'Promise',
-        process = global.process,
-        isNode = classof(process) == 'process',
-        P = global[PROMISE],
-        Wrapper;
-    var testResolve = function(sub) {
-      var test = new P(function() {});
-      if (sub)
-        test.constructor = Object;
-      return P.resolve(test) === test;
-    };
-    var useNative = function() {
-      var works = false;
-      function P2(x) {
-        var self = new P(x);
-        setProto(self, P2.prototype);
-        return self;
-      }
-      try {
-        works = P && P.resolve && testResolve();
-        setProto(P2, P);
-        P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
-        if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
-          works = false;
-        }
-        if (works && req('79')) {
-          var thenableThenGotten = false;
-          P.resolve($.setDesc({}, 'then', {get: function() {
-              thenableThenGotten = true;
-            }}));
-          works = thenableThenGotten;
-        }
-      } catch (e) {
-        works = false;
-      }
-      return works;
-    }();
-    var isPromise = function(it) {
-      return isObject(it) && (useNative ? classof(it) == 'Promise' : RECORD in it);
-    };
-    var sameConstructor = function(a, b) {
-      if (LIBRARY && a === P && b === Wrapper)
-        return true;
-      return same(a, b);
-    };
-    var getConstructor = function(C) {
-      var S = anObject(C)[SPECIES];
-      return S != undefined ? S : C;
-    };
-    var isThenable = function(it) {
-      var then;
-      return isObject(it) && typeof(then = it.then) == 'function' ? then : false;
-    };
-    var notify = function(record, isReject) {
-      if (record.n)
-        return;
-      record.n = true;
-      var chain = record.c;
-      asap(function() {
-        var value = record.v,
-            ok = record.s == 1,
-            i = 0;
-        var run = function(react) {
-          var cb = ok ? react.ok : react.fail,
-              ret,
-              then;
-          try {
-            if (cb) {
-              if (!ok)
-                record.h = true;
-              ret = cb === true ? value : cb(value);
-              if (ret === react.P) {
-                react.rej(TypeError('Promise-chain cycle'));
-              } else if (then = isThenable(ret)) {
-                then.call(ret, react.res, react.rej);
-              } else
-                react.res(ret);
-            } else
-              react.rej(value);
-          } catch (err) {
-            react.rej(err);
-          }
-        };
-        while (chain.length > i)
-          run(chain[i++]);
-        chain.length = 0;
-        record.n = false;
-        if (isReject)
-          setTimeout(function() {
-            var promise = record.p,
-                handler,
-                console;
-            if (isUnhandled(promise)) {
-              if (isNode) {
-                process.emit('unhandledRejection', value, promise);
-              } else if (handler = global.onunhandledrejection) {
-                handler({
-                  promise: promise,
-                  reason: value
-                });
-              } else if ((console = global.console) && console.error) {
-                console.error('Unhandled promise rejection', value);
-              }
-            }
-            record.a = undefined;
-          }, 1);
-      });
-    };
-    var isUnhandled = function(promise) {
-      var record = promise[RECORD],
-          chain = record.a || record.c,
-          i = 0,
-          react;
-      if (record.h)
-        return false;
-      while (chain.length > i) {
-        react = chain[i++];
-        if (react.fail || !isUnhandled(react.P))
-          return false;
-      }
-      return true;
-    };
-    var $reject = function(value) {
-      var record = this;
-      if (record.d)
-        return;
-      record.d = true;
-      record = record.r || record;
-      record.v = value;
-      record.s = 2;
-      record.a = record.c.slice();
-      notify(record, true);
-    };
-    var $resolve = function(value) {
-      var record = this,
-          then;
-      if (record.d)
-        return;
-      record.d = true;
-      record = record.r || record;
-      try {
-        if (then = isThenable(value)) {
-          asap(function() {
-            var wrapper = {
-              r: record,
-              d: false
-            };
-            try {
-              then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
-            } catch (e) {
-              $reject.call(wrapper, e);
-            }
-          });
-        } else {
-          record.v = value;
-          record.s = 1;
-          notify(record, false);
-        }
-      } catch (e) {
-        $reject.call({
-          r: record,
-          d: false
-        }, e);
-      }
-    };
-    if (!useNative) {
-      P = function Promise(executor) {
-        aFunction(executor);
-        var record = {
-          p: strictNew(this, P, PROMISE),
-          c: [],
-          a: undefined,
-          s: 0,
-          d: false,
-          v: undefined,
-          h: false,
-          n: false
-        };
-        this[RECORD] = record;
-        try {
-          executor(ctx($resolve, record, 1), ctx($reject, record, 1));
-        } catch (err) {
-          $reject.call(record, err);
-        }
-      };
-      req('7a')(P.prototype, {
-        then: function then(onFulfilled, onRejected) {
-          var react = {
-            ok: typeof onFulfilled == 'function' ? onFulfilled : true,
-            fail: typeof onRejected == 'function' ? onRejected : false
-          };
-          var promise = react.P = new (speciesConstructor(this, P))(function(res, rej) {
-            react.res = res;
-            react.rej = rej;
-          });
-          aFunction(react.res);
-          aFunction(react.rej);
-          var record = this[RECORD];
-          record.c.push(react);
-          if (record.a)
-            record.a.push(react);
-          if (record.s)
-            notify(record, false);
-          return promise;
-        },
-        'catch': function(onRejected) {
-          return this.then(undefined, onRejected);
-        }
-      });
-    }
-    $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
-    req('7b')(P, PROMISE);
-    species(P);
-    species(Wrapper = req('2a')[PROMISE]);
-    $def($def.S + $def.F * !useNative, PROMISE, {reject: function reject(r) {
-        return new this(function(res, rej) {
-          rej(r);
-        });
-      }});
-    $def($def.S + $def.F * (!useNative || testResolve(true)), PROMISE, {resolve: function resolve(x) {
-        return isPromise(x) && sameConstructor(x.constructor, this) ? x : new this(function(res) {
-          res(x);
-        });
-      }});
-    $def($def.S + $def.F * !(useNative && req('7c')(function(iter) {
-      P.all(iter)['catch'](function() {});
-    })), PROMISE, {
-      all: function all(iterable) {
-        var C = getConstructor(this),
-            values = [];
-        return new C(function(res, rej) {
-          forOf(iterable, false, values.push, values);
-          var remaining = values.length,
-              results = Array(remaining);
-          if (remaining)
-            $.each.call(values, function(promise, index) {
-              C.resolve(promise).then(function(value) {
-                results[index] = value;
-                --remaining || res(results);
-              }, rej);
-            });
-          else
-            res(results);
-        });
-      },
-      race: function race(iterable) {
-        var C = getConstructor(this);
-        return new C(function(res, rej) {
-          forOf(iterable, false, function(promise) {
-            C.resolve(promise).then(res, rej);
-          });
-        });
-      }
-    });
-  })(req('65'));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7d", ["5b", "22", "23", "73", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('5b');
-  req('22');
-  req('23');
-  req('73');
-  module.exports = req('2a').Promise;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c", ["7d"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('7d'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('7e', ['c', '3b', '3a', '3c', '3f'], function (_export) {
-  var _Promise, Coverage, CoverageCollection, assert, load;
-
-  /**
-   * Reads a CoverageJSON document and returns a {@link Promise} that succeeds with
-   * a {@link Coverage} or {@link CoverageCollection} object.
-   * 
-   * Note that if the document references external domain or range documents,
-   * then these are not loaded immediately. 
-   * 
-   * 
-   * @example <caption>ES6 module</caption>
-   * read('http://example.com/coverage.covjson').then(cov => {
-   *   // work with Coverage object
-   * }).catch(e => {
-   *   // there was an error when loading the coverage
-   *   console.log(e)
-   * })
-   * @example <caption>ES5 global</caption>
-   * CovJSON.read('http://example.com/coverage.covjson').then(function (cov) {
-   *   // work with Coverage object
-   * }).catch(function (e) {
-   *   // there was an error when loading the coverage
-   *   console.log(e)
-   * })
-   * @param {Object|string} input 
-   *    Either a URL pointing to a CoverageJSON Coverage or Coverage Collection document
-   *    or a CoverageJSON Coverage or Coverage Collection object.
-   * @return {Promise} 
-   *    A promise object succeeding with a {@link Coverage} or {@link CoverageCollection} object,
-   *    and failing with an {@link Error} object.
-   */
-
-  function read(input) {
-    if (typeof input === 'object') {
-      return _Promise.resolve(transformCovJSON(input));
-    } else {
-      // it's a URL, load it
-      return load(input).then(function (_ref) {
-        var data = _ref.data;
-        var headers = _ref.headers;
-        return transformCovJSON(data, headers);
-      });
-    }
-  }
-
-  /**
-   * Transforms a CoverageJSON object into one or more Coverage objects.
-   *  
-   * @param obj A CoverageJSON object of type Coverage or CoverageCollection.
-   * @param headers An optional array of HTTP headers.
-   * @return {Coverage|Array of Coverage}
-   */
-  function transformCovJSON(obj, headers) {
-    checkValidCovJSON(obj);
-    if (obj.type !== 'Coverage' && obj.type !== 'CoverageCollection') {
-      throw new Error('CoverageJSON document must be of Coverage or CoverageCollection type');
-    }
-
-    var result = undefined;
-    if (obj.type === 'Coverage') {
-      result = new Coverage(obj);
-    } else {
-      result = new CoverageCollection(obj);
-    }
-
-    addLinkRelations(result, headers);
-
-    return result;
-  }
-
-  /**
-   * Scans the supplied HTTP headers for Link relations and adds them
-   * to the .ld property of the Coverage/CoverageCollection.
-   */
-  function addLinkRelations(cov, headers) {}
-  // TODO implement
-
-  /**
-   * Performs basic structural checks to validate whether a given object is a CoverageJSON object.
-   * 
-   * Note that this method is not comprehensive and should not be used for checking
-   * whether an object fully conforms to the CoverageJSON specification.
-   * 
-   * @param obj
-   * @throws {Error} when obj is not a valid CoverageJSON document 
-   */
-  function checkValidCovJSON(obj) {
-    assert('type' in obj, '"type" missing');
-    if (obj.type === 'Coverage') {
-      assert('parameters' in obj, '"parameters" missing');
-      assert('domain' in obj, '"domain" missing');
-      assert('ranges' in obj, '"ranges" missing');
-    } else if (obj.type === 'CoverageCollection') {
-      assert(Array.isArray(obj.coverages), '"coverages" must be an array');
-    }
-  }
-  return {
-    setters: [function (_c) {
-      _Promise = _c['default'];
-    }, function (_b) {
-      Coverage = _b['default'];
-    }, function (_a) {
-      CoverageCollection = _a['default'];
-    }, function (_c2) {
-      assert = _c2.assert;
-    }, function (_f) {
-      var _exportObj5 = {};
-      load = _f.load;
-      _exportObj5['load'] = _f.load;
-
-      _export(_exportObj5);
-    }],
-    execute: function () {
-      /* */
-      'use strict';
-
-      _export('read', read);
-    }
-  };
-});
-
-$__System.register("7f", ["7e"], function (_export) {
-  "use strict";
-
-  return {
-    setters: [function (_e) {
-      var _exportObj = {};
-
-      for (var _key in _e) {
-        if (_key !== "default") _exportObj[_key] = _e[_key];
-      }
-
-      _exportObj["default"] = _e["default"];
-
-      _export(_exportObj);
-    }],
-    execute: function () {}
-  };
-});
-
-(function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-/^u/.test(typeof define) && function(a) {
-  var b = this.require = function(b) {
-    return a[b];
-  };
-  this.define = function(c, d) {
-    a[c] = a[c] || d(b);
-  };
-}({}), define("80", [], function() {
-  function a(a) {
-    return a.substr(0, 3);
-  }
-  function b(a) {
-    return a != Fa ? "" + a : "";
-  }
-  function c(a) {
-    return "string" == typeof a;
-  }
-  function d(a) {
-    return !!a && "object" == typeof a;
-  }
-  function e(a) {
-    return a && a.nodeType;
-  }
-  function f(a) {
-    return "number" == typeof a;
-  }
-  function g(a) {
-    return d(a) && !!a.getDay;
-  }
-  function h(a) {
-    return !0 === a || !1 === a;
-  }
-  function i(a) {
-    var b = typeof a;
-    return "object" == b ? !(!a || !a.getDay) : "string" == b || "number" == b || h(a);
-  }
-  function j(a) {
-    return a;
-  }
-  function k(a) {
-    return a + 1;
-  }
-  function l(a, c, d) {
-    return b(a).replace(c, d != Fa ? d : "");
-  }
-  function m(a) {
-    return l(a, /[\\\[\]\/{}()*+?.$|^-]/g, "\\$&");
-  }
-  function n(a) {
-    return l(a, /^\s+|\s+$/g);
-  }
-  function o(a, b, c) {
-    for (var d in a)
-      a.hasOwnProperty(d) && b.call(c || a, d, a[d]);
-    return a;
-  }
-  function p(a, b, c) {
-    if (a)
-      for (var d = 0; d < a.length; d++)
-        b.call(c || a, a[d], d);
-    return a;
-  }
-  function q(a, b, c) {
-    var d = [],
-        e = ea(b) ? b : function(a) {
-          return b != a;
-        };
-    return p(a, function(b, f) {
-      e.call(c || a, b, f) && d.push(b);
-    }), d;
-  }
-  function r(a, b, c, d) {
-    var e = [];
-    return a(b, function(a, f) {
-      fa(a = c.call(d || b, a, f)) ? p(a, function(a) {
-        e.push(a);
-      }) : a != Fa && e.push(a);
-    }), e;
-  }
-  function s(a, b, c) {
-    return r(p, a, b, c);
-  }
-  function t(a) {
-    var b = 0;
-    return o(a, function() {
-      b++;
-    }), b;
-  }
-  function u(a) {
-    var b = [];
-    return o(a, function(a) {
-      b.push(a);
-    }), b;
-  }
-  function v(a, b, c) {
-    var d = [];
-    return p(a, function(e, f) {
-      d.push(b.call(c || a, e, f));
-    }), d;
-  }
-  function w(a, b) {
-    if (fa(a)) {
-      var c = wa(b);
-      return M(G(a, 0, c.length), c);
-    }
-    return b != Fa && a.substr(0, b.length) == b;
-  }
-  function x(a, b) {
-    if (fa(a)) {
-      var c = wa(b);
-      return M(G(a, -c.length), c) || !c.length;
-    }
-    return b != Fa && a.substr(a.length - b.length) == b;
-  }
-  function y(a) {
-    var b = a.length;
-    return fa(a) ? new va(v(a, function() {
-      return a[--b];
-    })) : l(a, /[\s\S]/g, function() {
-      return a.charAt(--b);
-    });
-  }
-  function z(a, b) {
-    var c = {};
-    return p(a, function(a) {
-      c[a] = b;
-    }), c;
-  }
-  function A(a, b) {
-    var c,
-        d = b || {};
-    for (c in a)
-      d[c] = a[c];
-    return d;
-  }
-  function B(a, b) {
-    for (var c = b,
-        d = 0; d < a.length; d++)
-      c = A(a[d], c);
-    return c;
-  }
-  function C(a) {
-    return ea(a) ? a : function(b, c) {
-      return a === b ? c : void 0;
-    };
-  }
-  function D(a, b, c) {
-    return b == Fa ? c : 0 > b ? Math.max(a.length + b, 0) : Math.min(a.length, b);
-  }
-  function E(a, b, c, d) {
-    b = C(b), d = D(a, d, a.length);
-    for (var e = D(a, c, 0); d > e; e++)
-      if ((c = b.call(a, a[e], e)) != Fa)
-        return c;
-  }
-  function F(a, b, c, d) {
-    b = C(b), d = D(a, d, -1);
-    for (var e = D(a, c, a.length - 1); e > d; e--)
-      if ((c = b.call(a, a[e], e)) != Fa)
-        return c;
-  }
-  function G(a, b, c) {
-    var d = [];
-    if (a)
-      for (c = D(a, c, a.length), b = D(a, b, 0); c > b; b++)
-        d.push(a[b]);
-    return d;
-  }
-  function H(a) {
-    return v(a, j);
-  }
-  function I(a) {
-    return function() {
-      return new va(O(a, arguments));
-    };
-  }
-  function J(a) {
-    var b = {};
-    return q(a, function(a) {
-      return b[a] ? !1 : b[a] = 1;
-    });
-  }
-  function K(a, b) {
-    var c = z(b, 1);
-    return q(a, function(a) {
-      var b = c[a];
-      return c[a] = 0, b;
-    });
-  }
-  function L(a, b) {
-    for (var c = 0; c < a.length; c++)
-      if (a[c] == b)
-        return !0;
-    return !1;
-  }
-  function M(a, b) {
-    var c,
-        d = ea(a) ? a() : a,
-        e = ea(b) ? b() : b;
-    return d == e ? !0 : d == Fa || e == Fa ? !1 : i(d) || i(e) ? g(d) && g(e) && +d == +e : fa(d) ? d.length == e.length && !E(d, function(a, b) {
-      return M(a, e[b]) ? void 0 : !0;
-    }) : !fa(e) && (c = u(d)).length == t(e) && !E(c, function(a) {
-      return M(d[a], e[a]) ? void 0 : !0;
-    });
-  }
-  function N(a, b, c) {
-    return ea(a) ? a.apply(c && b, v(c || b, j)) : void 0;
-  }
-  function O(a, b, c) {
-    return v(a, function(a) {
-      return N(a, b, c);
-    });
-  }
-  function P(a, b, c, d) {
-    return function() {
-      return N(a, b, s([c, arguments, d], j));
-    };
-  }
-  function Q(a, b) {
-    for (var c = 0 > b ? "-" : "",
-        d = (c ? -b : b).toFixed(0); d.length < a; )
-      d = "0" + d;
-    return c + d;
-  }
-  function R(a, b, c) {
-    var d,
-        e = 0,
-        f = c ? b : y(b);
-    return a = (c ? a : y(a)).replace(/./g, function(a) {
-      return "0" == a ? (d = !1, f.charAt(e++) || "0") : "#" == a ? (d = !0, f.charAt(e++) || "") : d && !f.charAt(e) ? "" : a;
-    }), c ? a : b.substr(0, b.length - e) + y(a);
-  }
-  function S(a, b, c) {
-    return b != Fa && a ? 60 * parseFloat(a[b] + a[b + 1]) + parseFloat(a[b] + a[b + 2]) + c.getTimezoneOffset() : 0;
-  }
-  function T(a) {
-    return new Date(+a);
-  }
-  function U(a, b, c) {
-    return a["set" + b](a["get" + b]() + c), a;
-  }
-  function V(a, b, c) {
-    return c == Fa ? V(new Date, a, b) : U(T(a), b.charAt(0).toUpperCase() + b.substr(1), c);
-  }
-  function W(a, b, c) {
-    var d = +b,
-        e = +c,
-        f = e - d;
-    if (0 > f)
-      return -W(a, c, b);
-    if (b = {
-      milliseconds: 1,
-      seconds: 1e3,
-      minutes: 6e4,
-      hours: 36e5
-    }[a])
-      return f / b;
-    for (b = a.charAt(0).toUpperCase() + a.substr(1), a = Math.floor(f / {
-      fullYear: 31536e6,
-      month: 2628e6,
-      date: 864e5
-    }[a] - 2), d = U(new Date(d), b, a), f = a; 1.2 * a + 4 > f; f++)
-      if (+U(d, b, 1) > e)
-        return f;
-  }
-  function X(a) {
-    return "\\u" + ("0000" + a.charCodeAt(0).toString(16)).slice(-4);
-  }
-  function Y(a) {
-    return l(a, /[\x00-\x1f'"\u2028\u2029]/g, X);
-  }
-  function Z(a, b) {
-    return a.split(b);
-  }
-  function $(a, b) {
-    function c(a, c) {
-      var d = [];
-      return e.call(c || a, a, function(a, b) {
-        fa(a) ? p(a, function(a, c) {
-          b.call(a, a, c);
-        }) : o(a, function(a, c) {
-          b.call(c, a, c);
-        });
-      }, b || j, function() {
-        N(d.push, d, arguments);
-      }, wa), d.join("");
-    }
-    if (Ma[a])
-      return Ma[a];
-    var d = "with(_.isObject(obj)?obj:{}){" + v(Z(a, /{{|}}}?/g), function(a, b) {
-      var c,
-          d = n(a),
-          e = l(d, /^{/),
-          d = d == e ? "esc(" : "";
-      return b % 2 ? (c = /^each\b(\s+([\w_]+(\s*,\s*[\w_]+)?)\s*:)?(.*)/.exec(e)) ? "each(" + (n(c[4]) ? c[4] : "this") + ", function(" + c[2] + "){" : (c = /^if\b(.*)/.exec(e)) ? "if(" + c[1] + "){" : (c = /^else\b\s*(if\b(.*))?/.exec(e)) ? "}else " + (c[1] ? "if(" + c[2] + ")" : "") + "{" : (c = /^\/(if)?/.exec(e)) ? c[1] ? "}\n" : "});\n" : (c = /^(var\s.*)/.exec(e)) ? c[1] + ";" : (c = /^#(.*)/.exec(e)) ? c[1] : (c = /(.*)::\s*(.*)/.exec(e)) ? "print(" + d + '_.formatValue("' + Y(c[2]) + '",' + (n(c[1]) ? c[1] : "this") + (d && ")") + "));\n" : "print(" + d + (n(e) ? e : "this") + (d && ")") + ");\n" : a ? 'print("' + Y(a) + '");\n' : void 0;
-    }).join("") + "}",
-        e = Function("obj", "each", "esc", "print", "_", d);
-    return 99 < Na.push(c) && delete Ma[Na.shift()], Ma[a] = c;
-  }
-  function _(a) {
-    return l(a, /[<>'"&]/g, function(a) {
-      return "&#" + a.charCodeAt(0) + ";";
-    });
-  }
-  function aa(a, b) {
-    return $(a, _)(b);
-  }
-  function ba(a) {
-    return function(b, c) {
-      return new va(a(this, b, c));
-    };
-  }
-  function ca(a) {
-    return function(b, c, d) {
-      return a(this, b, c, d);
-    };
-  }
-  function da(a) {
-    return function(b, c, d) {
-      return new va(a(b, c, d));
-    };
-  }
-  function ea(a) {
-    return "function" == typeof a && !a.item;
-  }
-  function fa(a) {
-    return a && a.length != Fa && !c(a) && !e(a) && !ea(a) && a !== ya;
-  }
-  function ga(a) {
-    return parseFloat(l(a, /^[^\d-]+/));
-  }
-  function ha(a) {
-    return a.Nia = a.Nia || ++Ba;
-  }
-  function ia(a, b) {
-    var c,
-        d = [],
-        e = {};
-    return sa(a, function(a) {
-      sa(b(a), function(a) {
-        e[c = ha(a)] || (d.push(a), e[c] = !0);
-      });
-    }), d;
-  }
-  function ja(a, b) {
-    var c = {
-      $position: "absolute",
-      $visibility: "hidden",
-      $display: "block",
-      $height: Fa
-    },
-        d = a.get(c),
-        c = a.set(c).get("clientHeight");
-    return a.set(d), c * b + "px";
-  }
-  function ka(a) {
-    Ca ? Ca.push(a) : setTimeout(a, 0);
-  }
-  function la(a, b, c) {
-    return pa(a, b, c)[0];
-  }
-  function ma(a, b, c) {
-    return a = oa(document.createElement(a)), fa(b) || b != Fa && !d(b) ? a.add(b) : a.set(b).add(c);
-  }
-  function na(a) {
-    return r(sa, a, function(a) {
-      return fa(a) ? na(a) : (e(a) && (a = a.cloneNode(!0), a.removeAttribute && a.removeAttribute("id")), a);
-    });
-  }
-  function oa(a, b, c) {
-    return ea(a) ? ka(a) : new va(pa(a, b, c));
-  }
-  function pa(a, b, d) {
-    function f(a) {
-      return fa(a) ? r(sa, a, f) : a;
-    }
-    function g(a) {
-      return q(r(sa, a, f), function(a) {
-        for (; a = a.parentNode; )
-          if (a == b[0] || d)
-            return a == b[0];
-      });
-    }
-    return b ? 1 != (b = pa(b)).length ? ia(b, function(b) {
-      return pa(a, b, d);
-    }) : c(a) ? 1 != e(b[0]) ? [] : d ? g(b[0].querySelectorAll(a)) : b[0].querySelectorAll(a) : g(a) : c(a) ? document.querySelectorAll(a) : r(sa, a, f);
-  }
-  function qa(a, b) {
-    function d(a, b) {
-      var c = RegExp("(^|\\s+)" + a + "(?=$|\\s)", "i");
-      return function(d) {
-        return a ? c.test(d[b]) : !0;
-      };
-    }
-    var g,
-        h,
-        i = {},
-        j = i;
-    return ea(a) ? a : f(a) ? function(b, c) {
-      return c == a;
-    } : !a || "*" == a || c(a) && (j = /^([\w-]*)\.?([\w-]*)$/.exec(a)) ? (g = d(j[1], "tagName"), h = d(j[2], "className"), function(a) {
-      return 1 == e(a) && g(a) && h(a);
-    }) : b ? function(c) {
-      return oa(a, b).find(c) != Fa;
-    } : (oa(a).each(function(a) {
-      i[ha(a)] = !0;
-    }), function(a) {
-      return i[ha(a)];
-    });
-  }
-  function ra(a) {
-    var b = qa(a);
-    return function(a) {
-      return b(a) ? Fa : !0;
-    };
-  }
-  function sa(a, b) {
-    return fa(a) ? p(a, b) : a != Fa && b(a, 0), a;
-  }
-  function ta() {
-    this.state = null, this.values = [], this.parent = null;
-  }
-  function ua() {
-    var a,
-        b,
-        c = [],
-        e = arguments,
-        f = e.length,
-        g = 0,
-        h = 0,
-        i = new ta;
-    return i.errHandled = function() {
-      h++, i.parent && i.parent.errHandled();
-    }, a = i.fire = function(a, b) {
-      return null == i.state && null != a && (i.state = !!a, i.values = fa(b) ? b : [b], setTimeout(function() {
-        p(c, function(a) {
-          a();
-        });
-      }, 0)), i;
-    }, p(e, function j(b, c) {
-      try {
-        b.then ? b.then(function(b) {
-          (d(b) || ea(b)) && ea(b.then) ? j(b, c) : (i.values[c] = H(arguments), ++g == f && a(!0, 2 > f ? i.values[c] : i.values));
-        }, function() {
-          i.values[c] = H(arguments), a(!1, 2 > f ? i.values[c] : [i.values[c][0], i.values, c]);
-        }) : b(function() {
-          a(!0, H(arguments));
-        }, function() {
-          a(!1, H(arguments));
-        });
-      } catch (e) {
-        a(!1, [e, i.values, c]);
-      }
-    }), i.stop = function() {
-      return p(e, function(a) {
-        a.stop && a.stop();
-      }), i.stop0 && N(i.stop0);
-    }, b = i.then = function(a, b) {
-      function e() {
-        try {
-          var c = i.state ? a : b;
-          ea(c) ? function g(a) {
-            try {
-              var b,
-                  c = 0;
-              if ((d(a) || ea(a)) && ea(b = a.then)) {
-                if (a === f)
-                  throw new TypeError;
-                b.call(a, function(a) {
-                  c++ || g(a);
-                }, function(a) {
-                  c++ || f.fire(!1, [a]);
-                }), f.stop0 = a.stop;
-              } else
-                f.fire(!0, [a]);
-            } catch (e) {
-              if (!c++ && (f.fire(!1, [e]), !h))
-                throw e;
-            }
-          }(N(c, xa, i.values)) : f.fire(i.state, i.values);
-        } catch (e) {
-          if (f.fire(!1, [e]), !h)
-            throw e;
-        }
-      }
-      var f = ua();
-      return ea(b) && i.errHandled(), f.stop0 = i.stop, f.parent = i, null != i.state ? setTimeout(e, 0) : c.push(e), f;
-    }, i.always = function(a) {
-      return b(a, a);
-    }, i.error = function(a) {
-      return b(0, a);
-    }, i;
-  }
-  function va(a, b) {
-    var c,
-        d,
-        e,
-        f,
-        g,
-        h = 0;
-    if (a)
-      for (c = 0, d = a.length; d > c; c++)
-        if (e = a[c], b && fa(e))
-          for (f = 0, g = e.length; g > f; f++)
-            this[h++] = e[f];
-        else
-          this[h++] = e;
-    else
-      this[h++] = b;
-    this.length = h, this._ = !0;
-  }
-  function wa() {
-    return new va(arguments, !0);
-  }
-  var xa,
-      ya = window,
-      za = {},
-      Aa = {},
-      Ba = 1,
-      Ca = /^[ic]/.test(document.readyState) ? Fa : [],
-      Da = {},
-      Ea = 0,
-      Fa = null,
-      Ga = Z("January,February,March,April,May,June,July,August,September,October,November,December", /,/g),
-      Ha = v(Ga, a),
-      Ia = Z("Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday", /,/g),
-      Ja = v(Ia, a),
-      Ka = {
-        y: ["FullYear", j],
-        Y: ["FullYear", function(a) {
-          return a % 100;
-        }],
-        M: ["Month", k],
-        n: ["Month", Ha],
-        N: ["Month", Ga],
-        d: ["Date", j],
-        m: ["Minutes", j],
-        H: ["Hours", j],
-        h: ["Hours", function(a) {
-          return a % 12 || 12;
-        }],
-        k: ["Hours", k],
-        K: ["Hours", function(a) {
-          return a % 12;
-        }],
-        s: ["Seconds", j],
-        S: ["Milliseconds", j],
-        a: ["Hours", Z("am,am,am,am,am,am,am,am,am,am,am,am,pm,pm,pm,pm,pm,pm,pm,pm,pm,pm,pm,pm", /,/g)],
-        w: ["Day", Ja],
-        W: ["Day", Ia],
-        z: ["TimezoneOffset", function(a, b, c) {
-          return c ? c : (b = 0 > a ? -a : a, (a > 0 ? "-" : "+") + Q(2, Math.floor(b / 60)) + Q(2, b % 60));
-        }]
-      },
-      La = {
-        y: 0,
-        Y: [0, -2e3],
-        M: [1, 1],
-        n: [1, Ha],
-        N: [1, Ga],
-        d: 2,
-        m: 4,
-        H: 3,
-        h: 3,
-        K: [3, 1],
-        k: [3, 1],
-        s: 5,
-        S: 6,
-        a: [3, Z("am,pm", /,/g)]
-      },
-      Ma = {},
-      Na = [];
-  return A({
-    each: ca(p),
-    filter: ba(q),
-    collect: ba(s),
-    map: ba(v),
-    toObject: ca(z),
-    equals: ca(M),
-    sub: ba(G),
-    reverse: ca(y),
-    find: ca(E),
-    findLast: ca(F),
-    startsWith: ca(w),
-    endsWith: ca(x),
-    contains: ca(L),
-    call: ba(O),
-    array: ca(H),
-    unite: ca(I),
-    merge: ca(B),
-    uniq: ba(J),
-    intersection: ba(K),
-    join: function(a) {
-      return v(this, j).join(a);
-    },
-    reduce: function(a, b) {
-      return p(this, function(c, d) {
-        b = a.call(this, b, c, d);
-      }), b;
-    },
-    sort: function(a) {
-      return new va(v(this, j).sort(a));
-    },
-    remove: function() {
-      sa(this, function(a) {
-        a.parentNode.removeChild(a);
-      });
-    },
-    text: function() {
-      return r(sa, this, function(a) {
-        return a.textContent;
-      }).join("");
-    },
-    trav: function(a, b, c) {
-      var d = f(b),
-          e = qa(d ? Fa : b),
-          g = d ? b : c;
-      return new va(ia(this, function(b) {
-        for (var c = []; (b = b[a]) && c.length != g; )
-          e(b) && c.push(b);
-        return c;
-      }));
-    },
-    next: function(a, b) {
-      return this.trav("nextSibling", a, b || 1);
-    },
-    up: function(a, b) {
-      return this.trav("parentNode", a, b || 1);
-    },
-    select: function(a, b) {
-      return oa(a, this, b);
-    },
-    is: function(a) {
-      return !this.find(ra(a));
-    },
-    only: function(a) {
-      return new va(q(this, qa(a)));
-    },
-    not: function(a) {
-      return new va(q(this, ra(a)));
-    },
-    get: function(a, b) {
-      var d,
-          e,
-          f,
-          g,
-          h = this,
-          i = h[0];
-      return i ? c(a) ? (d = /^(\W*)(.*)/.exec(l(a, /^%/, "@data-")), e = d[1], f = Aa[e] ? Aa[e](this, d[2]) : "$" == a ? h.get("className") : "$$" == a ? h.get("@style") : "$$slide" == a ? h.get("$height") : "$$fade" == a || "$$show" == a ? "hidden" == h.get("$visibility") || "none" == h.get("$display") ? 0 : "$$fade" == a ? isNaN(h.get("$opacity", !0)) ? 1 : h.get("$opacity", !0) : 1 : "$" == e ? ya.getComputedStyle(i, Fa).getPropertyValue(l(d[2], /[A-Z]/g, function(a) {
-        return "-" + a.toLowerCase();
-      })) : "@" == e ? i.getAttribute(d[2]) : i[d[2]], b ? ga(f) : f) : (g = {}, (fa(a) ? sa : o)(a, function(a) {
-        g[a] = h.get(a, b);
-      }), g) : void 0;
-    },
-    set: function(a, b) {
-      var d,
-          e,
-          f = this;
-      return b !== xa ? (d = /^(\W*)(.*)/.exec(l(l(a, /^\$float$/, "cssFloat"), /^%/, "@data-")), e = d[1], za[e] ? za[e](this, d[2], b) : "$$fade" == a ? this.set({
-        $visibility: b ? "visible" : "hidden",
-        $opacity: b
-      }) : "$$slide" == a ? f.set({
-        $visibility: b ? "visible" : "hidden",
-        $overflow: "hidden",
-        $height: /px/.test(b) ? b : function(a, c, d) {
-          return ja(oa(d), b);
-        }
-      }) : "$$show" == a ? b ? f.set({
-        $visibility: b ? "visible" : "hidden",
-        $display: ""
-      }).set({$display: function(a) {
-          return "none" == a ? "block" : a;
-        }}) : f.set({$display: "none"}) : "$$" == a ? f.set("@style", b) : sa(this, function(c, f) {
-        var g = ea(b) ? b(oa(c).get(a), f, c) : b;
-        "$" == e ? d[2] ? c.style[d[2]] = g : sa(g && g.split(/\s+/), function(a) {
-          var b = l(a, /^[+-]/),
-              d = c.className || "",
-              e = l(d, RegExp("(^|\\s+)" + b + "(?=$|\\s)"));
-          (/^\+/.test(a) || b == a && d == e) && (e += " " + b), c.className = n(e);
-        }) : "$$scrollX" == a ? c.scroll(g, oa(c).get("$$scrollY")) : "$$scrollY" == a ? c.scroll(oa(c).get("$$scrollX"), g) : "@" == e ? g == Fa ? c.removeAttribute(d[2]) : c.setAttribute(d[2], g) : c[d[2]] = g;
-      })) : c(a) || ea(a) ? f.set("$", a) : o(a, function(a, b) {
-        f.set(a, b);
-      }), f;
-    },
-    show: function() {
-      return this.set("$$show", 1);
-    },
-    hide: function() {
-      return this.set("$$show", 0);
-    },
-    add: function(a, b) {
-      return this.each(function(c, d) {
-        function f(a) {
-          fa(a) ? sa(a, f) : ea(a) ? f(a(c, d)) : a != Fa && (a = e(a) ? a : document.createTextNode(a), g ? g.parentNode.insertBefore(a, g.nextSibling) : b ? b(a, c, c.parentNode) : c.appendChild(a), g = a);
-        }
-        var g;
-        f(d && !ea(a) ? na(a) : a);
-      });
-    },
-    fill: function(a) {
-      return this.each(function(a) {
-        oa(a.childNodes).remove();
-      }).add(a);
-    },
-    addAfter: function(a) {
-      return this.add(a, function(a, b, c) {
-        c.insertBefore(a, b.nextSibling);
-      });
-    },
-    addBefore: function(a) {
-      return this.add(a, function(a, b, c) {
-        c.insertBefore(a, b);
-      });
-    },
-    addFront: function(a) {
-      return this.add(a, function(a, b) {
-        b.insertBefore(a, b.firstChild);
-      });
-    },
-    replace: function(a) {
-      return this.add(a, function(a, b, c) {
-        c.replaceChild(a, b);
-      });
-    },
-    clone: ba(na),
-    animate: function(a, b, c) {
-      var d,
-          e = ua(),
-          f = this,
-          g = r(sa, this, function(b, d) {
-            var e,
-                f = oa(b),
-                g = {};
-            return o(e = f.get(a), function(c, e) {
-              var h = a[c];
-              g[c] = ea(h) ? h(e, d, b) : "$$slide" == c ? ja(f, h) : h;
-            }), f.dial(e, g, c);
-          }),
-          h = b || 500;
-      return e.stop0 = function() {
-        return e.fire(!1), d();
-      }, d = oa.loop(function(a) {
-        O(g, [a / h]), a >= h && (d(), e.fire(!0, [f]));
-      }), e;
-    },
-    dial: function(a, c, d) {
-      function e(a, b) {
-        return /^#/.test(a) ? parseInt(6 < a.length ? a.substr(2 * b + 1, 2) : (a = a.charAt(b + 1)) + a, 16) : ga(a.split(",")[b]);
-      }
-      var f = this,
-          g = d || 0,
-          h = ea(g) ? g : function(a, b, c) {
-            return c * (b - a) * (g + (1 - g) * c * (3 - 2 * c)) + a;
-          };
-      return function(d) {
-        o(a, function(a, g) {
-          var i = c[a],
-              j = 0;
-          f.set(a, 0 >= d ? g : d >= 1 ? i : /^#|rgb\(/.test(i) ? "rgb(" + Math.round(h(e(g, j), e(i, j++), d)) + "," + Math.round(h(e(g, j), e(i, j++), d)) + "," + Math.round(h(e(g, j), e(i, j++), d)) + ")" : l(i, /-?[\d.]+/, b(h(ga(g), ga(i), d))));
-        });
-      };
-    },
-    toggle: function(a, b, c, d) {
-      var e,
-          f,
-          g = this,
-          h = !1;
-      return b ? (g.set(a), function(i) {
-        i !== h && (f = (h = !0 === i || !1 === i ? i : !h) ? b : a, c ? (e = g.animate(f, e ? e.stop() : c, d)).then(function() {
-          e = Fa;
-        }) : g.set(f));
-      }) : g.toggle(l(a, /\b(?=\w)/g, "-"), l(a, /\b(?=\w)/g, "+"));
-    },
-    values: function(a) {
-      var c = a || {};
-      return this.each(function(a) {
-        var d = a.name || a.id,
-            e = b(a.value);
-        if (/form/i.test(a.tagName))
-          for (d = 0; d < a.elements.length; d++)
-            oa(a.elements[d]).values(c);
-        else
-          !d || /ox|io/i.test(a.type) && !a.checked || (c[d] = c[d] == Fa ? e : r(sa, [c[d], e], j));
-      }), c;
-    },
-    offset: function() {
-      for (var a = this[0],
-          b = {
-            x: 0,
-            y: 0
-          }; a; )
-        b.x += a.offsetLeft, b.y += a.offsetTop, a = a.offsetParent;
-      return b;
-    },
-    on: function(a, d, e, f, g) {
-      return ea(d) ? this.on(Fa, a, d, e, f) : c(f) ? this.on(a, d, e, Fa, f) : this.each(function(c, h) {
-        sa(a ? pa(a, c) : c, function(a) {
-          sa(b(d).split(/\s/), function(b) {
-            function c(b, c, d) {
-              var j,
-                  l = !g;
-              if (d = g ? d : a, g)
-                for (j = qa(g, a); d && d != a && !(l = j(d)); )
-                  d = d.parentNode;
-              return !l || i != b || e.apply(oa(d), f || [c, h]) && "?" == k || "|" == k;
-            }
-            function d(a) {
-              c(i, a, a.target) || (a.preventDefault(), a.stopPropagation());
-            }
-            var i = l(b, /[?|]/g),
-                k = l(b, /[^?|]/g),
-                m = ("blur" == i || "focus" == i) && !!g,
-                n = Ba++;
-            a.addEventListener(i, d, m), a.M || (a.M = {}), a.M[n] = c, e.M = r(sa, [e.M, function() {
-              a.removeEventListener(i, d, m), delete a.M[n];
-            }], j);
-          });
-        });
-      });
-    },
-    onOver: function(a, b) {
-      var c = this,
-          d = [];
-      return ea(b) ? this.on(a, "|mouseover |mouseout", function(a, e) {
-        var f = a.relatedTarget || a.toElement,
-            g = "mouseout" != a.type;
-        d[e] === g || !g && f && (f == c[e] || oa(f).up(c[e]).length) || (d[e] = g, b.call(this, g, a));
-      }) : this.onOver(Fa, a);
-    },
-    onFocus: function(a, b, c) {
-      return ea(b) ? this.on(a, "|blur", b, [!1], c).on(a, "|focus", b, [!0], c) : this.onFocus(Fa, a, b);
-    },
-    onChange: function(a, b, c) {
-      return ea(b) ? this.on(a, "|input |change |click", function(a, c) {
-        var d = this[0],
-            e = /ox|io/i.test(d.type) ? d.checked : d.value;
-        d.NiaP != e && b.call(this, d.NiaP = e, c);
-      }, c) : this.onChange(Fa, a, b);
-    },
-    onClick: function(a, b, c, d) {
-      return ea(b) ? this.on(a, "click", b, c, d) : this.onClick(Fa, a, b, c);
-    },
-    trigger: function(a, b) {
-      return this.each(function(c) {
-        for (var d = !0,
-            e = c; e && d; )
-          o(e.M, function(e, f) {
-            d = d && f(a, b, c);
-          }), e = e.parentNode;
-      });
-    },
-    per: function(a, b) {
-      if (ea(a))
-        for (var c = this.length,
-            d = 0; c > d; d++)
-          a.call(this, new va(Fa, this[d]), d);
-      else
-        oa(a, this).per(b);
-      return this;
-    },
-    ht: function(a, b) {
-      var c = 2 < arguments.length ? B(G(arguments, 1)) : b;
-      return this.set("innerHTML", ea(a) ? a(c) : /{{/.test(a) ? aa(a, c) : /^#\S+$/.test(a) ? aa(la(a).text, c) : a);
-    }
-  }, va.prototype), A({
-    request: function(a, c, d, e) {
-      e = e || {};
-      var f,
-          g = 0,
-          h = ua(),
-          i = d && d.constructor == e.constructor;
-      try {
-        h.xhr = f = new XMLHttpRequest, h.stop0 = function() {
-          f.abort();
-        }, i && (d = r(o, d, function(a, b) {
-          return r(sa, b, function(b) {
-            return encodeURIComponent(a) + (b != Fa ? "=" + encodeURIComponent(b) : "");
-          });
-        }).join("&")), d == Fa || /post/i.test(a) || (c += "?" + d, d = Fa), f.open(a, c, !0, e.user, e.pass), i && /post/i.test(a) && f.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"), o(e.headers, function(a, b) {
-          f.setRequestHeader(a, b);
-        }), o(e.xhr, function(a, b) {
-          f[a] = b;
-        }), f.onreadystatechange = function() {
-          4 != f.readyState || g++ || (200 <= f.status && 300 > f.status ? h.fire(!0, [f.responseText, f]) : h.fire(!1, [f.status, f.responseText, f]));
-        }, f.send(d);
-      } catch (j) {
-        g || h.fire(!1, [0, Fa, b(j)]);
-      }
-      return h;
-    },
-    toJSON: JSON.stringify,
-    parseJSON: JSON.parse,
-    ready: ka,
-    loop: function(a) {
-      function b(a) {
-        o(Da, function(b, c) {
-          c(a);
-        }), Ea && g(b);
-      }
-      function c() {
-        return Da[f] && (delete Da[f], Ea--), e;
-      }
-      var d,
-          e = 0,
-          f = Ba++,
-          g = ya.requestAnimationFrame || function(a) {
-            setTimeout(function() {
-              a(+new Date);
-            }, 33);
-          };
-      return Da[f] = function(b) {
-        d = d || b, a(e = b - d, c);
-      }, Ea++ || g(b), c;
-    },
-    off: function(a) {
-      O(a.M), a.M = Fa;
-    },
-    setCookie: function(a, b, c, e) {
-      document.cookie = a + "=" + (e ? b : escape(b)) + (c ? "; expires=" + (d(c) ? c : new Date(+new Date + 864e5 * c)).toUTCString() : "");
-    },
-    getCookie: function(a, b) {
-      var c,
-          d = (c = RegExp("(^|;)\\s*" + a + "=([^;]*)").exec(document.cookie)) && c[2];
-      return b ? d : d && unescape(d);
-    },
-    wait: function(a, b) {
-      var c = ua(),
-          d = setTimeout(function() {
-            c.fire(!0, b);
-          }, a);
-      return c.stop0 = function() {
-        c.fire(!1), clearTimeout(d);
-      }, c;
-    }
-  }, oa), A({
-    filter: da(q),
-    collect: da(s),
-    map: da(v),
-    sub: da(G),
-    reverse: y,
-    each: p,
-    toObject: z,
-    find: E,
-    findLast: F,
-    contains: L,
-    startsWith: w,
-    endsWith: x,
-    equals: M,
-    call: da(O),
-    array: H,
-    unite: I,
-    merge: B,
-    uniq: da(J),
-    intersection: da(K),
-    keys: da(u),
-    values: da(function(a, b) {
-      var c = [];
-      return b ? p(b, function(b) {
-        c.push(a[b]);
-      }) : o(a, function(a, b) {
-        c.push(b);
-      }), c;
-    }),
-    copyObj: A,
-    extend: function(a) {
-      return B(G(arguments, 1), a);
-    },
-    range: function(a, b) {
-      for (var c = [],
-          d = b == Fa ? a : b,
-          e = b != Fa ? a : 0; d > e; e++)
-        c.push(e);
-      return new va(c);
-    },
-    bind: P,
-    partial: function(a, b, c) {
-      return P(a, this, b, c);
-    },
-    eachObj: o,
-    mapObj: function(a, b, c) {
-      var d = {};
-      return o(a, function(e, f) {
-        d[e] = b.call(c || a, e, f);
-      }), d;
-    },
-    filterObj: function(a, b, c) {
-      var d = {};
-      return o(a, function(e, f) {
-        b.call(c || a, e, f) && (d[e] = f);
-      }), d;
-    },
-    isList: fa,
-    isFunction: ea,
-    isObject: d,
-    isNumber: f,
-    isBool: h,
-    isDate: g,
-    isValue: i,
-    isString: c,
-    toString: b,
-    dateClone: T,
-    dateAdd: V,
-    dateDiff: W,
-    dateMidnight: function(a) {
-      return a = a || new Date, new Date(a.getFullYear(), a.getMonth(), a.getDate());
-    },
-    pad: Q,
-    formatValue: function(a, d) {
-      var e,
-          h,
-          i = l(a, /^\?/);
-      return g(d) ? ((h = /^\[(([+-])(\d\d)(\d\d))\]\s*(.*)/.exec(i)) && (e = h[1], d = V(d, "minutes", S(h, 2, d)), i = h[5]), l(i, /(\w)(\1*)(?:\[([^\]]+)\])?/g, function(a, b, f, g) {
-        return (b = Ka[b]) && (a = d["get" + b[0]](), g = g && g.split(","), a = fa(b[1]) ? (g || b[1])[a] : b[1](a, g, e), a == Fa || c(a) || (a = Q(f.length + 1, a))), a;
-      })) : E(i.split(/\s*\|\s*/), function(a) {
-        var c,
-            e;
-        if (c = /^([<>]?)(=?)([^:]*?)\s*:\s*(.*)$/.exec(a)) {
-          if (a = d, e = +c[3], (isNaN(e) || !f(a)) && (a = a == Fa ? "null" : b(a), e = c[3]), c[1]) {
-            if (!c[2] && a == e || "<" == c[1] && a > e || ">" == c[1] && e > a)
-              return Fa;
-          } else if (a != e)
-            return Fa;
-          c = c[4];
-        } else
-          c = a;
-        return f(d) ? c.replace(/[0#](.*[0#])?/, function(a) {
-          var b,
-              c = /^([^.]+)(\.)([^.]+)$/.exec(a) || /^([^,]+)(,)([^,]+)$/.exec(a),
-              e = 0 > d ? "-" : "",
-              f = /(\d+)(\.(\d+))?/.exec((e ? -d : d).toFixed(c ? c[3].length : 0));
-          return a = c ? c[1] : a, b = c ? R(c[3], l(f[3], /0+$/), !0) : "", (e ? "-" : "") + ("#" == a ? f[1] : R(a, f[1])) + (b.length ? c[2] : "") + b;
-        }) : c;
-      });
-    },
-    parseDate: function(a, b) {
-      var c,
-          d,
-          e,
-          f,
-          g,
-          h,
-          i,
-          j,
-          k,
-          o = {},
-          p = 1,
-          q = l(a, /^\?/);
-      if (q != a && !n(b))
-        return Fa;
-      if ((e = /^\[([+-])(\d\d)(\d\d)\]\s*(.*)/.exec(q)) && (c = e, q = e[4]), !(e = RegExp(q.replace(/(.)(\1*)(?:\[([^\]]*)\])?/g, function(a, b, c, e) {
-        return /[dmhkyhs]/i.test(b) ? (o[p++] = b, a = c.length + 1, "(\\d" + (2 > a ? "+" : "{1," + a + "}") + ")") : "z" == b ? (d = p, p += 3, "([+-])(\\d\\d)(\\d\\d)") : /[Nna]/.test(b) ? (o[p++] = [b, e && e.split(",")], "([a-zA-Z\\u0080-\\u1fff]+)") : /w/i.test(b) ? "[a-zA-Z\\u0080-\\u1fff]+" : /\s/.test(b) ? "\\s+" : m(a);
-      })).exec(b)))
-        return xa;
-      for (q = [0, 0, 0, 0, 0, 0, 0], f = 1; p > f; f++)
-        if (g = e[f], h = o[f], fa(h)) {
-          if (i = h[0], j = La[i], k = j[0], h = E(h[1] || j[1], function(a, b) {
-            return w(g.toLowerCase(), a.toLowerCase()) ? b : void 0;
-          }), h == Fa)
-            return xa;
-          q[k] = "a" == i ? q[k] + 12 * h : h;
-        } else
-          h && (i = parseFloat(g), j = La[h], fa(j) ? q[j[0]] += i - j[1] : q[j] += i);
-      return q = new Date(q[0], q[1], q[2], q[3], q[4], q[5], q[6]), V(q, "minutes", -S(c, 1, q) - S(e, d, q));
-    },
-    parseNumber: function(a, b) {
-      var c = l(a, /^\?/);
-      return c == a || n(b) ? (c = /(^|[^0#.,])(,|[0#.]*,[0#]+|[0#]+\.[0#]+\.[0#.,]*)($|[^0#.,])/.test(c) ? "," : ".", c = parseFloat(l(l(l(b, "," == c ? /\./g : /,/g), c, "."), /^[^\d-]*(-?\d)/, "$1")), isNaN(c) ? xa : c) : Fa;
-    },
-    trim: n,
-    isEmpty: function(a, b) {
-      return a == Fa || !a.length || b && /^\s*$/.test(a);
-    },
-    escapeRegExp: m,
-    escapeHtml: _,
-    format: function(a, b, c) {
-      return $(a, c)(b);
-    },
-    template: $,
-    formatHtml: aa,
-    promise: ua
-  }, wa), document.addEventListener("DOMContentLoaded", function() {
-    O(Ca), Ca = Fa;
-  }, !1), {
-    HTML: function() {
-      var a = ma("div");
-      return wa(N(a.ht, a, arguments)[0].childNodes);
-    },
-    _: wa,
-    $: oa,
-    $$: la,
-    EE: ma,
-    M: va,
-    getter: Aa,
-    setter: za
-  };
-});
-
-_removeDefine();
-})();
-(function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("6", ["80"], function(main) {
-  return main;
-});
-
-_removeDefine();
-})();
-$__System.register("81", [], function() { return { setters: [], execute: function() {} } });
-
-$__System.registerDynamic("82", [], false, function(__require, __exports, __module) {
-  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
-  (function() {
-    "format global";
-    L.Control.Sidebar = L.Control.extend({
-      includes: L.Mixin.Events,
-      options: {position: 'left'},
-      initialize: function(id, options) {
-        var i,
-            child;
-        L.setOptions(this, options);
-        this._sidebar = L.DomUtil.get(id);
-        L.DomUtil.addClass(this._sidebar, 'sidebar-' + this.options.position);
-        if (L.Browser.touch)
-          L.DomUtil.addClass(this._sidebar, 'leaflet-touch');
-        for (i = this._sidebar.children.length - 1; i >= 0; i--) {
-          child = this._sidebar.children[i];
-          if (child.tagName == 'DIV' && L.DomUtil.hasClass(child, 'sidebar-content'))
-            this._container = child;
-        }
-        this._tabitems = this._sidebar.querySelectorAll('ul.sidebar-tabs > li, .sidebar-tabs > ul > li');
-        for (i = this._tabitems.length - 1; i >= 0; i--) {
-          this._tabitems[i]._sidebar = this;
-        }
-        this._panes = [];
-        this._closeButtons = [];
-        for (i = this._container.children.length - 1; i >= 0; i--) {
-          child = this._container.children[i];
-          if (child.tagName == 'DIV' && L.DomUtil.hasClass(child, 'sidebar-pane')) {
-            this._panes.push(child);
-            var closeButtons = child.querySelectorAll('.sidebar-close');
-            for (var j = 0,
-                len = closeButtons.length; j < len; j++)
-              this._closeButtons.push(closeButtons[j]);
-          }
-        }
-      },
-      addTo: function(map) {
-        var i,
-            child;
-        this._map = map;
-        for (i = this._tabitems.length - 1; i >= 0; i--) {
-          child = this._tabitems[i];
-          L.DomEvent.on(child.querySelector('a'), 'click', L.DomEvent.preventDefault).on(child.querySelector('a'), 'click', this._onClick, child);
-        }
-        for (i = this._closeButtons.length - 1; i >= 0; i--) {
-          child = this._closeButtons[i];
-          L.DomEvent.on(child, 'click', this._onCloseClick, this);
-        }
-        return this;
-      },
-      removeFrom: function(map) {
-        var i,
-            child;
-        this._map = null;
-        for (i = this._tabitems.length - 1; i >= 0; i--) {
-          child = this._tabitems[i];
-          L.DomEvent.off(child.querySelector('a'), 'click', this._onClick);
-        }
-        for (i = this._closeButtons.length - 1; i >= 0; i--) {
-          child = this._closeButtons[i];
-          L.DomEvent.off(child, 'click', this._onCloseClick, this);
-        }
-        return this;
-      },
-      open: function(id) {
-        var i,
-            child;
-        for (i = this._panes.length - 1; i >= 0; i--) {
-          child = this._panes[i];
-          if (child.id == id)
-            L.DomUtil.addClass(child, 'active');
-          else if (L.DomUtil.hasClass(child, 'active'))
-            L.DomUtil.removeClass(child, 'active');
-        }
-        for (i = this._tabitems.length - 1; i >= 0; i--) {
-          child = this._tabitems[i];
-          if (child.querySelector('a').hash == '#' + id)
-            L.DomUtil.addClass(child, 'active');
-          else if (L.DomUtil.hasClass(child, 'active'))
-            L.DomUtil.removeClass(child, 'active');
-        }
-        this.fire('content', {id: id});
-        if (L.DomUtil.hasClass(this._sidebar, 'collapsed')) {
-          this.fire('opening');
-          L.DomUtil.removeClass(this._sidebar, 'collapsed');
-        }
-        return this;
-      },
-      close: function() {
-        for (var i = this._tabitems.length - 1; i >= 0; i--) {
-          var child = this._tabitems[i];
-          if (L.DomUtil.hasClass(child, 'active'))
-            L.DomUtil.removeClass(child, 'active');
-        }
-        if (!L.DomUtil.hasClass(this._sidebar, 'collapsed')) {
-          this.fire('closing');
-          L.DomUtil.addClass(this._sidebar, 'collapsed');
-        }
-        return this;
-      },
-      _onClick: function() {
-        if (L.DomUtil.hasClass(this, 'active'))
-          this._sidebar.close();
-        else if (!L.DomUtil.hasClass(this, 'disabled'))
-          this._sidebar.open(this.querySelector('a').hash.slice(1));
-      },
-      _onCloseClick: function() {
-        this.close();
-      }
-    });
-    L.control.sidebar = function(id, options) {
-      return new L.Control.Sidebar(id, options);
-    };
-  })();
-  return _retrieveGlobal();
-});
-
-$__System.registerDynamic("83", ["70", "84", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var anObject = req('70'),
-      get = req('84');
-  module.exports = req('2a').getIterator = function(it) {
-    var iterFn = get(it);
-    if (typeof iterFn != 'function')
-      throw TypeError(it + ' is not iterable!');
-    return anObject(iterFn.call(it));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("85", ["23", "22", "83"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('23');
-  req('22');
-  module.exports = req('83');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("10", ["85"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('85'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("56", ["76", "5d"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var forOf = req('76'),
-      classof = req('5d');
+  var forOf = req('7a'),
+      classof = req('5a');
   module.exports = function(NAME) {
     return function toJSON() {
       if (classof(this) != NAME)
@@ -14761,39 +16249,39 @@ $__System.registerDynamic("56", ["76", "5d"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("86", ["27", "56"], true, function(req, exports, module) {
+$__System.registerDynamic("8d", ["2e", "2f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $def = req('27');
-  $def($def.P, 'Set', {toJSON: req('56')('Set')});
+  var $def = req('2e');
+  $def($def.P, 'Map', {toJSON: req('2f')('Map')});
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("59", ["2d", "27", "87", "76", "75", "68", "79", "51", "7a", "7b"], true, function(req, exports, module) {
+$__System.registerDynamic("32", ["77", "2e", "8e", "7a", "79", "6b", "7e", "8f", "7f", "80"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('2d'),
-      $def = req('27'),
-      hide = req('87'),
-      forOf = req('76'),
-      strictNew = req('75');
+  var $ = req('77'),
+      $def = req('2e'),
+      hide = req('8e'),
+      forOf = req('7a'),
+      strictNew = req('79');
   module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
-    var Base = req('68')[NAME],
+    var Base = req('6b')[NAME],
         C = Base,
         ADDER = IS_MAP ? 'set' : 'add',
         proto = C && C.prototype,
         O = {};
-    if (!req('79') || typeof C != 'function' || !(IS_WEAK || proto.forEach && !req('51')(function() {
+    if (!req('7e') || typeof C != 'function' || !(IS_WEAK || proto.forEach && !req('8f')(function() {
       new C().entries().next();
     }))) {
       C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
-      req('7a')(C.prototype, methods);
+      req('7f')(C.prototype, methods);
     } else {
       C = wrapper(function(target, iterable) {
         strictNew(target, C, NAME);
@@ -14814,7 +16302,7 @@ $__System.registerDynamic("59", ["2d", "27", "87", "76", "75", "68", "79", "51",
             return this._c.size;
           }});
     }
-    req('7b')(C, NAME);
+    req('80')(C, NAME);
     O[NAME] = C;
     $def($def.G + $def.W + $def.F, O);
     if (!IS_WEAK)
@@ -14825,12 +16313,12 @@ $__System.registerDynamic("59", ["2d", "27", "87", "76", "75", "68", "79", "51",
   return module.exports;
 });
 
-$__System.registerDynamic("7a", ["88"], true, function(req, exports, module) {
+$__System.registerDynamic("7f", ["90"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $redef = req('88');
+  var $redef = req('90');
   module.exports = function(target, src) {
     for (var key in src)
       $redef(target, key, src[key]);
@@ -14840,17 +16328,65 @@ $__System.registerDynamic("7a", ["88"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("76", ["6c", "89", "8a", "70", "8b", "84"], true, function(req, exports, module) {
+$__System.registerDynamic("87", ["91"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ctx = req('6c'),
-      call = req('89'),
-      isArrayIter = req('8a'),
-      anObject = req('70'),
-      toLength = req('8b'),
-      getIterFn = req('84');
+  var toInteger = req('91'),
+      min = Math.min;
+  module.exports = function(it) {
+    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("86", ["5b", "24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var Iterators = req('5b'),
+      ITERATOR = req('24')('iterator');
+  module.exports = function(it) {
+    return (Iterators.Array || Array.prototype[ITERATOR]) === it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("85", ["73"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('73');
+  module.exports = function(iterator, fn, value, entries) {
+    try {
+      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+    } catch (e) {
+      var ret = iterator['return'];
+      if (ret !== undefined)
+        anObject(ret.call(iterator));
+      throw e;
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7a", ["6f", "85", "86", "73", "87", "88"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ctx = req('6f'),
+      call = req('85'),
+      isArrayIter = req('86'),
+      anObject = req('73'),
+      toLength = req('87'),
+      getIterFn = req('88');
   module.exports = function(iterable, entries, fn, that) {
     var iterFn = getIterFn(iterable),
         f = ctx(fn, that, entries ? 2 : 1),
@@ -14873,7 +16409,7 @@ $__System.registerDynamic("76", ["6c", "89", "8a", "70", "8b", "84"], true, func
   return module.exports;
 });
 
-$__System.registerDynamic("75", [], true, function(req, exports, module) {
+$__System.registerDynamic("79", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -14887,16 +16423,16 @@ $__System.registerDynamic("75", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("77", ["2d", "24", "79"], true, function(req, exports, module) {
+$__System.registerDynamic("7c", ["77", "24", "7e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('2d'),
+  var $ = req('77'),
       SPECIES = req('24')('species');
   module.exports = function(C) {
-    if (req('79') && !(SPECIES in C))
+    if (req('7e') && !(SPECIES in C))
       $.setDesc(C, SPECIES, {
         configurable: true,
         get: function() {
@@ -14908,25 +16444,25 @@ $__System.registerDynamic("77", ["2d", "24", "79"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("58", ["2d", "87", "6c", "77", "75", "8c", "76", "8d", "78", "8e", "67", "79", "7a", "8f", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("31", ["77", "8e", "6f", "7c", "79", "83", "7a", "92", "7d", "93", "6a", "7e", "7f", "94", "35"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('2d'),
-      hide = req('87'),
-      ctx = req('6c'),
-      species = req('77'),
-      strictNew = req('75'),
-      defined = req('8c'),
-      forOf = req('76'),
-      step = req('8d'),
-      ID = req('78')('id'),
-      $has = req('8e'),
-      isObject = req('67'),
+  var $ = req('77'),
+      hide = req('8e'),
+      ctx = req('6f'),
+      species = req('7c'),
+      strictNew = req('79'),
+      defined = req('83'),
+      forOf = req('7a'),
+      step = req('92'),
+      ID = req('7d')('id'),
+      $has = req('93'),
+      isObject = req('6a'),
       isExtensible = Object.isExtensible || isObject,
-      SUPPORT_DESC = req('79'),
+      SUPPORT_DESC = req('7e'),
       SIZE = SUPPORT_DESC ? '_s' : 'size',
       id = 0;
   var fastKey = function(it, create) {
@@ -14962,7 +16498,7 @@ $__System.registerDynamic("58", ["2d", "87", "6c", "77", "75", "8c", "76", "8d",
         if (iterable != undefined)
           forOf(iterable, IS_MAP, that[ADDER], that);
       });
-      req('7a')(C.prototype, {
+      req('7f')(C.prototype, {
         clear: function clear() {
           for (var that = this,
               data = that._i,
@@ -15041,7 +16577,7 @@ $__System.registerDynamic("58", ["2d", "87", "6c", "77", "75", "8c", "76", "8d",
     },
     getEntry: getEntry,
     setStrong: function(C, NAME, IS_MAP) {
-      req('8f')(C, NAME, function(iterated, kind) {
+      req('94')(C, NAME, function(iterated, kind) {
         this._t = iterated;
         this._k = kind;
         this._l = undefined;
@@ -15062,59 +16598,686 @@ $__System.registerDynamic("58", ["2d", "87", "6c", "77", "75", "8c", "76", "8d",
         return step(0, [entry.k, entry.v]);
       }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
       species(C);
-      species(req('2a')[NAME]);
+      species(req('35')[NAME]);
     }
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("90", ["58", "59"], true, function(req, exports, module) {
+$__System.registerDynamic("95", ["31", "32"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var strong = req('58');
-  req('59')('Set', function(get) {
-    return function Set() {
+  var strong = req('31');
+  req('32')('Map', function(get) {
+    return function Map() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
     };
-  }, {add: function add(value) {
-      return strong.def(this, value = value === 0 ? 0 : value, value);
-    }}, strong);
+  }, {
+    get: function get(key) {
+      var entry = strong.getEntry(this, key);
+      return entry && entry.v;
+    },
+    set: function set(key, value) {
+      return strong.def(this, key === 0 ? 0 : key, value);
+    }
+  }, strong, true);
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("91", ["6d"], true, function(req, exports, module) {
+$__System.registerDynamic("34", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var cof = req('6d');
-  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
-    return cof(it) == 'String' ? it.split('') : Object(it);
+  "format cjs";
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("96", ["34", "22", "23", "95", "8d", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('34');
+  req('22');
+  req('23');
+  req('95');
+  req('8d');
+  module.exports = req('35').Map;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("26", ["96"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('96'),
+    __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("30", ["91", "8c"], true, function(req, exports, module) {
+$__System.register("97", ["26", "1e", "3d"], function (_export) {
+  var _Map, _getIterator, jsonld, DCAT_CONTEXT, DCAT_CATALOG_FRAME, DCAT_DATASET_FRAME, UNKNOWN_LANG, i18n;
+
+  /**
+   * Load a DCAT catalog or a single dataset that we wrap into a catalog.
+   */
+
+  function loadCatalog(url) {
+    return jsonld.frame(url, DCAT_CATALOG_FRAME).then(function (framed) {
+      return jsonld.compact(framed, framed['@context']);
+    }).then(function (compacted) {
+      if (!('datasets' in compacted)) {
+        // we may have a single Dataset here, so we'll try to frame for that
+        return jsonld.frame(url, DCAT_DATASET_FRAME).then(function (framed) {
+          return jsonld.compact(framed, framed['@context']);
+        }).then(function (compacted) {
+          var catalog = {
+            datasets: [compacted]
+          };
+          return catalog;
+        });
+      } else {
+        return compacted;
+      }
+    }).then(function (catalog) {
+      // We create our own preferred structure:
+      // title/description is always a language map where an untagged string is stored under the "unknown"
+      // language key. This is not possible with JSON-LD framing alone.
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = _getIterator(catalog.datasets), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var dataset = _step.value;
+          var _arr = ['title', 'description'];
+
+          for (var _i = 0; _i < _arr.length; _i++) {
+            var key = _arr[_i];
+            transform_i18n(dataset, key);
+          }
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = _getIterator(dataset.distributions), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var dist = _step2.value;
+              var _arr2 = ['title', 'description'];
+
+              for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+                var key = _arr2[_i2];
+                transform_i18n(dist, key);
+              }
+              // repair CKAN data a bit...
+              if (!dist.mediaType) {
+                if (dist.format === 'GeoJSON') {
+                  dist.mediaType = 'application/vnd.geo+json';
+                }
+              }
+              // TODO remove once ckanext-dcat is fixed (properties are of string instead of resource type)
+              if (dist['dcat:downloadURL']) {
+                dist.downloadURL = dist['dcat:downloadURL'];
+              }
+              if (dist['dcat:accessURL']) {
+                dist.accessURL = dist['dcat:accessURL'];
+              }
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
+                _iterator2["return"]();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+        }
+        // since this is not a valid JSON-LD doc anymore, we might as well remove the context now
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator["return"]) {
+            _iterator["return"]();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      delete catalog['@context'];
+      return catalog;
+    });
+  }
+
+  /**
+   * Transforms %key% and %key%_i18n into a single %key% language map
+   * where strings with unknown language get the language tag "unknown". 
+   */
+  function transform_i18n(obj, key) {
+    if (obj[key]) {
+      if (!obj[key + i18n]) {
+        obj[key + i18n] = {};
+      }
+      obj[key + i18n][UNKNOWN_LANG] = obj[key];
+    }
+    if (obj[key + i18n]) {
+      var map = new _Map();
+      for (var lang in obj[key + i18n]) {
+        map.set(lang, obj[key + i18n][lang]);
+      }
+      obj[key] = map;
+      delete obj[key + i18n];
+    }
+  }
+  return {
+    setters: [function (_) {
+      _Map = _["default"];
+    }, function (_e) {
+      _getIterator = _e["default"];
+    }, function (_d) {
+      jsonld = _d.promises;
+    }],
+    execute: function () {
+      "use strict";
+
+      _export("loadCatalog", loadCatalog);
+
+      DCAT_CONTEXT = [
+      // unmodified copy of https://github.com/ec-melodies/wp02-dcat/blob/master/context.jsonld
+      // Note: This has to be kept in sync when changes are made to the context!
+      // We embed the context here directly to save a network request.
+      {
+        "@language": "en",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "dcat": "http://www.w3.org/ns/dcat#",
+        "dct": "http://purl.org/dc/terms/",
+        "locn": "http://www.w3.org/ns/locn#",
+        "foaf": "http://xmlns.com/foaf/0.1/",
+        "schema": "http://schema.org/",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "Catalog": "dcat:Catalog",
+        "datasets": { "@id": "dcat:dataset", "@container": "@set" },
+        "Dataset": "dcat:Dataset",
+        "Location": "dct:Location",
+        "geometry": { "@id": "locn:geometry", "@type": "gsp:wktLiteral" },
+        "gsp": "http://www.opengis.net/ont/geosparql#",
+        "PeriodOfTime": "dct:PeriodOfTime",
+        "startDate": { "@id": "schema:startDate", "@type": "xsd:dateTime" },
+        "endDate": { "@id": "schema:endDate", "@type": "xsd:dateTime" },
+        "title": { "@id": "dct:title", "@container": "@language" },
+        "description": { "@id": "dct:description", "@container": "@language" },
+        "theme": { "@id": "dcat:theme", "@type": "@id" },
+        "issued": { "@id": "dct:issued", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
+        "modified": { "@id": "dct:modified", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
+        "landingPage": { "@id": "dcat:landingPage", "@type": "@id" },
+        "homepage": { "@id": "foaf:homepage", "@type": "@id" },
+        "spatial": "dct:spatial",
+        "temporal": "dct:temporal",
+        "keywords": { "@id": "dcat:keyword", "@container": "@set" },
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+        "observedProperties": { "@id": "ssn:observedProperty", "@type": "@id", "@container": "@set" },
+        "publisher": "dct:publisher",
+        "Organization": "foaf:Organization",
+        "Group": "foaf:Group",
+        "name": { "@id": "foaf:name", "@language": null },
+        "Distribution": "dcat:Distribution",
+        "distributions": { "@id": "dcat:distribution", "@container": "@set" },
+        "accessURL": { "@id": "dcat:accessURL", "@type": "@id" },
+        "downloadURL": { "@id": "dcat:downloadURL", "@type": "@id" },
+        "mediaType": { "@id": "dcat:mediaType", "@language": null },
+        "format": { "@id": "dct:format", "@language": null },
+        "isPartOf": { "@id": "dct:isPartOf", "@type": "@id" },
+        "parts": { "@id": "dct:hasPart", "@type": "@id", "@container": "@set" }
+      },
+
+      // geometry override since we want the GeoJSON geometry, not the WKT one
+      // Also, @language and title/description override is because CKAN
+      // isn't giving us language-tagged strings which means that we
+      // cannot create nice language maps by default.
+      // To support both scenarios (with/without language tags),
+      // there are two properties for each:
+      // title, description - always a string with unknown language
+      // title_i18n, description_i18n - always a language map
+      // If a language map is given, then the simple string property probably doesn't exist.
+      // If *all* DCAT feeds had language tags then we would only need the latter,
+      // but for wider support, we do a little more effort.
+      // Note that these dual fields get collapsed in a post-processing step, see loadCatalog().
+      {
+        "geometry": {
+          "@id": "locn:geometry",
+          "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
+        },
+        "@language": null,
+        "title": { "@id": "dct:title" },
+        "description": { "@id": "dct:description" },
+        "title_i18n": { "@id": "dct:title", "@container": "@language" },
+        "description_i18n": { "@id": "dct:description", "@container": "@language" },
+        "@base": null,
+        "id": "@id"
+      }];
+      DCAT_CATALOG_FRAME = {
+        "@context": DCAT_CONTEXT,
+        "@type": "Catalog",
+        "datasets": {
+          "@type": "Dataset",
+          "isPartOf": {
+            "@embed": "@never",
+            "@omitDefault": true
+          },
+          "parts": {
+            "@embed": "@never",
+            "@omitDefault": true
+          },
+          "distributions": {}
+        }
+      };
+      DCAT_DATASET_FRAME = {
+        "@context": DCAT_CONTEXT,
+        "@type": "Dataset",
+        "isPartOf": {
+          "@embed": "@never",
+          "@omitDefault": true
+        },
+        "parts": {
+          "@embed": "@never",
+          "@omitDefault": true
+        },
+        "distributions": {}
+      };
+      UNKNOWN_LANG = 'unknown';
+      i18n = '_i18n';
+    }
+  };
+});
+
+$__System.registerDynamic("5a", ["70", "24"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var IObject = req('91'),
-      defined = req('8c');
+  var cof = req('70'),
+      TAG = req('24')('toStringTag'),
+      ARG = cof(function() {
+        return arguments;
+      }()) == 'Arguments';
   module.exports = function(it) {
-    return IObject(defined(it));
+    var O,
+        T,
+        B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8d", [], true, function(req, exports, module) {
+$__System.registerDynamic("88", ["5a", "24", "5b", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var classof = req('5a'),
+      ITERATOR = req('24')('iterator'),
+      Iterators = req('5b');
+  module.exports = req('35').getIteratorMethod = function(it) {
+    if (it != undefined)
+      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("98", ["73", "88", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('73'),
+      get = req('88');
+  module.exports = req('35').getIterator = function(it) {
+    var iterFn = get(it);
+    if (typeof iterFn != 'function')
+      throw TypeError(it + ' is not iterable!');
+    return anObject(iterFn.call(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("91", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function(it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("99", ["91", "83"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('91'),
+      defined = req('83');
+  module.exports = function(TO_STRING) {
+    return function(that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l)
+        return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("22", ["99", "94"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $at = req('99')(true);
+  req('94')(String, 'String', function(iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function() {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length)
+      return {
+        value: undefined,
+        done: true
+      };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("80", ["77", "93", "24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var def = req('77').setDesc,
+      has = req('93'),
+      TAG = req('24')('toStringTag');
+  module.exports = function(it, tag, stat) {
+    if (it && !has(it = stat ? it : it.prototype, TAG))
+      def(it, TAG, {
+        configurable: true,
+        value: tag
+      });
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("9a", ["77", "8e", "24", "9b", "80"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $ = req('77'),
+      IteratorPrototype = {};
+  req('8e')(IteratorPrototype, req('24')('iterator'), function() {
+    return this;
+  });
+  module.exports = function(Constructor, NAME, next) {
+    Constructor.prototype = $.create(IteratorPrototype, {next: req('9b')(1, next)});
+    req('80')(Constructor, NAME + ' Iterator');
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var id = 0,
+      px = Math.random();
+  module.exports = function(key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("9c", ["6b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('6b'),
+      SHARED = '__core-js_shared__',
+      store = global[SHARED] || (global[SHARED] = {});
+  module.exports = function(key) {
+    return store[key] || (store[key] = {});
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("24", ["9c", "6b", "7d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var store = req('9c')('wks'),
+      Symbol = req('6b').Symbol;
+  module.exports = function(name) {
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || req('7d'))('Symbol.' + name));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("93", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var hasOwnProperty = {}.hasOwnProperty;
+  module.exports = function(it, key) {
+    return hasOwnProperty.call(it, key);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7e", ["8f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = !req('8f')(function() {
+    return Object.defineProperty({}, 'a', {get: function() {
+        return 7;
+      }}).a != 7;
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("9b", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("8e", ["77", "9b", "7e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('77'),
+      createDesc = req('9b');
+  module.exports = req('7e') ? function(object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function(object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("90", ["8e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('8e');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("78", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("94", ["78", "2e", "90", "8e", "93", "24", "5b", "9a", "77", "80"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var LIBRARY = req('78'),
+      $def = req('2e'),
+      $redef = req('90'),
+      hide = req('8e'),
+      has = req('93'),
+      SYMBOL_ITERATOR = req('24')('iterator'),
+      Iterators = req('5b'),
+      BUGGY = !([].keys && 'next' in [].keys()),
+      FF_ITERATOR = '@@iterator',
+      KEYS = 'keys',
+      VALUES = 'values';
+  var returnThis = function() {
+    return this;
+  };
+  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE) {
+    req('9a')(Constructor, NAME, next);
+    var createMethod = function(kind) {
+      switch (kind) {
+        case KEYS:
+          return function keys() {
+            return new Constructor(this, kind);
+          };
+        case VALUES:
+          return function values() {
+            return new Constructor(this, kind);
+          };
+      }
+      return function entries() {
+        return new Constructor(this, kind);
+      };
+    };
+    var TAG = NAME + ' Iterator',
+        proto = Base.prototype,
+        _native = proto[SYMBOL_ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
+        _default = _native || createMethod(DEFAULT),
+        methods,
+        key;
+    if (_native) {
+      var IteratorPrototype = req('77').getProto(_default.call(new Base));
+      req('80')(IteratorPrototype, TAG, true);
+      if (!LIBRARY && has(proto, FF_ITERATOR))
+        hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
+    }
+    if (!LIBRARY || FORCE)
+      hide(proto, SYMBOL_ITERATOR, _default);
+    Iterators[NAME] = _default;
+    Iterators[TAG] = returnThis;
+    if (DEFAULT) {
+      methods = {
+        values: DEFAULT == VALUES ? _default : createMethod(VALUES),
+        keys: IS_SET ? _default : createMethod(KEYS),
+        entries: DEFAULT != VALUES ? _default : createMethod('entries')
+      };
+      if (FORCE)
+        for (key in methods) {
+          if (!(key in proto))
+            $redef(proto, key, methods[key]);
+        }
+      else
+        $def($def.P + $def.F * BUGGY, NAME, methods);
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5b", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {};
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("92", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15129,7 +17292,7 @@ $__System.registerDynamic("8d", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("92", [], true, function(req, exports, module) {
+$__System.registerDynamic("9d", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15139,17 +17302,17 @@ $__System.registerDynamic("92", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("93", ["92", "8d", "5e", "30", "8f"], true, function(req, exports, module) {
+$__System.registerDynamic("9e", ["9d", "92", "5b", "9f", "94"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var setUnscope = req('92'),
-      step = req('8d'),
-      Iterators = req('5e'),
-      toIObject = req('30');
-  req('8f')(Array, 'Array', function(iterated, kind) {
+  var setUnscope = req('9d'),
+      step = req('92'),
+      Iterators = req('5b'),
+      toIObject = req('9f');
+  req('94')(Array, 'Array', function(iterated, kind) {
     this._t = toIObject(iterated);
     this._i = 0;
     this._k = kind;
@@ -15175,231 +17338,101 @@ $__System.registerDynamic("93", ["92", "8d", "5e", "30", "8f"], true, function(r
   return module.exports;
 });
 
-$__System.registerDynamic("23", ["93", "5e"], true, function(req, exports, module) {
+$__System.registerDynamic("23", ["9e", "5b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('93');
-  var Iterators = req('5e');
+  req('9e');
+  var Iterators = req('5b');
   Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("5b", [], true, function(req, exports, module) {
+$__System.registerDynamic("a0", ["23", "22", "98"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  "format cjs";
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("94", ["5b", "22", "23", "90", "86", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('5b');
-  req('22');
   req('23');
-  req('90');
-  req('86');
-  module.exports = req('2a').Set;
+  req('22');
+  module.exports = req('98');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("95", ["94"], true, function(req, exports, module) {
+$__System.registerDynamic("1e", ["a0"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('94'),
+    "default": req('a0'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7c", ["24"], true, function(req, exports, module) {
+$__System.registerDynamic("a1", ["77"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var SYMBOL_ITERATOR = req('24')('iterator'),
-      SAFE_CLOSING = false;
-  try {
-    var riter = [7][SYMBOL_ITERATOR]();
-    riter['return'] = function() {
-      SAFE_CLOSING = true;
-    };
-    Array.from(riter, function() {
-      throw 2;
-    });
-  } catch (e) {}
-  module.exports = function(exec, skipClosing) {
-    if (!skipClosing && !SAFE_CLOSING)
-      return false;
-    var safe = false;
-    try {
-      var arr = [7],
-          iter = arr[SYMBOL_ITERATOR]();
-      iter.next = function() {
-        safe = true;
-      };
-      arr[SYMBOL_ITERATOR] = function() {
-        return iter;
-      };
-      exec(arr);
-    } catch (e) {}
-    return safe;
+  var $ = req('77');
+  module.exports = function defineProperty(it, key, desc) {
+    return $.setDesc(it, key, desc);
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("6d", [], true, function(req, exports, module) {
+$__System.registerDynamic("2a", ["a1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toString = {}.toString;
-  module.exports = function(it) {
-    return toString.call(it).slice(8, -1);
+  module.exports = {
+    "default": req('a1'),
+    __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("5d", ["6d", "24"], true, function(req, exports, module) {
+$__System.registerDynamic("7", ["2a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var cof = req('6d'),
-      TAG = req('24')('toStringTag'),
-      ARG = cof(function() {
-        return arguments;
-      }()) == 'Arguments';
-  module.exports = function(it) {
-    var O,
-        T,
-        B;
-    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("84", ["5d", "24", "5e", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var classof = req('5d'),
-      ITERATOR = req('24')('iterator'),
-      Iterators = req('5e');
-  module.exports = req('2a').getIteratorMethod = function(it) {
-    if (it != undefined)
-      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("8b", ["96"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toInteger = req('96'),
-      min = Math.min;
-  module.exports = function(it) {
-    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("8a", ["5e", "24"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var Iterators = req('5e'),
-      ITERATOR = req('24')('iterator');
-  module.exports = function(it) {
-    return (Iterators.Array || Array.prototype[ITERATOR]) === it;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("67", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("70", ["67"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('67');
-  module.exports = function(it) {
-    if (!isObject(it))
-      throw TypeError(it + ' is not an object!');
-    return it;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("89", ["70"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var anObject = req('70');
-  module.exports = function(iterator, fn, value, entries) {
-    try {
-      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
-    } catch (e) {
-      var ret = iterator['return'];
-      if (ret !== undefined)
-        anObject(ret.call(iterator));
-      throw e;
+  "use strict";
+  var _Object$defineProperty = req('2a')["default"];
+  exports["default"] = (function() {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor)
+          descriptor.writable = true;
+        _Object$defineProperty(target, descriptor.key, descriptor);
+      }
     }
-  };
+    return function(Constructor, protoProps, staticProps) {
+      if (protoProps)
+        defineProperties(Constructor.prototype, protoProps);
+      if (staticProps)
+        defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  })();
+  exports.__esModule = true;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("53", ["8c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var defined = req('8c');
-  module.exports = function(it) {
-    return Object(defined(it));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("71", [], true, function(req, exports, module) {
+$__System.registerDynamic("74", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15413,12 +17446,12 @@ $__System.registerDynamic("71", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("6c", ["71"], true, function(req, exports, module) {
+$__System.registerDynamic("6f", ["74"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var aFunction = req('71');
+  var aFunction = req('74');
   module.exports = function(fn, that, length) {
     aFunction(fn);
     if (that === undefined)
@@ -15445,158 +17478,158 @@ $__System.registerDynamic("6c", ["71"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("97", ["6c", "27", "53", "89", "8a", "8b", "84", "7c"], true, function(req, exports, module) {
+$__System.registerDynamic("73", ["6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  'use strict';
-  var ctx = req('6c'),
-      $def = req('27'),
-      toObject = req('53'),
-      call = req('89'),
-      isArrayIter = req('8a'),
-      toLength = req('8b'),
-      getIterFn = req('84');
-  $def($def.S + $def.F * !req('7c')(function(iter) {
-    Array.from(iter);
-  }), 'Array', {from: function from(arrayLike) {
-      var O = toObject(arrayLike),
-          C = typeof this == 'function' ? this : Array,
-          $$ = arguments,
-          $$len = $$.length,
-          mapfn = $$len > 1 ? $$[1] : undefined,
-          mapping = mapfn !== undefined,
-          index = 0,
-          iterFn = getIterFn(O),
-          length,
-          result,
-          step,
-          iterator;
-      if (mapping)
-        mapfn = ctx(mapfn, $$len > 2 ? $$[2] : undefined, 2);
-      if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
-        for (iterator = iterFn.call(O), result = new C; !(step = iterator.next()).done; index++) {
-          result[index] = mapping ? call(iterator, mapfn, [step.value, index], true) : step.value;
-        }
-      } else {
-        length = toLength(O.length);
-        for (result = new C(length); length > index; index++) {
-          result[index] = mapping ? mapfn(O[index], index) : O[index];
-        }
+  var isObject = req('6a');
+  module.exports = function(it) {
+    if (!isObject(it))
+      throw TypeError(it + ' is not an object!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6a", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7b", ["77", "6a", "73", "6f"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var getDesc = req('77').getDesc,
+      isObject = req('6a'),
+      anObject = req('73');
+  var check = function(O, proto) {
+    anObject(O);
+    if (!isObject(proto) && proto !== null)
+      throw TypeError(proto + ": can't set as prototype!");
+  };
+  module.exports = {
+    set: Object.setPrototypeOf || ('__proto__' in {} ? function(test, buggy, set) {
+      try {
+        set = req('6f')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+        set(test, []);
+        buggy = !(test instanceof Array);
+      } catch (e) {
+        buggy = true;
       }
-      result.length = index;
-      return result;
-    }});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7b", ["2d", "8e", "24"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var def = req('2d').setDesc,
-      has = req('8e'),
-      TAG = req('24')('toStringTag');
-  module.exports = function(it, tag, stat) {
-    if (it && !has(it = stat ? it : it.prototype, TAG))
-      def(it, TAG, {
-        configurable: true,
-        value: tag
-      });
+      return function setPrototypeOf(O, proto) {
+        check(O, proto);
+        if (buggy)
+          O.__proto__ = proto;
+        else
+          set(O, proto);
+        return O;
+      };
+    }({}, false) : undefined),
+    check: check
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("98", ["2d", "87", "24", "99", "7b"], true, function(req, exports, module) {
+$__System.registerDynamic("a2", ["2e", "7b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  'use strict';
-  var $ = req('2d'),
-      IteratorPrototype = {};
-  req('87')(IteratorPrototype, req('24')('iterator'), function() {
-    return this;
-  });
-  module.exports = function(Constructor, NAME, next) {
-    Constructor.prototype = $.create(IteratorPrototype, {next: req('99')(1, next)});
-    req('7b')(Constructor, NAME + ' Iterator');
+  var $def = req('2e');
+  $def($def.S, 'Object', {setPrototypeOf: req('7b').set});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a3", ["a2", "35"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('a2');
+  module.exports = req('35').Object.setPrototypeOf;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a4", ["a3"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('a3'),
+    __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("5e", [], true, function(req, exports, module) {
+$__System.registerDynamic("a5", ["77"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = {};
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("78", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var id = 0,
-      px = Math.random();
-  module.exports = function(key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  var $ = req('77');
+  module.exports = function create(P, D) {
+    return $.create(P, D);
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9a", ["68"], true, function(req, exports, module) {
+$__System.registerDynamic("a6", ["a5"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var global = req('68'),
-      SHARED = '__core-js_shared__',
-      store = global[SHARED] || (global[SHARED] = {});
-  module.exports = function(key) {
-    return store[key] || (store[key] = {});
+  module.exports = {
+    "default": req('a5'),
+    __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("24", ["9a", "68", "78"], true, function(req, exports, module) {
+$__System.registerDynamic("e", ["a6", "a4"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var store = req('9a')('wks'),
-      Symbol = req('68').Symbol;
-  module.exports = function(name) {
-    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || req('78'))('Symbol.' + name));
+  "use strict";
+  var _Object$create = req('a6')["default"];
+  var _Object$setPrototypeOf = req('a4')["default"];
+  exports["default"] = function(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+    subClass.prototype = _Object$create(superClass && superClass.prototype, {constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }});
+    if (superClass)
+      _Object$setPrototypeOf ? _Object$setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   };
+  exports.__esModule = true;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8e", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var hasOwnProperty = {}.hasOwnProperty;
-  module.exports = function(it, key) {
-    return hasOwnProperty.call(it, key);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("51", [], true, function(req, exports, module) {
+$__System.registerDynamic("8f", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15612,65 +17645,7 @@ $__System.registerDynamic("51", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("79", ["51"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = !req('51')(function() {
-    return Object.defineProperty({}, 'a', {get: function() {
-        return 7;
-      }}).a != 7;
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("99", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(bitmap, value) {
-    return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("87", ["2d", "99", "79"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = req('2d'),
-      createDesc = req('99');
-  module.exports = req('79') ? function(object, key, value) {
-    return $.setDesc(object, key, createDesc(1, value));
-  } : function(object, key, value) {
-    object[key] = value;
-    return object;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("88", ["87"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('87');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2a", [], true, function(req, exports, module) {
+$__System.registerDynamic("35", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15682,7 +17657,7 @@ $__System.registerDynamic("2a", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("68", [], true, function(req, exports, module) {
+$__System.registerDynamic("6b", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15694,13 +17669,13 @@ $__System.registerDynamic("68", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("27", ["68", "2a"], true, function(req, exports, module) {
+$__System.registerDynamic("2e", ["6b", "35"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var global = req('68'),
-      core = req('2a'),
+  var global = req('6b'),
+      core = req('35'),
       PROTOTYPE = 'prototype';
   var ctx = function(fn, that) {
     return function() {
@@ -15752,89 +17727,25 @@ $__System.registerDynamic("27", ["68", "2a"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("74", [], true, function(req, exports, module) {
+$__System.registerDynamic("57", ["2e", "35", "8f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("8f", ["74", "27", "88", "87", "8e", "24", "5e", "98", "2d", "7b"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var LIBRARY = req('74'),
-      $def = req('27'),
-      $redef = req('88'),
-      hide = req('87'),
-      has = req('8e'),
-      SYMBOL_ITERATOR = req('24')('iterator'),
-      Iterators = req('5e'),
-      BUGGY = !([].keys && 'next' in [].keys()),
-      FF_ITERATOR = '@@iterator',
-      KEYS = 'keys',
-      VALUES = 'values';
-  var returnThis = function() {
-    return this;
-  };
-  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE) {
-    req('98')(Constructor, NAME, next);
-    var createMethod = function(kind) {
-      switch (kind) {
-        case KEYS:
-          return function keys() {
-            return new Constructor(this, kind);
-          };
-        case VALUES:
-          return function values() {
-            return new Constructor(this, kind);
-          };
-      }
-      return function entries() {
-        return new Constructor(this, kind);
-      };
-    };
-    var TAG = NAME + ' Iterator',
-        proto = Base.prototype,
-        _native = proto[SYMBOL_ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
-        _default = _native || createMethod(DEFAULT),
-        methods,
-        key;
-    if (_native) {
-      var IteratorPrototype = req('2d').getProto(_default.call(new Base));
-      req('7b')(IteratorPrototype, TAG, true);
-      if (!LIBRARY && has(proto, FF_ITERATOR))
-        hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
-    }
-    if (!LIBRARY || FORCE)
-      hide(proto, SYMBOL_ITERATOR, _default);
-    Iterators[NAME] = _default;
-    Iterators[TAG] = returnThis;
-    if (DEFAULT) {
-      methods = {
-        values: DEFAULT == VALUES ? _default : createMethod(VALUES),
-        keys: IS_SET ? _default : createMethod(KEYS),
-        entries: DEFAULT != VALUES ? _default : createMethod('entries')
-      };
-      if (FORCE)
-        for (key in methods) {
-          if (!(key in proto))
-            $redef(proto, key, methods[key]);
-        }
-      else
-        $def($def.P + $def.F * BUGGY, NAME, methods);
-    }
+  module.exports = function(KEY, exec) {
+    var $def = req('2e'),
+        fn = (req('35').Object || {})[KEY] || Object[KEY],
+        exp = {};
+    exp[KEY] = exec(fn);
+    $def($def.S + $def.F * req('8f')(function() {
+      fn(1);
+    }), 'Object', exp);
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8c", [], true, function(req, exports, module) {
+$__System.registerDynamic("83", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -15848,138 +17759,62 @@ $__System.registerDynamic("8c", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("96", [], true, function(req, exports, module) {
+$__System.registerDynamic("70", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ceil = Math.ceil,
-      floor = Math.floor;
+  var toString = {}.toString;
   module.exports = function(it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+    return toString.call(it).slice(8, -1);
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9b", ["96", "8c"], true, function(req, exports, module) {
+$__System.registerDynamic("a7", ["70"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toInteger = req('96'),
-      defined = req('8c');
-  module.exports = function(TO_STRING) {
-    return function(that, pos) {
-      var s = String(defined(that)),
-          i = toInteger(pos),
-          l = s.length,
-          a,
-          b;
-      if (i < 0 || i >= l)
-        return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
+  var cof = req('70');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("22", ["9b", "8f"], true, function(req, exports, module) {
+$__System.registerDynamic("9f", ["a7", "83"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  'use strict';
-  var $at = req('9b')(true);
-  req('8f')(String, 'String', function(iterated) {
-    this._t = String(iterated);
-    this._i = 0;
-  }, function() {
-    var O = this._t,
-        index = this._i,
-        point;
-    if (index >= O.length)
-      return {
-        value: undefined,
-        done: true
-      };
-    point = $at(O, index);
-    this._i += point.length;
-    return {
-      value: point,
-      done: false
+  var IObject = req('a7'),
+      defined = req('83');
+  module.exports = function(it) {
+    return IObject(defined(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a8", ["9f", "57"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toIObject = req('9f');
+  req('57')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
+    return function getOwnPropertyDescriptor(it, key) {
+      return $getOwnPropertyDescriptor(toIObject(it), key);
     };
   });
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9c", ["22", "97", "2a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  req('22');
-  req('97');
-  module.exports = req('2a').Array.from;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("61", ["9c"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": req('9c'),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1e", ["61"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Array$from = req('61')["default"];
-  exports["default"] = function(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0,
-          arr2 = Array(arr.length); i < arr.length; i++)
-        arr2[i] = arr[i];
-      return arr2;
-    } else {
-      return _Array$from(arr);
-    }
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("a", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  exports["default"] = function(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2d", [], true, function(req, exports, module) {
+$__System.registerDynamic("77", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -16001,645 +17836,207 @@ $__System.registerDynamic("2d", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("9d", ["2d"], true, function(req, exports, module) {
+$__System.registerDynamic("a9", ["77", "a8"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('2d');
-  module.exports = function defineProperty(it, key, desc) {
-    return $.setDesc(it, key, desc);
+  var $ = req('77');
+  req('a8');
+  module.exports = function getOwnPropertyDescriptor(it, key) {
+    return $.getDesc(it, key);
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("37", ["9d"], true, function(req, exports, module) {
+$__System.registerDynamic("aa", ["a9"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('9d'),
+    "default": req('a9'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9", ["37"], true, function(req, exports, module) {
+$__System.registerDynamic("d", ["aa"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$defineProperty = req('37')["default"];
-  exports["default"] = (function() {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor)
-          descriptor.writable = true;
-        _Object$defineProperty(target, descriptor.key, descriptor);
+  var _Object$getOwnPropertyDescriptor = req('aa')["default"];
+  exports["default"] = function get(_x, _x2, _x3) {
+    var _again = true;
+    _function: while (_again) {
+      var object = _x,
+          property = _x2,
+          receiver = _x3;
+      _again = false;
+      if (object === null)
+        object = Function.prototype;
+      var desc = _Object$getOwnPropertyDescriptor(object, property);
+      if (desc === undefined) {
+        var parent = Object.getPrototypeOf(object);
+        if (parent === null) {
+          return undefined;
+        } else {
+          _x = parent;
+          _x2 = property;
+          _x3 = receiver;
+          _again = true;
+          desc = parent = undefined;
+          continue _function;
+        }
+      } else if ("value" in desc) {
+        return desc.value;
+      } else {
+        var getter = desc.get;
+        if (getter === undefined) {
+          return undefined;
+        }
+        return getter.call(receiver);
       }
     }
-    return function(Constructor, protoProps, staticProps) {
-      if (protoProps)
-        defineProperties(Constructor.prototype, protoProps);
-      if (staticProps)
-        defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  })();
+  };
   exports.__esModule = true;
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('9e', ['4', '5', '6', '9', '10', '17', '39', '81', '82', '95', 'a', '1e', '9f', '7f', 'f', 'b'], function (_export) {
-  var ImageLegend, L, $, HTML, _createClass, _getIterator, CoverageLegend, LayerFactory, _Set, _classCallCheck, _toConsumableArray, CovJSON, dcat, wms, MediaTypes, MappableFormats, DataFormats, templatesHtml, sidebarHtml, Sidebar;
+$__System.register('ab', ['7', '8', '97', 'd', 'e', '1e', '8b'], function (_export) {
+  var _createClass, _classCallCheck, dcat, _get, _inherits, _getIterator, Eventable, Catalogue;
 
-  /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
-  function getDistFormat(dist) {
-    var formatOrMediaType = dist.format ? dist.format : dist.mediaType;
-    if (!formatOrMediaType) {
-      return 'generic';
-    }
-    for (var key in MediaTypes) {
-      if (MediaTypes[key].indexOf(formatOrMediaType) !== -1) {
-        return key;
-      }
-    }
-    return formatOrMediaType;
-  }
-
-  function fromTemplate(id) {
-    return document.importNode($('#' + id)[0].content, true).children[0];
-  }
-
-  function sortByKey(array, key) {
-    return array.sort(function (a, b) {
-      var x = a[key];
-      var y = b[key];
-      return x < y ? -1 : x > y ? 1 : 0;
-    });
-  }
   return {
-    setters: [function (_10) {
-      ImageLegend = _10['default'];
-    }, function (_4) {
-      L = _4['default'];
-    }, function (_7) {
-      $ = _7.$;
-      HTML = _7.HTML;
-    }, function (_) {
+    setters: [function (_) {
       _createClass = _['default'];
+    }, function (_2) {
+      _classCallCheck = _2['default'];
     }, function (_3) {
-      _getIterator = _3['default'];
-    }, function (_9) {
-      CoverageLegend = _9['default'];
-    }, function (_8) {
-      LayerFactory = _8['default'];
-    }, function (_6) {}, function (_5) {}, function (_2) {
-      _Set = _2['default'];
-    }, function (_a) {
-      _classCallCheck = _a['default'];
+      dcat = _3;
+    }, function (_d) {
+      _get = _d['default'];
     }, function (_e) {
-      _toConsumableArray = _e['default'];
-    }, function (_f) {}, function (_f2) {
-      CovJSON = _f2;
-    }, function (_f3) {
-      dcat = _f3;
+      _inherits = _e['default'];
+    }, function (_e2) {
+      _getIterator = _e2['default'];
     }, function (_b) {
-      wms = _b;
+      Eventable = _b['default'];
     }],
     execute: function () {
-
-      // maps short format identifiers to media types
       'use strict';
 
-      MediaTypes = {
-        CovJSON: ['application/prs.coverage+json', 'application/prs.coverage+cbor'],
-        netCDF: ['application/x-netcdf'],
-        GeoJSON: ['application/vnd.geo+json']
-      };
+      Catalogue = (function (_Eventable) {
+        _inherits(Catalogue, _Eventable);
 
-      /** Formats we can visualize on a map */
-      MappableFormats = new _Set(['WMS', 'GeoJSON', 'CovJSON']);
+        function Catalogue() {
+          _classCallCheck(this, Catalogue);
 
-      /** Formats we can do data processing on */
-      DataFormats = new _Set(['GeoJSON', 'CovJSON']);
-      templatesHtml = '\n<template id="template-dataset-list-item">\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading dataset-title"></h4>\n    <p class="dataset-publisher"></p>\n    <p class="dataset-distribution-labels"></p>\n    <p class="dataset-description"></p>\n    <p class="dataset-temporal"><i class="glyphicon glyphicon-time"></i> <span class="dataset-temporal-text"></span></p>\n    <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>\n    <div class="dataset-spatial-minimap"></div>\n    <button type="button" class="btn btn-success dataset-analyse-button" style="display:none">\n      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse\n    </button>\n  </li>\n</template>\n\n<style>\n.catalog-url-panel {\n  margin-top: 20px;\n}\n.dataset-spatial-minimap {\n  margin-bottom: 10px;\n}\n</style>\n';
-
-      $('body').add(HTML(templatesHtml));
-
-      sidebarHtml = function sidebarHtml(id) {
-        return '\n<div id="' + id + '" class="sidebar collapsed">\n  <!-- Nav tabs -->\n  <div class="sidebar-tabs">\n      <ul role="tablist">\n          <li><a href="#datasets" role="tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>\n          <li><a href="#analyse" role="tab"><i class="glyphicon glyphicon-flash"></i></a></li>\n      </ul>\n  </div>\n  \n  <!-- Tab panes -->\n  <div class="sidebar-content">\n      <div class="sidebar-pane" id="datasets">\n          <h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>\n  \n          <div class="panel panel-default catalog-url-panel">\n            <div class="panel-heading">\n              <h3 class="panel-title">\n                <a href="http://json-ld.org/" title="JSON-LD Data"><img width="32" src="http://json-ld.org/images/json-ld-data-32.png" alt="JSON-LD-logo-32"></a>\n                <span style="vertical-align:middle">\n                  <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a> Catalogue\n                </span>\n              </h3>\n            </div>\n            <div class="panel-body catalog-url-info">\n              <a href="#" class="catalog-url-edit"><i class="glyphicon glyphicon-pencil"></i></a>\n              <a class="catalog-url"></a>\n            </div>\n            <div class="panel-body catalog-url-form" style="display:none">\n              <form>\n                <div class="form-group">\n                  <input type="text" class="form-control" placeholder="http://">\n                </div>\n                <button type="submit" class="btn btn-default">Load</button>\n                <button type="button" name="cancel" class="btn btn-default">Cancel</button>\n              </form>\n            </div>\n          </div>\n          \n          <ul class="list-group dataset-list"></ul>\n      </div>\n      <div class="sidebar-pane" id="analyse">\n          <h1 class="sidebar-header">Analyse<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>\n    \n          \n      </div>\n  </div>\n</div>\n';
-      };
-
-      Sidebar = (function () {
-        function Sidebar(map) {
-          var _this = this;
-
-          var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-          var _ref$id = _ref.id;
-          var id = _ref$id === undefined ? 'sidebar' : _ref$id;
-          var _ref$layerControl = _ref.layerControl;
-          var layerControl = _ref$layerControl === undefined ? null : _ref$layerControl;
-
-          _classCallCheck(this, Sidebar);
-
-          this.map = map;
-          this.id = id;
-          this.layerControl = layerControl;
-          // has to come before the map div, otherwise it overlays zoom controls
-          $('body').addFront(HTML(sidebarHtml(id)));
-
-          $('#' + map.getContainer().id).set('+sidebar-map');
-          this.control = L.control.sidebar(id).addTo(map);
-
-          var el = $('#' + this.id);
-          var input = $('input', $('.catalog-url-form', el));
-          $('.catalog-url-edit', el).on('click', function () {
-            $('.catalog-url-info', el).hide();
-            $('.catalog-url-form', el).show();
-            input.set('value', _this.url);
-          });
-          $('form', $('.catalog-url-form', el)).on('submit', function () {
-            _this.loadCatalog(input.get('value')).then(function () {
-              $('.catalog-url-info', el).show();
-              $('.catalog-url-form', el).hide();
-            })['catch'](function (e) {
-              console.log(e);
-              alert(e);
-            });
-          });
-          $('button', $('.catalog-url-form', el)).filter(function (b) {
-            return b.name === 'cancel';
-          }).on('click', function () {
-            $('.catalog-url-info', el).show();
-            $('.catalog-url-form', el).hide();
-          });
+          _get(Object.getPrototypeOf(Catalogue.prototype), 'constructor', this).call(this);
+          this.datasets = [];
         }
 
-        _createClass(Sidebar, [{
-          key: 'loadCatalog',
-          value: function loadCatalog(url) {
-            var _this2 = this;
+        /** 
+         * Load a DCAT catalogue and replace the current datasets with the loaded datasets.
+         */
 
+        _createClass(Catalogue, [{
+          key: 'loadFromDCAT',
+          value: function loadFromDCAT(url) {
+            var _this = this;
+
+            this.datasets = [];
             return dcat.loadCatalog(url).then(function (catalog) {
-              _this2.clearDatasets();
               var datasets = catalog.datasets;
-              console.log(datasets);
-              _this2.addDatasets(datasets);
-
-              _this2.url = url;
-              $('.catalog-url', '#' + _this2.id).set('@href', url).fill(url);
-
-              return catalog;
-            });
-          }
-        }, {
-          key: 'clearDatasets',
-          value: function clearDatasets() {
-            $('.dataset-list', '#' + this.id).fill();
-          }
-        }, {
-          key: 'addDatasets',
-          value: function addDatasets(datasets) {
-            var sortKey = arguments.length <= 1 || arguments[1] === undefined ? 'title' : arguments[1];
-
-            datasets = sortByKey(datasets, sortKey);
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-              for (var _iterator = _getIterator(datasets), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var dataset = _step.value;
-
-                this.addDataset(dataset);
-              }
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
-            }
-          }
-        }, {
-          key: '_i18n',
-          value: function _i18n(prop) {
-            if (!prop) return;
-            // TODO be clever and select proper language
-            if (prop.has('en')) {
-              return prop.get('en');
-            } else {
-              // random
-              return prop.values().next().value;
-            }
-          }
-        }, {
-          key: 'addDataset',
-          value: function addDataset(dataset) {
-            var _this3 = this;
-
-            var el = fromTemplate('template-dataset-list-item');
-            $('.dataset-list', '#' + this.id).add(el);
-
-            var title = this._i18n(dataset.title);
-            var description = this._i18n(dataset.description);
-
-            // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
-            //let landingPage = dataset.landingPage
-            var landingPage = dataset['dcat:landingPage'] || dataset['landingPage'];
-            if (landingPage) {
-              $('.dataset-title', el).fill(HTML('<a href="' + landingPage + '" target="_new" class="external dataset-title">' + title + '</a>'));
-            } else {
-              $('.dataset-title', el).fill(title);
-            }
-
-            $('.dataset-description', el).fill(description);
-
-            if (dataset.publisher) {
-              // TODO switch to .homepage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
-              //let homepage = dataset.publisher.homepage
-              var homepage = dataset.publisher['foaf:homepage'];
-              if (homepage) {
-                $('.dataset-publisher', el).fill(HTML('<a class="external" href="' + homepage + '"><em>' + dataset.publisher.name + '</em></a>'));
-              } else {
-                $('.dataset-publisher', el).fill(HTML('<em>' + dataset.publisher.name + '</em>'));
-              }
-            } else {
-              $('.dataset-publisher', el).hide();
-            }
-
-            if (dataset.temporal) {
-              var temporal = dataset.temporal.startDate.substr(0, 10) + ' to ' + dataset.temporal.endDate.substr(0, 10);
-              $('.dataset-temporal-text', el).fill(temporal);
-            } else {
-              $('.dataset-temporal', el).hide();
-            }
-
-            var isGlobal = undefined;
-            var geom = dataset.spatial && dataset.spatial.geometry ? JSON.parse(dataset.spatial.geometry) : null;
-            // check if global bounding box and don't display map in that case
-            if (geom) {
-              var geomLayer = L.geoJson(geom);
-              isGlobal = geomLayer.getBounds().equals([[-90, -180], [90, 180]]);
-            }
-
-            if (geom && !isGlobal) {
-              (function () {
-                $('.dataset-spatial-geometry', el).hide();
-
-                var map = L.map($('.dataset-spatial-minimap', el)[0], {
-                  touchZoom: false,
-                  scrollWheelZoom: false,
-                  doubleClickZoom: false,
-                  boxZoom: false,
-                  zoomControl: false,
-                  attributionControl: false
-                }).on('load', function () {
-                  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                });
-
-                setTimeout(function () {
-                  var geomLayer = L.geoJson(geom, {
-                    style: function style() {
-                      return { color: "#ff7800", weight: 1, clickable: false };
-                    }
-                  });
-                  map.fitBounds(geomLayer.getBounds(), { reset: true });
-                  geomLayer.addTo(map);
-                }, 1000);
-              })();
-            } else {
-              $('.dataset-spatial-minimap', el).hide();
-              if (isGlobal) {
-                $('.dataset-spatial-geometry-text', el).fill('global');
-              } else {
-                $('.dataset-spatial-geometry', el).hide();
-              }
-            }
-
-            if (dataset.distributions) {
-              var formats = new _Set(dataset.distributions.map(getDistFormat));
-              formats = [].concat(_toConsumableArray(formats));
-              formats.sort(function (a, b) {
-                return a.toLowerCase().localeCompare(b.toLowerCase());
-              });
-
-              var _iteratorNormalCompletion2 = true;
-              var _didIteratorError2 = false;
-              var _iteratorError2 = undefined;
+              var _iteratorNormalCompletion = true;
+              var _didIteratorError = false;
+              var _iteratorError = undefined;
 
               try {
-                var _loop = function () {
-                  var format = _step2.value;
+                for (var _iterator = _getIterator(datasets), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  var dataset = _step.value;
 
-                  if (!format) return 'continue';
-                  var color = MappableFormats.has(format) ? 'success' : 'default';
-                  var glyph = DataFormats.has(format) ? '<span class="glyphicon glyphicon-flash"></span> ' : '';
-                  var html = undefined;
-                  if (MappableFormats.has(format)) {
-                    html = HTML('<a href="#"><span class="label label-success">' + glyph + format + '</span></a> ');
-
-                    // hacky, see https://github.com/timjansen/minified.js/issues/68
-                    $(html[0]).on('click', function () {
-                      if (format === 'WMS') {
-                        _this3._displayWMS(dataset);
-                      } else if (format === 'GeoJSON') {
-                        _this3._displayGeoJSON(dataset);
-                      } else if (format === 'CovJSON') {
-                        _this3._displayCovJSON(dataset);
-                      } else {
-                        throw new Error('should not happen');
-                      }
-                    });
-                  } else {
-                    html = HTML('<span class="label label-' + color + '">' + format + '</span> ');
-                  }
-                  $('.dataset-distribution-labels', el).add(html);
-                };
-
-                for (var _iterator2 = _getIterator(formats), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                  var _ret2 = _loop();
-
-                  if (_ret2 === 'continue') continue;
+                  _this.datasets.push(dataset);
                 }
               } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
+                _didIteratorError = true;
+                _iteratorError = err;
               } finally {
                 try {
-                  if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                    _iterator2['return']();
+                  if (!_iteratorNormalCompletion && _iterator['return']) {
+                    _iterator['return']();
                   }
                 } finally {
-                  if (_didIteratorError2) {
-                    throw _iteratorError2;
+                  if (_didIteratorError) {
+                    throw _iteratorError;
                   }
                 }
               }
 
-              if (formats.some(function (t) {
-                return DataFormats.has(t);
-              })) {
-                $('.dataset-analyse-button', el).show();
-              }
-            }
-          }
-
-          // TODO the display code should not be directly in the sidebar module
-        }, {
-          key: '_displayWMS',
-          value: function _displayWMS(dataset) {
-            var _this4 = this;
-
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-              var _loop2 = function () {
-                var dist = _step3.value;
-
-                // TODO remove dcat: once ckanext-dcat is fixed
-                var url = dist['dcat:accessURL'] || dist['accessURL'];
-                _this4.map.fire('dataloading');
-                wms.readLayers(url).then(function (wmsLayers) {
-                  var _iteratorNormalCompletion4 = true;
-                  var _didIteratorError4 = false;
-                  var _iteratorError4 = undefined;
-
-                  try {
-                    var _loop3 = function () {
-                      var wmsLayer = _step4.value;
-
-                      var layer = L.tileLayer.wms(url, {
-                        layers: wmsLayer.name,
-                        format: 'image/png',
-                        transparent: true
-                      });
-                      // In leaflet 1.0 every layer will have add/remove events, this is a workaround
-                      _this4.map.on('layeradd', function (e) {
-                        if (e.layer !== layer) return;
-                        var legendUrl = wms.getLegendUrl(url, wmsLayer.name);
-                        new ImageLegend(legendUrl, { layer: e.layer, title: wmsLayer.title }).addTo(_this4.map);
-                      });
-                      var datasetTitle = _this4._i18n(dataset.title);
-                      _this4.layerControl.addOverlay(layer, '<span class="label label-success">WMS</span> ' + wmsLayer.title, { groupName: datasetTitle, expanded: true });
-                    };
-
-                    for (var _iterator4 = _getIterator(wmsLayers), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                      _loop3();
-                    }
-                  } catch (err) {
-                    _didIteratorError4 = true;
-                    _iteratorError4 = err;
-                  } finally {
-                    try {
-                      if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-                        _iterator4['return']();
-                      }
-                    } finally {
-                      if (_didIteratorError4) {
-                        throw _iteratorError4;
-                      }
-                    }
-                  }
-
-                  _this4.map.fire('dataload');
-                });
-              };
-
-              for (var _iterator3 = _getIterator(dataset.distributions.filter(function (dist) {
-                return getDistFormat(dist) === 'WMS';
-              })), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                _loop2();
-              }
-            } catch (err) {
-              _didIteratorError3 = true;
-              _iteratorError3 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                  _iterator3['return']();
-                }
-              } finally {
-                if (_didIteratorError3) {
-                  throw _iteratorError3;
-                }
-              }
-            }
-          }
-        }, {
-          key: '_displayGeoJSON',
-          value: function _displayGeoJSON(dataset) {
-            var _this5 = this;
-
-            var bounds = [];
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
-
-            try {
-              var _loop4 = function () {
-                var dist = _step5.value;
-
-                // TODO remove dcat: once ckanext-dcat is fixed
-                var url = dist['dcat:accessURL'] || dist['dcat:downloadURL'] || dist['downloadURL'] || dist['accessURL'];
-                _this5.map.fire('dataloading');
-                $.request('get', url, null, { headers: {
-                    Accept: 'application/vnd.geo+json; q=1.0,application/json; q=0.5' } }).then(function (json) {
-                  var layer = L.geoJson(JSON.parse(json), {
-                    pointToLayer: function pointToLayer(feature, latlng) {
-                      return L.circleMarker(latlng);
-                    },
-                    onEachFeature: function onEachFeature(feature, layer) {
-                      layer.bindPopup('<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>', { maxWidth: 400, maxHeight: 300 });
-                    }
-                  });
-                  bounds.push(layer.getBounds());
-                  layer.addTo(_this5.map);
-                  var distTitle = _this5._i18n(dist.title);
-                  var datasetTitle = _this5._i18n(dataset.title);
-                  _this5.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, { groupName: datasetTitle, expanded: true });
-                  _this5.map.fitBounds(bounds);
-                  _this5.map.fire('dataload');
-                });
-              };
-
-              for (var _iterator5 = _getIterator(dataset.distributions.filter(function (dist) {
-                return getDistFormat(dist) === 'GeoJSON';
-              })), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                _loop4();
-              }
-            } catch (err) {
-              _didIteratorError5 = true;
-              _iteratorError5 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-                  _iterator5['return']();
-                }
-              } finally {
-                if (_didIteratorError5) {
-                  throw _iteratorError5;
-                }
-              }
-            }
-          }
-        }, {
-          key: '_displayCovJSON',
-          value: function _displayCovJSON(dataset) {
-            var _this6 = this;
-
-            // TODO check if both CovJSON and CovCBOR exist and prefer CovCBOR in that case (ignore the other)
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
-
-            try {
-              for (var _iterator6 = _getIterator(dataset.distributions.filter(function (dist) {
-                return getDistFormat(dist) === 'CovJSON';
-              })), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                var dist = _step6.value;
-
-                // TODO remove dcat: once ckanext-dcat is fixed
-                var url = dist['dcat:downloadURL'] || dist['dcat:accessURL'] || dist['downloadURL'] || dist['accessURL'];
-                this.map.fire('dataloading');
-                // FIXME handle collections
-                CovJSON.read(url).then(function (cov) {
-                  // each parameter becomes a layer
-                  var _iteratorNormalCompletion7 = true;
-                  var _didIteratorError7 = false;
-                  var _iteratorError7 = undefined;
-
-                  try {
-                    var _loop5 = function () {
-                      var key = _step7.value;
-
-                      var opts = { keys: [key] };
-                      var layer = LayerFactory()(cov, opts).on('add', function (e) {
-                        var covLayer = e.target;
-                        _this6.map.fitBounds(covLayer.getBounds());
-
-                        if (covLayer.palette) {
-                          CoverageLegend(layer, {
-                            position: 'bottomright'
-                          }).addTo(_this6.map);
-                        }
-                      });
-                      var layerName = _this6._i18n(cov.parameters.get(key).observedProperty.label);
-                      var datasetTitle = _this6._i18n(dataset.title);
-                      _this6.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span>: ' + layerName, { groupName: datasetTitle, expanded: true });
-                    };
-
-                    for (var _iterator7 = _getIterator(cov.parameters.keys()), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                      _loop5();
-                    }
-                  } catch (err) {
-                    _didIteratorError7 = true;
-                    _iteratorError7 = err;
-                  } finally {
-                    try {
-                      if (!_iteratorNormalCompletion7 && _iterator7['return']) {
-                        _iterator7['return']();
-                      }
-                    } finally {
-                      if (_didIteratorError7) {
-                        throw _iteratorError7;
-                      }
-                    }
-                  }
-
-                  _this6.map.fire('dataload');
-                });
-              }
-            } catch (err) {
-              _didIteratorError6 = true;
-              _iteratorError6 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-                  _iterator6['return']();
-                }
-              } finally {
-                if (_didIteratorError6) {
-                  throw _iteratorError6;
-                }
-              }
-            }
-          }
-        }, {
-          key: 'open',
-          value: function open(tabId) {
-            this.control.open(tabId);
+              _this.fire('load', { url: url, datasets: datasets });
+            });
           }
         }]);
 
-        return Sidebar;
-      })();
+        return Catalogue;
+      })(Eventable);
 
-      _export('default', Sidebar);
+      _export('default', Catalogue);
     }
   };
 });
 
-$__System.registerDynamic("a0", ["5"], false, function(__require, __exports, __module) {
+$__System.registerDynamic("8", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  exports["default"] = function(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register('ac', ['8', 'ab', '8a'], function (_export) {
+  var _classCallCheck, Catalogue, AnalysisCatalogue, App;
+
+  return {
+    setters: [function (_) {
+      _classCallCheck = _['default'];
+    }, function (_ab) {
+      Catalogue = _ab['default'];
+    }, function (_a) {
+      AnalysisCatalogue = _a['default'];
+    }],
+    execute: function () {
+
+      /**
+       * Something like a controller.
+       */
+      'use strict';
+
+      App = function App() {
+        _classCallCheck(this, App);
+
+        this.catalogue = new Catalogue();
+        this.analysisCatalogue = new AnalysisCatalogue();
+      };
+
+      _export('default', App);
+    }
+  };
+});
+
+$__System.registerDynamic("ad", ["c"], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     "format global";
@@ -16935,17 +18332,17 @@ $__System.registerDynamic("a0", ["5"], false, function(__require, __exports, __m
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("a1", ["a0"], true, function(req, exports, module) {
+$__System.registerDynamic("ae", ["ad"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('a0');
+  module.exports = req('ad');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("a2", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("af", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -17154,7 +18551,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     };
   }
   if (typeof define === 'function' && define.amd) {
-    define("a3", ["5"], function(L) {
+    define("b0", ["c"], function(L) {
       defineLeafletLoading(L);
     });
   } else {
@@ -17166,7 +18563,7 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("a4", ["a3"], function(main) {
+define("b1", ["b0"], function(main) {
   return main;
 });
 
@@ -17176,7 +18573,7 @@ _removeDefine();
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define("a5", ["5"], factory);
+    define("b2", ["c"], factory);
   } else if (typeof modules === 'object' && module.exports) {
     module.exports = factory(require('leaflet'));
   } else {
@@ -17720,13 +19117,13 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("a6", ["a5"], function(main) {
+define("b3", ["b2"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("a7", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("b4", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -17737,7 +19134,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("a8", [], L);
+    define("b5", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -24235,23 +25632,25 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("5", ["a8"], function(main) {
+define("c", ["b5"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("9f", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("3b", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('1', ['2', '3', '5', '9f', 'a7', 'a6', 'a4', 'a2', 'a1', '9e'], function (_export) {
+$__System.register('1', ['2', '3', '3b', 'c', 'b4', 'b3', 'b1', 'af', 'ae', 'ac', '3a'], function (_export) {
   'use strict';
 
-  var L, Sidebar, MELODIES_DCAT_CATALOG_URL, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, catalogUrl, sidebar;
+  var L, App, Sidebar, MELODIES_DCAT_CATALOG_URL, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, app, catalogUrl, sidebar;
   return {
-    setters: [function (_3) {}, function (_2) {}, function (_) {
-      L = _['default'];
-    }, function (_f) {}, function (_a7) {}, function (_a6) {}, function (_a4) {}, function (_a2) {}, function (_a1) {}, function (_e) {
-      Sidebar = _e['default'];
+    setters: [function (_2) {}, function (_) {}, function (_b) {}, function (_c) {
+      L = _c['default'];
+    }, function (_b4) {}, function (_b3) {}, function (_b1) {}, function (_af) {}, function (_ae) {}, function (_ac) {
+      App = _ac['default'];
+    }, function (_a) {
+      Sidebar = _a['default'];
     }],
     execute: function () {
       MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu';
@@ -24292,6 +25691,8 @@ $__System.register('1', ['2', '3', '5', '9f', 'a7', 'a6', 'a4', 'a2', 'a1', '9e'
 
       map.addControl(layerControl);
 
+      app = new App();
+
       // Sidebar setup
       catalogUrl = undefined;
 
@@ -24301,9 +25702,9 @@ $__System.register('1', ['2', '3', '5', '9f', 'a7', 'a6', 'a4', 'a2', 'a1', '9e'
         catalogUrl = MELODIES_DCAT_CATALOG_URL;
       }
 
-      sidebar = new Sidebar(map, { layerControl: layerControl });
+      sidebar = new Sidebar(map, { app: app, layerControl: layerControl });
 
-      sidebar.loadCatalog(catalogUrl).then(function () {
+      app.catalogue.loadFromDCAT(catalogUrl).then(function () {
         sidebar.open('datasets');
       });
     }
