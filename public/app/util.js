@@ -25,7 +25,7 @@ export function fromTemplate (id) {
 
 // https://github.com/github/fetch#handling-http-error-statuses
 export function checkStatus (response) {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.ok) { // status 2xx
     return response
   } else {
     let error = new Error(response.statusText)
