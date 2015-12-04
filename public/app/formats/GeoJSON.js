@@ -1,9 +1,14 @@
 import 'fetch'
 import {checkStatus} from '../util.js'
+import Format from './Format.js'
 
 const MEDIA_TYPE = 'application/vnd.geo+json'
 
-export default class GeoJSONLoader {
+export default class GeoJSON extends Format {
+  constructor (actionFactories) {
+    super(actionFactories)
+  }
+  
   supports (mediaType) {
     return mediaType === MEDIA_TYPE
   }
@@ -12,7 +17,7 @@ export default class GeoJSONLoader {
    * @param urlOrObject Either a URL or a GeoJSON object.
    * @returns {Object} An object with metadata.
    */
-  loadMetadata (urlOrObject) {
+  load (urlOrObject) {
     if (typeof urlOrObject === 'string') {
       return fetch(urlOrObject, {
         headers: new Headers({
@@ -26,17 +31,16 @@ export default class GeoJSONLoader {
       })
       .then(checkStatus)
       .then(response => response.json())
-      .then(json => this._extractMetadata(json))
     } else {
-      return Promise.resolve(this._extractMetadata(urlOrObject))
+      return Promise.resolve(urlOrObject)
     }
   }
   
-  _extractMetadata (geojson) {
+  getMetadata (geojson) {
     return {
-      loader: this,
       format: 'GeoJSON',
       type: geojson.type
     }
   }
+  
 }

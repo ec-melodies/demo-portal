@@ -1,30 +1,29 @@
 import Eventable from './Eventable.js'
-import GeoJSONLoader from './loaders/GeoJSONLoader.js'
-import CovJSONLoader from './loaders/CovJSONLoader.js'
-import JSONLDLoader from './loaders/JSONLDLoader.js'
 
 export default class AnalysisCatalogue extends Eventable {
-  constructor () {
+  constructor (formats) {
     super()
     this._datasets = new Map()
     
-    this._loaders = [
-      new GeoJSONLoader(),
-      new CovJSONLoader(), 
-      new JSONLDLoader()
-      ]
+    this._formats = formats
   }
   
   addDataset (dataset) {
     if (!this._datasets.has(dataset.id)) {
       this._datasets.set(dataset.id, dataset)
       this.fire('add', {dataset})
-      this._loadDistributionMetadata(dataset)
+      this._loadDistribution(dataset)
     }
   }
   
   removeDataset (dataset) {
     if (this._datasets.has(dataset.id)) {
+      // give all actions a chance to clean up
+      for (let dist of dataset.distributions.filter(dist => 'actions' in dist)) {
+        for (let action of dist.actions) {
+          action.remove()
+        }
+      }
       this._datasets.delete(dataset.id)
       this.fire('remove', {dataset})
     }
@@ -33,7 +32,7 @@ export default class AnalysisCatalogue extends Eventable {
   get datasets () {
     return [...this._datasets.values()]
   }
-  
+    
   /**
    * Loads analysable distributions of a dataset and stores metadata about them
    * in their "metadata" field.
@@ -49,27 +48,37 @@ export default class AnalysisCatalogue extends Eventable {
    * It would be infeasible to persist such data somehow into a Blob and
    * use URL.createObjectURL(blob) just to get a URL.
    */
-  _loadDistributionMetadata (dataset) {
-    this.fire('distributionsMetadataLoading', {dataset})
+  _loadDistribution (dataset) {
+    this.fire('distributionsLoading', {dataset})
     let promises = []
     for (let distribution of dataset.distributions) {
-      for (let loader of this._loaders) {
-        if (loader.supports(distribution.mediaType)) {
-          this.fire('distributionMetadataLoading', {dataset, distribution})
+      for (let format of this._formats) {
+        if (format.supports(distribution.mediaType)) {
+          this.fire('distributionLoading', {dataset, distribution})
           let urlOrData = distribution.accessURL || distribution.downloadURL || distribution.data
-          let promise = loader.loadMetadata(urlOrData).then(meta => {
+          let promise = format.load(urlOrData).then(data => {
+            let meta = format.getMetadata(data)
+            let actions = format.getActions(data)
+            
+            // inject context into actions
+            for (let action of actions) {
+              action.context = {dataset, distribution}
+            }
+            
             distribution.metadata = meta
-            this.fire('distributionMetadataLoad', {dataset, distribution})
+            distribution.actions = actions
+
+            this.fire('distributionLoad', {dataset, distribution})
           }).catch(e => {
             distribution.error = e
-            this.fire('distributionMetadataLoadError', {dataset, distribution, error: e})
+            this.fire('distributionLoadError', {dataset, distribution, error: e})
           })
           promises.push(promise)
         }
       }
     }
     Promise.all(promises).then(() => {
-      this.fire('distributionsMetadataLoad', {dataset})
+      this.fire('distributionsLoad', {dataset})
     })
   }
 }

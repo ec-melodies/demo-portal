@@ -1,8 +1,13 @@
 import {promises as jsonld} from 'jsonld'
+import Format from './Format.js'
 
 const MEDIA_TYPE = 'application/ld+json'
 
-export default class JSONLDLoader {
+export default class JSONLD extends Format {
+  constructor (actionFactories) {
+    super(actionFactories)
+  }
+  
   supports (mediaType) {
     return mediaType && mediaType.startsWith(MEDIA_TYPE) // can have parameters
   }
@@ -11,15 +16,14 @@ export default class JSONLDLoader {
    * @param urlOrObject Either a URL or a GeoJSON object.
    * @returns {Object} An object with metadata.
    */
-  loadMetadata (urlOrObject) {
-    return jsonld.compact(urlOrObject, {}).then(data => this._extractMetadata(data))
+  load (urlOrObject) {
+    return jsonld.compact(urlOrObject, {})
   }
   
-  _extractMetadata (data) {
+  getMetadata (data) {
     // TODO check if we have a more specialized loader for the root type
     // TODO are we supporting cases where there is no single root after compaction?
     return {
-      loader: this,
       format: 'JSON-LD',
       type: data['@type']
     }

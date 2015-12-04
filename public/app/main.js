@@ -48,8 +48,10 @@ let layerControl = L.Control.styledLayerControl(baseMaps, [], {
   collapsed: false
 })
 map.addControl(layerControl)
+// probably not the best idea
+map.layerControl = layerControl
 
-let app = new App()
+let app = new App(map)
 
 // Sidebar setup
 let catalogUrl

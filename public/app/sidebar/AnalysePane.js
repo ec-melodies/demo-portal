@@ -28,7 +28,13 @@ let templatesHtml = `
   <li class="list-group-item analysis-dataset-distribution">
     <p class="distribution-format"></p>
     <p class="distribution-metadata"></p>
+    <div class="distribution-actions"></div>
   </li>
+</template>
+<template id="template-analysis-dataset-distribution-action">
+  <span class="analysis-dataset-distribution-action">
+    <button type="button" class="btn btn-primary"></button>
+  </span>
 </template>
 <template id="template-analysis-dataset-distribution-error">
 <li class="list-group-item analysis-dataset-distribution">
@@ -127,19 +133,19 @@ export default class AnalysePane {
       $(dataset.domEl).remove()
     })
     
-    this.analysisCatalogue.on('distributionsMetadataLoading', ({dataset}) => {
+    this.analysisCatalogue.on('distributionsLoading', ({dataset}) => {
       $('.panel-body', dataset.domEl).show()
     })
     
-    this.analysisCatalogue.on('distributionsMetadataLoad', ({dataset}) => {
+    this.analysisCatalogue.on('distributionsLoad', ({dataset}) => {
       $('.panel-body', dataset.domEl).hide()
     })
     
-    this.analysisCatalogue.on('distributionMetadataLoad', ({dataset, distribution}) => {
+    this.analysisCatalogue.on('distributionLoad', ({dataset, distribution}) => {
       this._addDistribution(dataset, distribution)
     })
     
-    this.analysisCatalogue.on('distributionMetadataLoadError', ({dataset, distribution, error}) => {
+    this.analysisCatalogue.on('distributionLoadError', ({dataset, distribution, error}) => {
       this._addDistributionLoadError(dataset, distribution, error)
     })
   }
@@ -165,6 +171,16 @@ export default class AnalysePane {
     
     $('.distribution-format', el).fill(meta.format)
     $('.distribution-metadata', el).fill(meta.type)
+    
+    if (distribution.actions) {
+      for (let action of distribution.actions) {
+        let actionEl = fromTemplate('template-analysis-dataset-distribution-action')
+        $('button', actionEl).fill(action.label).on('click', () => {
+          action.run()
+        })
+        $('.distribution-actions', el).add(actionEl)
+      }
+    }
   }
   
   _addDistributionLoadError (dataset, distribution, error) {

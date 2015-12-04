@@ -141,7 +141,7 @@ export function loadCatalog (url) {
           }
           // repair CKAN data a bit...
           if (!dist.mediaType) {
-            if (dist.format === 'GeoJSON') {
+            if (dist.format.toLowerCase() === 'geojson') {
               dist.mediaType = 'application/vnd.geo+json'
             }
           }
