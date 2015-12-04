@@ -7,6 +7,8 @@ const MEDIA_TYPE = 'application/vnd.geo+json'
 export default class GeoJSON extends Format {
   constructor (actionFactories) {
     super(actionFactories)
+    this.label = 'GeoJSON'
+    this.shortLabel = this.label
   }
   
   supports (mediaType) {
@@ -38,7 +40,7 @@ export default class GeoJSON extends Format {
   
   getMetadata (geojson) {
     return {
-      format: 'GeoJSON',
+      format: this.label,
       type: geojson.type
     }
   }

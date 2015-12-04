@@ -6,6 +6,16 @@ export default class AnalysisCatalogue extends Eventable {
     this._datasets = new Map()
     
     this._formats = formats
+    this._staticActionContext = {}
+  }
+  
+  /**
+   * Context that should be set on every Action after it is instantiated.
+   */
+  addStaticActionContext (staticContext) {
+    for (let key of Object.keys(staticContext)) {
+      this._staticActionContext[key] = staticContext[key]
+    }
   }
   
   addDataset (dataset) {
@@ -63,6 +73,10 @@ export default class AnalysisCatalogue extends Eventable {
             // inject context into actions
             for (let action of actions) {
               action.context = {dataset, distribution}
+              
+              for (let key in this._staticActionContext) {
+                action.context[key] = this._staticActionContext[key]
+              }
             }
             
             distribution.metadata = meta

@@ -6,6 +6,8 @@ const MEDIA_TYPE = 'application/ld+json'
 export default class JSONLD extends Format {
   constructor (actionFactories) {
     super(actionFactories)
+    this.label = 'JSON-LD'
+    this.shortLabel = 'JSON-LD'
   }
   
   supports (mediaType) {
@@ -24,7 +26,7 @@ export default class JSONLD extends Format {
     // TODO check if we have a more specialized loader for the root type
     // TODO are we supporting cases where there is no single root after compaction?
     return {
-      format: 'JSON-LD',
+      format: this.label,
       type: data['@type']
     }
   }

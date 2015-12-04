@@ -1,8 +1,8 @@
 import {$, HTML} from 'minified'
 import L from 'leaflet'
 
+import {PROCESS} from '../actions/Action.js'
 import {i18n, fromTemplate, sortByKey} from '../util.js'
-import {getDistFormat, MappableFormats, DataFormats} from './common.js'
 
 let templatesHtml = `
 <template id="template-dataset-list-item">
@@ -198,24 +198,35 @@ export default class DatasetsPane {
     }
     
     if (dataset.distributions) {
-      let formats = new Set(dataset.distributions.map(getDistFormat))
-      formats = [...formats]
-      formats.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+      let formats = dataset.distributions.map(d => ({
+        label: getDistFormatLabel(d),
+        mediaType: d.mediaType
+      }))
+      formats.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()))
       
+      let seen = new Set()
+      let hasProcessableDistributions = false
       for (let format of formats) {
-        if (!format) continue
-        let color = MappableFormats.has(format) ? 'success' : 'default'
-        let glyph = DataFormats.has(format) ? '<span class="glyphicon glyphicon-flash"></span> ' : ''
+        if (seen.has(format.label)) continue
+        seen.add(format.label)
+        let formatImpl = this._findFormatImpl(format.mediaType)
+        if (formatImpl) {
+          hasProcessableDistributions = true
+        }
+        let label = formatImpl ? formatImpl.shortLabel : format.label
+        
+        let color = formatImpl ? 'success' : 'default'
+        let glyph = formatImpl && formatImpl.actionClasses.some(cl => cl.type === PROCESS) ? '<span class="glyphicon glyphicon-flash"></span> ' : ''
         let html
-        if (MappableFormats.has(format)) {
-          html = HTML(`<span class="label label-success">${glyph}${format}</span> `)
+        if (formatImpl) {
+          html = HTML(`<span class="label label-success">${glyph}${label}</span> `)
         } else {
-          html = HTML(`<span class="label label-${color}">${format}</span> `)
+          html = HTML(`<span class="label label-${color}">${label}</span> `)
         }
         $('.dataset-distribution-labels', el).add(html)
       }
       
-      if (formats.some(t => DataFormats.has(t))) {
+      if (hasProcessableDistributions) {
         $('.dataset-analyse-button', el).show()
         $('.dataset-analyse-button', el).on('click', () => {
           this.analysisCatalogue.addDataset(dataset)
@@ -225,4 +236,30 @@ export default class DatasetsPane {
     
   }
   
+  _findFormatImpl (mediaType) {
+    // TODO formats should be directly injected
+    for (let format of this.sidebar.app.formats) {
+      if (format.supports(mediaType)) {
+        return format
+      }
+    }
+  }
+  
+}
+
+/** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
+function getDistFormatLabel (dist) {
+  let label = dist.format
+  if (!label && dist.mediaType in MediaTypeLabels) {
+    label = MediaTypeLabels[dist.mediaType]
+  }
+  if (!label) {
+    label = dist.mediaType || 'unknown'
+  }
+  return label
+}
+
+// maps media types we don't support in analysis/display to short format labels
+const MediaTypeLabels = {
+  'application/x-netcdf': 'netCDF'
 }

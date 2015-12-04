@@ -1,14 +1,9 @@
-import Action from './Action.js'
+import {default as Action, PROCESS} from './Action.js'
 
-export default function factory (map) {
-  return data => new CovJSONRemapCategories(data, map)
-} 
-
-export class CovJSONRemapCategories extends Action {
-  constructor (data, map) {
+export default class CovJSONRemapCategories extends Action {
+  constructor (data) {
     super()
     this.cov = data
-    this.map = map
     
     this.label = 'Remap Categories'
   }
@@ -32,3 +27,5 @@ export class CovJSONRemapCategories extends Action {
     // open UI for remapping etc.
   }
 }
+
+CovJSONRemapCategories.type = PROCESS

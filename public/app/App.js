@@ -19,18 +19,22 @@ export default class App {
     this.map = map
             
     this.catalogue = new Catalogue()
-    this.analysisCatalogue = new AnalysisCatalogue([
+    
+    this.formats = [
       new CovJSON([
-        CovJSONView(map),
-        CovJSONRemapCategories(map)
+         CovJSONView,
+         CovJSONRemapCategories
       ]),
       new GeoJSON([
-        GeoJSONView(map)
+        GeoJSONView
       ]),
       new WMS([
-        WMSView(map)
+        WMSView
       ]),
       new JSONLD()
-    ])
+    ]
+    
+    this.analysisCatalogue = new AnalysisCatalogue(this.formats)
+    this.analysisCatalogue.addStaticActionContext({map})
   }
 }

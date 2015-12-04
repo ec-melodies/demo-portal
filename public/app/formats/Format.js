@@ -1,12 +1,14 @@
 export default class Format {
-  constructor (actionFactories) {
-    this._actionFactories = actionFactories || []
+  constructor (actionClasses) {
+    this.actionClasses = actionClasses || []
+    this.label = '<OVERWRITE ME>'
+    this.shortLabel = this.label
   }
   
   getActions (obj) {
     let actions = []
-    for (let actionFactory of this._actionFactories) {
-      let action = actionFactory(obj)
+    for (let actionClass of this.actionClasses) {
+      let action = new actionClass(obj)
       if (action.isSupported) {
         actions.push(action)
       }

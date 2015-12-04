@@ -1,20 +1,16 @@
 import LayerFactory from 'leaflet-coverage'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 
-import Action from './Action.js'
+import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
 
-export default function factory (map) {
-  return data => new CovJSONView(data, map)
-} 
-
-export class CovJSONView extends Action {
-  constructor (data, map) {
+export default class CovJSONView extends Action {
+  constructor (data) {
     super()
-    this.map = map
     this.cov = data
     
     this.label = 'View'
+      
     this.layers = []
   }
   
@@ -25,6 +21,8 @@ export class CovJSONView extends Action {
   run () {
     if (this.hasRun) return
     this.hasRun = true
+    
+    let map = this.context.map
     
     let dataset = this.context.dataset
     let datasetTitle = i18n(dataset.title)
@@ -37,29 +35,33 @@ export class CovJSONView extends Action {
       let opts = {keys: [key]}
       let layer = LayerFactory()(cov, opts).on('add', e => {
         let covLayer = e.target
-        this.map.fitBounds(covLayer.getBounds())
+        map.fitBounds(covLayer.getBounds())
         
         if (covLayer.palette) {
           CoverageLegend(layer, {
             position: 'bottomright'
-          }).addTo(this.map)
+          }).addTo(map)
         }
       })
       if (!firstDisplayed) {
         firstDisplayed = true
-        layer.addTo(this.map)
+        layer.addTo(map)
       }
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
-      this.map.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, {groupName: datasetTitle, expanded: true})
+      map.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, {groupName: datasetTitle, expanded: true})
       this.layers.push(layer)
     }
   }
   
   remove () {
+    let map = this.context.map
+    
     let datasetTitle = i18n(this.context.dataset.title)
-    this.map.layerControl.removeGroup(datasetTitle)
+    map.layerControl.removeGroup(datasetTitle)
     for (let layer of this.layers) {
-      this.map.removeLayer(layer)
+      map.removeLayer(layer)
     }
   }
 }
+
+CovJSONView.type = VIEW

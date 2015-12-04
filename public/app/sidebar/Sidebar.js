@@ -28,6 +28,7 @@ let sidebarHtml = (sidebarId, datasetsPaneId, analysePaneId) => `
 export default class Sidebar {
   constructor (map, {app, sidebarId='sidebar', datasetsPaneId='datasets', analysePaneId='analyse', layerControl=null}={}) {
     this.map = map
+    this.app = app
     this.catalogue = app.catalogue
     this.analysisCatalogue = app.analysisCatalogue
     this.id = sidebarId

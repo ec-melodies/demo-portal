@@ -9,6 +9,8 @@ export default class CovJSON extends Format {
    */
   constructor (actionFactories) {
     super(actionFactories)
+    this.label = 'CoverageJSON'
+    this.shortLabel = 'CovJSON'
   }
   
   supports (mediaType) {
@@ -25,7 +27,7 @@ export default class CovJSON extends Format {
   
   getMetadata (cov) {
     return {
-      format: 'CoverageJSON',
+      format: this.label,
       type: cov.type
     }
   }

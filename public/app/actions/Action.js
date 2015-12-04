@@ -1,3 +1,9 @@
+export const VIEW = 'view'
+export const PROCESS = 'process'
+
+/**
+ * Note: every subclass must add a static `type` property with either VIEW or PROCESS. 
+ */
 export default class Action {
   constructor () {
     this._context = {}

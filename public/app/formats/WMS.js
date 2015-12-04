@@ -10,6 +10,8 @@ export default class WMS extends Format {
    */
   constructor (actionFactories) {
     super(actionFactories)
+    this.label = 'Web Map Service'
+    this.shortLabel = 'WMS'
   }
   
   supports (mediaType) {
@@ -28,7 +30,7 @@ export default class WMS extends Format {
   
   getMetadata (data) {
     return {
-      format: 'WMS',
+      format: this.label,
       type: data.layers.length + ' layers'
     }
   }
