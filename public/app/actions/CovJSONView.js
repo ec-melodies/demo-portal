@@ -33,16 +33,19 @@ export default class CovJSONView extends Action {
     // each parameter becomes a layer
     for (let key of cov.parameters.keys()) {
       let opts = {keys: [key]}
-      let layer = LayerFactory()(cov, opts).on('add', e => {
-        let covLayer = e.target
-        map.fitBounds(covLayer.getBounds())
-        
-        if (covLayer.palette) {
-          CoverageLegend(layer, {
-            position: 'bottomright'
-          }).addTo(map)
-        }
-      })
+      let layer = LayerFactory()(cov, opts)
+        .on('add', e => {
+          let covLayer = e.target
+          map.fitBounds(covLayer.getBounds())
+          
+          if (covLayer.palette) {
+            CoverageLegend(layer, {
+              position: 'bottomright'
+            }).addTo(map)
+          }
+        })
+        .on('dataLoading', () => this.fire('loading'))
+        .on('dataLoad', () => this.fire('load'))
       if (!firstDisplayed) {
         firstDisplayed = true
         layer.addTo(map)

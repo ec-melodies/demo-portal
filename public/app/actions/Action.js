@@ -1,11 +1,17 @@
+import Eventable from '../Eventable.js'
+
 export const VIEW = 'view'
 export const PROCESS = 'process'
 
 /**
- * Note: every subclass must add a static `type` property with either VIEW or PROCESS. 
+ * Every subclass must add a static `type` property with either VIEW or PROCESS.
+ * 
+ * When a subclass is loading external data, then the dataLoading and dataLoad events
+ * should be fired.
  */
-export default class Action {
+export default class Action extends Eventable {
   constructor () {
+    super()
     this._context = {}
   }
   /**

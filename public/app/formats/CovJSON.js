@@ -21,7 +21,7 @@ export default class CovJSON extends Format {
    * @param urlOrObject Either a URL or a CovJSON object.
    * @returns {Promise} succeeds with a Coverage or Coverage Collection API object
    */
-  load (urlOrObject) {
+  doLoad (urlOrObject) {
     return CovJSONReader.read(urlOrObject)
   }
   

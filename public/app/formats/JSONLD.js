@@ -15,10 +15,10 @@ export default class JSONLD extends Format {
   }
   
   /**
-   * @param urlOrObject Either a URL or a GeoJSON object.
-   * @returns {Object} An object with metadata.
+   * @param urlOrObject Either a URL or a JSON-LD object.
+   * @returns {Promise} succeeds with JSON-LD object
    */
-  load (urlOrObject) {
+  doLoad (urlOrObject) {
     return jsonld.compact(urlOrObject, {})
   }
   

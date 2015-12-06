@@ -3,12 +3,16 @@ export default class Eventable {
     this.listeners = new DefaultMap(() => [])
   }
   
-  on (event, fn) {
-    this.listeners.get(event).push(fn)
+  on (events, fn) {
+    events = Array.isArray(events) ? events : [events]
+    for (let event of events) {
+      this.listeners.get(event).push(fn)
+    }
+    return this
   }
   
   fire (event, data) {
-    console.log('EVENT: ' + event, data)
+    console.log(`Event: '${event}', Class: ${this.constructor.name}, Data:`, data)
     for (let fn of this.listeners.get(event)) {
       fn(data)
     }

@@ -19,7 +19,7 @@ export default class GeoJSON extends Format {
    * @param urlOrObject Either a URL or a GeoJSON object.
    * @returns {Object} An object with metadata.
    */
-  load (urlOrObject) {
+  doLoad (urlOrObject) {
     if (typeof urlOrObject === 'string') {
       return fetch(urlOrObject, {
         headers: new Headers({

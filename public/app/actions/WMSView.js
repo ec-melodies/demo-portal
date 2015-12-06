@@ -34,7 +34,9 @@ export default class WMSView extends Action {
         layers: wmsLayer.name,
         format: 'image/png',
         transparent: true
-      })
+      }).on('loading', () => this.fire('loading'))
+        .on('load', () => this.fire('load'))
+      
       // In leaflet 1.0 every layer will have add/remove events, this is a workaround
       map.on('layeradd', e => {
         if (e.layer !== layer) return

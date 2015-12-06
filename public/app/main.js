@@ -52,6 +52,8 @@ map.addControl(layerControl)
 map.layerControl = layerControl
 
 let app = new App(map)
+app.on('dataLoading', () => map.fire('dataloading'))
+app.on('dataLoad', () => map.fire('dataload'))
 
 // Sidebar setup
 let catalogUrl
@@ -63,5 +65,7 @@ if (window.location.hash) {
 
 let sidebar = new Sidebar(map, {app, layerControl})
 app.catalogue.loadFromDCAT(catalogUrl).then(() => {
+  sidebar.open('datasets')
+}).catch(() => {
   sidebar.open('datasets')
 })

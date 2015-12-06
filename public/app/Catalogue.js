@@ -12,12 +12,16 @@ export default class Catalogue extends Eventable {
    */
   loadFromDCAT (url) {
     this.datasets = []
+    this.fire('loading', {url})
     return dcat.loadCatalog(url).then(catalog => {
       let datasets = catalog.datasets
       for (let dataset of datasets) {
         this.datasets.push(dataset)
       }
       this.fire('load', {url, datasets})
+    }).catch(error => {
+      this.fire('loadError', {url, error})
+      throw error
     })
   }
 }

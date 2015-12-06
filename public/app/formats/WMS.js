@@ -22,10 +22,8 @@ export default class WMS extends Format {
    * @param url A WMS endpoint URL.
    * @returns {Promise} succeeds with layers metadata.
    */
-  load (url) {
-    return readLayers(url).then(layers => {
-      return {layers, url}
-    })
+  doLoad (url) {
+    return readLayers(url).then(layers => ({layers, url}))
   }
   
   getMetadata (data) {

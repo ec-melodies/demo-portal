@@ -19,6 +19,14 @@ let templatesHtml = `
     </button>
   </li>
 </template>
+<template id="template-dataset-error">
+<li class="list-group-item list-group-item-danger">
+  <h4 class="list-group-item-heading dataset-title">Problem while loading catalogue</h4>
+  <p>Error: <em class="error-message"></em></p>
+  <p>Details:</p>
+  <small><pre class="error-details"></pre></small>
+</li>
+</template>
 
 <style>
 .catalog-url-panel {
@@ -89,9 +97,6 @@ export default class DatasetsPane {
       this.catalogue.loadFromDCAT(input.get('value')).then(() => {
         $('.catalog-url-info', el).show()
         $('.catalog-url-form', el).hide()
-      }).catch(e => {
-        console.log(e)
-        alert(e)
       })
     })
     $('button', $('.catalog-url-form', el)).filter(b => b.name === 'cancel').on('click', () => {
@@ -102,15 +107,31 @@ export default class DatasetsPane {
   
   _registerModelListeners () {
     this.catalogue.on('load', ({url}) => {
-      $('.dataset-list', '#' + this.id).fill()
-      
+      this._clearList()      
       this._addDatasets(this.catalogue.datasets)
-      
-      this.url = url
-      $('.catalog-url', '#' + this.id)
-        .set('@href', url)
-        .fill(url)
+      this._setCatalogueUrl(url)
     })
+    this.catalogue.on('loadError', ({url, error}) => {
+      this._clearList()
+      this._setCatalogueUrl(url)
+      let el = fromTemplate('template-dataset-error')
+      $('.error-message', el).fill(error.message)
+      let json = JSON.stringify(error, null, 1)
+      $('.error-details', el).fill(json)
+      $('.dataset-list', '#' + this.id).fill(el)
+      console.log(error)
+    })
+  }
+  
+  _clearList () {
+    $('.dataset-list', '#' + this.id).fill()
+  }
+  
+  _setCatalogueUrl (url) {
+    this.url = url
+    $('.catalog-url', '#' + this.id)
+      .set('@href', url)
+      .fill(url)
   }
   
   _addDatasets (datasets, sortKey='title') {

@@ -37,10 +37,13 @@ let templatesHtml = `
   </span>
 </template>
 <template id="template-analysis-dataset-distribution-error">
-<li class="list-group-item analysis-dataset-distribution">
+<li class="list-group-item list-group-item-danger analysis-dataset-distribution">
   <p>Format: <span class="distribution-format"></span></p>
-  <p>Error: <span class="distribution-loading-error"></span></p>
-  <p>Source: <span class="distribution-source"></span></p>
+  <p>Error: <em class="error-message"></em></p>
+  <span class="error-details-section">
+    <p>Details:</p>
+    <small><pre class="error-details"></pre></small>
+  </span>
 </li>
 </template>
 
@@ -189,14 +192,12 @@ export default class AnalysePane {
     distribution.domEl = el
     
     $('.distribution-format', el).fill(distribution.format || distribution.mediaType)
-    $('.distribution-loading-error', el).fill(error.message)
-    let source
-    if (error.response) {
-      source = error.response.url
+    $('.error-message', el).fill(error.message)
+    if (Object.keys(error).length > 0) {
+      $('.error-details', el).fill(JSON.stringify(error, null, 1))
     } else {
-      source = 'local'
+      $('.error-details-section', el).remove()
     }
-    $('.distribution-source', el).fill(source)
   }
   
 }
