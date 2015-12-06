@@ -1,5 +1,8 @@
 import 'core-js/modules/es6.string.starts-with'
 import 'core-js/modules/es6.string.ends-with'
+import 'core-js/modules/es6.string.ends-with'
+import 'core-js/modules/es6.array.find'
+import 'core-js/modules/es6.promise'
 
 import 'bootstrap/css/bootstrap.css!'
 import L from 'leaflet'
