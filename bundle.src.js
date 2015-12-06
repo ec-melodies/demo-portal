@@ -2090,7 +2090,7 @@ $__System.register('19', ['7', '8', '20', '24', '1f'], function (_export) {
 });
 
 $__System.register('25', ['5', '7', '8', '18', '20', '26', '27', '28', '1f'], function (_export) {
-  var $, _createClass, _classCallCheck, L, _inherits, _slicedToArray, inject, i18n, _get, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, ContinuousLegend;
+  var $, _createClass, _classCallCheck, L, _inherits, _slicedToArray, inject, fromTemplate, i18n, _get, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, ContinuousLegend;
 
   return {
     setters: [function (_6) {
@@ -2107,6 +2107,7 @@ $__System.register('25', ['5', '7', '8', '18', '20', '26', '27', '28', '1f'], fu
       _slicedToArray = _4['default'];
     }, function (_7) {
       inject = _7.inject;
+      fromTemplate = _7.fromTemplate;
     }, function (_8) {
       i18n = _8;
     }, function (_f) {
@@ -2207,7 +2208,7 @@ $__System.register('25', ['5', '7', '8', '18', '20', '26', '27', '28', '1f'], fu
             var title = i18n.getLanguageString(param.observedProperty.label, language);
             var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language) : '';
 
-            var el = document.importNode($('#' + this.id)[0].content, true).children[0];
+            var el = fromTemplate(this.id);
             this._el = el;
             $('.legend-title', el).fill(title);
             $('.legend-uom', el).fill(unit);
@@ -2268,7 +2269,9 @@ $__System.register('28', [], function (_export) {
   };
 });
 
-$__System.register('27', [], function (_export) {
+$__System.register('27', ['5'], function (_export) {
+  /* */
+
   /**
    * Inject HTML and CSS into the DOM.
    * 
@@ -2277,14 +2280,16 @@ $__System.register('27', [], function (_export) {
    */
   'use strict';
 
+  var $, HTML;
+
   _export('inject', inject);
+
+  _export('fromTemplate', fromTemplate);
 
   function inject(html, css) {
     // inject default template and CSS into DOM
     if (html) {
-      var span = document.createElement('span');
-      span.innerHTML = html;
-      document.body.appendChild(span.children[0]);
+      $('body').add(HTML(html));
     }
 
     if (css) {
@@ -2299,14 +2304,26 @@ $__System.register('27', [], function (_export) {
     }
   }
 
+  function fromTemplate(id) {
+    var node = $('#' + id)[0];
+    // browsers without <template> support don't wrap everything in .content
+    if ('content' in node) {
+      node = node.content;
+    }
+    return document.importNode(node, true).children[0];
+  }
+
   return {
-    setters: [],
+    setters: [function (_) {
+      $ = _.$;
+      HTML = _.HTML;
+    }],
     execute: function () {}
   };
 });
 
 $__System.register('29', ['5', '7', '8', '18', '20', '27', '28', '1f'], function (_export) {
-  var $, HTML, _createClass, _classCallCheck, L, _inherits, inject, i18n, _get, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, DiscreteLegend;
+  var $, HTML, _createClass, _classCallCheck, L, _inherits, inject, fromTemplate, i18n, _get, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, DiscreteLegend;
 
   return {
     setters: [function (_5) {
@@ -2322,6 +2339,7 @@ $__System.register('29', ['5', '7', '8', '18', '20', '27', '28', '1f'], function
       _inherits = _['default'];
     }, function (_6) {
       inject = _6.inject;
+      fromTemplate = _6.fromTemplate;
     }, function (_7) {
       i18n = _7;
     }, function (_f) {
@@ -2429,7 +2447,7 @@ $__System.register('29', ['5', '7', '8', '18', '20', '27', '28', '1f'], function
             this.language = i18n.getLanguageTag(param.observedProperty.label, this.language);
             var title = i18n.getLanguageString(param.observedProperty.label, this.language);
 
-            var el = document.importNode($('#' + this.id)[0].content, true).children[0];
+            var el = fromTemplate(this.id);
             this._el = el;
             $('.legend-title', el).fill(title);
             this.updateLegend();
