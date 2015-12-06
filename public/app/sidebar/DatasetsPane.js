@@ -2,10 +2,10 @@ import {$, HTML} from 'minified'
 import L from 'leaflet'
 
 import {PROCESS} from '../actions/Action.js'
-import {i18n, fromTemplate, sortByKey} from '../util.js'
+import {i18n, sortByKey} from '../util.js'
 
-let templatesHtml = `
-<template id="template-dataset-list-item">
+const TEMPLATES = {
+  'dataset-list-item': `
   <li class="list-group-item">
     <h4 class="list-group-item-heading dataset-title"></h4>
     <p class="dataset-publisher"></p>
@@ -18,16 +18,17 @@ let templatesHtml = `
       <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse
     </button>
   </li>
-</template>
-<template id="template-dataset-error">
-<li class="list-group-item list-group-item-danger">
-  <h4 class="list-group-item-heading dataset-title">Problem while loading catalogue</h4>
-  <p>Error: <em class="error-message"></em></p>
-  <p>Details:</p>
-  <small><pre class="error-details"></pre></small>
-</li>
-</template>
-
+  `,
+  'dataset-error': `
+  <li class="list-group-item list-group-item-danger">
+    <h4 class="list-group-item-heading dataset-title">Problem while loading catalogue</h4>
+    <p>Error: <em class="error-message"></em></p>
+    <p>Details:</p>
+    <small><pre class="error-details"></pre></small>
+  </li>
+  `
+}
+let css = `
 <style>
 .catalog-url-panel {
   margin-top: 20px;
@@ -37,7 +38,7 @@ let templatesHtml = `
 }
 </style>
 `
-$('body').add(HTML(templatesHtml))
+$('head').add(HTML(css))
 
 let paneHtml = () => `
 <h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
@@ -114,7 +115,7 @@ export default class DatasetsPane {
     this.catalogue.on('loadError', ({url, error}) => {
       this._clearList()
       this._setCatalogueUrl(url)
-      let el = fromTemplate('template-dataset-error')
+      let el = HTML(TEMPLATES['dataset-error'])
       $('.error-message', el).fill(error.message)
       let json = JSON.stringify(error, null, 1)
       $('.error-details', el).fill(json)
@@ -142,7 +143,7 @@ export default class DatasetsPane {
   }
   
   _addDataset (dataset) {
-    let el = fromTemplate('template-dataset-list-item')
+    let el = HTML(TEMPLATES['dataset-list-item'])
     $('.dataset-list', '#' + this.id).add(el)
 
     let title = i18n(dataset.title)

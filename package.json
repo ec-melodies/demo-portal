@@ -28,7 +28,8 @@
       "leaflet-providers": "github:leaflet-extras/leaflet-providers@^1.1.5",
       "leaflet-styledlayercontrol": "github:davicustodio/Leaflet.StyledLayerControl@master",
       "minified": "github:timjansen/minified.js@^2015.1.1",
-      "sidebar-v2": "github:Turbo87/sidebar-v2@master"
+      "sidebar-v2": "github:Turbo87/sidebar-v2@master",
+      "core-js": "npm:core-js@^1.1.4"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.22",

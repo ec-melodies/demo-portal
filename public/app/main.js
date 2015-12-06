@@ -1,3 +1,6 @@
+import 'core-js/modules/es6.string.starts-with'
+import 'core-js/modules/es6.string.ends-with'
+
 import 'bootstrap/css/bootstrap.css!'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css!'

@@ -8,8 +8,8 @@ let paneHtml = () => `
 <div class="analysis-dataset-list"></div>
 `
 
-let templatesHtml = `
-<template id="template-analysis-dataset">
+const TEMPLATES = {
+  'analysis-dataset': `
   <div class="panel panel-default analysis-dataset">
     <div class="panel-heading">
       <h4>
@@ -23,30 +23,32 @@ let templatesHtml = `
   
     <ul class="list-group analysis-dataset-distribution-list"></ul>
   </div>
-</template>
-<template id="template-analysis-dataset-distribution">
+  `,
+  'analysis-dataset-distribution': `
   <li class="list-group-item analysis-dataset-distribution">
     <p class="distribution-format"></p>
     <p class="distribution-metadata"></p>
     <div class="distribution-actions"></div>
   </li>
-</template>
-<template id="template-analysis-dataset-distribution-action">
+  `,
+  'analysis-dataset-distribution-action': `
   <span class="analysis-dataset-distribution-action">
     <button type="button" class="btn btn-primary"></button>
   </span>
-</template>
-<template id="template-analysis-dataset-distribution-error">
-<li class="list-group-item list-group-item-danger analysis-dataset-distribution">
-  <p>Format: <span class="distribution-format"></span></p>
-  <p>Error: <em class="error-message"></em></p>
-  <span class="error-details-section">
-    <p>Details:</p>
-    <small><pre class="error-details"></pre></small>
-  </span>
-</li>
-</template>
+  `,
+  'analysis-dataset-distribution-error': `
+  <li class="list-group-item list-group-item-danger analysis-dataset-distribution">
+    <p>Format: <span class="distribution-format"></span></p>
+    <p>Error: <em class="error-message"></em></p>
+    <span class="error-details-section">
+      <p>Details:</p>
+      <small><pre class="error-details"></pre></small>
+    </span>
+  </li>
+  `
+}
 
+let css = `
 <style>
 .distribution-source {
   word-wrap: break-word;
@@ -107,7 +109,7 @@ let templatesHtml = `
 }
 </style>
 `
-$('body').add(HTML(templatesHtml))
+$('head').add(HTML(css))
 
 export default class AnalysePane {
   constructor (sidebar, paneId) {
@@ -154,7 +156,7 @@ export default class AnalysePane {
   }
   
   _addDataset (dataset) {
-    let el = fromTemplate('template-analysis-dataset')
+    let el = HTML(TEMPLATES['analysis-dataset'])
     $('.analysis-dataset-list', '#' + this.id).add(el)
     dataset.domEl = el
     
@@ -167,7 +169,7 @@ export default class AnalysePane {
   }
   
   _addDistribution (dataset, distribution) {
-    let el = fromTemplate('template-analysis-dataset-distribution')
+    let el = HTML(TEMPLATES['analysis-dataset-distribution'])
     $('.analysis-dataset-distribution-list', dataset.domEl).add(el)
     distribution.domEl = el
     let meta = distribution.metadata
@@ -177,7 +179,7 @@ export default class AnalysePane {
     
     if (distribution.actions) {
       for (let action of distribution.actions) {
-        let actionEl = fromTemplate('template-analysis-dataset-distribution-action')
+        let actionEl = HTML(TEMPLATES['analysis-dataset-distribution-action'])
         $('button', actionEl).fill(action.label).on('click', () => {
           action.run()
         })
@@ -187,7 +189,7 @@ export default class AnalysePane {
   }
   
   _addDistributionLoadError (dataset, distribution, error) {
-    let el = fromTemplate('template-analysis-dataset-distribution-error')
+    let el = HTML(TEMPLATES['analysis-dataset-distribution-error'])
     $('.analysis-dataset-distribution-list', dataset.domEl).add(el)
     distribution.domEl = el
     

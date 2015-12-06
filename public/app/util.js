@@ -1,5 +1,3 @@
-import {$} from 'minified'
-
 export function i18n (prop) {
   if (!prop) return
   // TODO be clever and select proper language
@@ -17,10 +15,6 @@ export function sortByKey (array, keyFn) {
     let y = keyFn(b)
     return ((x < y) ? -1 : ((x > y) ? 1 : 0))
   })
-}
-
-export function fromTemplate (id) {
-  return document.importNode($('#' + id)[0].content, true).children[0]
 }
 
 // https://github.com/github/fetch#handling-http-error-statuses
