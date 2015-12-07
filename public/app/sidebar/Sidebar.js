@@ -23,6 +23,10 @@ let sidebarHtml = (sidebarId, datasetsPaneId, analysePaneId) => `
       <div class="sidebar-pane" id="${analysePaneId}"></div>
   </div>
 </div>
+<style>
+.error-item {
+  word-wrap: break-word;
+}
 `
 
 export default class Sidebar {

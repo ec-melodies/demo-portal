@@ -1,9 +1,9 @@
 import {$, HTML} from 'minified'
 
-import {i18n, fromTemplate} from '../util.js'
+import {i18n} from '../util.js'
 
 let paneHtml = () => `
-<h1 class="sidebar-header">Analyse<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
+<h1 class="sidebar-header">Workspace<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
 
 <div class="analysis-dataset-list"></div>
 `
@@ -37,7 +37,7 @@ const TEMPLATES = {
   </span>
   `,
   'analysis-dataset-distribution-error': `
-  <li class="list-group-item list-group-item-danger analysis-dataset-distribution">
+  <li class="list-group-item list-group-item-danger analysis-dataset-distribution error-item">
     <p>Format: <span class="distribution-format"></span></p>
     <p>Error: <em class="error-message"></em></p>
     <span class="error-details-section">
@@ -50,9 +50,6 @@ const TEMPLATES = {
 
 let css = `
 <style>
-.distribution-source {
-  word-wrap: break-word;
-}
 .analysis-dataset-list {
   margin-top: 20px;
 }

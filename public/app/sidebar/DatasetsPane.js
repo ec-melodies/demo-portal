@@ -15,12 +15,12 @@ const TEMPLATES = {
     <p class="dataset-spatial-geometry"><i class="glyphicon glyphicon-globe"></i> <span class="dataset-spatial-geometry-text"></span></p>
     <div class="dataset-spatial-minimap"></div>
     <button type="button" class="btn btn-success dataset-analyse-button" style="display:none">
-      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Analyse
+      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Add to Workspace
     </button>
   </li>
   `,
   'dataset-error': `
-  <li class="list-group-item list-group-item-danger">
+  <li class="list-group-item list-group-item-danger error-item">
     <h4 class="list-group-item-heading dataset-title">Problem while loading catalogue</h4>
     <p>Error: <em class="error-message"></em></p>
     <p>Details:</p>
@@ -41,7 +41,7 @@ let css = `
 $('head').add(HTML(css))
 
 let paneHtml = () => `
-<h1 class="sidebar-header">Datasets<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
+<h1 class="sidebar-header">Search<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
 
 <div class="panel panel-default catalog-url-panel">
   <div class="panel-heading">
