@@ -5,7 +5,9 @@ import {i18n} from '../util.js'
 let paneHtml = () => `
 <h1 class="sidebar-header">Workspace<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
 
-<div class="analysis-dataset-list"></div>
+<div class="analysis-dataset-list">
+  <p class="user-hint">Click on "Add to Workspace" in the search tab to add datasets.</p>
+</div>
 `
 
 const TEMPLATES = {
@@ -26,8 +28,9 @@ const TEMPLATES = {
   `,
   'analysis-dataset-distribution': `
   <li class="list-group-item analysis-dataset-distribution">
-    <p class="distribution-format"></p>
-    <p class="distribution-metadata"></p>
+    <p>Title: <em class="distribution-title"></em></p>
+    <p>Type: <span class="distribution-format"></span></p>
+    <p>Content: <span class="distribution-metadata"></span></p>
     <div class="distribution-actions"></div>
   </li>
   `,
@@ -129,6 +132,8 @@ export default class AnalysePane {
       }, 100)
       
       this._addDataset(dataset)
+
+      $('.user-hint', '#' + this.id).remove()
     })
     
     this.analysisCatalogue.on('remove', ({dataset}) => {
@@ -171,6 +176,7 @@ export default class AnalysePane {
     distribution.domEl = el
     let meta = distribution.metadata
     
+    $('.distribution-title', el).fill(i18n(distribution.title))
     $('.distribution-format', el).fill(meta.format)
     $('.distribution-metadata', el).fill(meta.type)
     

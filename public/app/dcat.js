@@ -156,6 +156,8 @@ export function loadCatalog (url) {
           if (dist['dcat:accessURL']) {
             dist.accessURL = dist['dcat:accessURL']
           }
+          // convenience
+          dist.url = dist.downloadURL || dist.accessURL
         }
       }
       // since this is not a valid JSON-LD doc anymore, we might as well remove the context now

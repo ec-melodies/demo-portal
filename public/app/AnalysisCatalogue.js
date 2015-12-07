@@ -1,5 +1,6 @@
 import Eventable from './Eventable.js'
 
+// TODO rename to Workspace
 export default class AnalysisCatalogue extends Eventable {
   constructor (formats) {
     super()
@@ -65,22 +66,23 @@ export default class AnalysisCatalogue extends Eventable {
       for (let format of this._formats) {
         if (format.supports(distribution.mediaType)) {
           this.fire('distributionLoading', {dataset, distribution})
-          let urlOrData = distribution.accessURL || distribution.downloadURL || distribution.data
+          let urlOrData = distribution.url || distribution.data
           let promise = format.load(urlOrData).then(data => {
             let meta = format.getMetadata(data)
             let actions = format.getActions(data)
             
             // inject context into actions
             for (let action of actions) {
-              action.context = {dataset, distribution}
+              action.context = {dataset, distribution, workspace: this}
               
               for (let key in this._staticActionContext) {
                 action.context[key] = this._staticActionContext[key]
               }
             }
-            
+            distribution.formatImpl = format
             distribution.metadata = meta
             distribution.actions = actions
+            distribution.data = data
 
             this.fire('distributionLoad', {dataset, distribution})
           }).catch(e => {
