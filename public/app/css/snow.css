@@ -1,0 +1,34 @@
+/* adapted from http://codepen.io/NickyCDK/pen/AIonk */
+.snow{
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index:1;
+	pointer-events: none;
+}
+#snow1{
+	background-image: url('http://www.wearewebstars.dk/codepen/img/s1.png');
+	animation: snow1 5s linear infinite;
+}
+#snow2{
+	background-image: url('http://www.wearewebstars.dk/codepen/img/s2.png');
+	animation: snow2 20s linear infinite;
+}
+#snow3{
+	background-image: url('http://www.wearewebstars.dk/codepen/img/s3.png');
+	animation: snow3 30s linear infinite;
+}
+@keyframes snow1 {
+  from {background-position: 0px 0px}
+  to {background-position: 500px 500px}
+}
+@keyframes snow2 {
+  from {background-position: 0px 0px}
+  to {background-position: 400px 800px}
+}
+@keyframes snow3 {
+  from {background-position: 0px 0px}
+  to {background-position: -600px 900px}
+}

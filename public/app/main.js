@@ -17,6 +17,15 @@ import Sidebar from './sidebar/Sidebar.js'
 import './css/style.css!'
 import './css/styledLayerControl/styledLayerControl.css!'
 
+// Xmas magic
+import {$,HTML} from 'minified'
+import './css/snow.css!'
+$('body').add(HTML(`
+  <div id="snow1" class="snow"></div>
+  <div id="snow2" class="snow"></div>
+  <div id="snow3" class="snow"></div>
+`))
+
 const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
 let map = L.map('map', {
