@@ -42,6 +42,10 @@ export default class Workspace extends Eventable {
     }
   }
   
+  requestFocus (dataset) {
+    this.fire('requestFocus', {dataset})
+  }
+  
   get datasets () {
     return [...this._datasets.values()]
   }

@@ -1,6 +1,7 @@
 import {$, HTML} from 'minified'
 
 import {i18n} from '../util.js'
+import Eventable from '../Eventable.js'
 
 let paneHtml = () => `
 <h1 class="sidebar-header">Workspace<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
@@ -11,8 +12,9 @@ let paneHtml = () => `
 `
 
 const TEMPLATES = {
-  'analysis-dataset': `
-  <div class="panel analysis-dataset">
+  // Important: No whitespace at beginning as this introduces text nodes and we just get the first node!
+  'analysis-dataset': 
+  `<div class="panel analysis-dataset">
     <div class="panel-heading">
       <h4>
         <span class="dataset-title"></span>
@@ -24,31 +26,28 @@ const TEMPLATES = {
     </div>
   
     <ul class="list-group analysis-dataset-distribution-list"></ul>
-  </div>
-  `,
-  'analysis-dataset-distribution': `
-  <li class="list-group-item analysis-dataset-distribution">
+  </div>`,
+  
+  'analysis-dataset-distribution':
+  `<li class="list-group-item analysis-dataset-distribution">
     <p>Title: <em class="distribution-title"></em></p>
     <p>Type: <span class="distribution-format"></span></p>
     <p>Content: <span class="distribution-metadata"></span></p>
     <div class="distribution-actions"></div>
-  </li>
-  `,
-  'analysis-dataset-distribution-action': `
-  <span class="analysis-dataset-distribution-action">
+  </li>`,
+  'analysis-dataset-distribution-action': 
+  `<span class="analysis-dataset-distribution-action">
     <button type="button" class="btn btn-primary"></button>
-  </span>
-  `,
-  'analysis-dataset-distribution-error': `
-  <li class="list-group-item list-group-item-danger analysis-dataset-distribution error-item">
+  </span>`,
+  'analysis-dataset-distribution-error': 
+  `<li class="list-group-item list-group-item-danger analysis-dataset-distribution error-item">
     <p>Format: <span class="distribution-format"></span></p>
     <p>Error: <em class="error-message"></em></p>
     <span class="error-details-section">
       <p>Details:</p>
       <small><pre class="error-details"></pre></small>
     </span>
-  </li>
-  `
+  </li>`
 }
 
 let css = `
@@ -111,8 +110,9 @@ let css = `
 `
 $('head').add(HTML(css))
 
-export default class AnalysePane {
+export default class AnalysePane extends Eventable {
   constructor (sidebar, paneId) {
+    super()
     this.sidebar = sidebar
     this.id = paneId
     
@@ -155,10 +155,25 @@ export default class AnalysePane {
     this.workspace.on('distributionLoadError', ({dataset, distribution, error}) => {
       this._addDistributionLoadError(dataset, distribution, error)
     })
+    
+    this.workspace.on('requestFocus', ({dataset}) => {
+      // not added to dom yet, defer
+      if (!dataset.domEl) {
+        var fn = data => {
+          if (data.dataset === dataset) {
+            dataset.domEl.scrollIntoView()
+            this.off('add', fn)
+          }
+        }
+        this.on('add', fn)
+      } else {
+        dataset.domEl.scrollIntoView()
+      }
+    })
   }
   
   _addDataset (dataset) {
-    let el = HTML(TEMPLATES['analysis-dataset'])
+    let el = HTML(TEMPLATES['analysis-dataset'])[0] // the outer div
     $('.analysis-dataset-list', '#' + this.id).add(el)
     dataset.domEl = el
     
@@ -172,6 +187,7 @@ export default class AnalysePane {
     $('.close', el).on('click', () => {
       this.workspace.removeDataset(dataset)
     })
+    this.fire('add', {dataset})
   }
   
   _addDistribution (dataset, distribution) {

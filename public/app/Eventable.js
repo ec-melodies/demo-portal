@@ -1,14 +1,18 @@
 export default class Eventable {
   constructor () {
-    this.listeners = new DefaultMap(() => [])
+    this.listeners = new DefaultMap(() => new Set())
   }
   
   on (events, fn) {
     events = Array.isArray(events) ? events : [events]
     for (let event of events) {
-      this.listeners.get(event).push(fn)
+      this.listeners.get(event).add(fn)
     }
     return this
+  }
+  
+  off (event, fn) {
+    this.listeners.get(event).delete(fn)
   }
   
   fire (event, data) {

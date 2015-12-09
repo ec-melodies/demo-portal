@@ -51,7 +51,11 @@ export default class CoverageView extends Action {
         layer.addTo(map)
       }
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
-      map.layerControl.addOverlay(layer, '<span class="label label-success">CovJSON</span> ' + layerName, {groupName: datasetTitle, expanded: true})
+      let formatLabel = this.context.distribution.formatImpl.shortLabel
+      map.layerControl.addOverlay(
+          layer,
+          '<span class="label label-success">' + formatLabel + '</span> ' + layerName,
+          {groupName: datasetTitle, expanded: true})
       this.layers.push(layer)
     }
   }

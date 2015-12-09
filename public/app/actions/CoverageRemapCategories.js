@@ -274,7 +274,7 @@ export default class CoverageRemapCategories extends Action {
               let mapping = data.mapping
               let remappedCov = withCategories(this.cov, sourceParameter.key, covTargetCategories, mapping)
               
-              this.context.workspace.addDataset({
+              let virtualDataset = {
                 title: new Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
                 virtual: true,
                 distributions: [{
@@ -282,7 +282,9 @@ export default class CoverageRemapCategories extends Action {
                   mediaType: 'coveragedata',
                   data: remappedCov
                 }]
-              })
+              }
+              this.context.workspace.addDataset(virtualDataset)
+              this.context.workspace.requestFocus(virtualDataset)
             })
             
             remapper.show()
