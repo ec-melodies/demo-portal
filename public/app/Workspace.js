@@ -1,7 +1,6 @@
 import Eventable from './Eventable.js'
 
-// TODO rename to Workspace
-export default class AnalysisCatalogue extends Eventable {
+export default class Workspace extends Eventable {
   constructor (formats) {
     super()
     this._datasets = new Map()
@@ -20,6 +19,9 @@ export default class AnalysisCatalogue extends Eventable {
   }
   
   addDataset (dataset) {
+    if (!dataset.id) {
+      dataset.id = new Date().getTime()
+    }
     if (!this._datasets.has(dataset.id)) {
       this._datasets.set(dataset.id, dataset)
       this.fire('add', {dataset})

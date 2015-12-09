@@ -4,7 +4,7 @@ import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
 
-export default class CovJSONView extends Action {
+export default class CoverageView extends Action {
   constructor (data) {
     super()
     this.cov = data
@@ -67,4 +67,4 @@ export default class CovJSONView extends Action {
   }
 }
 
-CovJSONView.type = VIEW
+CoverageView.type = VIEW

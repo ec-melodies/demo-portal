@@ -1,9 +1,9 @@
 import * as CovJSONReader from 'covjson-reader'
-import Format from './Format.js'
+import CoverageData from './CoverageData.js'
 
 const MEDIA_TYPES = ['application/prs.coverage+json', 'application/prs.coverage+cbor']
 
-export default class CovJSON extends Format {
+export default class CovJSON extends CoverageData {
   /**
    * @param {Array} actionFactories Array of action class factories
    */
@@ -18,17 +18,15 @@ export default class CovJSON extends Format {
   }
   
   /**
-   * @param urlOrObject Either a URL or a CovJSON object.
+   * @param urlOrObject Either a URL, a CovJSON object, or a Coverage API object.
    * @returns {Promise} succeeds with a Coverage or Coverage Collection API object
    */
   doLoad (urlOrObject) {
-    return CovJSONReader.read(urlOrObject)
-  }
-  
-  getMetadata (cov) {
-    return {
-      format: this.label,
-      type: cov.type
+    if (typeof urlOrObject === 'object' && urlOrObject.loadDomain) {
+      return Promise.resolve(urlOrObject)
+    } else {
+      return CovJSONReader.read(urlOrObject)
     }
   }
+  
 }

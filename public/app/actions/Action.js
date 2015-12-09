@@ -15,7 +15,7 @@ export default class Action extends Eventable {
     this._context = {}
   }
   /**
-   * Set by AnalysisCatalogue._loadDistribution().
+   * Set by Workspace._loadDistribution().
    */
   set context (val) {
     this._context = val

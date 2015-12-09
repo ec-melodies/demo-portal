@@ -12,7 +12,7 @@ let paneHtml = () => `
 
 const TEMPLATES = {
   'analysis-dataset': `
-  <div class="panel panel-default analysis-dataset">
+  <div class="panel analysis-dataset">
     <div class="panel-heading">
       <h4>
         <span class="dataset-title"></span>
@@ -118,13 +118,13 @@ export default class AnalysePane {
     
     $('#' + paneId).fill(HTML(paneHtml()))
     
-    this.analysisCatalogue = sidebar.analysisCatalogue
+    this.workspace = sidebar.workspace
     
     this._registerModelListeners()
   }
   
   _registerModelListeners () {
-    this.analysisCatalogue.on('add', ({dataset}) => {
+    this.workspace.on('add', ({dataset}) => {
       let tab = $('a.sidebar-tab', '#' + this.sidebar.id).filter(t => $(t).get('@href') === '#' + this.id)
       tab.set('-highlight-anim')
       setTimeout(() => { // doesn't work without small delay
@@ -136,23 +136,23 @@ export default class AnalysePane {
       $('.user-hint', '#' + this.id).remove()
     })
     
-    this.analysisCatalogue.on('remove', ({dataset}) => {
+    this.workspace.on('remove', ({dataset}) => {
       $(dataset.domEl).remove()
     })
     
-    this.analysisCatalogue.on('distributionsLoading', ({dataset}) => {
+    this.workspace.on('distributionsLoading', ({dataset}) => {
       $('.panel-body', dataset.domEl).show()
     })
     
-    this.analysisCatalogue.on('distributionsLoad', ({dataset}) => {
+    this.workspace.on('distributionsLoad', ({dataset}) => {
       $('.panel-body', dataset.domEl).hide()
     })
     
-    this.analysisCatalogue.on('distributionLoad', ({dataset, distribution}) => {
+    this.workspace.on('distributionLoad', ({dataset, distribution}) => {
       this._addDistribution(dataset, distribution)
     })
     
-    this.analysisCatalogue.on('distributionLoadError', ({dataset, distribution, error}) => {
+    this.workspace.on('distributionLoadError', ({dataset, distribution, error}) => {
       this._addDistributionLoadError(dataset, distribution, error)
     })
   }
@@ -162,11 +162,15 @@ export default class AnalysePane {
     $('.analysis-dataset-list', '#' + this.id).add(el)
     dataset.domEl = el
     
-    let title = i18n(dataset.title)
-    $('.dataset-title', el).fill(title)
+    if (dataset.virtual) {
+      $(el).set('+panel-info')
+    } else {
+      $(el).set('+panel-default')
+    }
+    $('.dataset-title', el).fill(i18n(dataset.title))
     
     $('.close', el).on('click', () => {
-      this.analysisCatalogue.removeDataset(dataset)
+      this.workspace.removeDataset(dataset)
     })
   }
   

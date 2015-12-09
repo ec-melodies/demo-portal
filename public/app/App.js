@@ -1,14 +1,15 @@
 import Eventable from './Eventable.js'
 import Catalogue from './Catalogue.js'
-import AnalysisCatalogue from './AnalysisCatalogue.js'
+import Workspace from './Workspace.js'
 
+import CoverageData from './formats/CoverageData.js'
 import CovJSON from './formats/CovJSON.js'
 import GeoJSON from './formats/GeoJSON.js'
 import JSONLD from './formats/JSONLD.js'
 import WMS from './formats/WMS.js'
 
-import CovJSONView from './actions/CovJSONView.js'
-import CovJSONRemapCategories from './actions/CovJSONRemapCategories.js'
+import CoverageView from './actions/CoverageView.js'
+import CoverageRemapCategories from './actions/CoverageRemapCategories.js'
 import GeoJSONView from './actions/GeoJSONView.js'
 import WMSView from './actions/WMSView.js'
 
@@ -27,8 +28,12 @@ export default class App extends Eventable {
     
     this.formats = [
       new CovJSON([
-         CovJSONView,
-         CovJSONRemapCategories
+         CoverageView,
+         CoverageRemapCategories
+      ]),
+      new CoverageData([
+         CoverageView,
+         CoverageRemapCategories
       ]),
       new GeoJSON([
         GeoJSONView
@@ -39,8 +44,8 @@ export default class App extends Eventable {
       new JSONLD()
     ]
     
-    this.analysisCatalogue = new AnalysisCatalogue(this.formats)
-    this.analysisCatalogue.addStaticActionContext({map})
+    this.workspace = new Workspace(this.formats)
+    this.workspace.addStaticActionContext({map})
     
     this._registerLoadingListeners()
   }
@@ -65,7 +70,7 @@ export default class App extends Eventable {
     this.catalogue
       .on('loading', fireLoadingEvent)
       .on(['load', 'loadError'], fireLoadEvent)
-    this.analysisCatalogue
+    this.workspace
       .on('distributionsLoading', fireLoadingEvent)
       .on('distributionsLoad', fireLoadEvent)
     for (let format of this.formats) {

@@ -80,7 +80,7 @@ export default class DatasetsPane {
     $('#' + paneId).fill(HTML(paneHtml()))
     
     this.catalogue = sidebar.catalogue
-    this.analysisCatalogue = sidebar.analysisCatalogue
+    this.workspace = sidebar.workspace
     
     this._registerUIListeners()
     this._registerModelListeners()
@@ -251,7 +251,7 @@ export default class DatasetsPane {
       if (hasProcessableDistributions) {
         $('.dataset-analyse-button', el).show()
         $('.dataset-analyse-button', el).on('click', () => {
-          this.analysisCatalogue.addDataset(dataset)
+          this.workspace.addDataset(dataset)
         })
       }
     }

@@ -34,7 +34,7 @@ export default class Sidebar {
     this.map = map
     this.app = app
     this.catalogue = app.catalogue
-    this.analysisCatalogue = app.analysisCatalogue
+    this.workspace = app.workspace
     this.id = sidebarId
     this.layerControl = layerControl
     // has to come before the map div, otherwise it overlays zoom controls
