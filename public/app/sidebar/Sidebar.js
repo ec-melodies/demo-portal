@@ -41,12 +41,13 @@ export default class Sidebar {
     $('body').addFront(HTML(sidebarHtml(sidebarId, datasetsPaneId, analysePaneId)))
     
     $('#' + map.getContainer().id).set('+sidebar-map')
-    this.control = L.control.sidebar(sidebarId).addTo(map)
         
     this.panes = {
       Datasets: new DatasetsPane(this, datasetsPaneId),
       Analyse: new AnalysePane(this, analysePaneId)
     }
+    
+    this.control = L.control.sidebar(sidebarId).addTo(map)
   }
   
   open (tabId) {
