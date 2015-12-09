@@ -49,7 +49,7 @@ for (let id in baseLayerLabels) {
   let layer = L.tileLayer.provider(id)
   baseLayers[baseLayerLabels[id]] = layer
 }
-baseLayers[baseLayerLabels['OpenStreetMap']].addTo(map)
+baseLayers[baseLayerLabels['MapQuestOpen.Aerial']].addTo(map)
 
 let baseMaps = [{
   groupName: 'Base Maps',
