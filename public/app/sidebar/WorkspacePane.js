@@ -8,7 +8,7 @@ let paneHtml = () => `
 <h1 class="sidebar-header">Workspace<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
 
 <p style="margin-top: 20px">
-  <button type="button" class="btn btn-primary create-dataset-button">Create/Upload Data</button>
+  <button type="button" class="btn btn-primary create-dataset-button">Load Data</button>
 </p>
 
 <div class="workspace-dataset-list">
@@ -32,6 +32,21 @@ let bodyHtml = `
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="dataCreateLoadModal" tabindex="-1" role="dialog" aria-labelledby="dataCreateLoadModalLabel">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title" id="dataCreateLoadModalLabel">Input your data</h4>
+    </div>
+    <div class="modal-body"></div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+  </div>
+</div>
 </div>
 `
 $('body').add(HTML(bodyHtml))
@@ -60,10 +75,12 @@ const TEMPLATES = {
     <p>Content: <span class="distribution-metadata"></span></p>
     <div class="distribution-actions"></div>
   </li>`,
+  
   'workspace-dataset-distribution-action': 
   `<span class="workspace-dataset-distribution-action">
     <button type="button" class="btn btn-primary"></button>
   </span>`,
+  
   'workspace-dataset-distribution-error': 
   `<li class="list-group-item list-group-item-danger workspace-dataset-distribution error-item">
     <p>Format: <span class="distribution-format"></span></p>
@@ -73,13 +90,55 @@ const TEMPLATES = {
       <small><pre class="error-details"></pre></small>
     </span>
   </li>`,
+  
   'format-button-item':
-  `<span><button type="button" class="btn btn-primary format-button"></button></span> `
+  `<span><button type="button" class="btn btn-primary format-button" data-dismiss="modal"></button></span> `,
+  
+  'url-input-panel':
+  `<div class="panel panel-primary">
+    <div class="panel-heading">
+      <h4>By URL</h4>
+    </div>
+    <div class="panel-body">
+      <div class="input-group">
+        <input type="text" class="form-control data-url" placeholder="http://..." />
+        <span class="input-group-btn">
+          <button class="btn btn-primary load-url-button" type="button">Load</button>
+        </span>
+      </div>
+    </div>
+  </div>`,
+  
+  'file-input-panel':
+  `<div class="panel panel-primary">
+    <div class="panel-heading">
+      <h4>By Local File</h4>
+    </div>
+    <div class="panel-body">
+      <div class="input-group">
+        <input type="file" class="form-control data-file" />
+        <span class="input-group-btn">
+          <button class="btn btn-primary load-file-button" type="button">Load</button>
+        </span>
+      </div>
+    </div>
+  </div>`,
+  
+  'data-input-panel':
+  `<div class="panel panel-primary">
+    <div class="panel-heading">
+      <h4>By Direct Input</h4>
+    </div>
+    <div class="panel-body">
+      <textarea class="form-control data-textarea" rows="10"></textarea>
+      <button class="btn btn-primary load-input-button" type="button">Load</button>
+    </div>
+  </div>`
 }
 
 let css = `
 <style>
-.workspace-dataset-list {
+.workspace-dataset-list, .load-input-button {
   margin-top: 20px;
 }
 @keyframes flash-icon {
@@ -95,15 +154,9 @@ let css = `
 }
 /* http://www.css-spinners.com/spinner/throbber */
 @keyframes throbber-loader {
-  0% {
-    background: #dde2e7;
-  }
-  10% {
-    background: #6b9dc8;
-  }
-  40% {
-    background: #dde2e7;
-  }
+  0%  { background: #dde2e7 }
+  10% { background: #6b9dc8 }
+  40% { background: #dde2e7 }
 }
 /* :not(:required) hides these rules from IE9 and below */
 .throbber-loader:not(:required) {
@@ -160,22 +213,45 @@ export default class WorkspacePane extends Eventable {
     // Step 1: show first modal and let user select the format
     // Step 2: show second modal and display URL field, text area (if media type json or xml), and local file field
     // Step 3: create virtual dataset
-    let modalEl = $('#formatSelectModal')
     
-    // iterate over all formats and skip the ones without a proper mimetype (not in the form */*)
-    // (these are not real file formats and exist only internally as objects)
-    for (let format of this.app.formats) {
-      if (format.mediaTypes.some(mt => mt.indexOf('/') !== -1)) {
-        let el = $(HTML(TEMPLATES['format-button-item']))
-        $('.format-button', el).fill(format.label).on('click', () => {
+    let formatModal = () => {
+      let modalEl = $('#formatSelectModal')
+      
+      // iterate over all formats and skip the ones without a proper mimetype (not in the form */*)
+      // (these are not real file formats and exist only internally for derived object-only data (e.g. "CoverageData"))
+      
+      $('.format-list', modalEl).fill()
+      for (let format of this.app.formats) {
+        if (format.mediaTypes.some(mt => mt.indexOf('/') !== -1)) {
+          let el = $(HTML(TEMPLATES['format-button-item']))
+          $('.format-button', el).fill(format.label).on('|click', () => {
+            setTimeout(() => dataModal(format), 100)
+          })
           
-        })
-        
-        $('.format-list', modalEl).add(el)
+          $('.format-list', modalEl).add(el)
+        }
       }
+      
+      new Modal(modalEl[0]).open()
     }
     
-    new Modal(modalEl[0]).open()
+    let dataModal = format => {
+      let modalEl = $('#dataCreateLoadModal')
+      
+      let body = $('.modal-body', modalEl)
+      body.fill()
+      body.add(HTML(TEMPLATES['url-input-panel']))
+      body.add(HTML(TEMPLATES['file-input-panel']))
+      
+      // check if the format has a text media type, if yes: show text area
+      if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1 || mt.indexOf('xml') !== -1)) {
+        body.add(HTML(TEMPLATES['data-input-panel']))
+      }      
+      
+      new Modal(modalEl[0]).open()
+    }
+    
+    formatModal()
   }
   
   _registerModelListeners () {
