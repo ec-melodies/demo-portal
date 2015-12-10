@@ -1,9 +1,6 @@
 import {$} from 'minified'
 import Format from './Format.js'
 
-// see dcat.js, this media type does not actually exist!
-const MEDIA_TYPE = 'application/wms+xml'
-
 export default class WMS extends Format {
   /**
    * @param {Array} actionFactories Array of action class factories
@@ -12,12 +9,10 @@ export default class WMS extends Format {
     super(actionFactories)
     this.label = 'Web Map Service'
     this.shortLabel = 'WMS'
+    // see dcat.js, this media type does not actually exist!
+    this.mediaTypes = ['application/wms+xml']
   }
-  
-  supports (mediaType) {
-    return mediaType && mediaType.toLowerCase() === MEDIA_TYPE 
-  }
-  
+    
   /**
    * @param url A WMS endpoint URL.
    * @returns {Promise} succeeds with layers metadata.

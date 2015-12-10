@@ -1,4 +1,5 @@
 import {$, HTML} from 'minified'
+import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import {i18n} from '../util.js'
 import Eventable from '../Eventable.js'
@@ -6,15 +7,39 @@ import Eventable from '../Eventable.js'
 let paneHtml = () => `
 <h1 class="sidebar-header">Workspace<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
 
-<div class="analysis-dataset-list">
+<p style="margin-top: 20px">
+  <button type="button" class="btn btn-primary create-dataset-button">Create/Upload Data</button>
+</p>
+
+<div class="workspace-dataset-list">
   <p class="user-hint">Click on "Add to Workspace" in the search tab to add datasets.</p>
 </div>
 `
 
+let bodyHtml = `
+<div class="modal fade" id="formatSelectModal" tabindex="-1" role="dialog" aria-labelledby="formatSelectModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="formatSelectModalLabel">Select a format</h4>
+      </div>
+      <div class="modal-body">
+        <span class="format-list"></span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+`
+$('body').add(HTML(bodyHtml))
+
 const TEMPLATES = {
   // Important: No whitespace at beginning as this introduces text nodes and we just get the first node!
-  'analysis-dataset': 
-  `<div class="panel analysis-dataset">
+  'workspace-dataset': 
+  `<div class="panel workspace-dataset">
     <div class="panel-heading">
       <h4>
         <span class="dataset-title"></span>
@@ -25,34 +50,36 @@ const TEMPLATES = {
       <div class="throbber-loader loader">Loading...</div>
     </div>
   
-    <ul class="list-group analysis-dataset-distribution-list"></ul>
+    <ul class="list-group workspace-dataset-distribution-list"></ul>
   </div>`,
   
-  'analysis-dataset-distribution':
-  `<li class="list-group-item analysis-dataset-distribution">
+  'workspace-dataset-distribution':
+  `<li class="list-group-item workspace-dataset-distribution">
     <p>Title: <em class="distribution-title"></em></p>
     <p>Type: <span class="distribution-format"></span></p>
     <p>Content: <span class="distribution-metadata"></span></p>
     <div class="distribution-actions"></div>
   </li>`,
-  'analysis-dataset-distribution-action': 
-  `<span class="analysis-dataset-distribution-action">
+  'workspace-dataset-distribution-action': 
+  `<span class="workspace-dataset-distribution-action">
     <button type="button" class="btn btn-primary"></button>
   </span>`,
-  'analysis-dataset-distribution-error': 
-  `<li class="list-group-item list-group-item-danger analysis-dataset-distribution error-item">
+  'workspace-dataset-distribution-error': 
+  `<li class="list-group-item list-group-item-danger workspace-dataset-distribution error-item">
     <p>Format: <span class="distribution-format"></span></p>
     <p>Error: <em class="error-message"></em></p>
     <span class="error-details-section">
       <p>Details:</p>
       <small><pre class="error-details"></pre></small>
     </span>
-  </li>`
+  </li>`,
+  'format-button-item':
+  `<span><button type="button" class="btn btn-primary format-button"></button></span> `
 }
 
 let css = `
 <style>
-.analysis-dataset-list {
+.workspace-dataset-list {
   margin-top: 20px;
 }
 @keyframes flash-icon {
@@ -110,7 +137,7 @@ let css = `
 `
 $('head').add(HTML(css))
 
-export default class AnalysePane extends Eventable {
+export default class WorkspacePane extends Eventable {
   constructor (sidebar, paneId) {
     super()
     this.sidebar = sidebar
@@ -119,8 +146,36 @@ export default class AnalysePane extends Eventable {
     $('#' + paneId).fill(HTML(paneHtml()))
     
     this.workspace = sidebar.workspace
+    this.app = sidebar.app
     
+    this._registerUIListeners()
     this._registerModelListeners()
+  }
+  
+  _registerUIListeners() {
+    $('.create-dataset-button', '#' + this.id).on('click', () => this._createDatasetWorkflow())
+  }
+  
+  _createDatasetWorkflow () {
+    // Step 1: show first modal and let user select the format
+    // Step 2: show second modal and display URL field, text area (if media type json or xml), and local file field
+    // Step 3: create virtual dataset
+    let modalEl = $('#formatSelectModal')
+    
+    // iterate over all formats and skip the ones without a proper mimetype (not in the form */*)
+    // (these are not real file formats and exist only internally as objects)
+    for (let format of this.app.formats) {
+      if (format.mediaTypes.some(mt => mt.indexOf('/') !== -1)) {
+        let el = $(HTML(TEMPLATES['format-button-item']))
+        $('.format-button', el).fill(format.label).on('click', () => {
+          
+        })
+        
+        $('.format-list', modalEl).add(el)
+      }
+    }
+    
+    new Modal(modalEl[0]).open()
   }
   
   _registerModelListeners () {
@@ -173,8 +228,8 @@ export default class AnalysePane extends Eventable {
   }
   
   _addDataset (dataset) {
-    let el = HTML(TEMPLATES['analysis-dataset'])[0] // the outer div
-    $('.analysis-dataset-list', '#' + this.id).add(el)
+    let el = HTML(TEMPLATES['workspace-dataset'])[0] // the outer div
+    $('.workspace-dataset-list', '#' + this.id).add(el)
     dataset.domEl = el
     
     if (dataset.virtual) {
@@ -191,8 +246,8 @@ export default class AnalysePane extends Eventable {
   }
   
   _addDistribution (dataset, distribution) {
-    let el = HTML(TEMPLATES['analysis-dataset-distribution'])
-    $('.analysis-dataset-distribution-list', dataset.domEl).add(el)
+    let el = HTML(TEMPLATES['workspace-dataset-distribution'])
+    $('.workspace-dataset-distribution-list', dataset.domEl).add(el)
     distribution.domEl = el
     let meta = distribution.metadata
     
@@ -202,7 +257,7 @@ export default class AnalysePane extends Eventable {
     
     if (distribution.actions) {
       for (let action of distribution.actions) {
-        let actionEl = HTML(TEMPLATES['analysis-dataset-distribution-action'])
+        let actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action'])
         $('button', actionEl).fill(action.label).on('click', () => {
           action.run()
         })
@@ -212,8 +267,8 @@ export default class AnalysePane extends Eventable {
   }
   
   _addDistributionLoadError (dataset, distribution, error) {
-    let el = HTML(TEMPLATES['analysis-dataset-distribution-error'])
-    $('.analysis-dataset-distribution-list', dataset.domEl).add(el)
+    let el = HTML(TEMPLATES['workspace-dataset-distribution-error'])
+    $('.workspace-dataset-distribution-list', dataset.domEl).add(el)
     distribution.domEl = el
     
     $('.distribution-format', el).fill(distribution.format || distribution.mediaType)

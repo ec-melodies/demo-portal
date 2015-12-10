@@ -70,7 +70,7 @@ let paneHtml = () => `
 <ul class="list-group dataset-list"></ul>
 `
 
-export default class DatasetsPane {
+export default class SearchPane {
   constructor (sidebar, paneId) {
     this.sidebar = sidebar
     this.id = paneId

@@ -4,23 +4,23 @@ import 'sidebar-v2/css/leaflet-sidebar.css!'
 import 'bootstrap/css/bootstrap.css!'
 import {$, HTML} from 'minified'
 
-import DatasetsPane from './DatasetsPane.js'
-import AnalysePane from './AnalysePane.js'
+import SearchPane from './SearchPane.js'
+import WorkspacePane from './WorkspacePane.js'
 
-let sidebarHtml = (sidebarId, datasetsPaneId, analysePaneId) => `
+let sidebarHtml = (sidebarId, searchPaneId, workspacePaneId) => `
 <div id="${sidebarId}" class="sidebar collapsed">
   <!-- Nav tabs -->
   <div class="sidebar-tabs">
       <ul role="tablist">
-          <li><a href="#${datasetsPaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>
-          <li><a href="#${analysePaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-flash"></i></a></li>
+          <li><a href="#${searchPaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>
+          <li><a href="#${workspacePaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-flash"></i></a></li>
       </ul>
   </div>
   
   <!-- Tab panes -->
   <div class="sidebar-content">
-      <div class="sidebar-pane" id="${datasetsPaneId}"></div>
-      <div class="sidebar-pane" id="${analysePaneId}"></div>
+      <div class="sidebar-pane" id="${searchPaneId}"></div>
+      <div class="sidebar-pane" id="${workspacePaneId}"></div>
   </div>
 </div>
 <style>
@@ -30,7 +30,7 @@ let sidebarHtml = (sidebarId, datasetsPaneId, analysePaneId) => `
 `
 
 export default class Sidebar {
-  constructor (map, {app, sidebarId='sidebar', datasetsPaneId='datasets', analysePaneId='analyse', layerControl=null}={}) {
+  constructor (map, {app, sidebarId='sidebar', searchPaneId='search', workspacePaneId='workspace', layerControl=null}={}) {
     this.map = map
     this.app = app
     this.catalogue = app.catalogue
@@ -38,20 +38,20 @@ export default class Sidebar {
     this.id = sidebarId
     this.layerControl = layerControl
     // has to come before the map div, otherwise it overlays zoom controls
-    $('body').addFront(HTML(sidebarHtml(sidebarId, datasetsPaneId, analysePaneId)))
+    $('body').addFront(HTML(sidebarHtml(sidebarId, searchPaneId, workspacePaneId)))
     
     $('#' + map.getContainer().id).set('+sidebar-map')
         
     this.panes = {
-      Datasets: new DatasetsPane(this, datasetsPaneId),
-      Analyse: new AnalysePane(this, analysePaneId)
+      Search: new SearchPane(this, searchPaneId),
+      Workspace: new WorkspacePane(this, workspacePaneId)
     }
     
     this.control = L.control.sidebar(sidebarId).addTo(map)
   }
   
-  open (tabId) {
-    this.control.open(tabId)
+  open (pane) {
+    this.control.open(pane.id)
   }
 }
 

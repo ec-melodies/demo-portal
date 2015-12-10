@@ -4,8 +4,14 @@ export default class Format extends Eventable {
   constructor (actionClasses) {
     super()
     this.actionClasses = actionClasses || []
-    this.label = '<OVERWRITE ME>'
-    this.shortLabel = this.label
+    // overwrite in subclass
+    this.label = undefined
+    this.shortLabel = undefined
+    this.mediaTypes = undefined
+  }
+  
+  supports (mediaType) {
+    return mediaType && this.mediaTypes.some(m => mediaType.toLowerCase().startsWith(m))
   }
   
   getActions (obj) {

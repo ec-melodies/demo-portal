@@ -87,7 +87,7 @@ if (window.location.hash) {
 
 let sidebar = new Sidebar(map, {app, layerControl})
 app.catalogue.loadFromDCAT(catalogUrl).then(() => {
-  sidebar.open('datasets')
+  sidebar.open(sidebar.panes.Search)
 }).catch(() => {
-  sidebar.open('datasets')
+  sidebar.open(sidebar.panes.Search)
 })

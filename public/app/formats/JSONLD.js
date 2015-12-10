@@ -1,19 +1,14 @@
 import {promises as jsonld} from 'jsonld'
 import Format from './Format.js'
 
-const MEDIA_TYPE = 'application/ld+json'
-
 export default class JSONLD extends Format {
   constructor (actionFactories) {
     super(actionFactories)
     this.label = 'JSON-LD'
     this.shortLabel = 'JSON-LD'
+    this.mediaTypes = ['application/ld+json']
   }
-  
-  supports (mediaType) {
-    return mediaType && mediaType.startsWith(MEDIA_TYPE) // can have parameters
-  }
-  
+    
   /**
    * @param urlOrObject Either a URL or a JSON-LD object.
    * @returns {Promise} succeeds with JSON-LD object
