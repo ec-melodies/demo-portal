@@ -5,6 +5,7 @@ export const PROCESS = 'process'
 
 /**
  * Every subclass must add a static `type` property with either VIEW or PROCESS.
+ * This is automatically assigned as instance property to allow easier access.
  * 
  * When a subclass is loading external data, then the dataLoading and dataLoad events
  * should be fired.
@@ -13,6 +14,7 @@ export default class Action extends Eventable {
   constructor () {
     super()
     this._context = {}
+    this.type = this.constructor.type
   }
   /**
    * Set by Workspace._loadDistribution().

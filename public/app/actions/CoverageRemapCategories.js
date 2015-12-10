@@ -7,7 +7,7 @@ import 'category-remapper/css/remapper.css!'
 import {withCategories} from 'leaflet-coverage/util/transform.js'
 
 import {i18n} from '../util.js'
-import {default as Action, PROCESS} from './Action.js'
+import {default as Action, VIEW, PROCESS} from './Action.js'
 import CoverageData from '../formats/CoverageData.js'
 import JSONLD from '../formats/JSONLD.js'
 
@@ -54,7 +54,7 @@ let html = `
         
         <div class="panel panel-primary remap-remapping-distributions">
           <div class="panel-heading">
-            <h4>Apply ready-made remapping definitions</h4>
+            <h4>Option A: Apply ready-made remapping definitions</h4>
           </div>
           <div class="panel-body">
             <p>
@@ -69,7 +69,7 @@ let html = `
         
         <div class="panel panel-primary remap-categorical-distributions">
           <div class="panel-heading">
-            <h4>Remap manually with categories from existing datasets</h4>
+            <h4>Option B: Remap manually with categories from existing datasets</h4>
           </div>
           <div class="panel-body">
             <p>
@@ -85,7 +85,7 @@ let html = `
         
         <div class="panel panel-default remap-manual">
           <div class="panel-heading">
-            <h4>Fully manual remapping</h4>
+            <h4>Option C: Fully manual remapping</h4>
           </div>
           <div class="panel-body">
             <p>
@@ -123,7 +123,6 @@ const TEMPLATES = {
   'parameter-item': `
   <li class="list-group-item">
     <h4 class="list-group-item-heading parameter-label"></h4>
-    <p>Distribution: <span class="distribution-title"></span></p>
     <p>Categories: <span class="parameter-categories"></span></p>
 
     <button type="button" class="btn btn-primary parameter-select-button" data-dismiss="modal">
@@ -208,16 +207,34 @@ export default class CoverageRemapCategories extends Action {
   }
   
   _selectParameterModal () {
-    // TODO implement
-    let parameter = null
-    this._remapModal(parameter)
+    let modalEl = $('#parameterSelectModal')
+    
+    $('.parameter-list', modalEl).fill()
+    for (let param of this._getCategoricalParams()) {
+      let el = $(HTML(TEMPLATES['parameter-item']))
+      $('.parameter-label', el).fill(i18n(param.observedProperty.label))
+      
+      let categories = param.observedProperty.categories
+      let content = categories.map(cat => i18n(cat.label)).join(', ')
+      $('.parameter-categories', el).fill(content)
+      
+      $('.parameter-select-button', el).on('|click', () => {
+        // small timeout otherwise scrolling gets broken
+        // (immediate closing and opening of another modal seems problematic)
+        setTimeout(() => this._remapModal(param, 200))
+      })
+      
+      $('.parameter-list', modalEl).add(el)
+    }
+    
+    new Modal(modalEl[0]).open()
   }
   
   _remapModal (sourceParameter) {
-    // display "Modify" button when this is a remapped coverage
     let modalEl = $('#remapModal')
     $('.parameter-label', modalEl).fill(i18n(sourceParameter.observedProperty.label))
-       
+    
+    // display "Modify" button when this is a remapped coverage
     let isRemapped = this._isRemapped()
     $$('.remap-is-remapping', modalEl).style.display = isRemapped ? 'block' : 'none'
     
@@ -248,7 +265,7 @@ export default class CoverageRemapCategories extends Action {
             
             let sourceCategories = sourceParameter.observedProperty.categories.map(cat => {
               // TODO be more clever about colors
-              let color = cat.preferredColor || 'green'          
+              let color = cat.preferredColor || 'grey'          
               return {
                 id: cat.id,
                 label: i18n(cat.label),
@@ -257,7 +274,7 @@ export default class CoverageRemapCategories extends Action {
             })
             let targetCategories = covTargetCategories.map(cat => {
               // TODO be more clever about colors
-              let color = cat.preferredColor || 'green'          
+              let color = cat.preferredColor || 'grey'          
               return {
                 id: cat.id,
                 label: i18n(cat.label),
@@ -283,8 +300,20 @@ export default class CoverageRemapCategories extends Action {
                   data: remappedCov
                 }]
               }
-              this.context.workspace.addDataset(virtualDataset)
-              this.context.workspace.requestFocus(virtualDataset)
+              let workspace = this.context.workspace
+
+              // display after loading
+              var done = ({dataset}) => {
+                if (dataset === virtualDataset) {
+                  window.ac = dataset.distributions[0].actions
+                  dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
+                  workspace.off('distributionsLoad', done)
+                }
+              }
+              workspace.on('distributionsLoad', done)
+              
+              workspace.addDataset(virtualDataset)
+              workspace.requestFocus(virtualDataset)
             })
             
             remapper.show()
