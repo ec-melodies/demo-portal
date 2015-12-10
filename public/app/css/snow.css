@@ -7,6 +7,8 @@
 	width: 100%;
 	z-index:1;
 	pointer-events: none;
+	opacity: 0;
+	transition: opacity 3s;
 }
 #snow1{
 	background-image: url('http://www.wearewebstars.dk/codepen/img/s1.png');
