@@ -21,10 +21,17 @@ import './css/styledLayerControl/styledLayerControl.css!'
 import {$,HTML} from 'minified'
 import './css/snow.css!'
 $('body').add(HTML(`
-  <div id="snow1" class="snow"></div>
-  <div id="snow2" class="snow"></div>
-  <div id="snow3" class="snow"></div>
+  <div id="snow1" class="snow" style="display:none"></div>
+  <div id="snow2" class="snow" style="display:none"></div>
+  <div id="snow3" class="snow" style="display:none"></div>
 `))
+window.addEventListener("keypress", e => {
+  if (String.fromCharCode(e.charCode) == 's') {
+    for (let node of document.querySelectorAll('.snow')) {
+      node.style.display = !node.style.display || node.style.display === 'block' ? 'none' : 'block'
+    }
+  }
+}, false);
 
 const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
