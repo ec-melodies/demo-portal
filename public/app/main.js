@@ -29,7 +29,7 @@ function letItSnow() {
   for (let node of document.querySelectorAll('.snow'))
     node.style.opacity = node.style.opacity === '1' ? '0' : '1'
 }
-window.addEventListener('keypress', e => {
+document.getElementById('map').addEventListener('keypress', e => {
   if (String.fromCharCode(e.charCode) == 's') letItSnow()
 }, false);
 if (new Date('2015-12-22') <= new Date() && new Date() <= new Date('2016-01-03'))

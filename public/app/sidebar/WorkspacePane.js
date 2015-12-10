@@ -24,7 +24,7 @@ let bodyHtml = `
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="formatSelectModalLabel">Select a format</h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body">      
         <span class="format-list"></span>
       </div>
       <div class="modal-footer">
@@ -41,7 +41,14 @@ let bodyHtml = `
       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       <h4 class="modal-title" id="dataCreateLoadModalLabel">Input your data</h4>
     </div>
-    <div class="modal-body"></div>
+    <div class="modal-body">      
+      <div class="form-group">
+        <label for="formDatasetTitle">Give your new dataset a name:</label>
+        <input class="form-control dataset-title" type="text" id="formDatasetTitle" placeholder="My new dataset">
+      </div>
+    
+      <span class="data-input-methods"></span>
+    </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
@@ -83,7 +90,7 @@ const TEMPLATES = {
   
   'workspace-dataset-distribution-error': 
   `<li class="list-group-item list-group-item-danger workspace-dataset-distribution error-item">
-    <p>Format: <span class="distribution-format"></span></p>
+    <p>Type: <span class="distribution-format"></span></p>
     <p>Error: <em class="error-message"></em></p>
     <span class="error-details-section">
       <p>Details:</p>
@@ -103,7 +110,7 @@ const TEMPLATES = {
       <div class="input-group">
         <input type="text" class="form-control data-url" placeholder="http://..." />
         <span class="input-group-btn">
-          <button class="btn btn-primary load-url-button" type="button">Load</button>
+          <button class="btn btn-primary load-url-button" type="button" data-dismiss="modal">Load</button>
         </span>
       </div>
     </div>
@@ -118,20 +125,20 @@ const TEMPLATES = {
       <div class="input-group">
         <input type="file" class="form-control data-file" />
         <span class="input-group-btn">
-          <button class="btn btn-primary load-file-button" type="button">Load</button>
+          <button class="btn btn-primary load-file-button" type="button" data-dismiss="modal">Load</button>
         </span>
       </div>
     </div>
   </div>`,
   
-  'data-input-panel':
+  'text-input-panel':
   `<div class="panel panel-primary">
     <div class="panel-heading">
       <h4>By Direct Input</h4>
     </div>
     <div class="panel-body">
       <textarea class="form-control data-textarea" rows="10"></textarea>
-      <button class="btn btn-primary load-input-button" type="button">Load</button>
+      <button class="btn btn-primary load-text-button" type="button" data-dismiss="modal">Load</button>
     </div>
   </div>`
 }
@@ -238,15 +245,40 @@ export default class WorkspacePane extends Eventable {
     let dataModal = format => {
       let modalEl = $('#dataCreateLoadModal')
       
-      let body = $('.modal-body', modalEl)
-      body.fill()
-      body.add(HTML(TEMPLATES['url-input-panel']))
-      body.add(HTML(TEMPLATES['file-input-panel']))
+      let methods = $('.data-input-methods', modalEl)
+      methods.fill()
+      methods.add(HTML(TEMPLATES['url-input-panel']))
+      methods.add(HTML(TEMPLATES['file-input-panel']))
+            
+      $('.load-url-button', modalEl).on('|click', () => {
+        let datasetTitle = $('.dataset-title', modalEl).get('value') || '(No title)'
+        let url = $('.data-url', modalEl).get('value')
+        let virtualDataset = {
+          title: new Map([['en', datasetTitle]]),
+          virtual: true,
+          distributions: [{
+            title: new Map([['en', 'Data']]),
+            mediaType: format.mediaTypes[0],
+            url 
+          }]
+        }
+        
+        this.workspace.addDataset(virtualDataset)
+        this.workspace.requestFocus(virtualDataset)        
+      })
+      
+      $('.load-file-button', modalEl).on('|click', () => {
+        
+      })
       
       // check if the format has a text media type, if yes: show text area
       if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1 || mt.indexOf('xml') !== -1)) {
-        body.add(HTML(TEMPLATES['data-input-panel']))
-      }      
+        methods.add(HTML(TEMPLATES['text-input-panel']))
+        
+        $('.load-text-button', modalEl).on('|click', () => {
+        
+        })
+      }
       
       new Modal(modalEl[0]).open()
     }
@@ -347,7 +379,7 @@ export default class WorkspacePane extends Eventable {
     $('.workspace-dataset-distribution-list', dataset.domEl).add(el)
     distribution.domEl = el
     
-    $('.distribution-format', el).fill(distribution.format || distribution.mediaType)
+    $('.distribution-format', el).fill(distribution.formatImpl.label)
     $('.error-message', el).fill(error.message)
     if (Object.keys(error).length > 0) {
       $('.error-details', el).fill(JSON.stringify(error, null, 1))

@@ -73,6 +73,7 @@ export default class Workspace extends Eventable {
         if (format.supports(distribution.mediaType)) {
           this.fire('distributionLoading', {dataset, distribution})
           let urlOrData = distribution.url || distribution.data
+          distribution.formatImpl = format
           let promise = format.load(urlOrData).then(data => {
             let meta = format.getMetadata(data)
             let actions = format.getActions(data)
@@ -85,7 +86,6 @@ export default class Workspace extends Eventable {
                 action.context[key] = this._staticActionContext[key]
               }
             }
-            distribution.formatImpl = format
             distribution.metadata = meta
             distribution.actions = actions
             distribution.data = data
