@@ -6,7 +6,7 @@ import 'category-remapper/css/remapper.css!'
 
 import {withCategories} from 'leaflet-coverage/util/transform.js'
 
-import {i18n} from '../util.js'
+import {i18n, toLanguageMap} from '../util.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
 import CoverageData from '../formats/CoverageData.js'
 import CPMMapping from '../formats/CPMMapping.js'
@@ -248,7 +248,7 @@ export default class CoverageRemapCategories extends Action {
     
     // display categories and remapping specs that can be used
     let catDists = this._findCategoryDistributions()
-    let remappingDists = this._findRemappingDistributions()
+    let remappingDists = this._findRemappingDistributions(sourceParameter)
     
     $('.categorical-distribution-list', modalEl).fill()
     for (let {distribution,dataset} of catDists) {
@@ -297,7 +297,7 @@ export default class CoverageRemapCategories extends Action {
               remapper.remove() // we create a fresh one each time
               
               let mapping = data.mapping
-              let remappedCov = withCategories(this.cov, sourceParameter.key, covTargetCategories, mapping)
+              let remappedCov = withCategories(this.cov, sourceParameter.key, param.observedProperty, mapping)
               
               let virtualDataset = {
                 title: new Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
@@ -347,7 +347,44 @@ export default class CoverageRemapCategories extends Action {
       $('.target-categories', el).fill(catsStr)
       
       $('.remapping-button', el).on('|click', () => {
+        let targetObservedProp = {
+          label: toLanguageMap(data.destinationObservedProperty.label),
+          categories: data.destinationObservedProperty.categories.map(c => ({
+            id: c.id,
+            label: toLanguageMap(c.label),
+            preferredColor: c.preferredColor
+          }))
+        }
+        if (data.destinationObservedProperty.id) {
+          targetObservedProp.id = data.destinationObservedProperty.id
+        }
+        let mapping = new Map(data.categoryMappings.map(m => [m.sourceCategory, m.destinationCategory]))
+        let remappedCov = withCategories(this.cov, sourceParameter.key, targetObservedProp, mapping)
         
+        // TODO code duplication with semi-manual remapping above 
+        let virtualDataset = {
+          title: new Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
+          virtual: true,
+          distributions: [{
+            title: new Map([['en', 'Remapping of: ' + i18n(distribution.title)]]),
+            mediaType: 'coveragedata',
+            data: remappedCov
+          }]
+        }
+        let workspace = this.context.workspace
+
+        // display after loading
+        var done = ({dataset}) => {
+          if (dataset === virtualDataset) {
+            window.ac = dataset.distributions[0].actions
+            dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
+            workspace.off('distributionsLoad', done)
+          }
+        }
+        workspace.on('distributionsLoad', done)
+        
+        workspace.addDataset(virtualDataset)
+        workspace.requestFocus(virtualDataset)
       })
       
       $('.remapping-distribution-list', modalEl).add(el)
@@ -380,11 +417,13 @@ export default class CoverageRemapCategories extends Action {
   }
   
   /**
-   * Returns all distributions which are a category remapping specification.
+   * Returns all distributions which are a category remapping and are compatible to the source categories.
    */
-  _findRemappingDistributions () {
+  _findRemappingDistributions (sourceParameter) {
+    let sourceCats = new Set(sourceParameter.observedProperty.categories.map(c => c.id))
     return this._filterDistributions(dist => {
-      return dist.formatImpl instanceof CPMMapping
+      if (!(dist.formatImpl instanceof CPMMapping)) return false
+      return dist.data.categoryMappings.some(m => sourceCats.has(m.sourceCategory))
     })
   }
   

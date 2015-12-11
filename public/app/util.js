@@ -16,6 +16,10 @@ export function i18n (prop) {
   }
 }
 
+export function toLanguageMap (obj) {
+  return new Map(Object.keys(obj).map(lang => [lang, obj[lang]]))
+}
+
 export function sortByKey (array, keyFn) {
   return array.sort((a, b) => {
     let x = keyFn(a)
