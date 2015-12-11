@@ -7,9 +7,9 @@ export default class CovJSON extends CoverageData {
    */
   constructor (actionFactories) {
     super(actionFactories)
-    this.label = 'CoverageJSON'
-    this.shortLabel = 'CovJSON'
-    this.mediaTypes = ['application/prs.coverage+json']
+    this.label = 'CoverageJSON Binary'
+    this.shortLabel = 'CovJSONB'
+    this.mediaTypes = ['application/prs.coverage+cbor']
   }
     
   /**

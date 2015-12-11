@@ -26,7 +26,7 @@ let bodyHtml = `
       </div>
       <div class="modal-body">      
         <span class="format-list"></span>
-        <div class="alert alert-info" style="margin-top:20px" role="alert">
+        <div class="alert alert-info" role="alert">
           The data you add here is not uploaded to a server. It stays within your browser and is gone when you reload the page.
         </div>
       </div>
@@ -152,6 +152,9 @@ let css = `
 .workspace-dataset-list, .load-input-button, .json-parse-error {
   margin-top: 20px;
 }
+.format-button {
+  margin-bottom: 15px;
+}
 @keyframes flash-icon {
   0%   {color: black}
   50%  {color: red}
@@ -253,12 +256,8 @@ export default class WorkspacePane extends Eventable {
       methods.fill()
       methods.add(HTML(TEMPLATES['url-input-panel']))
       methods.add(HTML(TEMPLATES['file-input-panel']))
-      
-      // FIXME when a format has multiple media types we currently use the first one which doesn't work for CovJSON
-      // -> this is more a problem of CovJSON where CovCBOR should be an own format
-      // a format which has multiple media types should still have exactly the same content
-      
-      let createVirtualDataset = (url, data) => {
+
+      let createVirtualDataset = (url) => {
         let datasetTitle = $('.dataset-title', modalEl).get('value') || '(No title)'
         let virtualDataset = {
           title: new Map([['en', datasetTitle]]),
@@ -266,7 +265,7 @@ export default class WorkspacePane extends Eventable {
           distributions: [{
             title: new Map([['en', 'Data']]),
             mediaType: format.mediaTypes[0],
-            url, data
+            url
           }]
         }
         return virtualDataset
@@ -275,18 +274,14 @@ export default class WorkspacePane extends Eventable {
         this.workspace.addDataset(virtualDataset)
         this.workspace.requestFocus(virtualDataset)
       }
-      let createAndAddVirtualDataset = (url, data) => {
-        addVirtualDataset(createVirtualDataset(url, data))
-      }
       
       $('.load-url-button', modalEl).on('|click', () => {
         let url = $('.data-url', modalEl).get('value')
-        createAndAddVirtualDataset(url)
+        addVirtualDataset(createVirtualDataset(url))
       })
       
-      $('.load-file-button', modalEl).on('|click', () => {
-        let file = $('.data-file', modalEl)[0].files[0]
-        let blob = new Blob([file], {type: format.mediaTypes[0]})
+      let addBlobDataset = (content) => {
+        let blob = new Blob([content], {type: format.mediaTypes[0]})
         let url = URL.createObjectURL(blob)
         let virtualDataset = createVirtualDataset(url)
         
@@ -299,23 +294,29 @@ export default class WorkspacePane extends Eventable {
         this.workspace.on('distributionsLoad', fn)
         
         addVirtualDataset(virtualDataset)
+      } 
+      
+      $('.load-file-button', modalEl).on('|click', () => {
+        let file = $('.data-file', modalEl)[0].files[0]
+        addBlobDataset(file)
       })
       
-      // check if the format has a JSON media type, if yes: show text area
-      if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1)) {
+      // check if the format has a text media type, if yes: show text area
+      if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1 || mt.indexOf('xml') !== -1)) {
         methods.add(HTML(TEMPLATES['text-input-panel']))
         
         $('.load-text-button', modalEl).on('|click', event => {
           let text = $('.data-textarea', modalEl).get('value')
-          let obj
-          try {
-            obj = JSON.parse(text)
-          } catch (e) {
-            $('.json-parse-error', modalEl).show().fill(e.message)
-            event.stopPropagation() // prevent closing of modal
-            return
+          if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1)) {
+            try {
+              JSON.parse(text)
+            } catch (e) {
+              $('.json-parse-error', modalEl).show().fill(e.message)
+              event.stopPropagation() // prevent closing of modal
+              return
+            }
           }
-          createAndAddVirtualDataset(null, obj)
+          addBlobDataset(text)
         })
       }
       
