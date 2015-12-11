@@ -26,6 +26,9 @@ let bodyHtml = `
       </div>
       <div class="modal-body">      
         <span class="format-list"></span>
+        <div class="alert alert-info" style="margin-top:20px" role="alert">
+          The data you add here is not uploaded to a server. It stays within your browser and is gone when you reload the page.
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -139,13 +142,14 @@ const TEMPLATES = {
     <div class="panel-body">
       <textarea class="form-control data-textarea" rows="10"></textarea>
       <button class="btn btn-primary load-text-button" type="button" data-dismiss="modal">Load</button>
+      <div class="alert alert-danger json-parse-error" style="display:none" role="alert"></div>
     </div>
   </div>`
 }
 
 let css = `
 <style>
-.workspace-dataset-list, .load-input-button {
+.workspace-dataset-list, .load-input-button, .json-parse-error {
   margin-top: 20px;
 }
 @keyframes flash-icon {
@@ -249,34 +253,69 @@ export default class WorkspacePane extends Eventable {
       methods.fill()
       methods.add(HTML(TEMPLATES['url-input-panel']))
       methods.add(HTML(TEMPLATES['file-input-panel']))
-            
-      $('.load-url-button', modalEl).on('|click', () => {
+      
+      // FIXME when a format has multiple media types we currently use the first one which doesn't work for CovJSON
+      // -> this is more a problem of CovJSON where CovCBOR should be an own format
+      // a format which has multiple media types should still have exactly the same content
+      
+      let createVirtualDataset = (url, data) => {
         let datasetTitle = $('.dataset-title', modalEl).get('value') || '(No title)'
-        let url = $('.data-url', modalEl).get('value')
         let virtualDataset = {
           title: new Map([['en', datasetTitle]]),
           virtual: true,
           distributions: [{
             title: new Map([['en', 'Data']]),
             mediaType: format.mediaTypes[0],
-            url 
+            url, data
           }]
         }
-        
+        return virtualDataset
+      }
+      let addVirtualDataset = virtualDataset => {
         this.workspace.addDataset(virtualDataset)
-        this.workspace.requestFocus(virtualDataset)        
+        this.workspace.requestFocus(virtualDataset)
+      }
+      let createAndAddVirtualDataset = (url, data) => {
+        addVirtualDataset(createVirtualDataset(url, data))
+      }
+      
+      $('.load-url-button', modalEl).on('|click', () => {
+        let url = $('.data-url', modalEl).get('value')
+        createAndAddVirtualDataset(url)
       })
       
       $('.load-file-button', modalEl).on('|click', () => {
+        let file = $('.data-file', modalEl)[0].files[0]
+        let blob = new Blob([file], {type: format.mediaTypes[0]})
+        let url = URL.createObjectURL(blob)
+        let virtualDataset = createVirtualDataset(url)
         
+        var fn = ({dataset}) => {
+          if (dataset === virtualDataset) {
+            URL.revokeObjectURL(url)
+            this.workspace.off('distributionsLoad', fn)
+          }
+        }
+        this.workspace.on('distributionsLoad', fn)
+        
+        addVirtualDataset(virtualDataset)
       })
       
-      // check if the format has a text media type, if yes: show text area
-      if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1 || mt.indexOf('xml') !== -1)) {
+      // check if the format has a JSON media type, if yes: show text area
+      if (format.mediaTypes.some(mt => mt.indexOf('json') !== -1)) {
         methods.add(HTML(TEMPLATES['text-input-panel']))
         
-        $('.load-text-button', modalEl).on('|click', () => {
-        
+        $('.load-text-button', modalEl).on('|click', event => {
+          let text = $('.data-textarea', modalEl).get('value')
+          let obj
+          try {
+            obj = JSON.parse(text)
+          } catch (e) {
+            $('.json-parse-error', modalEl).show().fill(e.message)
+            event.stopPropagation() // prevent closing of modal
+            return
+          }
+          createAndAddVirtualDataset(null, obj)
         })
       }
       
