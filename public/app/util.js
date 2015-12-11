@@ -1,5 +1,12 @@
 export function i18n (prop) {
   if (!prop) return
+  if (!(prop instanceof Map)) {
+    let map = new Map()
+    for (let key in prop) {
+      map.set(key, prop[key])
+    }
+    prop = map
+  }
   // TODO be clever and select proper language
   if (prop.has('en')) {
     return prop.get('en')
@@ -15,15 +22,4 @@ export function sortByKey (array, keyFn) {
     let y = keyFn(b)
     return ((x < y) ? -1 : ((x > y) ? 1 : 0))
   })
-}
-
-// https://github.com/github/fetch#handling-http-error-statuses
-export function checkStatus (response) {
-  if (response.ok) { // status 2xx
-    return response
-  } else {
-    let error = new Error(response.statusText)
-    error.response = response
-    throw error
-  }
 }

@@ -6,7 +6,7 @@ import CoverageData from './formats/CoverageData.js'
 import CovJSON from './formats/CovJSON.js'
 import CovCBOR from './formats/CovCBOR.js'
 import GeoJSON from './formats/GeoJSON.js'
-import JSONLD from './formats/JSONLD.js'
+import CPMMapping from './formats/CPMMapping.js'
 import WMS from './formats/WMS.js'
 
 import CoverageView from './actions/CoverageView.js'
@@ -46,7 +46,7 @@ export default class App extends Eventable {
       new WMS([
         WMSView
       ]),
-      new JSONLD()
+      new CPMMapping()
     ]
     
     this.workspace = new Workspace(this.formats)

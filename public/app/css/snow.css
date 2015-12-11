@@ -1,5 +1,6 @@
 /* adapted from http://codepen.io/NickyCDK/pen/AIonk */
 .snow{
+	display: none;
 	height: 100%;
 	left: 0;
 	position: absolute;

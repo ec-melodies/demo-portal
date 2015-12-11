@@ -9,7 +9,7 @@ import {withCategories} from 'leaflet-coverage/util/transform.js'
 import {i18n} from '../util.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
 import CoverageData from '../formats/CoverageData.js'
-import JSONLD from '../formats/JSONLD.js'
+import CPMMapping from '../formats/CPMMapping.js'
 
 let html = `
 <div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">
@@ -135,7 +135,6 @@ const TEMPLATES = {
     <h4 class="list-group-item-heading dataset-title"></h4>
     <p>Distribution: <span class="distribution-title"></span></p>
     <span class="distribution-parameters"></span>
-
   </li>
   `,
   // leave the <span> in! otherwise we can't reach the button via minified...
@@ -150,7 +149,16 @@ const TEMPLATES = {
   </span>
   `,
   'remapping-distribution-item': `
-
+  <li class="list-group-item">
+    <h4 class="list-group-item-heading dataset-title"></h4>
+    <p>Distribution: <span class="distribution-title"></span></p>
+    <p>Target: <span class="target-observedProperty-label"></span></p>
+    <p>Categories: <span class="target-categories"></span></p>
+    
+    <button type="button" class="btn btn-primary remapping-button" data-dismiss="modal">
+      Apply
+    </button>
+  </li>
   `
 }
 
@@ -325,8 +333,24 @@ export default class CoverageRemapCategories extends Action {
     }
     
     $('.remapping-distribution-list', modalEl).fill()
-    for (let remappingDist of remappingDists) {
-      // TODO implement
+    for (let {distribution,dataset} of remappingDists) {
+      let el = $(HTML(TEMPLATES['remapping-distribution-item']))
+      
+      let data = distribution.data
+      
+      $('.dataset-title', el).fill(i18n(dataset.title))
+      $('.distribution-title', el).fill(i18n(distribution.title))
+      $('.target-observedProperty-label', el).fill(i18n(data.destinationObservedProperty.label))
+      
+      let cats = data.destinationObservedProperty.categories
+      let catsStr = cats.map(cat => i18n(cat.label)).join(', ')      
+      $('.target-categories', el).fill(catsStr)
+      
+      $('.remapping-button', el).on('|click', () => {
+        
+      })
+      
+      $('.remapping-distribution-list', modalEl).add(el)
     }
     
     $$('.categorical-distribution-list-empty', modalEl).style.display = catDists.length > 0 ? 'none' : 'block'
@@ -360,10 +384,7 @@ export default class CoverageRemapCategories extends Action {
    */
   _findRemappingDistributions () {
     return this._filterDistributions(dist => {
-      if (dist.formatImpl instanceof JSONLD) {
-        // TODO implement
-        return false
-      }
+      return dist.formatImpl instanceof CPMMapping
     })
   }
   

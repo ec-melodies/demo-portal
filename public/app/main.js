@@ -26,15 +26,19 @@ $('body').add(HTML(`
   <div id="snow3" class="snow"></div>
 `))
 function letItSnow() {
-  for (let node of document.querySelectorAll('.snow'))
-    node.style.opacity = node.style.opacity === '1' ? '0' : '1'
+  for (let node of document.querySelectorAll('.snow')) {
+    if (node.style.opacity === '1') setTimeout(() => node.style.display = 'none', 3500)
+    else node.style.display = 'block'
+    setTimeout(() => node.style.opacity = node.style.opacity === '1' ? '0' : '1', 100)      
+  }
 }
 document.getElementById('map').addEventListener('keypress', e => {
   if (String.fromCharCode(e.charCode) == 's') letItSnow()
 }, false);
 if (new Date('2015-12-22') <= new Date() && new Date() <= new Date('2016-01-03'))
   letItSnow()
-
+// end of Xmas magic
+  
 const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
 let map = L.map('map', {
