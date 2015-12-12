@@ -94,6 +94,7 @@ export default class Workspace extends Eventable {
           }).catch(e => {
             distribution.error = e
             this.fire('distributionLoadError', {dataset, distribution, error: e})
+            console.log(e)
           })
           promises.push(promise)
         }
