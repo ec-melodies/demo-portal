@@ -1,4 +1,5 @@
 import * as CovJSONReader from 'covjson-reader'
+import * as RestAPI from 'coverage-rest-client'
 import CoverageData from './CoverageData.js'
 
 export default class CovJSON extends CoverageData {
@@ -21,6 +22,9 @@ export default class CovJSON extends CoverageData {
       return Promise.resolve(urlOrObject)
     } else {
       return CovJSONReader.read(urlOrObject)
+        .then(data => RestAPI.wrap(data, {
+          loader: CovJSONReader.read
+        }))
     }
   }
   

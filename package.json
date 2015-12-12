@@ -21,6 +21,7 @@
       "bootstrap-native": "github:thednp/bootstrap.native@^1.0.0",
       "category-remapper": "github:neothemachine/category-remapper-js@modules",
       "core-js": "npm:core-js@^1.1.4",
+      "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
       "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",
       "css": "github:systemjs/plugin-css@^0.1.13",
       "fetch": "github:github/fetch@^0.10.1",
