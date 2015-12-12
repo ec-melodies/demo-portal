@@ -15200,8 +15200,8 @@ $__System.register('32', ['36', 'c', 'd', 'f', '3b'], function (_export) {
   };
 });
 
-$__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd', '1e', 'e', 'f', '1d'], function (_export) {
-  var _Object$keys, L, _Promise, arrays, linearPalette, directPalette, scale, rangeutil, referencingutil, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, _getIterator, _Map, ndarray, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
+$__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd', '1e', 'e', '1d'], function (_export) {
+  var _Object$keys, L, _Promise, arrays, linearPalette, directPalette, scale, rangeutil, referencingutil, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, _getIterator, ndarray, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
 
   function wrapLongitude(lon, range) {
     return wrapNum(lon, range, true);
@@ -15244,8 +15244,6 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
       _slicedToArray = _e['default'];
     }, function (_e2) {
       _getIterator = _e2['default'];
-    }, function (_f) {
-      _Map = _f['default'];
     }, function (_d2) {
       ndarray = _d2['default'];
     }],
@@ -15316,6 +15314,7 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
             t: { coordPref: options.time },
             z: { coordPref: options.vertical }
           };
+          this._initCategoryIdxMap();
 
           var categories = this.param.observedProperty.categories;
 
@@ -15364,7 +15363,113 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
           }
         }
 
+        /**
+         * Sets up a lookup table from categorical range value to palette index.
+         */
+
         _createClass(Grid, [{
+          key: '_initCategoryIdxMap',
+          value: function _initCategoryIdxMap() {
+            if (!this.param.categoryEncoding) return;
+
+            // categorical parameter with integer encoding
+            // Note: The palette order is equal to the categories array order.
+            var max = -Infinity;
+            var min = Infinity;
+            var categories = this.param.observedProperty.categories;
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = _getIterator(categories), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var category = _step.value;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
+
+                try {
+                  for (var _iterator3 = _getIterator(this.param.categoryEncoding.get(category.id)), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var val = _step3.value;
+
+                    max = Math.max(max, val);
+                    min = Math.min(min, val);
+                  }
+                } catch (err) {
+                  _didIteratorError3 = true;
+                  _iteratorError3 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                      _iterator3['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError3) {
+                      throw _iteratorError3;
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            var valIdxMap = undefined;
+            if (categories.length < 256) {
+              if (max > 10000 || min < 0) {
+                // TODO implement fallback to Map implementation
+                throw new Error('category values too high (>10000) or low (<0)');
+              }
+              valIdxMap = new Uint8Array(max + 1);
+              for (var i = 0; i <= max; i++) {
+                // the above length < 256 check ensures that no palette index is ever 255
+                valIdxMap[i] = 255;
+              }
+
+              for (var idx = 0; idx < categories.length; idx++) {
+                var cat = categories[idx];
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                  for (var _iterator2 = _getIterator(this.param.categoryEncoding.get(cat.id)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var val = _step2.value;
+
+                    valIdxMap[val] = idx;
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+              }
+            } else {
+              throw new Error('Too many categories: ' + categories.length);
+            }
+            this._categoryIdxMap = valIdxMap;
+          }
+        }, {
           key: 'onAdd',
           value: function onAdd(map) {
             var _this = this;
@@ -15462,13 +15567,13 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
               return idx;
             };
 
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
 
             try {
-              for (var _iterator = _getIterator(_Object$keys(this._axesSubset)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var axis = _step.value;
+              for (var _iterator4 = _getIterator(_Object$keys(this._axesSubset)), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                var axis = _step4.value;
 
                 var ax = this._axesSubset[axis];
                 if (ax.coordPref == undefined && this.domain.axes.has(axis)) {
@@ -15480,16 +15585,16 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
                 ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null;
               }
             } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
+                if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                  _iterator4['return']();
                 }
               } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
                 }
               }
             }
@@ -15585,49 +15690,14 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
 
             var setPixel = undefined;
             if (this.param.categoryEncoding) {
-              var _iteratorNormalCompletion2;
-
-              var _didIteratorError2;
-
-              var _iteratorError2;
-
-              var _iterator2, _step2;
-
               (function () {
                 // categorical parameter with integer encoding
-                var valIdxMap = new _Map();
-                for (var idx = 0; idx < _this4.param.observedProperty.categories.length; idx++) {
-                  var cat = _this4.param.observedProperty.categories[idx];
-                  if (_this4.param.categoryEncoding.has(cat.id)) {
-                    _iteratorNormalCompletion2 = true;
-                    _didIteratorError2 = false;
-                    _iteratorError2 = undefined;
-
-                    try {
-                      for (_iterator2 = _getIterator(_this4.param.categoryEncoding.get(cat.id)); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var val = _step2.value;
-
-                        valIdxMap.set(val, idx);
-                      }
-                    } catch (err) {
-                      _didIteratorError2 = true;
-                      _iteratorError2 = err;
-                    } finally {
-                      try {
-                        if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                          _iterator2['return']();
-                        }
-                      } finally {
-                        if (_didIteratorError2) {
-                          throw _iteratorError2;
-                        }
-                      }
-                    }
-                  }
-                }
+                var valIdxMap = _this4._categoryIdxMap;
+                var max = valIdxMap.length - 1;
                 setPixel = function (tileY, tileX, val) {
-                  if (val === null || !valIdxMap.has(val)) return;
-                  var idx = valIdxMap.get(val);
+                  if (val === null || val < 0 || val > max) return;
+                  var idx = valIdxMap[val];
+                  if (idx === 255) return;
                   doSetPixel(tileY, tileX, idx);
                 };
               })();
