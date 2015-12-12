@@ -300,10 +300,10 @@ export default class CoverageRemapCategories extends Action {
               let remappedCov = withCategories(this.cov, sourceParameter.key, param.observedProperty, mapping)
               
               let virtualDataset = {
-                title: new Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
+                title: new Map([['en', 'Remapped: ' + i18n(this.context.dataset.title)]]),
                 virtual: true,
                 distributions: [{
-                  title: new Map([['en', 'Remapping of: ' + i18n(distribution.title)]]),
+                  title: new Map([['en', 'Remapped: ' + i18n(this.context.distribution.title)]]),
                   mediaType: 'coveragedata',
                   data: remappedCov
                 }]
@@ -313,7 +313,6 @@ export default class CoverageRemapCategories extends Action {
               // display after loading
               var done = ({dataset}) => {
                 if (dataset === virtualDataset) {
-                  window.ac = dataset.distributions[0].actions
                   dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
                   workspace.off('distributionsLoad', done)
                 }
@@ -363,10 +362,10 @@ export default class CoverageRemapCategories extends Action {
         
         // TODO code duplication with semi-manual remapping above 
         let virtualDataset = {
-          title: new Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
+          title: new Map([['en', 'Remapped: ' + i18n(this.context.dataset.title)]]),
           virtual: true,
           distributions: [{
-            title: new Map([['en', 'Remapping of: ' + i18n(distribution.title)]]),
+            title: new Map([['en', 'Remapped: ' + i18n(this.context.distribution.title)]]),
             mediaType: 'coveragedata',
             data: remappedCov
           }]
