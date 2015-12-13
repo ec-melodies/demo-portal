@@ -1,4 +1,5 @@
 {
+  "private": true,
   "license": "BSD-3-Clause",
   "scripts": {
     "serve": "http-server -p 8095 -c0",
