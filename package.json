@@ -2,7 +2,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "serve": "http-server -p 8095 -c0",
-    "postinstall": "jspm install",
+    "postinstall": "jspm install --yes",
     "build": "npm run build-src && npm run build-min",
     "build-src": "jspm bundle-sfx app/main bundle.src.js --skip-source-maps",
     "build-min": "jspm bundle-sfx app/main bundle.min.js --skip-source-maps --minify",
