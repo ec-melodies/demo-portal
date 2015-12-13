@@ -26,7 +26,7 @@ export default class CoverageData extends Format {
   getMetadata (cov) {
     return {
       format: this.label,
-      type: cov.type
+      type: cov.coverages ? cov.coverages.length + ' coverages' : '1 coverage'
     }
   }
 }
