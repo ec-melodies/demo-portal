@@ -112,6 +112,9 @@ let html = `
 .categorical-distribution-list-empty, .remapping-distribution-list-empty {
   margin-bottom: 0;
 }
+.workspace-dataset-distribution-action .btn {
+  margin-bottom: 5px;
+}
 </style>
 `
 $('body').add(HTML(html))
@@ -173,6 +176,7 @@ export default class CoverageRemapCategories extends Action {
     this.cov = data
     
     this.label = 'Remap Categories'
+    this.icon = '<span class="glyphicon glyphicon-random"></span>'
   }
   
   get isSupported () {

@@ -10,6 +10,8 @@ export default class WMSView extends Action {
     this.data = data
     
     this.label = 'View'
+    this.icon = '<span class="glyphicon glyphicon-eye-open"></span>'
+        
     this.layers = []
   }
   

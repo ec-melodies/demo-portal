@@ -90,12 +90,12 @@ const TEMPLATES = {
   
   'workspace-dataset-distribution-action': 
   `<span class="workspace-dataset-distribution-action">
-    <button type="button" class="btn btn-primary"></button>
+    <button type="button" class="btn btn-primary"><span class="action-icon"></span> <span class="action-label"></span></button>
   </span>`,
   
   'workspace-dataset-distribution-action-external-link': 
   `<span class="workspace-dataset-distribution-action">
-    <a target="_new" class="btn btn-primary"><span class="glyphicon glyphicon-link"></span> <span class="action-label"></span></a>
+    <a target="_new" class="btn btn-primary"><span class="action-icon"></span> <span class="action-label"></span></a>
   </span>`,
   
   'workspace-dataset-distribution-error': 
@@ -417,13 +417,14 @@ export default class WorkspacePane extends Eventable {
         let actionEl
         if (action.type === EXTERNAL_LINK) {
           actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action-external-link'])
-          $('.action-label', actionEl).fill(action.label)
           $('a', actionEl).set('@href', action.run())
         } else {
           actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action'])
-          $('button', actionEl).fill(action.label).on('click', () => {
-            action.run()
-          })
+          $('button', actionEl).on('click', () => action.run())
+        }
+        $('.action-label', actionEl).fill(action.label)
+        if (action.icon) {
+          $('.action-icon', actionEl).fill(HTML(action.icon))
         }
         $('.distribution-actions', el).add(actionEl)
       }

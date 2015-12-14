@@ -4,7 +4,8 @@ export default class GoToSource extends Action {
   constructor (data) {
     super()
     
-    this.label = 'Go To Source'
+    this.icon = '<span class="glyphicon glyphicon-link"></span>'
+    this.label = 'Source'
   }
   
   get isSupported () {

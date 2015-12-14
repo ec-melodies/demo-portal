@@ -10,6 +10,7 @@ export default class CoverageView extends Action {
     this.cov = data
     
     this.label = 'View'
+    this.icon = '<span class="glyphicon glyphicon-eye-open"></span>'
       
     this.layers = []
   }
