@@ -16,6 +16,25 @@ export function i18n (prop) {
   }
 }
 
+export function stringifyMapReplacer (key, value) {
+  if (value instanceof Map) {
+    let obj = {}
+    for (let [k,v] of value) {
+      obj[k] = v
+    }
+    return obj
+  }
+  return value
+}
+
+export function parseLanguageMapReviver (key, value) {
+  if (key === 'label' || key === 'description') {
+    if (typeof value !== 'object') return value
+    return toLanguageMap(value)
+  }
+  return value
+}
+
 export function toLanguageMap (obj) {
   return new Map(Object.keys(obj).map(lang => [lang, obj[lang]]))
 }

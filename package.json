@@ -20,7 +20,7 @@
     "dependencies": {
       "bootstrap": "github:twbs/bootstrap@^3.3.5",
       "bootstrap-native": "github:thednp/bootstrap.native@^1.0.0",
-      "category-remapper": "github:neothemachine/category-remapper-js@modules",
+      "category-remapper": "github:guygriffiths/category-remapper-js@master",
       "core-js": "npm:core-js@^1.1.4",
       "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
       "covjson-reader": "github:Reading-eScience-Centre/covjson-reader@master",

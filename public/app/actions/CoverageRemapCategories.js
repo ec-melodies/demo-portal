@@ -6,10 +6,10 @@ import 'category-remapper/css/remapper.css!'
 
 import {withCategories} from 'leaflet-coverage/util/transform.js'
 
-import {i18n, toLanguageMap} from '../util.js'
+import {i18n, stringifyMapReplacer, parseLanguageMapReviver} from '../util.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
 import CoverageData from '../formats/CoverageData.js'
-import CPMMapping from '../formats/CPMMapping.js'
+import CatRemap from '../formats/CatRemap.js'
 
 let html = `
 <div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">
@@ -20,6 +20,8 @@ let html = `
         <h4 class="modal-title" id="paramSelectModalLabel">Select a categorical parameter</h4>
       </div>
       <div class="modal-body">
+        <span class="remap-is-remapping"></span>
+      
         <div class="panel panel-primary parameter-select">
           <div class="panel-body">
             <p>
@@ -45,12 +47,7 @@ let html = `
         <h4 class="modal-title" id="remapModalLabel">Remap <strong class="parameter-label"></strong> Categories</h4>
       </div>
       <div class="modal-body">
-        <div class="panel panel-primary remap-is-remapping">
-          <div class="panel-body">
-            <p>This coverage is already remapped.</p>
-            <button type="button" class="btn btn-primary btn-modify-remapping" data-dismiss="modal">Modify</button>
-          </div>
-        </div>
+        <span class="remap-is-remapping"></span>
         
         <div class="panel panel-primary remap-remapping-distributions">
           <div class="panel-heading">
@@ -120,6 +117,14 @@ let html = `
 $('body').add(HTML(html))
 
 const TEMPLATES = {
+  'is-remapping': `
+  <div class="panel panel-primary">
+    <div class="panel-body">
+      <p>This coverage data is the result of a category remapping operation.</p>
+      <button type="button" class="btn btn-primary btn-modify-remapping" data-dismiss="modal">Modify Remapping</button>
+    </div>
+  </div>
+  `,
   'parameter-item': `
   <li class="list-group-item">
     <h4 class="list-group-item-heading parameter-label"></h4>
@@ -140,7 +145,7 @@ const TEMPLATES = {
   // leave the <span> in! otherwise we can't reach the button via minified...
   'categorical-parameter-item': `
   <span>
-    <p>Parameter: <span class="parameter-label"></span></p>
+    <p>Target: <span class="parameter-label"></span></p>
     <p>Categories: <span class="parameter-categories"></span></p>
   
     <button type="button" class="btn btn-primary remapping-button" data-dismiss="modal">
@@ -217,6 +222,8 @@ export default class CoverageRemapCategories extends Action {
   _selectParameterModal () {
     let modalEl = $('#parameterSelectModal')
     
+    this._showModifyRemappingSection(modalEl)
+    
     $('.parameter-list', modalEl).fill()
     for (let param of this._getCategoricalParams()) {
       let el = $(HTML(TEMPLATES['parameter-item']))
@@ -238,13 +245,46 @@ export default class CoverageRemapCategories extends Action {
     new Modal(modalEl[0]).open()
   }
   
+  _modifyRemappingUI () {
+    let trans = this.cov.transformations[this.cov.transformations.length-1]
+    let sourceCov = trans.source
+    let param  = trans.operation.parameter
+    let remapDef = trans.operation.categoryRemappingDefinition
+    let prefixTitle = false
+    
+    this._createVirtualRemappedDataset(sourceCov, param, remapDef, prefixTitle, () => {
+      this.context.workspace.removeDataset(this.context.dataset)
+    })
+  }
+  
+  _showModifyRemappingSection (modalEl) {
+    // display "Modify Remapping" button when this is a remapped coverage
+    if (this._isRemapped()) {
+      $('.remap-is-remapping', modalEl).fill(HTML(TEMPLATES['is-remapping']))
+      $('.btn-modify-remapping', modalEl).on('click|', () => this._modifyRemappingUI())
+    } else {
+      $('.remap-is-remapping', modalEl).fill()
+    }
+  }
+  
+  _getCategoryMappingDefinition (sourceObservedProperty, targetObservedProperty) {
+    return {
+      type: 'CategoryRemappingDefinition',
+      label: {
+        // TODO do this properly
+        en: i18n(sourceObservedProperty.label) + ' / ' + i18n(targetObservedProperty.label) + ' Mapping'
+      },
+      sourceObservedProperty: JSON.stringify(sourceObservedProperty, stringifyMapReplacer),
+      destinationObservedProperty: JSON.stringify(targetObservedProperty, stringifyMapReplacer),
+      categoryMappings: []
+    }
+  }
+  
   _remapModal (sourceParameter) {
     let modalEl = $('#remapModal')
     $('.parameter-label', modalEl).fill(i18n(sourceParameter.observedProperty.label))
     
-    // display "Modify" button when this is a remapped coverage
-    let isRemapped = this._isRemapped()
-    $$('.remap-is-remapping', modalEl).style.display = isRemapped ? 'block' : 'none'
+    this._showModifyRemappingSection(modalEl)
     
     // display categories and remapping specs that can be used
     let catDists = this._findCategoryDistributions()
@@ -269,33 +309,8 @@ export default class CoverageRemapCategories extends Action {
           $('.distribution-parameters', el).add(paramEl)
           
           $('.remapping-button', paramEl).on('|click', () => {
-            this._showRemapper(sourceParameter.observedProperty, param.observedProperty, null, data => {
-              let mapping = data.mapping
-              let remappedCov = withCategories(this.cov, sourceParameter.key, param.observedProperty, mapping)
-              
-              let virtualDataset = {
-                title: new Map([['en', 'Remapped: ' + i18n(this.context.dataset.title)]]),
-                virtual: true,
-                distributions: [{
-                  title: new Map([['en', 'Remapped: ' + i18n(this.context.distribution.title)]]),
-                  mediaType: 'coveragedata',
-                  data: remappedCov
-                }]
-              }
-              let workspace = this.context.workspace
-
-              // display after loading
-              var done = ({dataset}) => {
-                if (dataset === virtualDataset) {
-                  dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
-                  workspace.off('distributionsLoad', done)
-                }
-              }
-              workspace.on('distributionsLoad', done)
-              
-              workspace.addDataset(virtualDataset)
-              workspace.requestFocus(virtualDataset)
-            })
+            let remapDef = this._getCategoryMappingDefinition(sourceParameter.observedProperty, param.observedProperty)
+            this._createVirtualRemappedDataset(this.cov, sourceParameter, remapDef, true)
           })
         }
       }
@@ -307,61 +322,18 @@ export default class CoverageRemapCategories extends Action {
     for (let {distribution,dataset} of remappingDists) {
       let el = $(HTML(TEMPLATES['remapping-distribution-item']))
       
-      let data = distribution.data
+      let remapDef = distribution.data
       
       $('.dataset-title', el).fill(i18n(dataset.title))
       $('.distribution-title', el).fill(i18n(distribution.title))
-      $('.target-observedProperty-label', el).fill(i18n(data.destinationObservedProperty.label))
+      $('.target-observedProperty-label', el).fill(i18n(remapDef.destinationObservedProperty.label))
       
-      let cats = data.destinationObservedProperty.categories
+      let cats = remapDef.destinationObservedProperty.categories
       let catsStr = cats.map(cat => i18n(cat.label)).join(', ')      
       $('.target-categories', el).fill(catsStr)
       
       $('.remapping-button', el).on('|click', () => {
-        let targetObservedProp = {
-          label: toLanguageMap(data.destinationObservedProperty.label),
-          categories: data.destinationObservedProperty.categories.map(c => ({
-            id: c.id,
-            label: toLanguageMap(c.label),
-            preferredColor: c.preferredColor
-          }))
-        }
-        if (data.destinationObservedProperty.id) {
-          targetObservedProp.id = data.destinationObservedProperty.id
-        }
-        let mapping = new Map(data.categoryMappings.map(m => [m.sourceCategory, m.destinationCategory]))
-        
-        this._showRemapper(sourceParameter.observedProperty, targetObservedProp, mapping, data => {
-          // use the mapping that was potentially modified by the user 
-          let mapping = data.mapping
-          
-          let remappedCov = withCategories(this.cov, sourceParameter.key, targetObservedProp, mapping)
-          
-          // TODO code duplication with semi-manual remapping above
-          let virtualDataset = {
-            title: new Map([['en', 'Remapped: ' + i18n(this.context.dataset.title)]]),
-            virtual: true,
-            distributions: [{
-              title: new Map([['en', 'Remapped: ' + i18n(this.context.distribution.title)]]),
-              mediaType: 'coveragedata',
-              data: remappedCov
-            }]
-          }
-          let workspace = this.context.workspace
-
-          // display after loading
-          var done = ({dataset}) => {
-            if (dataset === virtualDataset) {
-              window.ac = dataset.distributions[0].actions
-              dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
-              workspace.off('distributionsLoad', done)
-            }
-          }
-          workspace.on('distributionsLoad', done)
-          
-          workspace.addDataset(virtualDataset)
-          workspace.requestFocus(virtualDataset)
-        })
+        this._createVirtualRemappedDataset(this.cov, sourceParameter, remapDef, true)
       })
       
       $('.remapping-distribution-list', modalEl).add(el)
@@ -372,6 +344,70 @@ export default class CoverageRemapCategories extends Action {
     
     
     new Modal(modalEl[0]).open()
+  }
+  
+  _createVirtualRemappedDataset (cov, parameter, remapDef, prefixTitle, oncreate) {
+    if (prefixTitle) {
+      prefixTitle = 'Remapped: '
+    } else {
+      prefixTitle = ''
+    }
+      
+    let sourceParameter = parameter
+    let targetObservedProp = JSON.parse(JSON.stringify(remapDef.destinationObservedProperty), parseLanguageMapReviver)
+    let mapping = new Map(remapDef.categoryMappings.map(m => [m.sourceCategory, m.destinationCategory]))
+    
+    this._showRemapper(sourceParameter.observedProperty, targetObservedProp, mapping, data => {
+      // use the mapping that was potentially modified by the user 
+      let mapping = data.mapping
+      
+      let remappedCov = withCategories(cov, sourceParameter.key, targetObservedProp, mapping)
+      
+      // update remapDef in case the user dragged around connections
+      let newRemapDef = JSON.parse(JSON.stringify(remapDef))
+      newRemapDef.categoryMappings = []
+      for (let [sourceCategory, destinationCategory] of mapping) {
+        newRemapDef.categoryMappings.push({sourceCategory, destinationCategory})
+      }
+      
+      if (!remappedCov.transformations) {
+        remappedCov.transformations = []
+      }
+      remappedCov.transformations.push({
+        source: cov,
+        operation: {
+          type: 'CategoryRemappingOperation',
+          parameter: sourceParameter,
+          categoryRemappingDefinition: newRemapDef
+        }
+      })
+      
+      let virtualDataset = {
+        title: new Map([['en', prefixTitle + i18n(this.context.dataset.title)]]),
+        virtual: true,
+        distributions: [{
+          title: new Map([['en', prefixTitle + i18n(this.context.distribution.title)]]),
+          mediaType: 'coveragedata',
+          data: remappedCov
+        }]
+      }
+      let workspace = this.context.workspace
+
+      // display after loading
+      var done = ({dataset}) => {
+        if (dataset === virtualDataset) {
+          window.ac = dataset.distributions[0].actions
+          dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
+          workspace.off('distributionsLoad', done)
+        }
+      }
+      workspace.on('distributionsLoad', done)
+      
+      workspace.addDataset(virtualDataset)
+      workspace.requestFocus(virtualDataset)
+      
+      if (oncreate) oncreate()
+    })
   }
   
   _showRemapper (sourceObservedProperty, targetObservedProperty, mapping, onapply) {
@@ -435,7 +471,7 @@ export default class CoverageRemapCategories extends Action {
   _findRemappingDistributions (sourceParameter) {
     let sourceCats = new Set(sourceParameter.observedProperty.categories.map(c => c.id))
     return this._filterDistributions(dist => {
-      if (!(dist.formatImpl instanceof CPMMapping)) return false
+      if (!(dist.formatImpl instanceof CatRemap)) return false
       return dist.data.categoryMappings.some(m => sourceCats.has(m.sourceCategory))
     })
   }
@@ -444,8 +480,13 @@ export default class CoverageRemapCategories extends Action {
    * Returns whether the associated distribution is a result of a remapping.
    */
   _isRemapped () {
-    // TODO check Coverage data for remapping provenance info
-    return false
+    // check Coverage data for remapping transformation
+    
+    // .transformations contains a record of all transformations that led to the this coverage data
+    // The last applied transformation (which then directly resulted into this coverage data) is at the array end.
+    if (!this.cov.transformations) return false
+    let trans = this.cov.transformations[this.cov.transformations.length-1]
+    return trans.operation.type === 'CategoryRemappingOperation'
   }
    
   _filterDistributions (matchFn) {

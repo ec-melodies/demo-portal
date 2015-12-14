@@ -1,12 +1,12 @@
 import Format from './Format.js'
 import {loadJSON} from './util.js'
 
-export default class CPMMapping extends Format {
+export default class CatRemap extends Format {
   constructor (actionFactories) {
     super(actionFactories)
-    this.label = 'Complex Property Model Mapping in JSON-LD'
-    this.shortLabel = 'CPM-Mapping'
-    this.mediaTypes = ['application/ld+json;profile="http://purl.org/voc/cpm_mapping"']
+    this.label = 'Category Remapping Definition in JSON-LD'
+    this.shortLabel = 'CatRemap'
+    this.mediaTypes = ['application/ld+json;profile="http://purl.org/voc/cpm_catremap"']
   }
     
   /**
