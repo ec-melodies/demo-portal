@@ -269,33 +269,7 @@ export default class CoverageRemapCategories extends Action {
           $('.distribution-parameters', el).add(paramEl)
           
           $('.remapping-button', paramEl).on('|click', () => {
-            let remapper = new Remapper('remapper')
-            
-            let sourceCategories = sourceParameter.observedProperty.categories.map(cat => {
-              // TODO be more clever about colors
-              let color = cat.preferredColor || 'grey'          
-              return {
-                id: cat.id,
-                label: i18n(cat.label),
-                color
-              }
-            })
-            let targetCategories = covTargetCategories.map(cat => {
-              // TODO be more clever about colors
-              let color = cat.preferredColor || 'grey'          
-              return {
-                id: cat.id,
-                label: i18n(cat.label),
-                color
-              }
-            })
-            
-            remapper.populateFroms(sourceCategories)
-            remapper.populateTos(targetCategories)
-            
-            remapper.on('apply', data => {
-              remapper.remove() // we create a fresh one each time
-              
+            this._showRemapper(sourceParameter.observedProperty, param.observedProperty, null, data => {
               let mapping = data.mapping
               let remappedCov = withCategories(this.cov, sourceParameter.key, param.observedProperty, mapping)
               
@@ -322,8 +296,6 @@ export default class CoverageRemapCategories extends Action {
               workspace.addDataset(virtualDataset)
               workspace.requestFocus(virtualDataset)
             })
-            
-            remapper.show()
           })
         }
       }
@@ -358,32 +330,38 @@ export default class CoverageRemapCategories extends Action {
           targetObservedProp.id = data.destinationObservedProperty.id
         }
         let mapping = new Map(data.categoryMappings.map(m => [m.sourceCategory, m.destinationCategory]))
-        let remappedCov = withCategories(this.cov, sourceParameter.key, targetObservedProp, mapping)
         
-        // TODO code duplication with semi-manual remapping above 
-        let virtualDataset = {
-          title: new Map([['en', 'Remapped: ' + i18n(this.context.dataset.title)]]),
-          virtual: true,
-          distributions: [{
-            title: new Map([['en', 'Remapped: ' + i18n(this.context.distribution.title)]]),
-            mediaType: 'coveragedata',
-            data: remappedCov
-          }]
-        }
-        let workspace = this.context.workspace
-
-        // display after loading
-        var done = ({dataset}) => {
-          if (dataset === virtualDataset) {
-            window.ac = dataset.distributions[0].actions
-            dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
-            workspace.off('distributionsLoad', done)
+        this._showRemapper(sourceParameter.observedProperty, targetObservedProp, mapping, data => {
+          // use the mapping that was potentially modified by the user 
+          let mapping = data.mapping
+          
+          let remappedCov = withCategories(this.cov, sourceParameter.key, targetObservedProp, mapping)
+          
+          // TODO code duplication with semi-manual remapping above
+          let virtualDataset = {
+            title: new Map([['en', 'Remapped: ' + i18n(this.context.dataset.title)]]),
+            virtual: true,
+            distributions: [{
+              title: new Map([['en', 'Remapped: ' + i18n(this.context.distribution.title)]]),
+              mediaType: 'coveragedata',
+              data: remappedCov
+            }]
           }
-        }
-        workspace.on('distributionsLoad', done)
-        
-        workspace.addDataset(virtualDataset)
-        workspace.requestFocus(virtualDataset)
+          let workspace = this.context.workspace
+
+          // display after loading
+          var done = ({dataset}) => {
+            if (dataset === virtualDataset) {
+              window.ac = dataset.distributions[0].actions
+              dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
+              workspace.off('distributionsLoad', done)
+            }
+          }
+          workspace.on('distributionsLoad', done)
+          
+          workspace.addDataset(virtualDataset)
+          workspace.requestFocus(virtualDataset)
+        })
       })
       
       $('.remapping-distribution-list', modalEl).add(el)
@@ -394,6 +372,42 @@ export default class CoverageRemapCategories extends Action {
     
     
     new Modal(modalEl[0]).open()
+  }
+  
+  _showRemapper (sourceObservedProperty, targetObservedProperty, mapping, onapply) {
+    let remapper = new Remapper('remapper')
+    
+    let sourceCategories = sourceObservedProperty.categories.map(cat => {
+      // TODO be more clever about colors
+      let color = cat.preferredColor || 'grey'          
+      return {
+        id: cat.id,
+        label: i18n(cat.label),
+        color
+      }
+    })
+    let targetCategories = targetObservedProperty.categories.map(cat => {
+      // TODO be more clever about colors
+      let color = cat.preferredColor || 'grey'          
+      return {
+        id: cat.id,
+        label: i18n(cat.label),
+        color
+      }
+    })
+    
+    remapper.populateFroms(sourceCategories)
+    remapper.populateTos(targetCategories)
+    if (mapping) {
+      remapper.linkCategories(mapping)
+    }
+    
+    remapper.on('apply', data => {
+      remapper.remove() // we create a fresh one each time
+      onapply(data)
+    })
+    
+    remapper.show()
   }
   
   /**
