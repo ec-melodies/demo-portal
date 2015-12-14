@@ -795,33 +795,35 @@ $__System.register("3", [], function() { return { setters: [], execute: function
 
 $__System.register("4", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f'], function (_export) {
-  var $, HTML, Modal, i18n, Eventable, _Object$keys, _get, _inherits, _createClass, _classCallCheck, _getIterator, _Map, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
+$__System.register('5', ['6', '7', '8', '9', '10', '11', 'b', 'c', 'd', 'e', 'f', 'a'], function (_export) {
+  var $, HTML, Modal, i18n, Eventable, _Map, _Object$keys, _get, _inherits, _createClass, _classCallCheck, _getIterator, EXTERNAL_LINK, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
 
   return {
-    setters: [function (_2) {
-      $ = _2.$;
-      HTML = _2.HTML;
-    }, function (_3) {
-      Modal = _3['default'];
+    setters: [function (_3) {
+      $ = _3.$;
+      HTML = _3.HTML;
     }, function (_4) {
-      i18n = _4.i18n;
+      Modal = _4['default'];
     }, function (_5) {
-      Eventable = _5['default'];
+      i18n = _5.i18n;
+    }, function (_6) {
+      Eventable = _6['default'];
     }, function (_) {
-      _Object$keys = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
+      _Map = _['default'];
+    }, function (_2) {
+      _Object$keys = _2['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
     }, function (_f) {
-      _Map = _f['default'];
+      _getIterator = _f['default'];
+    }, function (_a) {
+      EXTERNAL_LINK = _a.EXTERNAL_LINK;
     }],
     execute: function () {
       'use strict';
@@ -836,11 +838,13 @@ $__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f']
 
       TEMPLATES = {
         // Important: No whitespace at beginning as this introduces text nodes and we just get the first node!
-        'workspace-dataset': '<div class="panel workspace-dataset">\n    <div class="panel-heading">\n      <h4>\n        <span class="dataset-title"></span>\n        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n      </h4>\n    </div>\n    <div class="panel-body" style="text-align: center">\n      <div class="throbber-loader loader">Loading...</div>\n    </div>\n  \n    <ul class="list-group workspace-dataset-distribution-list"></ul>\n  </div>',
+        'workspace-dataset': '<div class="panel workspace-dataset">\n    <div class="panel-heading">\n      <h4>\n        <span class="glyphicon glyphicon-asterisk virtual-dataset-icon"></span>\n        <span class="dataset-title"></span>\n        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n      </h4>\n    </div>\n    <div class="panel-body" style="text-align: center">\n      <div class="throbber-loader loader">Loading...</div>\n    </div>\n  \n    <ul class="list-group workspace-dataset-distribution-list"></ul>\n  </div>',
 
-        'workspace-dataset-distribution': '<li class="list-group-item workspace-dataset-distribution">\n    <p>Title: <em class="distribution-title"></em></p>\n    <p>Type: <span class="distribution-format"></span></p>\n    <p>Content: <span class="distribution-metadata"></span></p>\n    <div class="distribution-actions"></div>\n  </li>',
+        'workspace-dataset-distribution': '<li class="list-group-item workspace-dataset-distribution">\n    <p>Title: <em class="distribution-title"></em></p>\n    <p>Type: <span class="distribution-format"></span></p>\n    <p>Content: <span class="distribution-content"></span></p>\n    <div class="distribution-actions"></div>\n  </li>',
 
-        'workspace-dataset-distribution-action': '<span class="workspace-dataset-distribution-action">\n    <button type="button" class="btn btn-primary"></button>\n  </span>',
+        'workspace-dataset-distribution-action': '<span class="workspace-dataset-distribution-action">\n    <button type="button" class="btn btn-primary"><span class="action-icon"></span> <span class="action-label"></span></button>\n  </span>',
+
+        'workspace-dataset-distribution-action-external-link': '<span class="workspace-dataset-distribution-action">\n    <a target="_new" class="btn btn-primary"><span class="action-icon"></span> <span class="action-label"></span></a>\n  </span>',
 
         'workspace-dataset-distribution-error': '<li class="list-group-item list-group-item-danger workspace-dataset-distribution error-item">\n    <p>Type: <span class="distribution-format"></span></p>\n    <p>Error: <em class="error-message"></em></p>\n    <span class="error-details-section">\n      <p>Details:</p>\n      <small><pre class="error-details"></pre></small>\n    </span>\n  </li>',
 
@@ -984,6 +988,7 @@ $__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f']
 
                   if (dataset === virtualDataset) {
                     URL.revokeObjectURL(url);
+                    delete dataset.distributions[0].url;
                     _this2.workspace.off('distributionsLoad', fn);
                   }
                 };
@@ -1110,6 +1115,7 @@ $__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f']
               $(el).set('+panel-info');
             } else {
               $(el).set('+panel-default');
+              $('.virtual-dataset-icon', el).remove();
             }
             $('.dataset-title', el).fill(i18n(dataset.title));
 
@@ -1128,7 +1134,7 @@ $__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f']
 
             $('.distribution-title', el).fill(i18n(distribution.title));
             $('.distribution-format', el).fill(meta.format);
-            $('.distribution-metadata', el).fill(meta.type);
+            $('.distribution-content', el).fill(meta.content);
 
             if (distribution.actions) {
               var _iteratorNormalCompletion2 = true;
@@ -1139,10 +1145,20 @@ $__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f']
                 var _loop2 = function () {
                   var action = _step2.value;
 
-                  var actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action']);
-                  $('button', actionEl).fill(action.label).on('click', function () {
-                    action.run();
-                  });
+                  var actionEl = undefined;
+                  if (action.type === EXTERNAL_LINK) {
+                    actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action-external-link']);
+                    $('a', actionEl).set('@href', action.run());
+                  } else {
+                    actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action']);
+                    $('button', actionEl).on('click', function () {
+                      return action.run();
+                    });
+                  }
+                  $('.action-label', actionEl).fill(action.label);
+                  if (action.icon) {
+                    $('.action-icon', actionEl).fill(HTML(action.icon));
+                  }
                   $('.distribution-actions', el).add(actionEl);
                 };
 
@@ -1190,8 +1206,8 @@ $__System.register('5', ['6', '7', '8', '9', '10', 'a', 'b', 'c', 'd', 'e', 'f']
   };
 });
 
-$__System.register('11', ['6', '8', '12', '13', '14', 'c', 'd', 'e'], function (_export) {
-  var $, HTML, i18n, sortByKey, L, PROCESS, _Set, _createClass, _classCallCheck, _getIterator, TEMPLATES, css, paneHtml, SearchPane, MediaTypeLabels;
+$__System.register('12', ['6', '8', '13', '14', 'd', 'e', 'f', 'a'], function (_export) {
+  var $, HTML, i18n, sortByKey, L, _Set, _createClass, _classCallCheck, _getIterator, PROCESS, TEMPLATES, css, paneHtml, SearchPane, MediaTypeLabels;
 
   /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
   function getDistFormatLabel(dist) {
@@ -1210,21 +1226,21 @@ $__System.register('11', ['6', '8', '12', '13', '14', 'c', 'd', 'e'], function (
     setters: [function (_2) {
       $ = _2.$;
       HTML = _2.HTML;
-    }, function (_5) {
-      i18n = _5.i18n;
-      sortByKey = _5.sortByKey;
+    }, function (_4) {
+      i18n = _4.i18n;
+      sortByKey = _4.sortByKey;
     }, function (_3) {
       L = _3['default'];
-    }, function (_4) {
-      PROCESS = _4.PROCESS;
     }, function (_) {
       _Set = _['default'];
-    }, function (_c) {
-      _createClass = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
+    }, function (_a) {
+      PROCESS = _a.PROCESS;
     }],
     execute: function () {
       'use strict';
@@ -1667,7 +1683,7 @@ $__System.registerDynamic("16", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.register('17', ['5', '6', '11', '12', '15', '16', '18', 'c', 'd'], function (_export) {
+$__System.register('17', ['5', '6', '12', '13', '15', '16', '18', 'd', 'e'], function (_export) {
   var WorkspacePane, $, HTML, SearchPane, L, _createClass, _classCallCheck, sidebarHtml, Sidebar;
 
   return {
@@ -1680,10 +1696,10 @@ $__System.register('17', ['5', '6', '11', '12', '15', '16', '18', 'c', 'd'], fun
       SearchPane = _6['default'];
     }, function (_) {
       L = _['default'];
-    }, function (_3) {}, function (_2) {}, function (_4) {}, function (_c) {
-      _createClass = _c['default'];
-    }, function (_d) {
-      _classCallCheck = _d['default'];
+    }, function (_3) {}, function (_2) {}, function (_4) {}, function (_d) {
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
       'use strict';
@@ -1742,7 +1758,60 @@ $__System.register('17', ['5', '6', '11', '12', '15', '16', '18', 'c', 'd'], fun
   };
 });
 
-$__System.register('19', ['6', '12', 'a', 'b', 'c', 'd'], function (_export) {
+$__System.register('19', ['b', 'c', 'd', 'e', 'a'], function (_export) {
+  var _get, _inherits, _createClass, _classCallCheck, Action, EXTERNAL_LINK, GoToSource;
+
+  return {
+    setters: [function (_b) {
+      _get = _b['default'];
+    }, function (_c) {
+      _inherits = _c['default'];
+    }, function (_d) {
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
+    }, function (_a) {
+      Action = _a['default'];
+      EXTERNAL_LINK = _a.EXTERNAL_LINK;
+    }],
+    execute: function () {
+      'use strict';
+
+      GoToSource = (function (_Action) {
+        _inherits(GoToSource, _Action);
+
+        function GoToSource(data) {
+          _classCallCheck(this, GoToSource);
+
+          _get(Object.getPrototypeOf(GoToSource.prototype), 'constructor', this).call(this);
+
+          this.icon = '<span class="glyphicon glyphicon-link"></span>';
+          this.label = 'Source';
+        }
+
+        _createClass(GoToSource, [{
+          key: 'run',
+          value: function run() {
+            return this.context.distribution.url;
+          }
+        }, {
+          key: 'isSupported',
+          get: function get() {
+            return this.context.distribution.url;
+          }
+        }]);
+
+        return GoToSource;
+      })(Action);
+
+      _export('default', GoToSource);
+
+      GoToSource.type = EXTERNAL_LINK;
+    }
+  };
+});
+
+$__System.register('1a', ['6', '13', 'b', 'c', 'd', 'e'], function (_export) {
   var $, HTML, L, _get, _inherits, _createClass, _classCallCheck, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, ImageLegend;
 
   return {
@@ -1751,14 +1820,14 @@ $__System.register('19', ['6', '12', 'a', 'b', 'c', 'd'], function (_export) {
       HTML = _2.HTML;
     }, function (_) {
       L = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
       'use strict';
@@ -1834,8 +1903,8 @@ $__System.register('19', ['6', '12', 'a', 'b', 'c', 'd'], function (_export) {
   };
 });
 
-$__System.register('1a', ['8', '12', '13', '19', 'a', 'b', 'c', 'd', 'e'], function (_export) {
-  var i18n, L, Action, VIEW, ImageLegend, _get, _inherits, _createClass, _classCallCheck, _getIterator, WMSView;
+$__System.register('1b', ['8', '13', 'b', 'c', 'd', 'e', 'f', '1a', 'a'], function (_export) {
+  var i18n, L, _get, _inherits, _createClass, _classCallCheck, _getIterator, ImageLegend, Action, VIEW, WMSView;
 
   function getLegendUrl(wmsEndpoint, layer) {
     return wmsEndpoint + '?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&transparent=true&layer=' + layer;
@@ -1845,21 +1914,21 @@ $__System.register('1a', ['8', '12', '13', '19', 'a', 'b', 'c', 'd', 'e'], funct
       i18n = _2.i18n;
     }, function (_) {
       L = _['default'];
-    }, function (_4) {
-      Action = _4['default'];
-      VIEW = _4.VIEW;
-    }, function (_3) {
-      ImageLegend = _3['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
+    }, function (_a) {
+      ImageLegend = _a['default'];
+    }, function (_a2) {
+      Action = _a2['default'];
+      VIEW = _a2.VIEW;
     }],
     execute: function () {
       'use strict';
@@ -1874,6 +1943,8 @@ $__System.register('1a', ['8', '12', '13', '19', 'a', 'b', 'c', 'd', 'e'], funct
           this.data = data;
 
           this.label = 'View';
+          this.icon = '<span class="glyphicon glyphicon-eye-open"></span>';
+
           this.layers = [];
         }
 
@@ -1992,27 +2063,27 @@ $__System.register('1a', ['8', '12', '13', '19', 'a', 'b', 'c', 'd', 'e'], funct
   };
 });
 
-$__System.register('1b', ['8', '12', '13', 'a', 'b', 'c', 'd', 'e'], function (_export) {
-  var i18n, L, Action, VIEW, _get, _inherits, _createClass, _classCallCheck, _getIterator, GeoJSONView;
+$__System.register('1c', ['8', '13', 'b', 'c', 'd', 'e', 'f', 'a'], function (_export) {
+  var i18n, L, _get, _inherits, _createClass, _classCallCheck, _getIterator, Action, VIEW, GeoJSONView;
 
   return {
     setters: [function (_2) {
       i18n = _2.i18n;
     }, function (_) {
       L = _['default'];
-    }, function (_3) {
-      Action = _3['default'];
-      VIEW = _3.VIEW;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
+    }, function (_a) {
+      Action = _a['default'];
+      VIEW = _a.VIEW;
     }],
     execute: function () {
       'use strict';
@@ -2027,6 +2098,8 @@ $__System.register('1b', ['8', '12', '13', 'a', 'b', 'c', 'd', 'e'], function (_
           this.data = data;
 
           this.label = 'View';
+          this.icon = '<span class="glyphicon glyphicon-eye-open"></span>';
+
           this.layers = [];
         }
 
@@ -2103,8 +2176,8 @@ $__System.register('1b', ['8', '12', '13', 'a', 'b', 'c', 'd', 'e'], function (_
   };
 });
 
-$__System.register('1c', ['20', '21', '22', '1e', '1f', 'f', 'e', '1d'], function (_export) {
-  var _Promise, _Object$create, indicesOfNearest, _slicedToArray, _toConsumableArray, _Map, _getIterator, ndarray;
+$__System.register('1d', ['10', '20', '21', '22', '23', '1f', 'f', '1e'], function (_export) {
+  var _Map, _toConsumableArray, _Promise, _Object$create, indicesOfNearest, _slicedToArray, _getIterator, ndarray;
 
   /**
    * Returns a copy of the given Coverage object with the parameters
@@ -2387,22 +2460,22 @@ $__System.register('1c', ['20', '21', '22', '1e', '1f', 'f', 'e', '1d'], functio
     return copy;
   }
   return {
-    setters: [function (_) {
-      _Promise = _['default'];
-    }, function (_2) {
-      _Object$create = _2['default'];
+    setters: [function (_2) {
+      _Map = _2['default'];
+    }, function (_) {
+      _toConsumableArray = _['default'];
     }, function (_3) {
-      indicesOfNearest = _3.indicesOfNearest;
-    }, function (_e) {
-      _slicedToArray = _e['default'];
+      _Promise = _3['default'];
+    }, function (_4) {
+      _Object$create = _4['default'];
+    }, function (_5) {
+      indicesOfNearest = _5.indicesOfNearest;
     }, function (_f) {
-      _toConsumableArray = _f['default'];
+      _slicedToArray = _f['default'];
     }, function (_f2) {
-      _Map = _f2['default'];
-    }, function (_e2) {
-      _getIterator = _e2['default'];
-    }, function (_d) {
-      ndarray = _d['default'];
+      _getIterator = _f2['default'];
+    }, function (_e) {
+      ndarray = _e['default'];
     }],
     execute: function () {
       /* */
@@ -2421,9 +2494,9 @@ $__System.register('1c', ['20', '21', '22', '1e', '1f', 'f', 'e', '1d'], functio
   };
 });
 
-$__System.register("23", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("24", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic("24", ["25"], true, function(req, exports, module) {
+$__System.registerDynamic("25", ["26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -12524,22 +12597,22 @@ $__System.registerDynamic("24", ["25"], true, function(req, exports, module) {
       };
       ready(_jp.init);
     }).call(this);
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("26", ["24"], true, function(req, exports, module) {
+$__System.registerDynamic("27", ["25"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('24');
+  module.exports = req('25');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("27", ["26"], true, function(req, exports, module) {
+$__System.registerDynamic("28", ["27"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -12549,7 +12622,7 @@ $__System.registerDynamic("27", ["26"], true, function(req, exports, module) {
     if (typeof define === 'function' && define.amd) {
       define(['jsplumb'], factory);
     } else if (typeof module === 'object' && module.exports) {
-      module.exports = factory(req('26').jsPlumb);
+      module.exports = factory(req('27').jsPlumb);
     } else {
       root.Remapper = factory(root.jsPlumb);
     }
@@ -12587,7 +12660,7 @@ $__System.registerDynamic("27", ["26"], true, function(req, exports, module) {
       this.jsPlumb = jsPlumb.getInstance();
       var self = this;
       if (!$$('#' + self.id).innerHTML) {
-        $$('#' + self.id).innerHTML = '<div class="remap-froms"></div><div class="remap-tos"></div><div class="centrecontent"></div><div class="buttonholder"><button class="remap-button">' + buttonLabel + '</button></div>';
+        $$('#' + self.id).innerHTML = '<div class="remap-froms"></div><div class="remap-tos"></div><div class="centrecontent"></div><div class="buttonholder"><button class="remap-button">' + buttonLabel + '</button><button class="cancel-remap-button">Cancel</button></div>';
         $$('#' + self.id).style.display = 'none';
         $$('#' + self.id).classList.add('main-remapper');
         $$('.remap-button', '#' + self.id).addEventListener('click', function() {
@@ -12600,6 +12673,10 @@ $__System.registerDynamic("27", ["26"], true, function(req, exports, module) {
           });
           $$('#' + self.id).style.display = 'none';
           self.fire('apply', {mapping: mapping});
+        });
+        $$('.cancel-remap-button', '#' + self.id).addEventListener('click', function() {
+          $$('#' + self.id).style.display = 'none';
+          self.fire('cancel');
         });
       }
       this._resize = function() {
@@ -12699,12 +12776,12 @@ $__System.registerDynamic("27", ["26"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("28", ["27"], true, function(req, exports, module) {
+$__System.registerDynamic("29", ["28"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('27');
+  module.exports = req('28');
   global.define = __define;
   return module.exports;
 });
@@ -12949,60 +13026,64 @@ $__System.registerDynamic("7", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 'd', '1f', 'e', 'f', '1c', '2a', '2b'], function (_export) {
-  var $, $$, HTML, Modal, i18n, toLanguageMap, Action, VIEW, PROCESS, _Set, Remapper, _get, _inherits, _createClass, _classCallCheck, _toConsumableArray, _getIterator, _Map, withCategories, CoverageData, CPMMapping, html, TEMPLATES, CoverageRemapCategories;
+$__System.register('2a', ['6', '7', '8', '10', '14', '20', '24', '29', 'b', 'c', 'd', 'e', '1f', 'f', '1d', 'a', '2b', '2c'], function (_export) {
+  var $, $$, HTML, Modal, i18n, stringifyMapReplacer, parseLanguageMapReviver, _Map, _Set, _toConsumableArray, Remapper, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, _getIterator, withCategories, Action, VIEW, PROCESS, CoverageData, CatRemap, html, TEMPLATES, CoverageRemapCategories;
 
   return {
-    setters: [function (_2) {
-      $ = _2.$;
-      $$ = _2.$$;
-      HTML = _2.HTML;
+    setters: [function (_4) {
+      $ = _4.$;
+      $$ = _4.$$;
+      HTML = _4.HTML;
+    }, function (_5) {
+      Modal = _5['default'];
+    }, function (_8) {
+      i18n = _8.i18n;
+      stringifyMapReplacer = _8.stringifyMapReplacer;
+      parseLanguageMapReviver = _8.parseLanguageMapReviver;
+    }, function (_2) {
+      _Map = _2['default'];
     }, function (_3) {
-      Modal = _3['default'];
-    }, function (_6) {
-      i18n = _6.i18n;
-      toLanguageMap = _6.toLanguageMap;
-    }, function (_7) {
-      Action = _7['default'];
-      VIEW = _7.VIEW;
-      PROCESS = _7.PROCESS;
+      _Set = _3['default'];
     }, function (_) {
-      _Set = _['default'];
-    }, function (_5) {}, function (_4) {
-      Remapper = _4['default'];
-    }, function (_a) {
-      _get = _a['default'];
+      _toConsumableArray = _['default'];
+    }, function (_7) {}, function (_6) {
+      Remapper = _6['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_f) {
-      _toConsumableArray = _f['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
     }, function (_f2) {
-      _Map = _f2['default'];
-    }, function (_c2) {
-      withCategories = _c2.withCategories;
-    }, function (_a2) {
-      CoverageData = _a2['default'];
+      _getIterator = _f2['default'];
+    }, function (_d2) {
+      withCategories = _d2.withCategories;
+    }, function (_a) {
+      Action = _a['default'];
+      VIEW = _a.VIEW;
+      PROCESS = _a.PROCESS;
     }, function (_b2) {
-      CPMMapping = _b2['default'];
+      CoverageData = _b2['default'];
+    }, function (_c2) {
+      CatRemap = _c2['default'];
     }],
     execute: function () {
       'use strict';
 
-      html = '\n<div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="paramSelectModalLabel">Select a categorical parameter</h4>\n      </div>\n      <div class="modal-body">\n        <div class="panel panel-primary parameter-select">\n          <div class="panel-body">\n            <p>\n              Which of the following categorical parameters do you like to remap?\n            </p>\n          </div>\n          <ul class="list-group parameter-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="remapModal" tabindex="-1" role="dialog" aria-labelledby="remapModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="remapModalLabel">Remap <strong class="parameter-label"></strong> Categories</h4>\n      </div>\n      <div class="modal-body">\n        <div class="panel panel-primary remap-is-remapping">\n          <div class="panel-body">\n            <p>This coverage is already remapped.</p>\n            <button type="button" class="btn btn-primary btn-modify-remapping" data-dismiss="modal">Modify</button>\n          </div>\n        </div>\n        \n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Option A: Apply ready-made remapping definitions</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Using a ready-made remapping definition is the fastest way to apply a remapping.\n              The remapping definition defines both the target categories and their mapping\n              from the source categories.\n            </p>\n            <div class="alert alert-info remapping-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group remapping-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-primary remap-categorical-distributions">\n          <div class="panel-heading">\n            <h4>Option B: Remap manually with categories from existing datasets</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              A manual remapping can be done more quickly by loading the desired\n              target categories from an existing dataset. The connections then have\n              to be created manually via drag and drop.\n            </p>\n            <div class="alert alert-info categorical-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group categorical-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-default remap-manual">\n          <div class="panel-heading">\n            <h4>Option C: Fully manual remapping</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              When the above methods cannot be used then the only option left is\n              to manually create the target categories and connect\n              them to the source categories. NOTE: This is currently not supported.\n            </p>\n          </div>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n<div id="remapper"></div>\n<style>\n/* above sidebar */\n.modal, #remapper {\n  z-index: 3000; \n}\n.modal-backdrop {\n  z-index: 2500;\n}\n.categorical-distribution-list-empty, .remapping-distribution-list-empty {\n  margin-bottom: 0;\n}\n</style>\n';
+      html = '\n<div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="paramSelectModalLabel">Select a categorical parameter</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n      \n        <div class="panel panel-primary parameter-select">\n          <div class="panel-body">\n            <p>\n              Which of the following categorical parameters do you like to remap?\n            </p>\n          </div>\n          <ul class="list-group parameter-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="remapModal" tabindex="-1" role="dialog" aria-labelledby="remapModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="remapModalLabel">Remap <strong class="parameter-label"></strong> Categories</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n        \n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Option A: Apply ready-made remapping definitions</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Using a ready-made remapping definition is the fastest way to apply a remapping.\n              The remapping definition defines both the target categories and their mapping\n              from the source categories.\n            </p>\n            <div class="alert alert-info remapping-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group remapping-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-primary remap-categorical-distributions">\n          <div class="panel-heading">\n            <h4>Option B: Remap manually with categories from existing datasets</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              A manual remapping can be done more quickly by loading the desired\n              target categories from an existing dataset. The connections then have\n              to be created manually via drag and drop.\n            </p>\n            <div class="alert alert-info categorical-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group categorical-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-default remap-manual">\n          <div class="panel-heading">\n            <h4>Option C: Fully manual remapping</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              When the above methods cannot be used then the only option left is\n              to manually create the target categories and connect\n              them to the source categories. NOTE: This is currently not supported.\n            </p>\n          </div>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n<div id="remapper"></div>\n<style>\n/* above sidebar */\n.modal, #remapper {\n  z-index: 3000; \n}\n.modal-backdrop {\n  z-index: 2500;\n}\n.categorical-distribution-list-empty, .remapping-distribution-list-empty {\n  margin-bottom: 0;\n}\n.workspace-dataset-distribution-action .btn {\n  margin-bottom: 5px;\n}\n</style>\n';
 
       $('body').add(HTML(html));
 
       TEMPLATES = {
+        'is-remapping': '\n  <div class="panel panel-primary">\n    <div class="panel-body">\n      <p>This coverage data is the result of a category remapping operation.</p>\n      <button type="button" class="btn btn-primary btn-modify-remapping" data-dismiss="modal">Modify Remapping</button>\n    </div>\n  </div>\n  ',
         'parameter-item': '\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading parameter-label"></h4>\n    <p>Categories: <span class="parameter-categories"></span></p>\n\n    <button type="button" class="btn btn-primary parameter-select-button" data-dismiss="modal">\n      Select\n    </button>\n  </li>\n  ',
         'categorical-distribution-item': '\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading dataset-title"></h4>\n    <p>Distribution: <span class="distribution-title"></span></p>\n    <span class="distribution-parameters"></span>\n  </li>\n  ',
         // leave the <span> in! otherwise we can't reach the button via minified...
-        'categorical-parameter-item': '\n  <span>\n    <p>Parameter: <span class="parameter-label"></span></p>\n    <p>Categories: <span class="parameter-categories"></span></p>\n  \n    <button type="button" class="btn btn-primary remapping-button" data-dismiss="modal">\n      Use Categories\n    </button>\n  </span>\n  ',
+        'categorical-parameter-item': '\n  <span>\n    <p>Target: <span class="parameter-label"></span></p>\n    <p>Categories: <span class="parameter-categories"></span></p>\n  \n    <button type="button" class="btn btn-primary remapping-button" data-dismiss="modal">\n      Use Categories\n    </button>\n  </span>\n  ',
         'remapping-distribution-item': '\n  <li class="list-group-item">\n    <h4 class="list-group-item-heading dataset-title"></h4>\n    <p>Distribution: <span class="distribution-title"></span></p>\n    <p>Target: <span class="target-observedProperty-label"></span></p>\n    <p>Categories: <span class="target-categories"></span></p>\n    \n    <button type="button" class="btn btn-primary remapping-button" data-dismiss="modal">\n      Apply\n    </button>\n  </li>\n  '
       };
 
@@ -13016,6 +13097,7 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
           this.cov = data;
 
           this.label = 'Remap Categories';
+          this.icon = '<span class="glyphicon glyphicon-random"></span>';
         }
 
         _createClass(CoverageRemapCategories, [{
@@ -13061,6 +13143,8 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
             var _this = this;
 
             var modalEl = $('#parameterSelectModal');
+
+            this._showModifyRemappingSection(modalEl);
 
             $('.parameter-list', modalEl).fill();
             var _iteratorNormalCompletion = true;
@@ -13112,16 +13196,59 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
             new Modal(modalEl[0]).open();
           }
         }, {
+          key: '_modifyRemappingUI',
+          value: function _modifyRemappingUI() {
+            var _this2 = this;
+
+            var trans = this.cov.transformations[this.cov.transformations.length - 1];
+            var sourceCov = trans.source;
+            var param = trans.operation.parameter;
+            var remapDef = trans.operation.categoryRemappingDefinition;
+            var prefixTitle = false;
+
+            this._createVirtualRemappedDataset(sourceCov, param, remapDef, prefixTitle, function () {
+              _this2.context.workspace.removeDataset(_this2.context.dataset);
+            });
+          }
+        }, {
+          key: '_showModifyRemappingSection',
+          value: function _showModifyRemappingSection(modalEl) {
+            var _this3 = this;
+
+            // display "Modify Remapping" button when this is a remapped coverage
+            if (this._isRemapped()) {
+              $('.remap-is-remapping', modalEl).fill(HTML(TEMPLATES['is-remapping']));
+              $('.btn-modify-remapping', modalEl).on('click|', function () {
+                return _this3._modifyRemappingUI();
+              });
+            } else {
+              $('.remap-is-remapping', modalEl).fill();
+            }
+          }
+        }, {
+          key: '_getCategoryMappingDefinition',
+          value: function _getCategoryMappingDefinition(sourceObservedProperty, targetObservedProperty) {
+            var remapDef = {
+              type: 'CategoryRemappingDefinition',
+              label: {
+                // TODO do this properly
+                en: i18n(sourceObservedProperty.label) + ' / ' + i18n(targetObservedProperty.label) + ' Mapping'
+              },
+              sourceObservedProperty: JSON.parse(JSON.stringify(sourceObservedProperty, stringifyMapReplacer)),
+              destinationObservedProperty: JSON.parse(JSON.stringify(targetObservedProperty, stringifyMapReplacer)),
+              categoryMappings: []
+            };
+            return remapDef;
+          }
+        }, {
           key: '_remapModal',
           value: function _remapModal(sourceParameter) {
-            var _this2 = this;
+            var _this4 = this;
 
             var modalEl = $('#remapModal');
             $('.parameter-label', modalEl).fill(i18n(sourceParameter.observedProperty.label));
 
-            // display "Modify" button when this is a remapped coverage
-            var isRemapped = this._isRemapped();
-            $$('.remap-is-remapping', modalEl).style.display = isRemapped ? 'block' : 'none';
+            this._showModifyRemappingSection(modalEl);
 
             // display categories and remapping specs that can be used
             var catDists = this._findCategoryDistributions();
@@ -13133,7 +13260,7 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
             var _iteratorError2 = undefined;
 
             try {
-              var _loop2 = function () {
+              for (var _iterator2 = _getIterator(catDists), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                 var _step2$value = _step2.value;
                 var distribution = _step2$value.distribution;
                 var dataset = _step2$value.dataset;
@@ -13145,12 +13272,12 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
 
                 var cov = distribution.data;
                 var covTargetCategories = undefined;
-                _iteratorNormalCompletion4 = true;
-                _didIteratorError4 = false;
-                _iteratorError4 = undefined;
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
 
                 try {
-                  var _loop3 = function () {
+                  var _loop2 = function () {
                     var param = _step4.value;
 
                     if (param.observedProperty.categories) {
@@ -13164,72 +13291,14 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
                       $('.distribution-parameters', el).add(paramEl);
 
                       $('.remapping-button', paramEl).on('|click', function () {
-                        var remapper = new Remapper('remapper');
-
-                        var sourceCategories = sourceParameter.observedProperty.categories.map(function (cat) {
-                          // TODO be more clever about colors
-                          var color = cat.preferredColor || 'grey';
-                          return {
-                            id: cat.id,
-                            label: i18n(cat.label),
-                            color: color
-                          };
-                        });
-                        var targetCategories = covTargetCategories.map(function (cat) {
-                          // TODO be more clever about colors
-                          var color = cat.preferredColor || 'grey';
-                          return {
-                            id: cat.id,
-                            label: i18n(cat.label),
-                            color: color
-                          };
-                        });
-
-                        remapper.populateFroms(sourceCategories);
-                        remapper.populateTos(targetCategories);
-
-                        remapper.on('apply', function (data) {
-                          remapper.remove(); // we create a fresh one each time
-
-                          var mapping = data.mapping;
-                          var remappedCov = withCategories(_this2.cov, sourceParameter.key, param.observedProperty, mapping);
-
-                          var virtualDataset = {
-                            title: new _Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
-                            virtual: true,
-                            distributions: [{
-                              title: new _Map([['en', 'Remapping of: ' + i18n(distribution.title)]]),
-                              mediaType: 'coveragedata',
-                              data: remappedCov
-                            }]
-                          };
-                          var workspace = _this2.context.workspace;
-
-                          // display after loading
-                          var done = function done(_ref) {
-                            var dataset = _ref.dataset;
-
-                            if (dataset === virtualDataset) {
-                              window.ac = dataset.distributions[0].actions;
-                              dataset.distributions[0].actions.find(function (a) {
-                                return a.type === VIEW;
-                              }).run();
-                              workspace.off('distributionsLoad', done);
-                            }
-                          };
-                          workspace.on('distributionsLoad', done);
-
-                          workspace.addDataset(virtualDataset);
-                          workspace.requestFocus(virtualDataset);
-                        });
-
-                        remapper.show();
+                        var remapDef = _this4._getCategoryMappingDefinition(sourceParameter.observedProperty, param.observedProperty);
+                        _this4._createVirtualRemappedDataset(_this4.cov, sourceParameter, remapDef, true);
                       });
                     }
                   };
 
-                  for (_iterator4 = _getIterator(cov.parameters.values()); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    _loop3();
+                  for (var _iterator4 = _getIterator(cov.parameters.values()), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    _loop2();
                   }
                 } catch (err) {
                   _didIteratorError4 = true;
@@ -13247,18 +13316,6 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
                 }
 
                 $('.categorical-distribution-list', modalEl).add(el);
-              };
-
-              for (var _iterator2 = _getIterator(catDists), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var _iteratorNormalCompletion4;
-
-                var _didIteratorError4;
-
-                var _iteratorError4;
-
-                var _iterator4, _step4;
-
-                _loop2();
               }
             } catch (err) {
               _didIteratorError2 = true;
@@ -13281,79 +13338,34 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
             var _iteratorError3 = undefined;
 
             try {
-              var _loop4 = function () {
+              var _loop3 = function () {
                 var _step3$value = _step3.value;
                 var distribution = _step3$value.distribution;
                 var dataset = _step3$value.dataset;
 
                 var el = $(HTML(TEMPLATES['remapping-distribution-item']));
 
-                var data = distribution.data;
+                var remapDef = distribution.data;
 
                 $('.dataset-title', el).fill(i18n(dataset.title));
                 $('.distribution-title', el).fill(i18n(distribution.title));
-                $('.target-observedProperty-label', el).fill(i18n(data.destinationObservedProperty.label));
+                $('.target-observedProperty-label', el).fill(i18n(remapDef.destinationObservedProperty.label));
 
-                var cats = data.destinationObservedProperty.categories;
+                var cats = remapDef.destinationObservedProperty.categories;
                 var catsStr = cats.map(function (cat) {
                   return i18n(cat.label);
                 }).join(', ');
                 $('.target-categories', el).fill(catsStr);
 
                 $('.remapping-button', el).on('|click', function () {
-                  var targetObservedProp = {
-                    label: toLanguageMap(data.destinationObservedProperty.label),
-                    categories: data.destinationObservedProperty.categories.map(function (c) {
-                      return {
-                        id: c.id,
-                        label: toLanguageMap(c.label),
-                        preferredColor: c.preferredColor
-                      };
-                    })
-                  };
-                  if (data.destinationObservedProperty.id) {
-                    targetObservedProp.id = data.destinationObservedProperty.id;
-                  }
-                  var mapping = new _Map(data.categoryMappings.map(function (m) {
-                    return [m.sourceCategory, m.destinationCategory];
-                  }));
-                  var remappedCov = withCategories(_this2.cov, sourceParameter.key, targetObservedProp, mapping);
-
-                  // TODO code duplication with semi-manual remapping above
-                  var virtualDataset = {
-                    title: new _Map([['en', 'Remapped: ' + i18n(dataset.title)]]),
-                    virtual: true,
-                    distributions: [{
-                      title: new _Map([['en', 'Remapping of: ' + i18n(distribution.title)]]),
-                      mediaType: 'coveragedata',
-                      data: remappedCov
-                    }]
-                  };
-                  var workspace = _this2.context.workspace;
-
-                  // display after loading
-                  var done = function done(_ref2) {
-                    var dataset = _ref2.dataset;
-
-                    if (dataset === virtualDataset) {
-                      window.ac = dataset.distributions[0].actions;
-                      dataset.distributions[0].actions.find(function (a) {
-                        return a.type === VIEW;
-                      }).run();
-                      workspace.off('distributionsLoad', done);
-                    }
-                  };
-                  workspace.on('distributionsLoad', done);
-
-                  workspace.addDataset(virtualDataset);
-                  workspace.requestFocus(virtualDataset);
+                  _this4._createVirtualRemappedDataset(_this4.cov, sourceParameter, remapDef, true);
                 });
 
                 $('.remapping-distribution-list', modalEl).add(el);
               };
 
               for (var _iterator3 = _getIterator(remappingDists), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                _loop4();
+                _loop3();
               }
             } catch (err) {
               _didIteratorError3 = true;
@@ -13375,6 +13387,142 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
 
             new Modal(modalEl[0]).open();
           }
+        }, {
+          key: '_createVirtualRemappedDataset',
+          value: function _createVirtualRemappedDataset(cov, parameter, remapDef, prefixTitle, oncreate) {
+            var _this5 = this;
+
+            if (prefixTitle) {
+              prefixTitle = 'Remapped: ';
+            } else {
+              prefixTitle = '';
+            }
+
+            var sourceParameter = parameter;
+            var targetObservedProp = JSON.parse(JSON.stringify(remapDef.destinationObservedProperty), parseLanguageMapReviver);
+            var mapping = new _Map(remapDef.categoryMappings.map(function (m) {
+              return [m.sourceCategory, m.destinationCategory];
+            }));
+
+            this._showRemapper(sourceParameter.observedProperty, targetObservedProp, mapping, function (data) {
+              // use the mapping that was potentially modified by the user
+              var mapping = data.mapping;
+
+              var remappedCov = withCategories(cov, sourceParameter.key, targetObservedProp, mapping);
+
+              // update remapDef in case the user dragged around connections
+              var newRemapDef = JSON.parse(JSON.stringify(remapDef));
+              newRemapDef.categoryMappings = [];
+              var _iteratorNormalCompletion5 = true;
+              var _didIteratorError5 = false;
+              var _iteratorError5 = undefined;
+
+              try {
+                for (var _iterator5 = _getIterator(mapping), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                  var _step5$value = _slicedToArray(_step5.value, 2);
+
+                  var sourceCategory = _step5$value[0];
+                  var destinationCategory = _step5$value[1];
+
+                  newRemapDef.categoryMappings.push({ sourceCategory: sourceCategory, destinationCategory: destinationCategory });
+                }
+              } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+                    _iterator5['return']();
+                  }
+                } finally {
+                  if (_didIteratorError5) {
+                    throw _iteratorError5;
+                  }
+                }
+              }
+
+              if (!remappedCov.transformations) {
+                remappedCov.transformations = [];
+              }
+              remappedCov.transformations.push({
+                source: cov,
+                operation: {
+                  type: 'CategoryRemappingOperation',
+                  parameter: sourceParameter,
+                  categoryRemappingDefinition: newRemapDef
+                }
+              });
+
+              var virtualDataset = {
+                title: new _Map([['en', prefixTitle + i18n(_this5.context.dataset.title)]]),
+                virtual: true,
+                distributions: [{
+                  title: new _Map([['en', prefixTitle + i18n(_this5.context.distribution.title)]]),
+                  mediaType: 'coveragedata',
+                  data: remappedCov
+                }]
+              };
+              var workspace = _this5.context.workspace;
+
+              // display after loading
+              var done = function done(_ref) {
+                var dataset = _ref.dataset;
+
+                if (dataset === virtualDataset) {
+                  window.ac = dataset.distributions[0].actions;
+                  dataset.distributions[0].actions.find(function (a) {
+                    return a.type === VIEW;
+                  }).run();
+                  workspace.off('distributionsLoad', done);
+                }
+              };
+              workspace.on('distributionsLoad', done);
+
+              workspace.addDataset(virtualDataset);
+              workspace.requestFocus(virtualDataset);
+
+              if (oncreate) oncreate();
+            });
+          }
+        }, {
+          key: '_showRemapper',
+          value: function _showRemapper(sourceObservedProperty, targetObservedProperty, mapping, onapply) {
+            var remapper = new Remapper('remapper');
+
+            var sourceCategories = sourceObservedProperty.categories.map(function (cat) {
+              // TODO be more clever about colors
+              var color = cat.preferredColor || 'grey';
+              return {
+                id: cat.id,
+                label: i18n(cat.label),
+                color: color
+              };
+            });
+            var targetCategories = targetObservedProperty.categories.map(function (cat) {
+              // TODO be more clever about colors
+              var color = cat.preferredColor || 'grey';
+              return {
+                id: cat.id,
+                label: i18n(cat.label),
+                color: color
+              };
+            });
+
+            remapper.populateFroms(sourceCategories);
+            remapper.populateTos(targetCategories);
+            if (mapping) {
+              setTimeout(function () {
+                return remapper.linkCategories(mapping);
+              }, 100);
+            }
+
+            remapper.on('apply', function (data) {
+              remapper.remove(); // we create a fresh one each time
+              onapply(data);
+            });
+
+            remapper.show();
+          }
 
           /**
            * Returns all distributions which have categories, including categories contained in coverage data.
@@ -13387,28 +13535,28 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
                 var cov = dist.data;
                 // check for categorical parameters
                 if (cov.parameters) {
-                  var _iteratorNormalCompletion5 = true;
-                  var _didIteratorError5 = false;
-                  var _iteratorError5 = undefined;
+                  var _iteratorNormalCompletion6 = true;
+                  var _didIteratorError6 = false;
+                  var _iteratorError6 = undefined;
 
                   try {
-                    for (var _iterator5 = _getIterator(cov.parameters.values()), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                      var param = _step5.value;
+                    for (var _iterator6 = _getIterator(cov.parameters.values()), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                      var param = _step6.value;
 
                       if (!param.observedProperty.categories) continue;
                       return true;
                     }
                   } catch (err) {
-                    _didIteratorError5 = true;
-                    _iteratorError5 = err;
+                    _didIteratorError6 = true;
+                    _iteratorError6 = err;
                   } finally {
                     try {
-                      if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-                        _iterator5['return']();
+                      if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+                        _iterator6['return']();
                       }
                     } finally {
-                      if (_didIteratorError5) {
-                        throw _iteratorError5;
+                      if (_didIteratorError6) {
+                        throw _iteratorError6;
                       }
                     }
                   }
@@ -13428,7 +13576,7 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
               return c.id;
             }));
             return this._filterDistributions(function (dist) {
-              if (!(dist.formatImpl instanceof CPMMapping)) return false;
+              if (!(dist.formatImpl instanceof CatRemap)) return false;
               return dist.data.categoryMappings.some(function (m) {
                 return sourceCats.has(m.sourceCategory);
               });
@@ -13441,59 +13589,64 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
         }, {
           key: '_isRemapped',
           value: function _isRemapped() {
-            // TODO check Coverage data for remapping provenance info
-            return false;
+            // check Coverage data for remapping transformation
+
+            // .transformations contains a record of all transformations that led to the this coverage data
+            // The last applied transformation (which then directly resulted into this coverage data) is at the array end.
+            if (!this.cov.transformations) return false;
+            var trans = this.cov.transformations[this.cov.transformations.length - 1];
+            return trans.operation.type === 'CategoryRemappingOperation';
           }
         }, {
           key: '_filterDistributions',
           value: function _filterDistributions(matchFn) {
             var datasets = this.context.workspace.datasets;
             var dists = [];
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
-              for (var _iterator6 = _getIterator(datasets), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                var dataset = _step6.value;
-                var _iteratorNormalCompletion7 = true;
-                var _didIteratorError7 = false;
-                var _iteratorError7 = undefined;
+              for (var _iterator7 = _getIterator(datasets), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                var dataset = _step7.value;
+                var _iteratorNormalCompletion8 = true;
+                var _didIteratorError8 = false;
+                var _iteratorError8 = undefined;
 
                 try {
-                  for (var _iterator7 = _getIterator(dataset.distributions), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var dist = _step7.value;
+                  for (var _iterator8 = _getIterator(dataset.distributions), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    var dist = _step8.value;
 
                     if (matchFn(dist)) {
                       dists.push({ distribution: dist, dataset: dataset });
                     }
                   }
                 } catch (err) {
-                  _didIteratorError7 = true;
-                  _iteratorError7 = err;
+                  _didIteratorError8 = true;
+                  _iteratorError8 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion7 && _iterator7['return']) {
-                      _iterator7['return']();
+                    if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+                      _iterator8['return']();
                     }
                   } finally {
-                    if (_didIteratorError7) {
-                      throw _iteratorError7;
+                    if (_didIteratorError8) {
+                      throw _iteratorError8;
                     }
                   }
                 }
               }
             } catch (err) {
-              _didIteratorError6 = true;
-              _iteratorError6 = err;
+              _didIteratorError7 = true;
+              _iteratorError7 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-                  _iterator6['return']();
+                if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+                  _iterator7['return']();
                 }
               } finally {
-                if (_didIteratorError6) {
-                  throw _iteratorError6;
+                if (_didIteratorError7) {
+                  throw _iteratorError7;
                 }
               }
             }
@@ -13524,8 +13677,8 @@ $__System.register('29', ['6', '7', '8', '13', '14', '23', '28', 'a', 'b', 'c', 
   };
 });
 
-$__System.register('8', ['10', 'f'], function (_export) {
-  var _Object$keys, _Map;
+$__System.register('8', ['10', '11', '1f', 'f'], function (_export) {
+  var _Map, _Object$keys, _slicedToArray, _getIterator;
 
   function i18n(prop) {
     if (!prop) return;
@@ -13545,6 +13698,51 @@ $__System.register('8', ['10', 'f'], function (_export) {
     }
   }
 
+  function stringifyMapReplacer(key, value) {
+    // TODO remove the right || condition once https://github.com/zloirock/core-js/issues/148 is fixed
+    if (value instanceof _Map || (key === 'label' || key === 'description') && Array.isArray(value)) {
+      var obj = {};
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = _getIterator(value), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _step$value = _slicedToArray(_step.value, 2);
+
+          var k = _step$value[0];
+          var v = _step$value[1];
+
+          obj[k] = v;
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator['return']) {
+            _iterator['return']();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return obj;
+    }
+    return value;
+  }
+
+  function parseLanguageMapReviver(key, value) {
+    if (key === 'label' || key === 'description') {
+      if (typeof value !== 'object') return value;
+      return toLanguageMap(value);
+    }
+    return value;
+  }
+
   function toLanguageMap(obj) {
     return new _Map(_Object$keys(obj).map(function (lang) {
       return [lang, obj[lang]];
@@ -13561,14 +13759,22 @@ $__System.register('8', ['10', 'f'], function (_export) {
 
   return {
     setters: [function (_) {
-      _Object$keys = _['default'];
+      _Map = _['default'];
+    }, function (_2) {
+      _Object$keys = _2['default'];
     }, function (_f) {
-      _Map = _f['default'];
+      _slicedToArray = _f['default'];
+    }, function (_f2) {
+      _getIterator = _f2['default'];
     }],
     execute: function () {
       'use strict';
 
       _export('i18n', i18n);
+
+      _export('stringifyMapReplacer', stringifyMapReplacer);
+
+      _export('parseLanguageMapReviver', parseLanguageMapReviver);
 
       _export('toLanguageMap', toLanguageMap);
 
@@ -13577,20 +13783,20 @@ $__System.register('8', ['10', 'f'], function (_export) {
   };
 });
 
-$__System.register('13', ['9', 'a', 'b', 'c', 'd'], function (_export) {
-  var Eventable, _get, _inherits, _createClass, _classCallCheck, VIEW, PROCESS, Action;
+$__System.register('a', ['9', 'b', 'c', 'd', 'e'], function (_export) {
+  var Eventable, _get, _inherits, _createClass, _classCallCheck, VIEW, PROCESS, EXTERNAL_LINK, Action;
 
   return {
     setters: [function (_) {
       Eventable = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
       'use strict';
@@ -13602,6 +13808,10 @@ $__System.register('13', ['9', 'a', 'b', 'c', 'd'], function (_export) {
       PROCESS = 'process';
 
       _export('PROCESS', PROCESS);
+
+      EXTERNAL_LINK = 'external_link';
+
+      _export('EXTERNAL_LINK', EXTERNAL_LINK);
 
       /**
        * Every subclass must add a static `type` property with either VIEW or PROCESS.
@@ -13652,7 +13862,7 @@ $__System.register('13', ['9', 'a', 'b', 'c', 'd'], function (_export) {
   };
 });
 
-$__System.register('2c', ['6', '12', 'a', 'b', 'c', 'd', '1e', '2d', '2e'], function (_export) {
+$__System.register('2d', ['6', '13', 'b', 'c', 'd', 'e', '1f', '2e', '2f'], function (_export) {
   var $, L, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, inject, fromTemplate, i18n, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, ContinuousLegend;
 
   return {
@@ -13660,21 +13870,21 @@ $__System.register('2c', ['6', '12', 'a', 'b', 'c', 'd', '1e', '2d', '2e'], func
       $ = _2.$;
     }, function (_) {
       L = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _slicedToArray = _e['default'];
-    }, function (_d2) {
-      inject = _d2.inject;
-      fromTemplate = _d2.fromTemplate;
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
     }, function (_e2) {
-      i18n = _e2;
+      inject = _e2.inject;
+      fromTemplate = _e2.fromTemplate;
+    }, function (_f2) {
+      i18n = _f2;
     }],
     execute: function () {
       /* */
@@ -13789,7 +13999,7 @@ $__System.register('2c', ['6', '12', 'a', 'b', 'c', 'd', '1e', '2d', '2e'], func
   };
 });
 
-$__System.register('2e', [], function (_export) {
+$__System.register('2f', [], function (_export) {
   /* */
   'use strict';
 
@@ -13832,7 +14042,7 @@ $__System.register('2e', [], function (_export) {
   };
 });
 
-$__System.register('2d', ['6'], function (_export) {
+$__System.register('2e', ['6'], function (_export) {
   /* */
 
   /**
@@ -13885,7 +14095,7 @@ $__System.register('2d', ['6'], function (_export) {
   };
 });
 
-$__System.register('2f', ['6', '12', 'a', 'b', 'c', 'd', '2d', '2e'], function (_export) {
+$__System.register('30', ['6', '13', 'b', 'c', 'd', 'e', '2e', '2f'], function (_export) {
   var $, HTML, L, _get, _inherits, _createClass, _classCallCheck, inject, fromTemplate, i18n, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS, DiscreteLegend;
 
   return {
@@ -13894,19 +14104,19 @@ $__System.register('2f', ['6', '12', 'a', 'b', 'c', 'd', '2d', '2e'], function (
       HTML = _2.HTML;
     }, function (_) {
       L = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_d2) {
-      inject = _d2.inject;
-      fromTemplate = _d2.fromTemplate;
+      _createClass = _d['default'];
     }, function (_e) {
-      i18n = _e;
+      _classCallCheck = _e['default'];
+    }, function (_e2) {
+      inject = _e2.inject;
+      fromTemplate = _e2.fromTemplate;
+    }, function (_f) {
+      i18n = _f;
     }],
     execute: function () {
       /* */
@@ -14027,16 +14237,16 @@ $__System.register('2f', ['6', '12', 'a', 'b', 'c', 'd', '2d', '2e'], function (
   };
 });
 
-$__System.register('30', ['2f', '2c'], function (_export) {
+$__System.register('31', ['30', '2d'], function (_export) {
   /* */
   'use strict';
 
   var DiscreteLegend, ContinuousLegend;
   return {
-    setters: [function (_f) {
-      DiscreteLegend = _f['default'];
-    }, function (_c) {
-      ContinuousLegend = _c['default'];
+    setters: [function (_) {
+      DiscreteLegend = _['default'];
+    }, function (_d) {
+      ContinuousLegend = _d['default'];
     }],
     execute: function () {
       _export('default', function (layer, options) {
@@ -14050,7 +14260,7 @@ $__System.register('30', ['2f', '2c'], function (_export) {
   };
 });
 
-$__System.register('31', ['12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd', '1e'], function (_export) {
+$__System.register('32', ['13', '21', '23', '33', '34', '35', 'b', 'c', 'd', 'e', '1f'], function (_export) {
   var L, _Promise, arrays, linearPalette, scale, rangeutil, referencingutil, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, DOMAIN_TYPE, DEFAULT_COLOR, DEFAULT_PALETTE, VerticalProfile;
 
   return {
@@ -14067,16 +14277,16 @@ $__System.register('31', ['12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd'
       rangeutil = _5;
     }, function (_6) {
       referencingutil = _6;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _slicedToArray = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
     }],
     execute: function () {
       /* */
@@ -14323,7 +14533,7 @@ $__System.register('31', ['12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd'
   };
 });
 
-$__System.register('35', ['12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd', '1e'], function (_export) {
+$__System.register('36', ['13', '21', '23', '33', '34', '35', 'b', 'c', 'd', 'e', '1f'], function (_export) {
   var L, _Promise, arrays, linearPalette, scale, rangeutil, referencingutil, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, DOMAIN_TYPE, DEFAULT_PALETTE, Trajectory;
 
   return {
@@ -14340,16 +14550,16 @@ $__System.register('35', ['12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd'
       rangeutil = _5;
     }, function (_6) {
       referencingutil = _6;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _slicedToArray = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
     }],
     execute: function () {
       /* */
@@ -14579,7 +14789,7 @@ $__System.register('35', ['12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd'
   };
 });
 
-$__System.register('34', [], function (_export) {
+$__System.register('35', [], function (_export) {
   /** 3D WGS84 in lat-lon-height order */
   'use strict';
 
@@ -14627,7 +14837,7 @@ $__System.register('34', [], function (_export) {
   };
 });
 
-$__System.register('33', ['1f', '1e', 'e'], function (_export) {
+$__System.register('34', ['20', '1f', 'f'], function (_export) {
   var _toConsumableArray, _slicedToArray, _getIterator;
 
   function minMax(range) {
@@ -14714,7 +14924,7 @@ $__System.register('33', ['1f', '1e', 'e'], function (_export) {
 
     begin += '\n    fn(get(obj))\n  ';
 
-    var iterateLoop = new Function('get', 'fn', begin + end);
+    var iterateLoop = new Function('return function iterateRange (get, fn) { ' + begin + ' ' + end + ' }')();
     iterateLoop(range.get, fn);
   }
 
@@ -14743,12 +14953,12 @@ $__System.register('33', ['1f', '1e', 'e'], function (_export) {
   }
   */
   return {
-    setters: [function (_f) {
-      _toConsumableArray = _f['default'];
-    }, function (_e) {
-      _slicedToArray = _e['default'];
-    }, function (_e2) {
-      _getIterator = _e2['default'];
+    setters: [function (_) {
+      _toConsumableArray = _['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
+    }, function (_f2) {
+      _getIterator = _f2['default'];
     }],
     execute: function () {
       /**
@@ -14766,7 +14976,7 @@ $__System.register('33', ['1f', '1e', 'e'], function (_export) {
   };
 });
 
-$__System.register('22', ['36', 'c', 'd', '1d'], function (_export) {
+$__System.register('23', ['37', 'd', 'e', '1e'], function (_export) {
   var _Math$trunc, _createClass, _classCallCheck, ndarray, Wrapper1D;
 
   /***
@@ -14864,12 +15074,12 @@ $__System.register('22', ['36', 'c', 'd', '1d'], function (_export) {
   return {
     setters: [function (_) {
       _Math$trunc = _['default'];
-    }, function (_c) {
-      _createClass = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_d2) {
-      ndarray = _d2['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
+    }, function (_e2) {
+      ndarray = _e2['default'];
     }],
     execute: function () {
       /* */
@@ -14929,33 +15139,33 @@ $__System.register('22', ['36', 'c', 'd', '1d'], function (_export) {
   };
 });
 
-$__System.registerDynamic("37", ["38", "39", "3a"], true, function(req, exports, module) {
+$__System.registerDynamic("38", ["39", "3a", "3b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('38');
   req('39');
-  module.exports = req('3a')('iterator');
+  req('3a');
+  module.exports = req('3b')('iterator');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("3b", ["37"], true, function(req, exports, module) {
+$__System.registerDynamic("3c", ["38"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('37'),
+    "default": req('38'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('32', ['36', 'c', 'd', 'f', '3b'], function (_export) {
-  var _Math$trunc, _createClass, _classCallCheck, _Map, _Symbol$iterator, PaletteManager;
+$__System.register('33', ['10', '37', 'd', 'e', '3c'], function (_export) {
+  var _Map, _Math$trunc, _createClass, _classCallCheck, _Symbol$iterator, PaletteManager;
 
   function linearPalette(colors) {
     var steps = arguments.length <= 1 || arguments[1] === undefined ? 256 : arguments[1];
@@ -15069,16 +15279,16 @@ $__System.register('32', ['36', 'c', 'd', 'f', '3b'], function (_export) {
     return ta;
   }
   return {
-    setters: [function (_) {
+    setters: [function (_2) {
+      _Map = _2['default'];
+    }, function (_) {
       _Math$trunc = _['default'];
-    }, function (_c) {
-      _createClass = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_f) {
-      _Map = _f['default'];
-    }, function (_b) {
-      _Symbol$iterator = _b['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
+    }, function (_c) {
+      _Symbol$iterator = _c['default'];
     }],
     execute: function () {
       /**
@@ -15200,7 +15410,7 @@ $__System.register('32', ['36', 'c', 'd', 'f', '3b'], function (_export) {
   };
 });
 
-$__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c', 'd', '1e', 'e', '1d'], function (_export) {
+$__System.register('3d', ['11', '13', '21', '23', '33', '34', '35', 'b', 'c', 'd', 'e', '1f', 'f', '1e'], function (_export) {
   var _Object$keys, L, _Promise, arrays, linearPalette, directPalette, scale, rangeutil, referencingutil, _get, _inherits, _createClass, _classCallCheck, _slicedToArray, _getIterator, ndarray, DOMAIN_TYPE, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
 
   function wrapLongitude(lon, range) {
@@ -15232,20 +15442,20 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
       rangeutil = _6;
     }, function (_7) {
       referencingutil = _7;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _slicedToArray = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
+    }, function (_f2) {
+      _getIterator = _f2['default'];
     }, function (_e2) {
-      _getIterator = _e2['default'];
-    }, function (_d2) {
-      ndarray = _d2['default'];
+      ndarray = _e2['default'];
     }],
     execute: function () {
       /* */
@@ -15377,6 +15587,7 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
             var max = -Infinity;
             var min = Infinity;
             var categories = this.param.observedProperty.categories;
+            var encoding = this.param.categoryEncoding;
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -15384,28 +15595,31 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
             try {
               for (var _iterator = _getIterator(categories), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                 var category = _step.value;
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
 
-                try {
-                  for (var _iterator3 = _getIterator(this.param.categoryEncoding.get(category.id)), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var val = _step3.value;
+                if (encoding.has(category.id)) {
+                  var _iteratorNormalCompletion3 = true;
+                  var _didIteratorError3 = false;
+                  var _iteratorError3 = undefined;
 
-                    max = Math.max(max, val);
-                    min = Math.min(min, val);
-                  }
-                } catch (err) {
-                  _didIteratorError3 = true;
-                  _iteratorError3 = err;
-                } finally {
                   try {
-                    if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                      _iterator3['return']();
+                    for (var _iterator3 = _getIterator(encoding.get(category.id)), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                      var val = _step3.value;
+
+                      max = Math.max(max, val);
+                      min = Math.min(min, val);
                     }
+                  } catch (err) {
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
                   } finally {
-                    if (_didIteratorError3) {
-                      throw _iteratorError3;
+                    try {
+                      if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                        _iterator3['return']();
+                      }
+                    } finally {
+                      if (_didIteratorError3) {
+                        throw _iteratorError3;
+                      }
                     }
                   }
                 }
@@ -15438,28 +15652,30 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
               }
 
               for (var idx = 0; idx < categories.length; idx++) {
-                var cat = categories[idx];
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                var category = categories[idx];
+                if (encoding.has(category.id)) {
+                  var _iteratorNormalCompletion2 = true;
+                  var _didIteratorError2 = false;
+                  var _iteratorError2 = undefined;
 
-                try {
-                  for (var _iterator2 = _getIterator(this.param.categoryEncoding.get(cat.id)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var val = _step2.value;
-
-                    valIdxMap[val] = idx;
-                  }
-                } catch (err) {
-                  _didIteratorError2 = true;
-                  _iteratorError2 = err;
-                } finally {
                   try {
-                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                      _iterator2['return']();
+                    for (var _iterator2 = _getIterator(this.param.categoryEncoding.get(category.id)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                      var val = _step2.value;
+
+                      valIdxMap[val] = idx;
                     }
+                  } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
                   } finally {
-                    if (_didIteratorError2) {
-                      throw _iteratorError2;
+                    try {
+                      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                        _iterator2['return']();
+                      }
+                    } finally {
+                      if (_didIteratorError2) {
+                        throw _iteratorError2;
+                      }
                     }
                   }
                 }
@@ -15476,12 +15692,6 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
 
             // "loading" and "load" events are provided by the underlying TileLayer class
 
-            // TODO change to subsetCov once that is used in _updatePaletteExtent
-            //  the goal is to avoid reloading data when approximating palette extent via subsetting
-            //  but: memory has to be freed when the layer is removed from the map
-            //      -> therefore cacheRanges should be on subsetCov whose reference is removed on onRemove
-            this.cov.cacheRanges = true;
-
             this._map = map;
             this.fire('dataLoading'); // for supporting loading spinners
             this.cov.loadDomain().then(function (domain) {
@@ -15494,6 +15704,11 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
             }).then(function () {
               return _this._subsetByCoordinatePreference();
             }).then(function () {
+              //  the goal is to avoid reloading data when approximating palette extent via subsetting
+              //  but: memory has to be freed when the layer is removed from the map
+              //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
+              _this.subsetCov.cacheRanges = true;
+            }).then(function () {
               return _this.subsetCov.loadRange(_this.param.key);
             }).then(function (subsetRange) {
               _this.subsetRange = subsetRange;
@@ -15501,13 +15716,15 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
                 return _this._updatePaletteExtent(_this._paletteExtent);
               }
             }).then(function () {
+              _this.errored = false;
               _this.fire('add');
               _get(Object.getPrototypeOf(Grid.prototype), 'onAdd', _this).call(_this, map);
               _this.fire('dataLoad');
             })['catch'](function (e) {
+              _this.errored = true;
               console.error(e);
               _this.fire('error', e);
-
+              _get(Object.getPrototypeOf(Grid.prototype), 'onAdd', _this).call(_this, map);
               _this.fire('dataLoad');
             });
           }
@@ -15629,9 +15846,7 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
                 var xconstraint = { start: 0, stop: xlen, step: Math.max(Math.round(xlen / 100), 1) };
                 var yconstraint = { start: 0, stop: ylen, step: Math.max(Math.round(ylen / 100), 1) };
 
-                // TODO bug in covjson-reader doesn't expose subsetByIndex for subsetted covs
-                //return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})
-                return this.cov.subsetByIndex({ x: xconstraint, y: yconstraint, t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
+                return this.subsetCov.subsetByIndex({ x: xconstraint, y: yconstraint }).then(function (subsetCov) {
                   return subsetCov.loadRange(_this3.param.key).then(function (subsetRange) {
                     var _rangeutil$minMax = rangeutil.minMax(subsetRange);
 
@@ -15660,6 +15875,8 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
           key: 'drawTile',
           value: function drawTile(canvas, tilePoint, zoom) {
             var _this4 = this;
+
+            if (this.errored) return;
 
             var ctx = canvas.getContext('2d');
             var tileSize = this.options.tileSize;
@@ -16037,7 +16254,7 @@ $__System.register('3c', ['10', '12', '20', '22', '32', '33', '34', 'a', 'b', 'c
   };
 });
 
-$__System.register('3d', ['10', '31', '35', '3e', '3c'], function (_export) {
+$__System.register('3e', ['11', '32', '36', '3f', '3d'], function (_export) {
   var _Object$keys, VerticalProfile, Trajectory, _defineProperty, Grid, _DEFAULT_RENDERERS, pre, DEFAULT_RENDERERS;
 
   function LayerFactory() {
@@ -16074,10 +16291,10 @@ $__System.register('3d', ['10', '31', '35', '3e', '3c'], function (_export) {
       VerticalProfile = _3['default'];
     }, function (_2) {
       Trajectory = _2['default'];
-    }, function (_e) {
-      _defineProperty = _e['default'];
-    }, function (_c) {
-      Grid = _c['default'];
+    }, function (_f) {
+      _defineProperty = _f['default'];
+    }, function (_d) {
+      Grid = _d['default'];
     }],
     execute: function () {
       /* */
@@ -16093,18 +16310,18 @@ $__System.register('3d', ['10', '31', '35', '3e', '3c'], function (_export) {
   };
 });
 
-$__System.register("3f", ["3d"], function (_export) {
+$__System.register("40", ["3e"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_d) {
+    setters: [function (_e) {
       var _exportObj = {};
 
-      for (var _key in _d) {
-        if (_key !== "default") _exportObj[_key] = _d[_key];
+      for (var _key in _e) {
+        if (_key !== "default") _exportObj[_key] = _e[_key];
       }
 
-      _exportObj["default"] = _d["default"];
+      _exportObj["default"] = _e["default"];
 
       _export(_exportObj);
     }],
@@ -16112,29 +16329,29 @@ $__System.register("3f", ["3d"], function (_export) {
   };
 });
 
-$__System.register('40', ['8', '13', '30', 'a', 'b', 'c', 'd', 'e', '3f'], function (_export) {
-  var i18n, Action, VIEW, CoverageLegend, _get, _inherits, _createClass, _classCallCheck, _getIterator, LayerFactory, CoverageView;
+$__System.register('41', ['8', '31', '40', 'b', 'c', 'd', 'e', 'f', 'a'], function (_export) {
+  var i18n, CoverageLegend, LayerFactory, _get, _inherits, _createClass, _classCallCheck, _getIterator, Action, VIEW, CoverageView;
 
   return {
     setters: [function (_3) {
       i18n = _3.i18n;
     }, function (_2) {
-      Action = _2['default'];
-      VIEW = _2.VIEW;
+      CoverageLegend = _2['default'];
     }, function (_) {
-      CoverageLegend = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
+      LayerFactory = _['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
     }, function (_f) {
-      LayerFactory = _f['default'];
+      _getIterator = _f['default'];
+    }, function (_a) {
+      Action = _a['default'];
+      VIEW = _a.VIEW;
     }],
     execute: function () {
       'use strict';
@@ -16149,6 +16366,7 @@ $__System.register('40', ['8', '13', '30', 'a', 'b', 'c', 'd', 'e', '3f'], funct
           this.cov = data;
 
           this.label = 'View';
+          this.icon = '<span class="glyphicon glyphicon-eye-open"></span>';
 
           this.layers = [];
         }
@@ -16279,7 +16497,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("41", [], function() {
+}({}), define("42", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -17373,13 +17591,13 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("6", ["41"], function(main) {
+define("6", ["42"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register('42', ['6', '20', '43', 'a', 'b', 'c', 'd'], function (_export) {
+$__System.register('43', ['6', '21', '44', 'b', 'c', 'd', 'e'], function (_export) {
   var $, _Promise, Format, _get, _inherits, _createClass, _classCallCheck, WMS;
 
   function readLayers(wmsEndpoint) {
@@ -17424,14 +17642,14 @@ $__System.register('42', ['6', '20', '43', 'a', 'b', 'c', 'd'], function (_expor
       _Promise = _['default'];
     }, function (_3) {
       Format = _3['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
       'use strict';
@@ -17470,7 +17688,7 @@ $__System.register('42', ['6', '20', '43', 'a', 'b', 'c', 'd'], function (_expor
           value: function getMetadata(data) {
             return {
               format: this.label,
-              type: data.layers.length + ' layers'
+              content: data.layers.length + ' layers'
             };
           }
         }]);
@@ -17483,36 +17701,36 @@ $__System.register('42', ['6', '20', '43', 'a', 'b', 'c', 'd'], function (_expor
   };
 });
 
-$__System.register('2b', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
-  var Format, loadJSON, _get, _inherits, _createClass, _classCallCheck, CPMMapping;
+$__System.register('2c', ['44', '45', 'b', 'c', 'd', 'e'], function (_export) {
+  var Format, loadJSON, _get, _inherits, _createClass, _classCallCheck, CatRemap;
 
   return {
     setters: [function (_) {
       Format = _['default'];
     }, function (_2) {
       loadJSON = _2.loadJSON;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
       'use strict';
 
-      CPMMapping = (function (_Format) {
-        _inherits(CPMMapping, _Format);
+      CatRemap = (function (_Format) {
+        _inherits(CatRemap, _Format);
 
-        function CPMMapping(actionFactories) {
-          _classCallCheck(this, CPMMapping);
+        function CatRemap(actionFactories) {
+          _classCallCheck(this, CatRemap);
 
-          _get(Object.getPrototypeOf(CPMMapping.prototype), 'constructor', this).call(this, actionFactories);
-          this.label = 'Complex Property Model Mapping in JSON-LD';
-          this.shortLabel = 'CPM-Mapping';
-          this.mediaTypes = ['application/ld+json;profile="http://purl.org/voc/cpm_mapping"'];
+          _get(Object.getPrototypeOf(CatRemap.prototype), 'constructor', this).call(this, actionFactories);
+          this.label = 'Category Remapping Definition in JSON-LD';
+          this.shortLabel = 'CatRemap';
+          this.mediaTypes = ['application/ld+json;profile="http://purl.org/voc/cpm_catremap"'];
         }
 
         /**
@@ -17520,7 +17738,7 @@ $__System.register('2b', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
          * @returns {Promise} succeeds with JSON-LD object
          */
 
-        _createClass(CPMMapping, [{
+        _createClass(CatRemap, [{
           key: 'doLoad',
           value: function doLoad(urlOrObject) {
             return loadJSON(urlOrObject, this.mediaTypes);
@@ -17530,20 +17748,20 @@ $__System.register('2b', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
           value: function getMetadata(data) {
             return {
               format: this.label,
-              type: '1 Mapping'
+              content: '1 Mapping'
             };
           }
         }]);
 
-        return CPMMapping;
+        return CatRemap;
       })(Format);
 
-      _export('default', CPMMapping);
+      _export('default', CatRemap);
     }
   };
 });
 
-$__System.registerDynamic("45", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("46", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     (function() {
@@ -17873,17 +18091,17 @@ $__System.registerDynamic("45", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("46", ["45"], true, function(req, exports, module) {
+$__System.registerDynamic("47", ["46"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('45');
+  module.exports = req('46');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('44', ['20', '46'], function (_export) {
+$__System.register('45', ['21', '47'], function (_export) {
   var _Promise;
 
   // https://github.com/github/fetch#handling-http-error-statuses
@@ -17934,7 +18152,7 @@ $__System.register('44', ['20', '46'], function (_export) {
   };
 });
 
-$__System.register('47', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
+$__System.register('48', ['44', '45', 'b', 'c', 'd', 'e'], function (_export) {
   var Format, loadJSON, _get, _inherits, _createClass, _classCallCheck, GeoJSON;
 
   return {
@@ -17942,14 +18160,14 @@ $__System.register('47', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
       Format = _['default'];
     }, function (_2) {
       loadJSON = _2.loadJSON;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
       'use strict';
@@ -17981,7 +18199,7 @@ $__System.register('47', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
           value: function getMetadata(geojson) {
             return {
               format: this.label,
-              type: geojson.type
+              content: geojson.type
             };
           }
         }]);
@@ -17994,26 +18212,26 @@ $__System.register('47', ['43', '44', 'a', 'b', 'c', 'd'], function (_export) {
   };
 });
 
-$__System.register('48', ['20', '49', 'a', 'b', 'c', 'd', '4a', '2a'], function (_export) {
-  var _Promise, CovJSONReader, _get, _inherits, _createClass, _classCallCheck, RestAPI, CoverageData, CovJSON;
+$__System.register('49', ['21', 'b', 'c', 'd', 'e', '4a', '4b', '2b'], function (_export) {
+  var _Promise, _get, _inherits, _createClass, _classCallCheck, CovJSONReader, RestAPI, CoverageData, CovJSON;
 
   return {
     setters: [function (_) {
       _Promise = _['default'];
-    }, function (_2) {
-      CovJSONReader = _2;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_a2) {
-      RestAPI = _a2;
-    }, function (_a3) {
-      CoverageData = _a3['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
+    }, function (_a) {
+      CovJSONReader = _a;
+    }, function (_b2) {
+      RestAPI = _b2;
+    }, function (_b3) {
+      CoverageData = _b3['default'];
     }],
     execute: function () {
       'use strict';
@@ -18062,7 +18280,7 @@ $__System.register('48', ['20', '49', 'a', 'b', 'c', 'd', '4a', '2a'], function 
   };
 });
 
-$__System.registerDynamic("4b", [], true, function(req, exports, module) {
+$__System.registerDynamic("4c", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -18194,23 +18412,23 @@ $__System.registerDynamic("4b", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("4c", ["4b"], true, function(req, exports, module) {
+$__System.registerDynamic("4d", ["4c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('4b');
+  module.exports = req('4c');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("3e", ["4d"], true, function(req, exports, module) {
+$__System.registerDynamic("3f", ["4e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$defineProperty = req('4d')["default"];
+  var _Object$defineProperty = req('4e')["default"];
   exports["default"] = function(obj, key, value) {
     if (key in obj) {
       _Object$defineProperty(obj, key, {
@@ -18229,8 +18447,8 @@ $__System.registerDynamic("3e", ["4d"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('4e', ['20', 'c', 'd', '3e', 'f', 'e', '4f', '4c'], function (_export) {
-  var _Promise, _createClass, _classCallCheck, _defineProperty, _Map, _getIterator, jsonld, urltemplate, HYDRA_CONTEXT, PartialCollectionView, IriTemplate, COVAPI_NS, COVAPI_API, OSGEO_NS, OSTIME_NS, URL_PROPS, FRAME_CONTEXT, API;
+$__System.register('4f', ['10', '21', '50', 'd', 'e', '3f', 'f', '4d'], function (_export) {
+  var _Map, _Promise, jsonld, _createClass, _classCallCheck, _defineProperty, _getIterator, urltemplate, HYDRA_CONTEXT, PartialCollectionView, IriTemplate, COVAPI_NS, COVAPI_API, OSGEO_NS, OSTIME_NS, URL_PROPS, FRAME_CONTEXT, API;
 
   /**
    * Extracts API information from the given Coverage/CoverageCollection object
@@ -18257,22 +18475,22 @@ $__System.register('4e', ['20', 'c', 'd', '3e', 'f', 'e', '4f', '4c'], function 
   }
 
   return {
-    setters: [function (_) {
+    setters: [function (_2) {
+      _Map = _2['default'];
+    }, function (_) {
       _Promise = _['default'];
-    }, function (_c) {
-      _createClass = _c['default'];
+    }, function (_3) {
+      jsonld = _3.promises;
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _defineProperty = _e['default'];
+      _classCallCheck = _e['default'];
     }, function (_f) {
-      _Map = _f['default'];
-    }, function (_e2) {
-      _getIterator = _e2['default'];
+      _defineProperty = _f['default'];
     }, function (_f2) {
-      jsonld = _f2.promises;
-    }, function (_c2) {
-      urltemplate = _c2['default'];
+      _getIterator = _f2['default'];
+    }, function (_d2) {
+      urltemplate = _d2['default'];
     }],
     execute: function () {
       /* */
@@ -18319,6 +18537,8 @@ $__System.register('4e', ['20', 'c', 'd', '3e', 'f', 'e', '4f', '4c'], function 
         function API(ld) {
           _classCallCheck(this, API);
 
+          this.supportedUrlProps = new _Map();
+
           if (!ld) return;
           console.log(ld);
 
@@ -18328,8 +18548,6 @@ $__System.register('4e', ['20', 'c', 'd', '3e', 'f', 'e', '4f', '4c'], function 
 
             console.log(ld.view);
           }
-
-          this.supportedUrlProps = new _Map();
 
           if (ld.api && ld.api.type === IriTemplate) {
             this.hasUrlTemplate = true;
@@ -18399,7 +18617,7 @@ $__System.register('4e', ['20', 'c', 'd', '3e', 'f', 'e', '4f', '4c'], function 
   };
 });
 
-$__System.register('50', ['10', '21', '4e'], function (_export) {
+$__System.register('51', ['11', '22', '4f'], function (_export) {
   var _Object$keys, _Object$create, API;
 
   // Note: We currently can't handle Hydra data in non-default graphs due to lack of support in JSON-LD framing.
@@ -18484,8 +18702,8 @@ $__System.register('50', ['10', '21', '4e'], function (_export) {
       _Object$keys = _['default'];
     }, function (_2) {
       _Object$create = _2['default'];
-    }, function (_e) {
-      API = _e;
+    }, function (_f) {
+      API = _f;
     }],
     execute: function () {
       /* */
@@ -18496,7 +18714,7 @@ $__System.register('50', ['10', '21', '4e'], function (_export) {
   };
 });
 
-$__System.register("4a", ["50"], function (_export) {
+$__System.register("4b", ["51"], function (_export) {
   "use strict";
 
   return {
@@ -18515,7 +18733,7 @@ $__System.register("4a", ["50"], function (_export) {
   };
 });
 
-$__System.register('51', ['10', '52', '53', 'c', 'd', 'e'], function (_export) {
+$__System.register('52', ['11', '53', '54', 'd', 'e', 'f'], function (_export) {
   var _Object$keys, Coverage, shallowcopy, _createClass, _classCallCheck, _getIterator, CoverageCollection;
 
   return {
@@ -18525,12 +18743,12 @@ $__System.register('51', ['10', '52', '53', 'c', 'd', 'e'], function (_export) {
       Coverage = _2['default'];
     }, function (_3) {
       shallowcopy = _3.shallowcopy;
-    }, function (_c) {
-      _createClass = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
     }],
     execute: function () {
       /* */
@@ -18980,7 +19198,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     decode: decode
   };
   if (typeof define === "function" && define.amd)
-    define("54", [], obj);
+    define("55", [], obj);
   else if (!global.CBOR)
     global.CBOR = obj;
 })(this);
@@ -18989,13 +19207,13 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("55", ["54"], function(main) {
+define("56", ["55"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register('56', ['20', '53', '55'], function (_export) {
+$__System.register('57', ['21', '54', '56'], function (_export) {
   var _Promise, endsWith, cbor, MEDIA, ACCEPT, EXT;
 
   /**
@@ -19067,10 +19285,6 @@ $__System.register('56', ['20', '53', '55'], function (_export) {
             reject(new Error('Unsupported media type: ' + type));
             return;
           }
-          // TODO check if these are the initial response headers
-          //  Mozilla says "For multipart requests, this returns the headers
-          //  from the current part of the request, not from the original channel."
-          // -> is chunked transfer encoding a multipart request?
           var headers = parseResponseHeaders(req.getAllResponseHeaders());
           resolve({
             data: data,
@@ -19153,19 +19367,8 @@ $__System.register('56', ['20', '53', '55'], function (_export) {
   };
 });
 
-$__System.register('53', [], function (_export) {
-  /* */
-  'use strict';
-
-  var PREFIX;
-
-  _export('assert', assert);
-
-  _export('shallowcopy', shallowcopy);
-
-  _export('endsWith', endsWith);
-
-  _export('minMax', minMax);
+$__System.register('54', ['22'], function (_export) {
+  var _Object$create, PREFIX;
 
   function assert(condition, message) {
     if (!condition) {
@@ -19175,7 +19378,7 @@ $__System.register('53', [], function (_export) {
   }
 
   function shallowcopy(obj) {
-    var copy = {};
+    var copy = _Object$create(Object.getPrototypeOf(obj));
     for (var prop in obj) {
       copy[prop] = obj[prop];
     }
@@ -19217,8 +19420,21 @@ $__System.register('53', [], function (_export) {
   }
 
   return {
-    setters: [],
+    setters: [function (_) {
+      _Object$create = _['default'];
+    }],
     execute: function () {
+      /* */
+      'use strict';
+
+      _export('assert', assert);
+
+      _export('shallowcopy', shallowcopy);
+
+      _export('endsWith', endsWith);
+
+      _export('minMax', minMax);
+
       PREFIX = 'http://coveragejson.org/def#';
 
       _export('PREFIX', PREFIX);
@@ -19226,7 +19442,7 @@ $__System.register('53', [], function (_export) {
   };
 });
 
-$__System.registerDynamic("57", [], true, function(req, exports, module) {
+$__System.registerDynamic("58", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -19239,17 +19455,17 @@ $__System.registerDynamic("57", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("58", ["57"], true, function(req, exports, module) {
+$__System.registerDynamic("59", ["58"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('57');
+  module.exports = req('58');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("59", [], true, function(req, exports, module) {
+$__System.registerDynamic("5a", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -19334,17 +19550,17 @@ $__System.registerDynamic("59", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("5a", ["59"], true, function(req, exports, module) {
+$__System.registerDynamic("5b", ["5a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('59');
+  module.exports = req('5a');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("5b", [], true, function(req, exports, module) {
+$__System.registerDynamic("5c", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -19450,24 +19666,24 @@ $__System.registerDynamic("5b", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("5c", ["5b"], true, function(req, exports, module) {
+$__System.registerDynamic("5d", ["5c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('5b');
+  module.exports = req('5c');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("5d", ["5c", "5a", "58"], true, function(req, exports, module) {
+$__System.registerDynamic("5e", ["5d", "5b", "59"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var base64 = req('5c');
-  var ieee754 = req('5a');
-  var isArray = req('58');
+  var base64 = req('5d');
+  var ieee754 = req('5b');
+  var isArray = req('59');
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
   exports.INSPECT_MAX_BYTES = 50;
@@ -20761,22 +20977,12 @@ $__System.registerDynamic("5d", ["5c", "5a", "58"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("5e", ["5d"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('5d');
-  global.define = __define;
-  return module.exports;
-});
-
 $__System.registerDynamic("5f", ["5e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : req('5e');
+  module.exports = req('5e');
   global.define = __define;
   return module.exports;
 });
@@ -20786,7 +20992,7 @@ $__System.registerDynamic("60", ["5f"], true, function(req, exports, module) {
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('5f');
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : req('5f');
   global.define = __define;
   return module.exports;
 });
@@ -20796,11 +21002,7 @@ $__System.registerDynamic("61", ["60"], true, function(req, exports, module) {
   var global = this,
       __define = global.define;
   global.define = undefined;
-  (function(Buffer) {
-    module.exports = function(obj) {
-      return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
-    };
-  })(req('60').Buffer);
+  module.exports = req('60');
   global.define = __define;
   return module.exports;
 });
@@ -20810,12 +21012,26 @@ $__System.registerDynamic("62", ["61"], true, function(req, exports, module) {
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('61');
+  (function(Buffer) {
+    module.exports = function(obj) {
+      return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
+    };
+  })(req('61').Buffer);
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("63", [], true, function(req, exports, module) {
+$__System.registerDynamic("63", ["62"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('62');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("64", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -20833,23 +21049,23 @@ $__System.registerDynamic("63", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("64", ["63"], true, function(req, exports, module) {
+$__System.registerDynamic("65", ["64"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('63');
+  module.exports = req('64');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("65", ["64", "62"], true, function(req, exports, module) {
+$__System.registerDynamic("66", ["65", "63"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var iota = req('64');
-  var isBuffer = req('62');
+  var iota = req('65');
+  var isBuffer = req('63');
   var hasTypedArrays = ((typeof Float64Array) !== "undefined");
   function compare1st(a, b) {
     return a[0] - b[0];
@@ -21140,22 +21356,22 @@ b" + i + "*=d\
   return module.exports;
 });
 
-$__System.registerDynamic("1d", ["65"], true, function(req, exports, module) {
+$__System.registerDynamic("1e", ["66"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('65');
+  module.exports = req('66');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("66", ["67"], true, function(req, exports, module) {
+$__System.registerDynamic("67", ["68"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $export = req('67');
+  var $export = req('68');
   $export($export.S, 'Math', {trunc: function trunc(it) {
       return (it > 0 ? Math.floor : Math.ceil)(it);
     }});
@@ -21163,39 +21379,39 @@ $__System.registerDynamic("66", ["67"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("68", ["66", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("69", ["67", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('66');
-  module.exports = req('69').Math.trunc;
+  req('67');
+  module.exports = req('6a').Math.trunc;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("36", ["68"], true, function(req, exports, module) {
+$__System.registerDynamic("37", ["69"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('68'),
+    "default": req('69'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("6a", ["6b", "3a", "6c", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("6b", ["6c", "3b", "6d", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var classof = req('6b'),
-      ITERATOR = req('3a')('iterator'),
-      Iterators = req('6c');
-  module.exports = req('69').isIterable = function(it) {
+  var classof = req('6c'),
+      ITERATOR = req('3b')('iterator'),
+      Iterators = req('6d');
+  module.exports = req('6a').isIterable = function(it) {
     var O = Object(it);
     return O[ITERATOR] !== undefined || '@@iterator' in O || Iterators.hasOwnProperty(classof(O));
   };
@@ -21203,39 +21419,39 @@ $__System.registerDynamic("6a", ["6b", "3a", "6c", "69"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("6d", ["39", "38", "6a"], true, function(req, exports, module) {
+$__System.registerDynamic("6e", ["3a", "39", "6b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
+  req('3a');
   req('39');
-  req('38');
-  module.exports = req('6a');
+  module.exports = req('6b');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("6e", ["6d"], true, function(req, exports, module) {
+$__System.registerDynamic("6f", ["6e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('6d'),
+    "default": req('6e'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("1e", ["e", "6e"], true, function(req, exports, module) {
+$__System.registerDynamic("1f", ["f", "6f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _getIterator = req('e')["default"];
-  var _isIterable = req('6e')["default"];
+  var _getIterator = req('f')["default"];
+  var _isIterable = req('6f')["default"];
   exports["default"] = (function() {
     function sliceIterator(arr, i) {
       var _arr = [];
@@ -21278,8 +21494,8 @@ $__System.registerDynamic("1e", ["e", "6e"], true, function(req, exports, module
   return module.exports;
 });
 
-$__System.register('52', ['10', '20', '36', '53', '56', 'c', 'd', '1f', '1e', 'f', 'e', '6f', '1d'], function (_export) {
-  var _Object$keys, _Promise, _Math$trunc, shallowcopy, minMax, assert, PREFIX, load, _createClass, _classCallCheck, _toConsumableArray, _slicedToArray, _Map, _getIterator, _Array$from, ndarray, Coverage;
+$__System.register('53', ['10', '11', '20', '21', '37', '54', '57', '70', 'd', 'e', '1f', 'f', '1e'], function (_export) {
+  var _Map, _Object$keys, _toConsumableArray, _Promise, _Math$trunc, shallowcopy, minMax, assert, PREFIX, load, _Array$from, _createClass, _classCallCheck, _slicedToArray, _getIterator, ndarray, Coverage;
 
   /**
    * Currently unused, but may need in future.
@@ -21588,8 +21804,8 @@ $__System.register('52', ['10', '20', '36', '53', '56', 'c', 'd', '1f', '1e', 'f
       if (ndargs) ndargs += ',';
       ndargs += '\'' + axisOrder[i] + '\' in obj ? obj[\'' + axisOrder[i] + '\'] : 0';
     }
-    var fn = new Function('ndarr', 'obj', 'return ndarr.get(' + ndargs + ')');
-    return fn.bind(undefined, ndarr);
+    var fn = new Function('ndarr', 'return function ndarrget (obj) { return ndarr.get(' + ndargs + ') }')(ndarr);
+    return fn;
   }
 
   /*
@@ -21729,35 +21945,35 @@ $__System.register('52', ['10', '20', '36', '53', '56', 'c', 'd', '1f', '1e', 'f
     return domain;
   }
   return {
-    setters: [function (_) {
-      _Object$keys = _['default'];
-    }, function (_2) {
-      _Promise = _2['default'];
+    setters: [function (_2) {
+      _Map = _2['default'];
     }, function (_3) {
-      _Math$trunc = _3['default'];
+      _Object$keys = _3['default'];
+    }, function (_) {
+      _toConsumableArray = _['default'];
     }, function (_4) {
-      shallowcopy = _4.shallowcopy;
-      minMax = _4.minMax;
-      assert = _4.assert;
-      PREFIX = _4.PREFIX;
+      _Promise = _4['default'];
+    }, function (_6) {
+      _Math$trunc = _6['default'];
+    }, function (_7) {
+      shallowcopy = _7.shallowcopy;
+      minMax = _7.minMax;
+      assert = _7.assert;
+      PREFIX = _7.PREFIX;
+    }, function (_8) {
+      load = _8.load;
     }, function (_5) {
-      load = _5.load;
-    }, function (_c) {
-      _createClass = _c['default'];
+      _Array$from = _5['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_f) {
-      _toConsumableArray = _f['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _slicedToArray = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _slicedToArray = _f['default'];
     }, function (_f2) {
-      _Map = _f2['default'];
+      _getIterator = _f2['default'];
     }, function (_e2) {
-      _getIterator = _e2['default'];
-    }, function (_f3) {
-      _Array$from = _f3['default'];
-    }, function (_d2) {
-      ndarray = _d2['default'];
+      ndarray = _e2['default'];
     }],
     execute: function () {
       /* */
@@ -22282,7 +22498,6 @@ $__System.register('52', ['10', '20', '36', '53', '56', 'c', 'd', '1f', '1e', 'f
               };
               newcov.loadRange = loadRange;
               newcov.loadRanges = loadRanges;
-              // FIXME subsetByIndex does not exist in the subsetted coverage
               return newcov;
             });
           }
@@ -22296,7 +22511,7 @@ $__System.register('52', ['10', '20', '36', '53', '56', 'c', 'd', '1f', '1e', 'f
   };
 });
 
-$__System.register('70', ['20', '51', '52', '53', '56'], function (_export) {
+$__System.register('71', ['21', '52', '53', '54', '57'], function (_export) {
   var _Promise, CoverageCollection, Coverage, assert, load;
 
   /**
@@ -22420,7 +22635,7 @@ $__System.register('70', ['20', '51', '52', '53', '56'], function (_export) {
   };
 });
 
-$__System.register("49", ["70"], function (_export) {
+$__System.register("4a", ["71"], function (_export) {
   "use strict";
 
   return {
@@ -22439,26 +22654,26 @@ $__System.register("49", ["70"], function (_export) {
   };
 });
 
-$__System.register('71', ['20', '49', 'a', 'b', 'c', 'd', '4a', '2a'], function (_export) {
-  var _Promise, CovJSONReader, _get, _inherits, _createClass, _classCallCheck, RestAPI, CoverageData, CovJSON;
+$__System.register('72', ['21', 'b', 'c', 'd', 'e', '4a', '4b', '2b'], function (_export) {
+  var _Promise, _get, _inherits, _createClass, _classCallCheck, CovJSONReader, RestAPI, CoverageData, CovJSON;
 
   return {
     setters: [function (_) {
       _Promise = _['default'];
-    }, function (_2) {
-      CovJSONReader = _2;
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_a2) {
-      RestAPI = _a2;
-    }, function (_a3) {
-      CoverageData = _a3['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
+    }, function (_a) {
+      CovJSONReader = _a;
+    }, function (_b2) {
+      RestAPI = _b2;
+    }, function (_b3) {
+      CoverageData = _b3['default'];
     }],
     execute: function () {
       'use strict';
@@ -22507,22 +22722,22 @@ $__System.register('71', ['20', '49', 'a', 'b', 'c', 'd', '4a', '2a'], function 
   };
 });
 
-$__System.register('43', ['9', 'a', 'b', 'c', 'd', 'e'], function (_export) {
+$__System.register('44', ['9', 'b', 'c', 'd', 'e', 'f'], function (_export) {
   var Eventable, _get, _inherits, _createClass, _classCallCheck, _getIterator, Format;
 
   return {
     setters: [function (_) {
       Eventable = _['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
     }],
     execute: function () {
       'use strict';
@@ -22550,7 +22765,7 @@ $__System.register('43', ['9', 'a', 'b', 'c', 'd', 'e'], function (_export) {
           }
         }, {
           key: 'getActions',
-          value: function getActions(obj) {
+          value: function getActions(obj, context) {
             var actions = [];
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -22561,6 +22776,7 @@ $__System.register('43', ['9', 'a', 'b', 'c', 'd', 'e'], function (_export) {
                 var actionClass = _step.value;
 
                 var action = new actionClass(obj);
+                action.context = context;
                 if (action.isSupported) {
                   actions.push(action);
                   this.fire('actionCreate', { action: action });
@@ -22608,7 +22824,7 @@ $__System.register('43', ['9', 'a', 'b', 'c', 'd', 'e'], function (_export) {
   };
 });
 
-$__System.register('2a', ['20', '43', 'a', 'b', 'c', 'd'], function (_export) {
+$__System.register('2b', ['21', '44', 'b', 'c', 'd', 'e'], function (_export) {
   var _Promise, Format, _get, _inherits, _createClass, _classCallCheck, CoverageData;
 
   return {
@@ -22616,14 +22832,14 @@ $__System.register('2a', ['20', '43', 'a', 'b', 'c', 'd'], function (_export) {
       _Promise = _['default'];
     }, function (_2) {
       Format = _2['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
+    }, function (_e) {
+      _classCallCheck = _e['default'];
     }],
     execute: function () {
 
@@ -22664,7 +22880,7 @@ $__System.register('2a', ['20', '43', 'a', 'b', 'c', 'd'], function (_export) {
           value: function getMetadata(cov) {
             return {
               format: this.label,
-              type: cov.type
+              content: cov.coverages ? cov.coverages.length + ' coverages' : '1 coverage'
             };
           }
         }]);
@@ -22677,13 +22893,13 @@ $__System.register('2a', ['20', '43', 'a', 'b', 'c', 'd'], function (_export) {
   };
 });
 
-$__System.registerDynamic("72", ["73", "74"], true, function(req, exports, module) {
+$__System.registerDynamic("73", ["74", "75"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var isObject = req('73'),
-      document = req('74').document,
+  var isObject = req('74'),
+      document = req('75').document,
       is = isObject(document) && isObject(document.createElement);
   module.exports = function(it) {
     return is ? document.createElement(it) : {};
@@ -22692,17 +22908,17 @@ $__System.registerDynamic("72", ["73", "74"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("75", ["74"], true, function(req, exports, module) {
+$__System.registerDynamic("76", ["75"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('74').document && document.documentElement;
+  module.exports = req('75').document && document.documentElement;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("76", [], true, function(req, exports, module) {
+$__System.registerDynamic("77", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -22727,17 +22943,17 @@ $__System.registerDynamic("76", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("77", ["78", "76", "75", "72", "74", "79", "25"], true, function(req, exports, module) {
+$__System.registerDynamic("78", ["79", "77", "76", "73", "75", "7a", "26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
-    var ctx = req('78'),
-        invoke = req('76'),
-        html = req('75'),
-        cel = req('72'),
-        global = req('74'),
+    var ctx = req('79'),
+        invoke = req('77'),
+        html = req('76'),
+        cel = req('73'),
+        global = req('75'),
         process = global.process,
         setTask = global.setImmediate,
         clearTask = global.clearImmediate,
@@ -22774,7 +22990,7 @@ $__System.registerDynamic("77", ["78", "76", "75", "72", "74", "79", "25"], true
       clearTask = function clearImmediate(id) {
         delete queue[id];
       };
-      if (req('79')(process) == 'process') {
+      if (req('7a')(process) == 'process') {
         defer = function(id) {
           process.nextTick(ctx(run, id, 1));
         };
@@ -22805,23 +23021,23 @@ $__System.registerDynamic("77", ["78", "76", "75", "72", "74", "79", "25"], true
       set: setTask,
       clear: clearTask
     };
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7a", ["74", "77", "79", "25"], true, function(req, exports, module) {
+$__System.registerDynamic("7b", ["75", "78", "7a", "26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
-    var global = req('74'),
-        macrotask = req('77').set,
+    var global = req('75'),
+        macrotask = req('78').set,
         Observer = global.MutationObserver || global.WebKitMutationObserver,
         process = global.process,
         Promise = global.Promise,
-        isNode = req('79')(process) == 'process',
+        isNode = req('7a')(process) == 'process',
         head,
         last,
         notify;
@@ -22881,19 +23097,19 @@ $__System.registerDynamic("7a", ["74", "77", "79", "25"], true, function(req, ex
       }
       last = task;
     };
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("7b", ["7c", "7d", "3a"], true, function(req, exports, module) {
+$__System.registerDynamic("7c", ["7d", "7e", "3b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('7c'),
-      aFunction = req('7d'),
-      SPECIES = req('3a')('species');
+  var anObject = req('7d'),
+      aFunction = req('7e'),
+      SPECIES = req('3b')('species');
   module.exports = function(O, D) {
     var C = anObject(O).constructor,
         S;
@@ -22903,7 +23119,7 @@ $__System.registerDynamic("7b", ["7c", "7d", "3a"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("7e", [], true, function(req, exports, module) {
+$__System.registerDynamic("7f", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -22915,29 +23131,29 @@ $__System.registerDynamic("7e", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("7f", ["80", "81", "74", "78", "6b", "67", "73", "7c", "7d", "82", "83", "84", "7e", "3a", "7b", "7a", "85", "86", "87", "88", "69", "89", "25"], true, function(req, exports, module) {
+$__System.registerDynamic("80", ["81", "82", "75", "79", "6c", "68", "74", "7d", "7e", "83", "84", "85", "7f", "3b", "7c", "7b", "86", "87", "88", "89", "6a", "8a", "26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
     'use strict';
-    var $ = req('80'),
-        LIBRARY = req('81'),
-        global = req('74'),
-        ctx = req('78'),
-        classof = req('6b'),
-        $export = req('67'),
-        isObject = req('73'),
-        anObject = req('7c'),
-        aFunction = req('7d'),
-        strictNew = req('82'),
-        forOf = req('83'),
-        setProto = req('84').set,
-        same = req('7e'),
-        SPECIES = req('3a')('species'),
-        speciesConstructor = req('7b'),
-        asap = req('7a'),
+    var $ = req('81'),
+        LIBRARY = req('82'),
+        global = req('75'),
+        ctx = req('79'),
+        classof = req('6c'),
+        $export = req('68'),
+        isObject = req('74'),
+        anObject = req('7d'),
+        aFunction = req('7e'),
+        strictNew = req('83'),
+        forOf = req('84'),
+        setProto = req('85').set,
+        same = req('7f'),
+        SPECIES = req('3b')('species'),
+        speciesConstructor = req('7c'),
+        asap = req('7b'),
         PROMISE = 'Promise',
         process = global.process,
         isNode = classof(process) == 'process',
@@ -22963,7 +23179,7 @@ $__System.registerDynamic("7f", ["80", "81", "74", "78", "6b", "67", "73", "7c",
         if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
           works = false;
         }
-        if (works && req('85')) {
+        if (works && req('86')) {
           var thenableThenGotten = false;
           P.resolve($.setDesc({}, 'then', {get: function() {
               thenableThenGotten = true;
@@ -23141,7 +23357,7 @@ $__System.registerDynamic("7f", ["80", "81", "74", "78", "6b", "67", "73", "7c",
           $reject.call(record, err);
         }
       };
-      req('86')(P.prototype, {
+      req('87')(P.prototype, {
         then: function then(onFulfilled, onRejected) {
           var reaction = new PromiseCapability(speciesConstructor(this, P)),
               promise = reaction.promise,
@@ -23161,9 +23377,9 @@ $__System.registerDynamic("7f", ["80", "81", "74", "78", "6b", "67", "73", "7c",
       });
     }
     $export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: P});
-    req('87')(P, PROMISE);
-    req('88')(PROMISE);
-    Wrapper = req('69')[PROMISE];
+    req('88')(P, PROMISE);
+    req('89')(PROMISE);
+    Wrapper = req('6a')[PROMISE];
     $export($export.S + $export.F * !USE_NATIVE, PROMISE, {reject: function reject(r) {
         var capability = new PromiseCapability(this),
             $$reject = capability.reject;
@@ -23178,7 +23394,7 @@ $__System.registerDynamic("7f", ["80", "81", "74", "78", "6b", "67", "73", "7c",
         $$resolve(x);
         return capability.promise;
       }});
-    $export($export.S + $export.F * !(USE_NATIVE && req('89')(function(iter) {
+    $export($export.S + $export.F * !(USE_NATIVE && req('8a')(function(iter) {
       P.all(iter)['catch'](function() {});
     })), PROMISE, {
       all: function all(iterable) {
@@ -23223,45 +23439,45 @@ $__System.registerDynamic("7f", ["80", "81", "74", "78", "6b", "67", "73", "7c",
         return capability.promise;
       }
     });
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8a", ["8b", "38", "39", "7f", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("8b", ["8c", "39", "3a", "80", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('8b');
-  req('38');
+  req('8c');
   req('39');
-  req('7f');
-  module.exports = req('69').Promise;
+  req('3a');
+  req('80');
+  module.exports = req('6a').Promise;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("20", ["8a"], true, function(req, exports, module) {
+$__System.registerDynamic("21", ["8b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('8a'),
+    "default": req('8b'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8c", ["8d", "8e"], true, function(req, exports, module) {
+$__System.registerDynamic("8d", ["8e", "8f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toObject = req('8d');
-  req('8e')('keys', function($keys) {
+  var toObject = req('8e');
+  req('8f')('keys', function($keys) {
     return function keys(it) {
       return $keys(toObject(it));
     };
@@ -23270,36 +23486,36 @@ $__System.registerDynamic("8c", ["8d", "8e"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("8f", ["8c", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("90", ["8d", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('8c');
-  module.exports = req('69').Object.keys;
+  req('8d');
+  module.exports = req('6a').Object.keys;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("10", ["8f"], true, function(req, exports, module) {
+$__System.registerDynamic("11", ["90"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('8f'),
+    "default": req('90'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("89", ["3a"], true, function(req, exports, module) {
+$__System.registerDynamic("8a", ["3b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ITERATOR = req('3a')('iterator'),
+  var ITERATOR = req('3b')('iterator'),
       SAFE_CLOSING = false;
   try {
     var riter = [7][ITERATOR]();
@@ -23331,12 +23547,12 @@ $__System.registerDynamic("89", ["3a"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("8d", ["90"], true, function(req, exports, module) {
+$__System.registerDynamic("8e", ["91"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var defined = req('90');
+  var defined = req('91');
   module.exports = function(it) {
     return Object(defined(it));
   };
@@ -23344,20 +23560,20 @@ $__System.registerDynamic("8d", ["90"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("91", ["78", "67", "8d", "92", "93", "94", "95", "89"], true, function(req, exports, module) {
+$__System.registerDynamic("92", ["79", "68", "8e", "93", "94", "95", "96", "8a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var ctx = req('78'),
-      $export = req('67'),
-      toObject = req('8d'),
-      call = req('92'),
-      isArrayIter = req('93'),
-      toLength = req('94'),
-      getIterFn = req('95');
-  $export($export.S + $export.F * !req('89')(function(iter) {
+  var ctx = req('79'),
+      $export = req('68'),
+      toObject = req('8e'),
+      call = req('93'),
+      isArrayIter = req('94'),
+      toLength = req('95'),
+      getIterFn = req('96');
+  $export($export.S + $export.F * !req('8a')(function(iter) {
     Array.from(iter);
   }), 'Array', {from: function from(arrayLike) {
       var O = toObject(arrayLike),
@@ -23391,38 +23607,38 @@ $__System.registerDynamic("91", ["78", "67", "8d", "92", "93", "94", "95", "89"]
   return module.exports;
 });
 
-$__System.registerDynamic("96", ["38", "91", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("97", ["39", "92", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('38');
-  req('91');
-  module.exports = req('69').Array.from;
+  req('39');
+  req('92');
+  module.exports = req('6a').Array.from;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("6f", ["96"], true, function(req, exports, module) {
+$__System.registerDynamic("70", ["97"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('96'),
+    "default": req('97'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("1f", ["6f"], true, function(req, exports, module) {
+$__System.registerDynamic("20", ["70"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Array$from = req('6f')["default"];
+  var _Array$from = req('70')["default"];
   exports["default"] = function(arr) {
     if (Array.isArray(arr)) {
       for (var i = 0,
@@ -23438,30 +23654,30 @@ $__System.registerDynamic("1f", ["6f"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('97', ['9', '10', '20', 'a', 'b', 'c', 'd', '1f', 'f', 'e'], function (_export) {
-  var Eventable, _Object$keys, _Promise, _get, _inherits, _createClass, _classCallCheck, _toConsumableArray, _Map, _getIterator, Workspace;
+$__System.register('98', ['9', '10', '11', '20', '21', 'b', 'c', 'd', 'e', 'f'], function (_export) {
+  var Eventable, _Map, _Object$keys, _toConsumableArray, _Promise, _get, _inherits, _createClass, _classCallCheck, _getIterator, Workspace;
 
   return {
-    setters: [function (_3) {
-      Eventable = _3['default'];
-    }, function (_) {
-      _Object$keys = _['default'];
+    setters: [function (_5) {
+      Eventable = _5['default'];
     }, function (_2) {
-      _Promise = _2['default'];
-    }, function (_a) {
-      _get = _a['default'];
+      _Map = _2['default'];
+    }, function (_3) {
+      _Object$keys = _3['default'];
+    }, function (_) {
+      _toConsumableArray = _['default'];
+    }, function (_4) {
+      _Promise = _4['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
-    }, function (_f) {
-      _toConsumableArray = _f['default'];
-    }, function (_f2) {
-      _Map = _f2['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
     }],
     execute: function () {
       'use strict';
@@ -23630,37 +23846,13 @@ $__System.register('97', ['9', '10', '20', 'a', 'b', 'c', 'd', '1f', 'f', 'e'], 
                       distribution.formatImpl = format;
                       var promise = format.load(urlOrData).then(function (data) {
                         var meta = format.getMetadata(data);
-                        var actions = format.getActions(data);
 
-                        // inject context into actions
-                        var _iteratorNormalCompletion6 = true;
-                        var _didIteratorError6 = false;
-                        var _iteratorError6 = undefined;
-
-                        try {
-                          for (var _iterator6 = _getIterator(actions), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                            var action = _step6.value;
-
-                            action.context = { dataset: dataset, distribution: distribution, workspace: _this };
-
-                            for (var key in _this._staticActionContext) {
-                              action.context[key] = _this._staticActionContext[key];
-                            }
-                          }
-                        } catch (err) {
-                          _didIteratorError6 = true;
-                          _iteratorError6 = err;
-                        } finally {
-                          try {
-                            if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-                              _iterator6['return']();
-                            }
-                          } finally {
-                            if (_didIteratorError6) {
-                              throw _iteratorError6;
-                            }
-                          }
+                        var actionContext = { dataset: dataset, distribution: distribution, workspace: _this };
+                        for (var key in _this._staticActionContext) {
+                          actionContext[key] = _this._staticActionContext[key];
                         }
+
+                        var actions = format.getActions(data, actionContext);
 
                         distribution.metadata = meta;
                         distribution.actions = actions;
@@ -23670,6 +23862,7 @@ $__System.register('97', ['9', '10', '20', 'a', 'b', 'c', 'd', '1f', 'f', 'e'], 
                       })['catch'](function (e) {
                         distribution.error = e;
                         _this.fire('distributionLoadError', { dataset: dataset, distribution: distribution, error: e });
+                        console.log(e);
                       });
                       promises.push(promise);
                     }
@@ -28889,7 +29082,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     });
   };
   if (!_nodejs && (typeof define === 'function' && define.amd)) {
-    define("98", [], function() {
+    define("99", [], function() {
       wrapper(factory);
       return factory;
     });
@@ -28913,14 +29106,14 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("4f", ["98"], function(main) {
+define("50", ["99"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("99", ["e", "f", "4f"], function (_export) {
-  var _getIterator, _Map, jsonld, DCAT_CONTEXT, DCAT_CATALOG_FRAME, DCAT_DATASET_FRAME, UNKNOWN_LANG, i18n;
+$__System.register("9a", ["10", "50", "f"], function (_export) {
+  var _Map, jsonld, _getIterator, DCAT_CONTEXT, DCAT_CATALOG_FRAME, DCAT_DATASET_FRAME, UNKNOWN_LANG, i18n;
 
   /**
    * Load a DCAT catalog or a single dataset that we wrap into a catalog.
@@ -29050,12 +29243,12 @@ $__System.register("99", ["e", "f", "4f"], function (_export) {
     }
   }
   return {
-    setters: [function (_e) {
-      _getIterator = _e["default"];
+    setters: [function (_) {
+      _Map = _["default"];
+    }, function (_2) {
+      jsonld = _2.promises;
     }, function (_f) {
-      _Map = _f["default"];
-    }, function (_f2) {
-      jsonld = _f2.promises;
+      _getIterator = _f["default"];
     }],
     execute: function () {
       "use strict";
@@ -29170,24 +29363,24 @@ $__System.register("99", ["e", "f", "4f"], function (_export) {
   };
 });
 
-$__System.register('9a', ['9', '99', 'a', 'b', 'c', 'd', 'e'], function (_export) {
-  var Eventable, dcat, _get, _inherits, _createClass, _classCallCheck, _getIterator, Catalogue;
+$__System.register('9b', ['9', 'b', 'c', 'd', 'e', 'f', '9a'], function (_export) {
+  var Eventable, _get, _inherits, _createClass, _classCallCheck, _getIterator, dcat, Catalogue;
 
   return {
-    setters: [function (_2) {
-      Eventable = _2['default'];
-    }, function (_) {
-      dcat = _;
-    }, function (_a) {
-      _get = _a['default'];
+    setters: [function (_) {
+      Eventable = _['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
+    }, function (_a) {
+      dcat = _a;
     }],
     execute: function () {
       'use strict';
@@ -29256,25 +29449,25 @@ $__System.register('9a', ['9', '99', 'a', 'b', 'c', 'd', 'e'], function (_export
   };
 });
 
-$__System.registerDynamic("9b", ["67", "9c"], true, function(req, exports, module) {
+$__System.registerDynamic("9c", ["68", "9d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $export = req('67');
-  $export($export.P, 'Map', {toJSON: req('9c')('Map')});
+  var $export = req('68');
+  $export($export.P, 'Map', {toJSON: req('9d')('Map')});
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9d", ["9e", "9f"], true, function(req, exports, module) {
+$__System.registerDynamic("9e", ["9f", "a0"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var strong = req('9e');
-  req('9f')('Map', function(get) {
+  var strong = req('9f');
+  req('a0')('Map', function(get) {
     return function Map() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
     };
@@ -29291,41 +29484,41 @@ $__System.registerDynamic("9d", ["9e", "9f"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("a0", ["8b", "38", "39", "9d", "9b", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("a1", ["8c", "39", "3a", "9e", "9c", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('8b');
-  req('38');
+  req('8c');
   req('39');
-  req('9d');
-  req('9b');
-  module.exports = req('69').Map;
+  req('3a');
+  req('9e');
+  req('9c');
+  module.exports = req('6a').Map;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("f", ["a0"], true, function(req, exports, module) {
+$__System.registerDynamic("10", ["a1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('a0'),
+    "default": req('a1'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9c", ["83", "6b"], true, function(req, exports, module) {
+$__System.registerDynamic("9d", ["84", "6c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var forOf = req('83'),
-      classof = req('6b');
+  var forOf = req('84'),
+      classof = req('6c');
   module.exports = function(NAME) {
     return function toJSON() {
       if (classof(this) != NAME)
@@ -29339,34 +29532,34 @@ $__System.registerDynamic("9c", ["83", "6b"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("a1", ["67", "9c"], true, function(req, exports, module) {
+$__System.registerDynamic("a2", ["68", "9d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $export = req('67');
-  $export($export.P, 'Set', {toJSON: req('9c')('Set')});
+  var $export = req('68');
+  $export($export.P, 'Set', {toJSON: req('9d')('Set')});
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9f", ["80", "74", "67", "a2", "a3", "86", "83", "82", "73", "87", "85"], true, function(req, exports, module) {
+$__System.registerDynamic("a0", ["81", "75", "68", "a3", "a4", "87", "84", "83", "74", "88", "86"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('80'),
-      global = req('74'),
-      $export = req('67'),
-      fails = req('a2'),
-      hide = req('a3'),
-      redefineAll = req('86'),
-      forOf = req('83'),
-      strictNew = req('82'),
-      isObject = req('73'),
-      setToStringTag = req('87'),
-      DESCRIPTORS = req('85');
+  var $ = req('81'),
+      global = req('75'),
+      $export = req('68'),
+      fails = req('a3'),
+      hide = req('a4'),
+      redefineAll = req('87'),
+      forOf = req('84'),
+      strictNew = req('83'),
+      isObject = req('74'),
+      setToStringTag = req('88'),
+      DESCRIPTORS = req('86');
   module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
     var Base = global[NAME],
         C = Base,
@@ -29411,16 +29604,16 @@ $__System.registerDynamic("9f", ["80", "74", "67", "a2", "a3", "86", "83", "82",
   return module.exports;
 });
 
-$__System.registerDynamic("88", ["69", "80", "85", "3a"], true, function(req, exports, module) {
+$__System.registerDynamic("89", ["6a", "81", "86", "3b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var core = req('69'),
-      $ = req('80'),
-      DESCRIPTORS = req('85'),
-      SPECIES = req('3a')('species');
+  var core = req('6a'),
+      $ = req('81'),
+      DESCRIPTORS = req('86'),
+      SPECIES = req('3b')('species');
   module.exports = function(KEY) {
     var C = core[KEY];
     if (DESCRIPTORS && C && !C[SPECIES])
@@ -29435,12 +29628,12 @@ $__System.registerDynamic("88", ["69", "80", "85", "3a"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("94", ["a4"], true, function(req, exports, module) {
+$__System.registerDynamic("95", ["a5"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toInteger = req('a4'),
+  var toInteger = req('a5'),
       min = Math.min;
   module.exports = function(it) {
     return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
@@ -29449,13 +29642,13 @@ $__System.registerDynamic("94", ["a4"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("93", ["6c", "3a"], true, function(req, exports, module) {
+$__System.registerDynamic("94", ["6d", "3b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var Iterators = req('6c'),
-      ITERATOR = req('3a')('iterator'),
+  var Iterators = req('6d'),
+      ITERATOR = req('3b')('iterator'),
       ArrayProto = Array.prototype;
   module.exports = function(it) {
     return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
@@ -29464,12 +29657,12 @@ $__System.registerDynamic("93", ["6c", "3a"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("92", ["7c"], true, function(req, exports, module) {
+$__System.registerDynamic("93", ["7d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('7c');
+  var anObject = req('7d');
   module.exports = function(iterator, fn, value, entries) {
     try {
       return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -29484,17 +29677,17 @@ $__System.registerDynamic("92", ["7c"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("83", ["78", "92", "93", "7c", "94", "95"], true, function(req, exports, module) {
+$__System.registerDynamic("84", ["79", "93", "94", "7d", "95", "96"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ctx = req('78'),
-      call = req('92'),
-      isArrayIter = req('93'),
-      anObject = req('7c'),
-      toLength = req('94'),
-      getIterFn = req('95');
+  var ctx = req('79'),
+      call = req('93'),
+      isArrayIter = req('94'),
+      anObject = req('7d'),
+      toLength = req('95'),
+      getIterFn = req('96');
   module.exports = function(iterable, entries, fn, that) {
     var iterFn = getIterFn(iterable),
         f = ctx(fn, that, entries ? 2 : 1),
@@ -29517,7 +29710,7 @@ $__System.registerDynamic("83", ["78", "92", "93", "7c", "94", "95"], true, func
   return module.exports;
 });
 
-$__System.registerDynamic("82", [], true, function(req, exports, module) {
+$__System.registerDynamic("83", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -29531,12 +29724,12 @@ $__System.registerDynamic("82", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("86", ["a5"], true, function(req, exports, module) {
+$__System.registerDynamic("87", ["a6"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var redefine = req('a5');
+  var redefine = req('a6');
   module.exports = function(target, src) {
     for (var key in src)
       redefine(target, key, src[key]);
@@ -29546,26 +29739,26 @@ $__System.registerDynamic("86", ["a5"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("9e", ["80", "a3", "86", "78", "82", "90", "83", "a6", "a7", "a8", "a9", "73", "88", "85"], true, function(req, exports, module) {
+$__System.registerDynamic("9f", ["81", "a4", "87", "79", "83", "91", "84", "a7", "a8", "a9", "aa", "74", "89", "86"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('80'),
-      hide = req('a3'),
-      redefineAll = req('86'),
-      ctx = req('78'),
-      strictNew = req('82'),
-      defined = req('90'),
-      forOf = req('83'),
-      $iterDefine = req('a6'),
-      step = req('a7'),
-      ID = req('a8')('id'),
-      $has = req('a9'),
-      isObject = req('73'),
-      setSpecies = req('88'),
-      DESCRIPTORS = req('85'),
+  var $ = req('81'),
+      hide = req('a4'),
+      redefineAll = req('87'),
+      ctx = req('79'),
+      strictNew = req('83'),
+      defined = req('91'),
+      forOf = req('84'),
+      $iterDefine = req('a7'),
+      step = req('a8'),
+      ID = req('a9')('id'),
+      $has = req('aa'),
+      isObject = req('74'),
+      setSpecies = req('89'),
+      DESCRIPTORS = req('86'),
       isExtensible = Object.isExtensible || isObject,
       SIZE = DESCRIPTORS ? '_s' : 'size',
       id = 0;
@@ -29708,14 +29901,14 @@ $__System.registerDynamic("9e", ["80", "a3", "86", "78", "82", "90", "83", "a6",
   return module.exports;
 });
 
-$__System.registerDynamic("aa", ["9e", "9f"], true, function(req, exports, module) {
+$__System.registerDynamic("ab", ["9f", "a0"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var strong = req('9e');
-  req('9f')('Set', function(get) {
+  var strong = req('9f');
+  req('a0')('Set', function(get) {
     return function Set() {
       return get(this, arguments.length > 0 ? arguments[0] : undefined);
     };
@@ -29726,7 +29919,7 @@ $__System.registerDynamic("aa", ["9e", "9f"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("8b", [], true, function(req, exports, module) {
+$__System.registerDynamic("8c", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -29736,52 +29929,52 @@ $__System.registerDynamic("8b", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("ab", ["8b", "38", "39", "aa", "a1", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("ac", ["8c", "39", "3a", "ab", "a2", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('8b');
-  req('38');
+  req('8c');
   req('39');
-  req('aa');
-  req('a1');
-  module.exports = req('69').Set;
+  req('3a');
+  req('ab');
+  req('a2');
+  module.exports = req('6a').Set;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("14", ["ab"], true, function(req, exports, module) {
+$__System.registerDynamic("14", ["ac"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('ab'),
+    "default": req('ac'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("9", ["14", "c", "d", "a", "b", "e", "f"], function (_export) {
-  var _Set, _createClass, _classCallCheck, _get, _inherits, _getIterator, _Map2, Eventable, DefaultMap;
+$__System.register("9", ["10", "14", "d", "e", "b", "c", "f"], function (_export) {
+  var _Map2, _Set, _createClass, _classCallCheck, _get, _inherits, _getIterator, Eventable, DefaultMap;
 
   return {
-    setters: [function (_) {
+    setters: [function (_2) {
+      _Map2 = _2["default"];
+    }, function (_) {
       _Set = _["default"];
-    }, function (_c) {
-      _createClass = _c["default"];
     }, function (_d) {
-      _classCallCheck = _d["default"];
-    }, function (_a) {
-      _get = _a["default"];
-    }, function (_b) {
-      _inherits = _b["default"];
+      _createClass = _d["default"];
     }, function (_e) {
-      _getIterator = _e["default"];
+      _classCallCheck = _e["default"];
+    }, function (_b) {
+      _get = _b["default"];
+    }, function (_c) {
+      _inherits = _c["default"];
     }, function (_f) {
-      _Map2 = _f["default"];
+      _getIterator = _f["default"];
     }],
     execute: function () {
       "use strict";
@@ -29897,7 +30090,7 @@ $__System.register("9", ["14", "c", "d", "a", "b", "e", "f"], function (_export)
   };
 });
 
-$__System.registerDynamic("d", [], true, function(req, exports, module) {
+$__System.registerDynamic("e", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -29913,12 +30106,12 @@ $__System.registerDynamic("d", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("ac", ["80"], true, function(req, exports, module) {
+$__System.registerDynamic("ad", ["81"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('80');
+  var $ = req('81');
   module.exports = function defineProperty(it, key, desc) {
     return $.setDesc(it, key, desc);
   };
@@ -29926,26 +30119,26 @@ $__System.registerDynamic("ac", ["80"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("4d", ["ac"], true, function(req, exports, module) {
+$__System.registerDynamic("4e", ["ad"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('ac'),
+    "default": req('ad'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("c", ["4d"], true, function(req, exports, module) {
+$__System.registerDynamic("d", ["4e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$defineProperty = req('4d')["default"];
+  var _Object$defineProperty = req('4e')["default"];
   exports["default"] = (function() {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
@@ -29970,14 +30163,14 @@ $__System.registerDynamic("c", ["4d"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("84", ["80", "73", "7c", "78"], true, function(req, exports, module) {
+$__System.registerDynamic("85", ["81", "74", "7d", "79"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var getDesc = req('80').getDesc,
-      isObject = req('73'),
-      anObject = req('7c');
+  var getDesc = req('81').getDesc,
+      isObject = req('74'),
+      anObject = req('7d');
   var check = function(O, proto) {
     anObject(O);
     if (!isObject(proto) && proto !== null)
@@ -29986,7 +30179,7 @@ $__System.registerDynamic("84", ["80", "73", "7c", "78"], true, function(req, ex
   module.exports = {
     set: Object.setPrototypeOf || ('__proto__' in {} ? function(test, buggy, set) {
       try {
-        set = req('78')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+        set = req('79')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
         set(test, []);
         buggy = !(test instanceof Array);
       } catch (e) {
@@ -30007,47 +30200,47 @@ $__System.registerDynamic("84", ["80", "73", "7c", "78"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("ad", ["67", "84"], true, function(req, exports, module) {
+$__System.registerDynamic("ae", ["68", "85"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $export = req('67');
-  $export($export.S, 'Object', {setPrototypeOf: req('84').set});
+  var $export = req('68');
+  $export($export.S, 'Object', {setPrototypeOf: req('85').set});
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("ae", ["ad", "69"], true, function(req, exports, module) {
+$__System.registerDynamic("af", ["ae", "6a"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('ad');
-  module.exports = req('69').Object.setPrototypeOf;
+  req('ae');
+  module.exports = req('6a').Object.setPrototypeOf;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("af", ["ae"], true, function(req, exports, module) {
+$__System.registerDynamic("b0", ["af"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('ae'),
+    "default": req('af'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b0", ["80"], true, function(req, exports, module) {
+$__System.registerDynamic("b1", ["81"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('80');
+  var $ = req('81');
   module.exports = function create(P, D) {
     return $.create(P, D);
   };
@@ -30055,27 +30248,27 @@ $__System.registerDynamic("b0", ["80"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("21", ["b0"], true, function(req, exports, module) {
+$__System.registerDynamic("22", ["b1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('b0'),
+    "default": req('b1'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b", ["21", "af"], true, function(req, exports, module) {
+$__System.registerDynamic("c", ["22", "b0"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$create = req('21')["default"];
-  var _Object$setPrototypeOf = req('af')["default"];
+  var _Object$create = req('22')["default"];
+  var _Object$setPrototypeOf = req('b0')["default"];
   exports["default"] = function(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
@@ -30094,14 +30287,14 @@ $__System.registerDynamic("b", ["21", "af"], true, function(req, exports, module
   return module.exports;
 });
 
-$__System.registerDynamic("8e", ["67", "69", "a2"], true, function(req, exports, module) {
+$__System.registerDynamic("8f", ["68", "6a", "a3"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $export = req('67'),
-      core = req('69'),
-      fails = req('a2');
+  var $export = req('68'),
+      core = req('6a'),
+      fails = req('a3');
   module.exports = function(KEY, exec) {
     var fn = (core.Object || {})[KEY] || Object[KEY],
         exp = {};
@@ -30114,13 +30307,13 @@ $__System.registerDynamic("8e", ["67", "69", "a2"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("b1", ["b2", "8e"], true, function(req, exports, module) {
+$__System.registerDynamic("b2", ["b3", "8f"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var toIObject = req('b2');
-  req('8e')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
+  var toIObject = req('b3');
+  req('8f')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
     return function getOwnPropertyDescriptor(it, key) {
       return $getOwnPropertyDescriptor(toIObject(it), key);
     };
@@ -30129,13 +30322,13 @@ $__System.registerDynamic("b1", ["b2", "8e"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("b3", ["80", "b1"], true, function(req, exports, module) {
+$__System.registerDynamic("b4", ["81", "b2"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var $ = req('80');
-  req('b1');
+  var $ = req('81');
+  req('b2');
   module.exports = function getOwnPropertyDescriptor(it, key) {
     return $.getDesc(it, key);
   };
@@ -30143,26 +30336,26 @@ $__System.registerDynamic("b3", ["80", "b1"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("b4", ["b3"], true, function(req, exports, module) {
+$__System.registerDynamic("b5", ["b4"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('b3'),
+    "default": req('b4'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("a", ["b4"], true, function(req, exports, module) {
+$__System.registerDynamic("b", ["b5"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   "use strict";
-  var _Object$getOwnPropertyDescriptor = req('b4')["default"];
+  var _Object$getOwnPropertyDescriptor = req('b5')["default"];
   exports["default"] = function get(_x, _x2, _x3) {
     var _again = true;
     _function: while (_again) {
@@ -30201,14 +30394,14 @@ $__System.registerDynamic("a", ["b4"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.register('b5', ['9', '29', '40', '42', '47', '48', '71', '97', 'a', 'b', 'c', 'd', 'e', '9a', '2a', '2b', '1b', '1a'], function (_export) {
-  var Eventable, CoverageRemapCategories, CoverageView, WMS, GeoJSON, CovCBOR, CovJSON, Workspace, _get, _inherits, _createClass, _classCallCheck, _getIterator, Catalogue, CoverageData, CPMMapping, GeoJSONView, WMSView, App;
+$__System.register('b6', ['9', '19', '41', '43', '48', '49', '72', '98', 'b', 'c', 'd', 'e', 'f', '9b', '2b', '2c', '2a', '1c', '1b'], function (_export) {
+  var Eventable, GoToSource, CoverageView, WMS, GeoJSON, CovCBOR, CovJSON, Workspace, _get, _inherits, _createClass, _classCallCheck, _getIterator, Catalogue, CoverageData, CatRemap, CoverageRemapCategories, GeoJSONView, WMSView, App;
 
   return {
     setters: [function (_) {
       Eventable = _['default'];
     }, function (_8) {
-      CoverageRemapCategories = _8['default'];
+      GoToSource = _8['default'];
     }, function (_7) {
       CoverageView = _7['default'];
     }, function (_6) {
@@ -30221,26 +30414,28 @@ $__System.register('b5', ['9', '29', '40', '42', '47', '48', '71', '97', 'a', 'b
       CovJSON = _3['default'];
     }, function (_2) {
       Workspace = _2['default'];
-    }, function (_a) {
-      _get = _a['default'];
     }, function (_b) {
-      _inherits = _b['default'];
+      _get = _b['default'];
     }, function (_c) {
-      _createClass = _c['default'];
+      _inherits = _c['default'];
     }, function (_d) {
-      _classCallCheck = _d['default'];
+      _createClass = _d['default'];
     }, function (_e) {
-      _getIterator = _e['default'];
-    }, function (_a2) {
-      Catalogue = _a2['default'];
-    }, function (_a3) {
-      CoverageData = _a3['default'];
+      _classCallCheck = _e['default'];
+    }, function (_f) {
+      _getIterator = _f['default'];
     }, function (_b2) {
-      CPMMapping = _b2['default'];
+      Catalogue = _b2['default'];
     }, function (_b3) {
-      GeoJSONView = _b3['default'];
-    }, function (_a4) {
-      WMSView = _a4['default'];
+      CoverageData = _b3['default'];
+    }, function (_c2) {
+      CatRemap = _c2['default'];
+    }, function (_a) {
+      CoverageRemapCategories = _a['default'];
+    }, function (_c3) {
+      GeoJSONView = _c3['default'];
+    }, function (_b4) {
+      WMSView = _b4['default'];
     }],
     execute: function () {
 
@@ -30263,7 +30458,7 @@ $__System.register('b5', ['9', '29', '40', '42', '47', '48', '71', '97', 'a', 'b
 
           this.catalogue = new Catalogue();
 
-          this.formats = [new CovJSON([CoverageView, CoverageRemapCategories]), new CovCBOR([CoverageView, CoverageRemapCategories]), new CoverageData([CoverageView, CoverageRemapCategories]), new GeoJSON([GeoJSONView]), new WMS([WMSView]), new CPMMapping()];
+          this.formats = [new CovJSON([CoverageView, CoverageRemapCategories, GoToSource]), new CovCBOR([CoverageView, CoverageRemapCategories, GoToSource]), new CoverageData([CoverageView, CoverageRemapCategories]), new GeoJSON([GeoJSONView, GoToSource]), new WMS([WMSView, GoToSource]), new CatRemap([GoToSource])];
 
           this.workspace = new Workspace(this.formats);
           this.workspace.addStaticActionContext({ map: map });
@@ -30338,7 +30533,7 @@ $__System.register('b5', ['9', '29', '40', '42', '47', '48', '71', '97', 'a', 'b
   };
 });
 
-$__System.registerDynamic("b6", ["12"], false, function(__require, __exports, __module) {
+$__System.registerDynamic("b7", ["13"], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     "format global";
@@ -30634,17 +30829,17 @@ $__System.registerDynamic("b6", ["12"], false, function(__require, __exports, __
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("b7", ["b6"], true, function(req, exports, module) {
+$__System.registerDynamic("b8", ["b7"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('b6');
+  module.exports = req('b7');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("b8", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("b9", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -30853,7 +31048,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     };
   }
   if (typeof define === 'function' && define.amd) {
-    define("b9", ["12"], function(L) {
+    define("ba", ["13"], function(L) {
       defineLeafletLoading(L);
     });
   } else {
@@ -30865,7 +31060,7 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("ba", ["b9"], function(main) {
+define("bb", ["ba"], function(main) {
   return main;
 });
 
@@ -30875,7 +31070,7 @@ _removeDefine();
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define("bb", ["12"], factory);
+    define("bc", ["13"], factory);
   } else if (typeof modules === 'object' && module.exports) {
     module.exports = factory(require('leaflet'));
   } else {
@@ -31390,13 +31585,13 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("bc", ["bb"], function(main) {
+define("bd", ["bc"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("bd", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("be", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -31407,7 +31602,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("be", [], L);
+    define("bf", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -37905,7 +38100,7 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("12", ["be"], function(main) {
+define("13", ["bf"], function(main) {
   return main;
 });
 
@@ -37913,12 +38108,12 @@ _removeDefine();
 })();
 $__System.register("18", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic("bf", ["c0"], true, function(req, exports, module) {
+$__System.registerDynamic("c0", ["c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ITERATOR = req('c0')('iterator'),
+  var ITERATOR = req('c1')('iterator'),
       SAFE_CLOSING = false;
   try {
     var riter = [7][ITERATOR]();
@@ -37950,16 +38145,16 @@ $__System.registerDynamic("bf", ["c0"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("c1", ["c2", "c3", "c4", "c0"], true, function(req, exports, module) {
+$__System.registerDynamic("c2", ["c3", "c4", "c5", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var global = req('c2'),
-      $ = req('c3'),
-      DESCRIPTORS = req('c4'),
-      SPECIES = req('c0')('species');
+  var global = req('c3'),
+      $ = req('c4'),
+      DESCRIPTORS = req('c5'),
+      SPECIES = req('c1')('species');
   module.exports = function(KEY) {
     var C = global[KEY];
     if (DESCRIPTORS && C && !C[SPECIES])
@@ -37974,44 +38169,12 @@ $__System.registerDynamic("c1", ["c2", "c3", "c4", "c0"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("c5", [], true, function(req, exports, module) {
+$__System.registerDynamic("c6", ["c7"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var hasOwnProperty = {}.hasOwnProperty;
-  module.exports = function(it, key) {
-    return hasOwnProperty.call(it, key);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c6", ["c3", "c5", "c0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var def = req('c3').setDesc,
-      has = req('c5'),
-      TAG = req('c0')('toStringTag');
-  module.exports = function(it, tag, stat) {
-    if (it && !has(it = stat ? it : it.prototype, TAG))
-      def(it, TAG, {
-        configurable: true,
-        value: tag
-      });
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c7", ["c8"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var redefine = req('c8');
+  var redefine = req('c7');
   module.exports = function(target, src) {
     for (var key in src)
       redefine(target, key, src[key]);
@@ -38021,7 +38184,7 @@ $__System.registerDynamic("c7", ["c8"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("c9", [], true, function(req, exports, module) {
+$__System.registerDynamic("c8", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -38113,43 +38276,43 @@ $__System.registerDynamic("c9", [], true, function(req, exports, module) {
   return module.exports;
 });
 
+$__System.registerDynamic("c9", ["c8"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('c8');
+  global.define = __define;
+  return module.exports;
+});
+
 $__System.registerDynamic("ca", ["c9"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('c9');
+  module.exports = $__System._nodeRequire ? process : req('c9');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("cb", ["ca"], true, function(req, exports, module) {
+$__System.registerDynamic("26", ["ca"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__System._nodeRequire ? process : req('ca');
+  module.exports = req('ca');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("25", ["cb"], true, function(req, exports, module) {
+$__System.registerDynamic("cb", ["cc", "c3"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('cb');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("cc", ["cd", "c2"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('cd'),
-      document = req('c2').document,
+  var isObject = req('cc'),
+      document = req('c3').document,
       is = isObject(document) && isObject(document.createElement);
   module.exports = function(it) {
     return is ? document.createElement(it) : {};
@@ -38158,17 +38321,17 @@ $__System.registerDynamic("cc", ["cd", "c2"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("ce", ["c2"], true, function(req, exports, module) {
+$__System.registerDynamic("cd", ["c3"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = req('c2').document && document.documentElement;
+  module.exports = req('c3').document && document.documentElement;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("cf", [], true, function(req, exports, module) {
+$__System.registerDynamic("ce", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -38193,17 +38356,17 @@ $__System.registerDynamic("cf", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("d0", ["d1", "cf", "ce", "cc", "c2", "d2", "25"], true, function(req, exports, module) {
+$__System.registerDynamic("cf", ["d0", "ce", "cd", "cb", "c3", "d1", "26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
-    var ctx = req('d1'),
-        invoke = req('cf'),
-        html = req('ce'),
-        cel = req('cc'),
-        global = req('c2'),
+    var ctx = req('d0'),
+        invoke = req('ce'),
+        html = req('cd'),
+        cel = req('cb'),
+        global = req('c3'),
         process = global.process,
         setTask = global.setImmediate,
         clearTask = global.clearImmediate,
@@ -38240,7 +38403,7 @@ $__System.registerDynamic("d0", ["d1", "cf", "ce", "cc", "c2", "d2", "25"], true
       clearTask = function clearImmediate(id) {
         delete queue[id];
       };
-      if (req('d2')(process) == 'process') {
+      if (req('d1')(process) == 'process') {
         defer = function(id) {
           process.nextTick(ctx(run, id, 1));
         };
@@ -38271,23 +38434,23 @@ $__System.registerDynamic("d0", ["d1", "cf", "ce", "cc", "c2", "d2", "25"], true
       set: setTask,
       clear: clearTask
     };
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("d3", ["c2", "d0", "d2", "25"], true, function(req, exports, module) {
+$__System.registerDynamic("d2", ["c3", "cf", "d1", "26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
-    var global = req('c2'),
-        macrotask = req('d0').set,
+    var global = req('c3'),
+        macrotask = req('cf').set,
         Observer = global.MutationObserver || global.WebKitMutationObserver,
         process = global.process,
         Promise = global.Promise,
-        isNode = req('d2')(process) == 'process',
+        isNode = req('d1')(process) == 'process',
         head,
         last,
         notify;
@@ -38347,19 +38510,19 @@ $__System.registerDynamic("d3", ["c2", "d0", "d2", "25"], true, function(req, ex
       }
       last = task;
     };
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("d4", ["d5", "d6", "c0"], true, function(req, exports, module) {
+$__System.registerDynamic("d3", ["d4", "d5", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('d5'),
-      aFunction = req('d6'),
-      SPECIES = req('c0')('species');
+  var anObject = req('d4'),
+      aFunction = req('d5'),
+      SPECIES = req('c1')('species');
   module.exports = function(O, D) {
     var C = anObject(O).constructor,
         S;
@@ -38369,7 +38532,7 @@ $__System.registerDynamic("d4", ["d5", "d6", "c0"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("d7", [], true, function(req, exports, module) {
+$__System.registerDynamic("d6", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -38381,14 +38544,14 @@ $__System.registerDynamic("d7", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("d8", ["c3", "cd", "d5", "d1"], true, function(req, exports, module) {
+$__System.registerDynamic("d7", ["c4", "cc", "d4", "d0"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var getDesc = req('c3').getDesc,
-      isObject = req('cd'),
-      anObject = req('d5');
+  var getDesc = req('c4').getDesc,
+      isObject = req('cc'),
+      anObject = req('d4');
   var check = function(O, proto) {
     anObject(O);
     if (!isObject(proto) && proto !== null)
@@ -38397,7 +38560,7 @@ $__System.registerDynamic("d8", ["c3", "cd", "d5", "d1"], true, function(req, ex
   module.exports = {
     set: Object.setPrototypeOf || ('__proto__' in {} ? function(test, buggy, set) {
       try {
-        set = req('d1')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+        set = req('d0')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
         set(test, []);
         buggy = !(test instanceof Array);
       } catch (e) {
@@ -38418,15 +38581,15 @@ $__System.registerDynamic("d8", ["c3", "cd", "d5", "d1"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("d9", ["da", "c0", "db", "dc"], true, function(req, exports, module) {
+$__System.registerDynamic("d8", ["d9", "c1", "da", "db"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var classof = req('da'),
-      ITERATOR = req('c0')('iterator'),
-      Iterators = req('db');
-  module.exports = req('dc').getIteratorMethod = function(it) {
+  var classof = req('d9'),
+      ITERATOR = req('c1')('iterator'),
+      Iterators = req('da');
+  module.exports = req('db').getIteratorMethod = function(it) {
     if (it != undefined)
       return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
   };
@@ -38434,23 +38597,13 @@ $__System.registerDynamic("d9", ["da", "c0", "db", "dc"], true, function(req, ex
   return module.exports;
 });
 
-$__System.registerDynamic("db", [], true, function(req, exports, module) {
+$__System.registerDynamic("dc", ["da", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = {};
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("dd", ["db", "c0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var Iterators = req('db'),
-      ITERATOR = req('c0')('iterator'),
+  var Iterators = req('da'),
+      ITERATOR = req('c1')('iterator'),
       ArrayProto = Array.prototype;
   module.exports = function(it) {
     return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
@@ -38459,12 +38612,12 @@ $__System.registerDynamic("dd", ["db", "c0"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("de", ["d5"], true, function(req, exports, module) {
+$__System.registerDynamic("dd", ["d4"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var anObject = req('d5');
+  var anObject = req('d4');
   module.exports = function(iterator, fn, value, entries) {
     try {
       return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -38479,17 +38632,17 @@ $__System.registerDynamic("de", ["d5"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("df", ["d1", "de", "dd", "d5", "e0", "d9"], true, function(req, exports, module) {
+$__System.registerDynamic("de", ["d0", "dd", "dc", "d4", "df", "d8"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var ctx = req('d1'),
-      call = req('de'),
-      isArrayIter = req('dd'),
-      anObject = req('d5'),
-      toLength = req('e0'),
-      getIterFn = req('d9');
+  var ctx = req('d0'),
+      call = req('dd'),
+      isArrayIter = req('dc'),
+      anObject = req('d4'),
+      toLength = req('df'),
+      getIterFn = req('d8');
   module.exports = function(iterable, entries, fn, that) {
     var iterFn = getIterFn(iterable),
         f = ctx(fn, that, entries ? 2 : 1),
@@ -38512,7 +38665,7 @@ $__System.registerDynamic("df", ["d1", "de", "dd", "d5", "e0", "d9"], true, func
   return module.exports;
 });
 
-$__System.registerDynamic("e1", [], true, function(req, exports, module) {
+$__System.registerDynamic("e0", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -38526,12 +38679,12 @@ $__System.registerDynamic("e1", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("d5", ["cd"], true, function(req, exports, module) {
+$__System.registerDynamic("d4", ["cc"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var isObject = req('cd');
+  var isObject = req('cc');
   module.exports = function(it) {
     if (!isObject(it))
       throw TypeError(it + ' is not an object!');
@@ -38541,59 +38694,29 @@ $__System.registerDynamic("d5", ["cd"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("da", ["d2", "c0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var cof = req('d2'),
-      TAG = req('c0')('toStringTag'),
-      ARG = cof(function() {
-        return arguments;
-      }()) == 'Arguments';
-  module.exports = function(it) {
-    var O,
-        T,
-        B;
-    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e2", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = false;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e3", ["c3", "e2", "c2", "d1", "da", "e4", "cd", "d5", "d6", "e1", "df", "d8", "d7", "c0", "d4", "d3", "c4", "c7", "c6", "c1", "dc", "bf", "25"], true, function(req, exports, module) {
+$__System.registerDynamic("e1", ["c4", "e2", "c3", "d0", "d9", "e3", "cc", "d4", "d5", "e0", "de", "d7", "d6", "c1", "d3", "d2", "c5", "c6", "e4", "c2", "db", "c0", "26"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   (function(process) {
     'use strict';
-    var $ = req('c3'),
+    var $ = req('c4'),
         LIBRARY = req('e2'),
-        global = req('c2'),
-        ctx = req('d1'),
-        classof = req('da'),
-        $export = req('e4'),
-        isObject = req('cd'),
-        anObject = req('d5'),
-        aFunction = req('d6'),
-        strictNew = req('e1'),
-        forOf = req('df'),
-        setProto = req('d8').set,
-        same = req('d7'),
-        SPECIES = req('c0')('species'),
-        speciesConstructor = req('d4'),
-        asap = req('d3'),
+        global = req('c3'),
+        ctx = req('d0'),
+        classof = req('d9'),
+        $export = req('e3'),
+        isObject = req('cc'),
+        anObject = req('d4'),
+        aFunction = req('d5'),
+        strictNew = req('e0'),
+        forOf = req('de'),
+        setProto = req('d7').set,
+        same = req('d6'),
+        SPECIES = req('c1')('species'),
+        speciesConstructor = req('d3'),
+        asap = req('d2'),
         PROMISE = 'Promise',
         process = global.process,
         isNode = classof(process) == 'process',
@@ -38619,7 +38742,7 @@ $__System.registerDynamic("e3", ["c3", "e2", "c2", "d1", "da", "e4", "cd", "d5",
         if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
           works = false;
         }
-        if (works && req('c4')) {
+        if (works && req('c5')) {
           var thenableThenGotten = false;
           P.resolve($.setDesc({}, 'then', {get: function() {
               thenableThenGotten = true;
@@ -38797,7 +38920,7 @@ $__System.registerDynamic("e3", ["c3", "e2", "c2", "d1", "da", "e4", "cd", "d5",
           $reject.call(record, err);
         }
       };
-      req('c7')(P.prototype, {
+      req('c6')(P.prototype, {
         then: function then(onFulfilled, onRejected) {
           var reaction = new PromiseCapability(speciesConstructor(this, P)),
               promise = reaction.promise,
@@ -38817,9 +38940,9 @@ $__System.registerDynamic("e3", ["c3", "e2", "c2", "d1", "da", "e4", "cd", "d5",
       });
     }
     $export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: P});
-    req('c6')(P, PROMISE);
-    req('c1')(PROMISE);
-    Wrapper = req('dc')[PROMISE];
+    req('e4')(P, PROMISE);
+    req('c2')(PROMISE);
+    Wrapper = req('db')[PROMISE];
     $export($export.S + $export.F * !USE_NATIVE, PROMISE, {reject: function reject(r) {
         var capability = new PromiseCapability(this),
             $$reject = capability.reject;
@@ -38834,7 +38957,7 @@ $__System.registerDynamic("e3", ["c3", "e2", "c2", "d1", "da", "e4", "cd", "d5",
         $$resolve(x);
         return capability.promise;
       }});
-    $export($export.S + $export.F * !(USE_NATIVE && req('bf')(function(iter) {
+    $export($export.S + $export.F * !(USE_NATIVE && req('c0')(function(iter) {
       P.all(iter)['catch'](function() {});
     })), PROMISE, {
       all: function all(iterable) {
@@ -38879,819 +39002,107 @@ $__System.registerDynamic("e3", ["c3", "e2", "c2", "d1", "da", "e4", "cd", "d5",
         return capability.promise;
       }
     });
-  })(req('25'));
+  })(req('26'));
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("e5", ["c0", "e6"], true, function(req, exports, module) {
+$__System.registerDynamic("e5", ["e6", "e7"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var UNSCOPABLES = req('c0')('unscopables'),
-      ArrayProto = Array.prototype;
-  if (ArrayProto[UNSCOPABLES] == undefined)
-    req('e6')(ArrayProto, UNSCOPABLES, {});
-  module.exports = function(key) {
-    ArrayProto[UNSCOPABLES][key] = true;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e7", ["d2"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var cof = req('d2');
-  module.exports = Array.isArray || function(arg) {
-    return cof(arg) == 'Array';
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e8", ["cd", "e7", "c0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('cd'),
-      isArray = req('e7'),
-      SPECIES = req('c0')('species');
-  module.exports = function(original, length) {
-    var C;
-    if (isArray(original)) {
-      C = original.constructor;
-      if (typeof C == 'function' && (C === Array || isArray(C.prototype)))
-        C = undefined;
-      if (isObject(C)) {
-        C = C[SPECIES];
-        if (C === null)
-          C = undefined;
-      }
-    }
-    return new (C === undefined ? Array : C)(length);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e9", ["ea"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var defined = req('ea');
+  var IObject = req('e6'),
+      defined = req('e7');
   module.exports = function(it) {
-    return Object(defined(it));
+    return IObject(defined(it));
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("eb", ["d2"], true, function(req, exports, module) {
+$__System.registerDynamic("e8", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var cof = req('d2');
-  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
-    return cof(it) == 'String' ? it.split('') : Object(it);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("ec", ["d1", "eb", "e9", "e0", "e8"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var ctx = req('d1'),
-      IObject = req('eb'),
-      toObject = req('e9'),
-      toLength = req('e0'),
-      asc = req('e8');
-  module.exports = function(TYPE) {
-    var IS_MAP = TYPE == 1,
-        IS_FILTER = TYPE == 2,
-        IS_SOME = TYPE == 3,
-        IS_EVERY = TYPE == 4,
-        IS_FIND_INDEX = TYPE == 6,
-        NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
-    return function($this, callbackfn, that) {
-      var O = toObject($this),
-          self = IObject(O),
-          f = ctx(callbackfn, that, 3),
-          length = toLength(self.length),
-          index = 0,
-          result = IS_MAP ? asc($this, length) : IS_FILTER ? asc($this, 0) : undefined,
-          val,
-          res;
-      for (; length > index; index++)
-        if (NO_HOLES || index in self) {
-          val = self[index];
-          res = f(val, index, O);
-          if (TYPE) {
-            if (IS_MAP)
-              result[index] = res;
-            else if (res)
-              switch (TYPE) {
-                case 3:
-                  return true;
-                case 5:
-                  return val;
-                case 6:
-                  return index;
-                case 2:
-                  result.push(val);
-              }
-            else if (IS_EVERY)
-              return false;
-          }
-        }
-      return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("ed", ["e4", "ec", "e5"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var $export = req('e4'),
-      $find = req('ec')(5),
-      KEY = 'find',
-      forced = true;
-  if (KEY in [])
-    Array(1)[KEY](function() {
-      forced = false;
-    });
-  $export($export.P + $export.F * forced, 'Array', {find: function find(callbackfn) {
-      return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    }});
-  req('e5')(KEY);
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("ee", ["e4", "e0", "ef", "f0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var $export = req('e4'),
-      toLength = req('e0'),
-      context = req('ef'),
-      ENDS_WITH = 'endsWith',
-      $endsWith = ''[ENDS_WITH];
-  $export($export.P + $export.F * req('f0')(ENDS_WITH), 'String', {endsWith: function endsWith(searchString) {
-      var that = context(this, searchString, ENDS_WITH),
-          $$ = arguments,
-          endPosition = $$.length > 1 ? $$[1] : undefined,
-          len = toLength(that.length),
-          end = endPosition === undefined ? len : Math.min(toLength(endPosition), len),
-          search = String(searchString);
-      return $endsWith ? $endsWith.call(that, search, end) : that.slice(end - search.length, end) === search;
-    }});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f0", ["c0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var MATCH = req('c0')('match');
-  module.exports = function(KEY) {
-    var re = /./;
-    try {
-      '/./'[KEY](re);
-    } catch (e) {
-      try {
-        re[MATCH] = false;
-        return !'/./'[KEY](re);
-      } catch (f) {}
-    }
-    return true;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("ea", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(it) {
-    if (it == undefined)
-      throw TypeError("Can't call method on  " + it);
-    return it;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f1", ["c2"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = req('c2'),
-      SHARED = '__core-js_shared__',
-      store = global[SHARED] || (global[SHARED] = {});
-  module.exports = function(key) {
-    return store[key] || (store[key] = {});
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c0", ["f1", "f2", "c2"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var store = req('f1')('wks'),
-      uid = req('f2'),
-      Symbol = req('c2').Symbol;
-  module.exports = function(name) {
-    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("d2", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toString = {}.toString;
-  module.exports = function(it) {
-    return toString.call(it).slice(8, -1);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("cd", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f3", ["cd", "d2", "c0"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('cd'),
-      cof = req('d2'),
-      MATCH = req('c0')('match');
-  module.exports = function(it) {
-    var isRegExp;
-    return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : cof(it) == 'RegExp');
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("ef", ["f3", "ea"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isRegExp = req('f3'),
-      defined = req('ea');
-  module.exports = function(that, searchString, NAME) {
-    if (isRegExp(searchString))
-      throw TypeError('String#' + NAME + " doesn't accept regex!");
-    return String(defined(that));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f4", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var ceil = Math.ceil,
-      floor = Math.floor;
-  module.exports = function(it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e0", ["f4"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toInteger = req('f4'),
-      min = Math.min;
-  module.exports = function(it) {
-    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("d6", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(it) {
-    if (typeof it != 'function')
-      throw TypeError(it + ' is not a function!');
-    return it;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("d1", ["d6"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var aFunction = req('d6');
-  module.exports = function(fn, that, length) {
-    aFunction(fn);
-    if (that === undefined)
-      return fn;
-    switch (length) {
-      case 1:
-        return function(a) {
-          return fn.call(that, a);
-        };
-      case 2:
-        return function(a, b) {
-          return fn.call(that, a, b);
-        };
-      case 3:
-        return function(a, b, c) {
-          return fn.call(that, a, b, c);
-        };
-    }
-    return function() {
-      return fn.apply(that, arguments);
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f2", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var id = 0,
-      px = Math.random();
-  module.exports = function(key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c8", ["c2", "e6", "f2", "dc"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = req('c2'),
-      hide = req('e6'),
-      SRC = req('f2')('src'),
-      TO_STRING = 'toString',
-      $toString = Function[TO_STRING],
-      TPL = ('' + $toString).split(TO_STRING);
-  req('dc').inspectSource = function(it) {
-    return $toString.call(it);
-  };
-  (module.exports = function(O, key, val, safe) {
-    if (typeof val == 'function') {
-      val.hasOwnProperty(SRC) || hide(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
-      val.hasOwnProperty('name') || hide(val, 'name', key);
-    }
-    if (O === global) {
-      O[key] = val;
-    } else {
-      if (!safe)
-        delete O[key];
-      hide(O, key, val);
-    }
-  })(Function.prototype, TO_STRING, function toString() {
-    return typeof this == 'function' && this[SRC] || $toString.call(this);
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f5", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(exec) {
-    try {
-      return !!exec();
-    } catch (e) {
-      return true;
-    }
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c4", ["f5"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = !req('f5')(function() {
-    return Object.defineProperty({}, 'a', {get: function() {
-        return 7;
-      }}).a != 7;
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f6", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(bitmap, value) {
+  module.exports = function(done, value) {
     return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
+      value: value,
+      done: !!done
     };
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("c3", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $Object = Object;
-  module.exports = {
-    create: $Object.create,
-    getProto: $Object.getPrototypeOf,
-    isEnum: {}.propertyIsEnumerable,
-    getDesc: $Object.getOwnPropertyDescriptor,
-    setDesc: $Object.defineProperty,
-    setDescs: $Object.defineProperties,
-    getKeys: $Object.keys,
-    getNames: $Object.getOwnPropertyNames,
-    getSymbols: $Object.getOwnPropertySymbols,
-    each: [].forEach
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e6", ["c3", "f6", "c4"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = req('c3'),
-      createDesc = req('f6');
-  module.exports = req('c4') ? function(object, key, value) {
-    return $.setDesc(object, key, createDesc(1, value));
-  } : function(object, key, value) {
-    object[key] = value;
-    return object;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("dc", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var core = module.exports = {version: '1.2.6'};
-  if (typeof __e == 'number')
-    __e = core;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("c2", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-  if (typeof __g == 'number')
-    __g = global;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("e4", ["c2", "dc", "e6", "c8", "d1"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = req('c2'),
-      core = req('dc'),
-      hide = req('e6'),
-      redefine = req('c8'),
-      ctx = req('d1'),
-      PROTOTYPE = 'prototype';
-  var $export = function(type, name, source) {
-    var IS_FORCED = type & $export.F,
-        IS_GLOBAL = type & $export.G,
-        IS_STATIC = type & $export.S,
-        IS_PROTO = type & $export.P,
-        IS_BIND = type & $export.B,
-        target = IS_GLOBAL ? global : IS_STATIC ? global[name] || (global[name] = {}) : (global[name] || {})[PROTOTYPE],
-        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
-        expProto = exports[PROTOTYPE] || (exports[PROTOTYPE] = {}),
-        key,
-        own,
-        out,
-        exp;
-    if (IS_GLOBAL)
-      source = name;
-    for (key in source) {
-      own = !IS_FORCED && target && key in target;
-      out = (own ? target : source)[key];
-      exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-      if (target && !own)
-        redefine(target, key, out);
-      if (exports[key] != out)
-        hide(exports, key, exp);
-      if (IS_PROTO && expProto[key] != out)
-        expProto[key] = out;
-    }
-  };
-  global.core = core;
-  $export.F = 1;
-  $export.G = 2;
-  $export.S = 4;
-  $export.P = 8;
-  $export.B = 16;
-  $export.W = 32;
-  module.exports = $export;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f7", ["e4", "e0", "ef", "f0"], true, function(req, exports, module) {
+$__System.registerDynamic("e9", ["ea", "e8", "da", "e5", "eb"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $export = req('e4'),
-      toLength = req('e0'),
-      context = req('ef'),
-      STARTS_WITH = 'startsWith',
-      $startsWith = ''[STARTS_WITH];
-  $export($export.P + $export.F * req('f0')(STARTS_WITH), 'String', {startsWith: function startsWith(searchString) {
-      var that = context(this, searchString, STARTS_WITH),
-          $$ = arguments,
-          index = toLength(Math.min($$.length > 1 ? $$[1] : undefined, that.length)),
-          search = String(searchString);
-      return $startsWith ? $startsWith.call(that, search, index) : that.slice(index, index + search.length) === search;
-    }});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("6b", ["79", "3a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var cof = req('79'),
-      TAG = req('3a')('toStringTag'),
-      ARG = cof(function() {
-        return arguments;
-      }()) == 'Arguments';
-  module.exports = function(it) {
-    var O,
-        T,
-        B;
-    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("95", ["6b", "3a", "6c", "69"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var classof = req('6b'),
-      ITERATOR = req('3a')('iterator'),
-      Iterators = req('6c');
-  module.exports = req('69').getIteratorMethod = function(it) {
-    if (it != undefined)
-      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("73", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7c", ["73"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var isObject = req('73');
-  module.exports = function(it) {
-    if (!isObject(it))
-      throw TypeError(it + ' is not an object!');
-    return it;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f8", ["7c", "95", "69"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var anObject = req('7c'),
-      get = req('95');
-  module.exports = req('69').getIterator = function(it) {
-    var iterFn = get(it);
-    if (typeof iterFn != 'function')
-      throw TypeError(it + ' is not iterable!');
-    return anObject(iterFn.call(it));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("a4", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var ceil = Math.ceil,
-      floor = Math.floor;
-  module.exports = function(it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("f9", ["a4", "90"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var toInteger = req('a4'),
-      defined = req('90');
-  module.exports = function(TO_STRING) {
-    return function(that, pos) {
-      var s = String(defined(that)),
-          i = toInteger(pos),
-          l = s.length,
-          a,
-          b;
-      if (i < 0 || i >= l)
-        return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("38", ["f9", "a6"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var $at = req('f9')(true);
-  req('a6')(String, 'String', function(iterated) {
-    this._t = String(iterated);
+  var addToUnscopables = req('ea'),
+      step = req('e8'),
+      Iterators = req('da'),
+      toIObject = req('e5');
+  module.exports = req('eb')(Array, 'Array', function(iterated, kind) {
+    this._t = toIObject(iterated);
     this._i = 0;
+    this._k = kind;
   }, function() {
     var O = this._t,
-        index = this._i,
-        point;
-    if (index >= O.length)
-      return {
-        value: undefined,
-        done: true
-      };
-    point = $at(O, index);
-    this._i += point.length;
-    return {
-      value: point,
-      done: false
-    };
-  });
+        kind = this._k,
+        index = this._i++;
+    if (!O || index >= O.length) {
+      this._t = undefined;
+      return step(1);
+    }
+    if (kind == 'keys')
+      return step(0, index);
+    if (kind == 'values')
+      return step(0, O[index]);
+    return step(0, [index, O[index]]);
+  }, 'values');
+  Iterators.Arguments = Iterators.Array;
+  addToUnscopables('keys');
+  addToUnscopables('values');
+  addToUnscopables('entries');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("a8", [], true, function(req, exports, module) {
+$__System.registerDynamic("ec", ["e9", "c3", "ed", "da", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var id = 0,
-      px = Math.random();
-  module.exports = function(key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-  };
+  req('e9');
+  var global = req('c3'),
+      hide = req('ed'),
+      Iterators = req('da'),
+      ITERATOR = req('c1')('iterator'),
+      NL = global.NodeList,
+      HTC = global.HTMLCollection,
+      NLProto = NL && NL.prototype,
+      HTCProto = HTC && HTC.prototype,
+      ArrayValues = Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+  if (NLProto && !NLProto[ITERATOR])
+    hide(NLProto, ITERATOR, ArrayValues);
+  if (HTCProto && !HTCProto[ITERATOR])
+    hide(HTCProto, ITERATOR, ArrayValues);
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("fa", ["74"], true, function(req, exports, module) {
+$__System.registerDynamic("e4", ["c4", "ee", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var global = req('74'),
-      SHARED = '__core-js_shared__',
-      store = global[SHARED] || (global[SHARED] = {});
-  module.exports = function(key) {
-    return store[key] || (store[key] = {});
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3a", ["fa", "a8", "74"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var store = req('fa')('wks'),
-      uid = req('a8'),
-      Symbol = req('74').Symbol;
-  module.exports = function(name) {
-    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("87", ["80", "a9", "3a"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var def = req('80').setDesc,
-      has = req('a9'),
-      TAG = req('3a')('toStringTag');
+  var def = req('c4').setDesc,
+      has = req('ee'),
+      TAG = req('c1')('toStringTag');
   module.exports = function(it, tag, stat) {
     if (it && !has(it = stat ? it : it.prototype, TAG))
       def(it, TAG, {
@@ -39703,17 +39114,17 @@ $__System.registerDynamic("87", ["80", "a9", "3a"], true, function(req, exports,
   return module.exports;
 });
 
-$__System.registerDynamic("fb", ["80", "fc", "87", "a3", "3a"], true, function(req, exports, module) {
+$__System.registerDynamic("ef", ["c4", "f0", "e4", "ed", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var $ = req('80'),
-      descriptor = req('fc'),
-      setToStringTag = req('87'),
+  var $ = req('c4'),
+      descriptor = req('f0'),
+      setToStringTag = req('e4'),
       IteratorPrototype = {};
-  req('a3')(IteratorPrototype, req('3a')('iterator'), function() {
+  req('ed')(IteratorPrototype, req('c1')('iterator'), function() {
     return this;
   });
   module.exports = function(Constructor, NAME, next) {
@@ -39724,7 +39135,17 @@ $__System.registerDynamic("fb", ["80", "fc", "87", "a3", "3a"], true, function(r
   return module.exports;
 });
 
-$__System.registerDynamic("a9", [], true, function(req, exports, module) {
+$__System.registerDynamic("da", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {};
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("ee", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -39737,248 +39158,32 @@ $__System.registerDynamic("a9", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("a2", [], true, function(req, exports, module) {
+$__System.registerDynamic("e2", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = function(exec) {
-    try {
-      return !!exec();
-    } catch (e) {
-      return true;
-    }
-  };
+  module.exports = false;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("85", ["a2"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = !req('a2')(function() {
-    return Object.defineProperty({}, 'a', {get: function() {
-        return 7;
-      }}).a != 7;
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("fc", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(bitmap, value) {
-    return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("80", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $Object = Object;
-  module.exports = {
-    create: $Object.create,
-    getProto: $Object.getPrototypeOf,
-    isEnum: {}.propertyIsEnumerable,
-    getDesc: $Object.getOwnPropertyDescriptor,
-    setDesc: $Object.defineProperty,
-    setDescs: $Object.defineProperties,
-    getKeys: $Object.keys,
-    getNames: $Object.getOwnPropertyNames,
-    getSymbols: $Object.getOwnPropertySymbols,
-    each: [].forEach
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("a3", ["80", "fc", "85"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = req('80'),
-      createDesc = req('fc');
-  module.exports = req('85') ? function(object, key, value) {
-    return $.setDesc(object, key, createDesc(1, value));
-  } : function(object, key, value) {
-    object[key] = value;
-    return object;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("a5", ["a3"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = req('a3');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("7d", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(it) {
-    if (typeof it != 'function')
-      throw TypeError(it + ' is not a function!');
-    return it;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("78", ["7d"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var aFunction = req('7d');
-  module.exports = function(fn, that, length) {
-    aFunction(fn);
-    if (that === undefined)
-      return fn;
-    switch (length) {
-      case 1:
-        return function(a) {
-          return fn.call(that, a);
-        };
-      case 2:
-        return function(a, b) {
-          return fn.call(that, a, b);
-        };
-      case 3:
-        return function(a, b, c) {
-          return fn.call(that, a, b, c);
-        };
-    }
-    return function() {
-      return fn.apply(that, arguments);
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("69", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var core = module.exports = {version: '1.2.6'};
-  if (typeof __e == 'number')
-    __e = core;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("74", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-  if (typeof __g == 'number')
-    __g = global;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("67", ["74", "69", "78"], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = req('74'),
-      core = req('69'),
-      ctx = req('78'),
-      PROTOTYPE = 'prototype';
-  var $export = function(type, name, source) {
-    var IS_FORCED = type & $export.F,
-        IS_GLOBAL = type & $export.G,
-        IS_STATIC = type & $export.S,
-        IS_PROTO = type & $export.P,
-        IS_BIND = type & $export.B,
-        IS_WRAP = type & $export.W,
-        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
-        target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE],
-        key,
-        own,
-        out;
-    if (IS_GLOBAL)
-      source = name;
-    for (key in source) {
-      own = !IS_FORCED && target && key in target;
-      if (own && key in exports)
-        continue;
-      out = own ? target[key] : source[key];
-      exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key] : IS_BIND && own ? ctx(out, global) : IS_WRAP && target[key] == out ? (function(C) {
-        var F = function(param) {
-          return this instanceof C ? new C(param) : C(param);
-        };
-        F[PROTOTYPE] = C[PROTOTYPE];
-        return F;
-      })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-      if (IS_PROTO)
-        (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
-    }
-  };
-  $export.F = 1;
-  $export.G = 2;
-  $export.S = 4;
-  $export.P = 8;
-  $export.B = 16;
-  $export.W = 32;
-  module.exports = $export;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("81", [], true, function(req, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("a6", ["81", "67", "a5", "a3", "a9", "6c", "fb", "87", "80", "3a"], true, function(req, exports, module) {
+$__System.registerDynamic("eb", ["e2", "e3", "c7", "ed", "ee", "da", "ef", "e4", "c4", "c1"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var LIBRARY = req('81'),
-      $export = req('67'),
-      redefine = req('a5'),
-      hide = req('a3'),
-      has = req('a9'),
-      Iterators = req('6c'),
-      $iterCreate = req('fb'),
-      setToStringTag = req('87'),
-      getProto = req('80').getProto,
-      ITERATOR = req('3a')('iterator'),
+  var LIBRARY = req('e2'),
+      $export = req('e3'),
+      redefine = req('c7'),
+      hide = req('ed'),
+      has = req('ee'),
+      Iterators = req('da'),
+      $iterCreate = req('ef'),
+      setToStringTag = req('e4'),
+      getProto = req('c4').getProto,
+      ITERATOR = req('c1')('iterator'),
       BUGGY = !([].keys && 'next' in [].keys()),
       FF_ITERATOR = '@@iterator',
       KEYS = 'keys',
@@ -40050,7 +39255,339 @@ $__System.registerDynamic("a6", ["81", "67", "a5", "a3", "a9", "6c", "fb", "87",
   return module.exports;
 });
 
-$__System.registerDynamic("90", [], true, function(req, exports, module) {
+$__System.registerDynamic("f1", ["f2", "e7"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('f2'),
+      defined = req('e7');
+  module.exports = function(TO_STRING) {
+    return function(that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l)
+        return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f3", ["f1", "eb"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $at = req('f1')(true);
+  req('eb')(String, 'String', function(iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function() {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length)
+      return {
+        value: undefined,
+        done: true
+      };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("d9", ["d1", "c1"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('d1'),
+      TAG = req('c1')('toStringTag'),
+      ARG = cof(function() {
+        return arguments;
+      }()) == 'Arguments';
+  module.exports = function(it) {
+    var O,
+        T,
+        B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f4", ["d9", "c1", "c7"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var classof = req('d9'),
+      test = {};
+  test[req('c1')('toStringTag')] = 'z';
+  if (test + '' != '[object z]') {
+    req('c7')(Object.prototype, 'toString', function toString() {
+      return '[object ' + classof(this) + ']';
+    }, true);
+  }
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f5", ["f4", "f3", "ec", "e1", "db"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('f4');
+  req('f3');
+  req('ec');
+  req('e1');
+  module.exports = req('db').Promise;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("ea", ["c1", "ed"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var UNSCOPABLES = req('c1')('unscopables'),
+      ArrayProto = Array.prototype;
+  if (ArrayProto[UNSCOPABLES] == undefined)
+    req('ed')(ArrayProto, UNSCOPABLES, {});
+  module.exports = function(key) {
+    ArrayProto[UNSCOPABLES][key] = true;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f6", ["d1"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('d1');
+  module.exports = Array.isArray || function(arg) {
+    return cof(arg) == 'Array';
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f7", ["cc", "f6", "c1"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('cc'),
+      isArray = req('f6'),
+      SPECIES = req('c1')('species');
+  module.exports = function(original, length) {
+    var C;
+    if (isArray(original)) {
+      C = original.constructor;
+      if (typeof C == 'function' && (C === Array || isArray(C.prototype)))
+        C = undefined;
+      if (isObject(C)) {
+        C = C[SPECIES];
+        if (C === null)
+          C = undefined;
+      }
+    }
+    return new (C === undefined ? Array : C)(length);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f8", ["e7"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var defined = req('e7');
+  module.exports = function(it) {
+    return Object(defined(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("e6", ["d1"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('d1');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f9", ["d0", "e6", "f8", "df", "f7"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ctx = req('d0'),
+      IObject = req('e6'),
+      toObject = req('f8'),
+      toLength = req('df'),
+      asc = req('f7');
+  module.exports = function(TYPE) {
+    var IS_MAP = TYPE == 1,
+        IS_FILTER = TYPE == 2,
+        IS_SOME = TYPE == 3,
+        IS_EVERY = TYPE == 4,
+        IS_FIND_INDEX = TYPE == 6,
+        NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+    return function($this, callbackfn, that) {
+      var O = toObject($this),
+          self = IObject(O),
+          f = ctx(callbackfn, that, 3),
+          length = toLength(self.length),
+          index = 0,
+          result = IS_MAP ? asc($this, length) : IS_FILTER ? asc($this, 0) : undefined,
+          val,
+          res;
+      for (; length > index; index++)
+        if (NO_HOLES || index in self) {
+          val = self[index];
+          res = f(val, index, O);
+          if (TYPE) {
+            if (IS_MAP)
+              result[index] = res;
+            else if (res)
+              switch (TYPE) {
+                case 3:
+                  return true;
+                case 5:
+                  return val;
+                case 6:
+                  return index;
+                case 2:
+                  result.push(val);
+              }
+            else if (IS_EVERY)
+              return false;
+          }
+        }
+      return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("fa", ["e3", "f9", "ea"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $export = req('e3'),
+      $find = req('f9')(5),
+      KEY = 'find',
+      forced = true;
+  if (KEY in [])
+    Array(1)[KEY](function() {
+      forced = false;
+    });
+  $export($export.P + $export.F * forced, 'Array', {find: function find(callbackfn) {
+      return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    }});
+  req('ea')(KEY);
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("fb", ["fa", "db"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('fa');
+  module.exports = req('db').Array.find;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("fc", ["e3", "df", "fd", "fe"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $export = req('e3'),
+      toLength = req('df'),
+      context = req('fd'),
+      ENDS_WITH = 'endsWith',
+      $endsWith = ''[ENDS_WITH];
+  $export($export.P + $export.F * req('fe')(ENDS_WITH), 'String', {endsWith: function endsWith(searchString) {
+      var that = context(this, searchString, ENDS_WITH),
+          $$ = arguments,
+          endPosition = $$.length > 1 ? $$[1] : undefined,
+          len = toLength(that.length),
+          end = endPosition === undefined ? len : Math.min(toLength(endPosition), len),
+          search = String(searchString);
+      return $endsWith ? $endsWith.call(that, search, end) : that.slice(end - search.length, end) === search;
+    }});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("ff", ["fc", "db"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('fc');
+  module.exports = req('db').String.endsWith;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("fe", ["c1"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var MATCH = req('c1')('match');
+  module.exports = function(KEY) {
+    var re = /./;
+    try {
+      '/./'[KEY](re);
+    } catch (e) {
+      try {
+        re[MATCH] = false;
+        return !'/./'[KEY](re);
+      } catch (f) {}
+    }
+    return true;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("e7", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -40064,7 +39601,37 @@ $__System.registerDynamic("90", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("79", [], true, function(req, exports, module) {
+$__System.registerDynamic("100", ["c3"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('c3'),
+      SHARED = '__core-js_shared__',
+      store = global[SHARED] || (global[SHARED] = {});
+  module.exports = function(key) {
+    return store[key] || (store[key] = {});
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("c1", ["100", "101", "c3"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var store = req('100')('wks'),
+      uid = req('101'),
+      Symbol = req('c3').Symbol;
+  module.exports = function(name) {
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("d1", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -40077,12 +39644,955 @@ $__System.registerDynamic("79", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("fd", ["79"], true, function(req, exports, module) {
+$__System.registerDynamic("cc", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var cof = req('79');
+  module.exports = function(it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("102", ["cc", "d1", "c1"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('cc'),
+      cof = req('d1'),
+      MATCH = req('c1')('match');
+  module.exports = function(it) {
+    var isRegExp;
+    return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : cof(it) == 'RegExp');
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("fd", ["102", "e7"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isRegExp = req('102'),
+      defined = req('e7');
+  module.exports = function(that, searchString, NAME) {
+    if (isRegExp(searchString))
+      throw TypeError('String#' + NAME + " doesn't accept regex!");
+    return String(defined(that));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f2", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function(it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("df", ["f2"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('f2'),
+      min = Math.min;
+  module.exports = function(it) {
+    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("d5", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    if (typeof it != 'function')
+      throw TypeError(it + ' is not a function!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("d0", ["d5"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var aFunction = req('d5');
+  module.exports = function(fn, that, length) {
+    aFunction(fn);
+    if (that === undefined)
+      return fn;
+    switch (length) {
+      case 1:
+        return function(a) {
+          return fn.call(that, a);
+        };
+      case 2:
+        return function(a, b) {
+          return fn.call(that, a, b);
+        };
+      case 3:
+        return function(a, b, c) {
+          return fn.call(that, a, b, c);
+        };
+    }
+    return function() {
+      return fn.apply(that, arguments);
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("101", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var id = 0,
+      px = Math.random();
+  module.exports = function(key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("c7", ["c3", "ed", "101", "db"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('c3'),
+      hide = req('ed'),
+      SRC = req('101')('src'),
+      TO_STRING = 'toString',
+      $toString = Function[TO_STRING],
+      TPL = ('' + $toString).split(TO_STRING);
+  req('db').inspectSource = function(it) {
+    return $toString.call(it);
+  };
+  (module.exports = function(O, key, val, safe) {
+    if (typeof val == 'function') {
+      val.hasOwnProperty(SRC) || hide(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
+      val.hasOwnProperty('name') || hide(val, 'name', key);
+    }
+    if (O === global) {
+      O[key] = val;
+    } else {
+      if (!safe)
+        delete O[key];
+      hide(O, key, val);
+    }
+  })(Function.prototype, TO_STRING, function toString() {
+    return typeof this == 'function' && this[SRC] || $toString.call(this);
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("103", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("c5", ["103"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = !req('103')(function() {
+    return Object.defineProperty({}, 'a', {get: function() {
+        return 7;
+      }}).a != 7;
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("f0", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("c4", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $Object = Object;
+  module.exports = {
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("ed", ["c4", "f0", "c5"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('c4'),
+      createDesc = req('f0');
+  module.exports = req('c5') ? function(object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function(object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("db", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var core = module.exports = {version: '1.2.6'};
+  if (typeof __e == 'number')
+    __e = core;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("c3", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number')
+    __g = global;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("e3", ["c3", "db", "ed", "c7", "d0"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('c3'),
+      core = req('db'),
+      hide = req('ed'),
+      redefine = req('c7'),
+      ctx = req('d0'),
+      PROTOTYPE = 'prototype';
+  var $export = function(type, name, source) {
+    var IS_FORCED = type & $export.F,
+        IS_GLOBAL = type & $export.G,
+        IS_STATIC = type & $export.S,
+        IS_PROTO = type & $export.P,
+        IS_BIND = type & $export.B,
+        target = IS_GLOBAL ? global : IS_STATIC ? global[name] || (global[name] = {}) : (global[name] || {})[PROTOTYPE],
+        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
+        expProto = exports[PROTOTYPE] || (exports[PROTOTYPE] = {}),
+        key,
+        own,
+        out,
+        exp;
+    if (IS_GLOBAL)
+      source = name;
+    for (key in source) {
+      own = !IS_FORCED && target && key in target;
+      out = (own ? target : source)[key];
+      exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+      if (target && !own)
+        redefine(target, key, out);
+      if (exports[key] != out)
+        hide(exports, key, exp);
+      if (IS_PROTO && expProto[key] != out)
+        expProto[key] = out;
+    }
+  };
+  global.core = core;
+  $export.F = 1;
+  $export.G = 2;
+  $export.S = 4;
+  $export.P = 8;
+  $export.B = 16;
+  $export.W = 32;
+  module.exports = $export;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("104", ["e3", "df", "fd", "fe"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $export = req('e3'),
+      toLength = req('df'),
+      context = req('fd'),
+      STARTS_WITH = 'startsWith',
+      $startsWith = ''[STARTS_WITH];
+  $export($export.P + $export.F * req('fe')(STARTS_WITH), 'String', {startsWith: function startsWith(searchString) {
+      var that = context(this, searchString, STARTS_WITH),
+          $$ = arguments,
+          index = toLength(Math.min($$.length > 1 ? $$[1] : undefined, that.length)),
+          search = String(searchString);
+      return $startsWith ? $startsWith.call(that, search, index) : that.slice(index, index + search.length) === search;
+    }});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("105", ["104", "db"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('104');
+  module.exports = req('db').String.startsWith;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6c", ["7a", "3b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('7a'),
+      TAG = req('3b')('toStringTag'),
+      ARG = cof(function() {
+        return arguments;
+      }()) == 'Arguments';
+  module.exports = function(it) {
+    var O,
+        T,
+        B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("96", ["6c", "3b", "6d", "6a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var classof = req('6c'),
+      ITERATOR = req('3b')('iterator'),
+      Iterators = req('6d');
+  module.exports = req('6a').getIteratorMethod = function(it) {
+    if (it != undefined)
+      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("74", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7d", ["74"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('74');
+  module.exports = function(it) {
+    if (!isObject(it))
+      throw TypeError(it + ' is not an object!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("106", ["7d", "96", "6a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('7d'),
+      get = req('96');
+  module.exports = req('6a').getIterator = function(it) {
+    var iterFn = get(it);
+    if (typeof iterFn != 'function')
+      throw TypeError(it + ' is not iterable!');
+    return anObject(iterFn.call(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a5", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function(it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("107", ["a5", "91"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('a5'),
+      defined = req('91');
+  module.exports = function(TO_STRING) {
+    return function(that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l)
+        return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("39", ["107", "a7"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $at = req('107')(true);
+  req('a7')(String, 'String', function(iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function() {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length)
+      return {
+        value: undefined,
+        done: true
+      };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a9", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var id = 0,
+      px = Math.random();
+  module.exports = function(key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("108", ["75"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('75'),
+      SHARED = '__core-js_shared__',
+      store = global[SHARED] || (global[SHARED] = {});
+  module.exports = function(key) {
+    return store[key] || (store[key] = {});
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3b", ["108", "a9", "75"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var store = req('108')('wks'),
+      uid = req('a9'),
+      Symbol = req('75').Symbol;
+  module.exports = function(name) {
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("88", ["81", "aa", "3b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var def = req('81').setDesc,
+      has = req('aa'),
+      TAG = req('3b')('toStringTag');
+  module.exports = function(it, tag, stat) {
+    if (it && !has(it = stat ? it : it.prototype, TAG))
+      def(it, TAG, {
+        configurable: true,
+        value: tag
+      });
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("109", ["81", "10a", "88", "a4", "3b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $ = req('81'),
+      descriptor = req('10a'),
+      setToStringTag = req('88'),
+      IteratorPrototype = {};
+  req('a4')(IteratorPrototype, req('3b')('iterator'), function() {
+    return this;
+  });
+  module.exports = function(Constructor, NAME, next) {
+    Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
+    setToStringTag(Constructor, NAME + ' Iterator');
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("aa", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var hasOwnProperty = {}.hasOwnProperty;
+  module.exports = function(it, key) {
+    return hasOwnProperty.call(it, key);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a3", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("86", ["a3"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = !req('a3')(function() {
+    return Object.defineProperty({}, 'a', {get: function() {
+        return 7;
+      }}).a != 7;
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("10a", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("81", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $Object = Object;
+  module.exports = {
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a4", ["81", "10a", "86"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('81'),
+      createDesc = req('10a');
+  module.exports = req('86') ? function(object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function(object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a6", ["a4"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('a4');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7e", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    if (typeof it != 'function')
+      throw TypeError(it + ' is not a function!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("79", ["7e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var aFunction = req('7e');
+  module.exports = function(fn, that, length) {
+    aFunction(fn);
+    if (that === undefined)
+      return fn;
+    switch (length) {
+      case 1:
+        return function(a) {
+          return fn.call(that, a);
+        };
+      case 2:
+        return function(a, b) {
+          return fn.call(that, a, b);
+        };
+      case 3:
+        return function(a, b, c) {
+          return fn.call(that, a, b, c);
+        };
+    }
+    return function() {
+      return fn.apply(that, arguments);
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6a", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var core = module.exports = {version: '1.2.6'};
+  if (typeof __e == 'number')
+    __e = core;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("75", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number')
+    __g = global;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("68", ["75", "6a", "79"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('75'),
+      core = req('6a'),
+      ctx = req('79'),
+      PROTOTYPE = 'prototype';
+  var $export = function(type, name, source) {
+    var IS_FORCED = type & $export.F,
+        IS_GLOBAL = type & $export.G,
+        IS_STATIC = type & $export.S,
+        IS_PROTO = type & $export.P,
+        IS_BIND = type & $export.B,
+        IS_WRAP = type & $export.W,
+        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
+        target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE],
+        key,
+        own,
+        out;
+    if (IS_GLOBAL)
+      source = name;
+    for (key in source) {
+      own = !IS_FORCED && target && key in target;
+      if (own && key in exports)
+        continue;
+      out = own ? target[key] : source[key];
+      exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key] : IS_BIND && own ? ctx(out, global) : IS_WRAP && target[key] == out ? (function(C) {
+        var F = function(param) {
+          return this instanceof C ? new C(param) : C(param);
+        };
+        F[PROTOTYPE] = C[PROTOTYPE];
+        return F;
+      })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+      if (IS_PROTO)
+        (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+    }
+  };
+  $export.F = 1;
+  $export.G = 2;
+  $export.S = 4;
+  $export.P = 8;
+  $export.B = 16;
+  $export.W = 32;
+  module.exports = $export;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("82", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("a7", ["82", "68", "a6", "a4", "aa", "6d", "109", "88", "81", "3b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var LIBRARY = req('82'),
+      $export = req('68'),
+      redefine = req('a6'),
+      hide = req('a4'),
+      has = req('aa'),
+      Iterators = req('6d'),
+      $iterCreate = req('109'),
+      setToStringTag = req('88'),
+      getProto = req('81').getProto,
+      ITERATOR = req('3b')('iterator'),
+      BUGGY = !([].keys && 'next' in [].keys()),
+      FF_ITERATOR = '@@iterator',
+      KEYS = 'keys',
+      VALUES = 'values';
+  var returnThis = function() {
+    return this;
+  };
+  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+    $iterCreate(Constructor, NAME, next);
+    var getMethod = function(kind) {
+      if (!BUGGY && kind in proto)
+        return proto[kind];
+      switch (kind) {
+        case KEYS:
+          return function keys() {
+            return new Constructor(this, kind);
+          };
+        case VALUES:
+          return function values() {
+            return new Constructor(this, kind);
+          };
+      }
+      return function entries() {
+        return new Constructor(this, kind);
+      };
+    };
+    var TAG = NAME + ' Iterator',
+        DEF_VALUES = DEFAULT == VALUES,
+        VALUES_BUG = false,
+        proto = Base.prototype,
+        $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
+        $default = $native || getMethod(DEFAULT),
+        methods,
+        key;
+    if ($native) {
+      var IteratorPrototype = getProto($default.call(new Base));
+      setToStringTag(IteratorPrototype, TAG, true);
+      if (!LIBRARY && has(proto, FF_ITERATOR))
+        hide(IteratorPrototype, ITERATOR, returnThis);
+      if (DEF_VALUES && $native.name !== VALUES) {
+        VALUES_BUG = true;
+        $default = function values() {
+          return $native.call(this);
+        };
+      }
+    }
+    if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+      hide(proto, ITERATOR, $default);
+    }
+    Iterators[NAME] = $default;
+    Iterators[TAG] = returnThis;
+    if (DEFAULT) {
+      methods = {
+        values: DEF_VALUES ? $default : getMethod(VALUES),
+        keys: IS_SET ? $default : getMethod(KEYS),
+        entries: !DEF_VALUES ? $default : getMethod('entries')
+      };
+      if (FORCED)
+        for (key in methods) {
+          if (!(key in proto))
+            redefine(proto, key, methods[key]);
+        }
+      else
+        $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+    }
+    return methods;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("91", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    if (it == undefined)
+      throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("7a", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toString = {}.toString;
+  module.exports = function(it) {
+    return toString.call(it).slice(8, -1);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("10b", ["7a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('7a');
   module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
     return cof(it) == 'String' ? it.split('') : Object(it);
   };
@@ -40090,13 +40600,13 @@ $__System.registerDynamic("fd", ["79"], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("b2", ["fd", "90"], true, function(req, exports, module) {
+$__System.registerDynamic("b3", ["10b", "91"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var IObject = req('fd'),
-      defined = req('90');
+  var IObject = req('10b'),
+      defined = req('91');
   module.exports = function(it) {
     return IObject(defined(it));
   };
@@ -40104,7 +40614,7 @@ $__System.registerDynamic("b2", ["fd", "90"], true, function(req, exports, modul
   return module.exports;
 });
 
-$__System.registerDynamic("6c", [], true, function(req, exports, module) {
+$__System.registerDynamic("6d", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -40114,7 +40624,7 @@ $__System.registerDynamic("6c", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("a7", [], true, function(req, exports, module) {
+$__System.registerDynamic("a8", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -40129,7 +40639,7 @@ $__System.registerDynamic("a7", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("fe", [], true, function(req, exports, module) {
+$__System.registerDynamic("10c", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -40139,17 +40649,17 @@ $__System.registerDynamic("fe", [], true, function(req, exports, module) {
   return module.exports;
 });
 
-$__System.registerDynamic("ff", ["fe", "a7", "6c", "b2", "a6"], true, function(req, exports, module) {
+$__System.registerDynamic("10d", ["10c", "a8", "6d", "b3", "a7"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   'use strict';
-  var addToUnscopables = req('fe'),
-      step = req('a7'),
-      Iterators = req('6c'),
-      toIObject = req('b2');
-  module.exports = req('a6')(Array, 'Array', function(iterated, kind) {
+  var addToUnscopables = req('10c'),
+      step = req('a8'),
+      Iterators = req('6d'),
+      toIObject = req('b3');
+  module.exports = req('a7')(Array, 'Array', function(iterated, kind) {
     this._t = toIObject(iterated);
     this._i = 0;
     this._k = kind;
@@ -40175,44 +40685,44 @@ $__System.registerDynamic("ff", ["fe", "a7", "6c", "b2", "a6"], true, function(r
   return module.exports;
 });
 
-$__System.registerDynamic("39", ["ff", "6c"], true, function(req, exports, module) {
+$__System.registerDynamic("3a", ["10d", "6d"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  req('ff');
-  var Iterators = req('6c');
+  req('10d');
+  var Iterators = req('6d');
   Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("100", ["39", "38", "f8"], true, function(req, exports, module) {
+$__System.registerDynamic("10e", ["3a", "39", "106"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
+  req('3a');
   req('39');
-  req('38');
-  module.exports = req('f8');
+  module.exports = req('106');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("e", ["100"], true, function(req, exports, module) {
+$__System.registerDynamic("f", ["10e"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": req('100'),
+    "default": req('10e'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('1', ['2', '3', '4', '6', '12', '17', '18', 'e', 'f7', 'ee', 'ed', 'e3', 'bd', 'bc', 'ba', 'b8', 'b7', 'b5'], function (_export) {
+$__System.register('1', ['2', '3', '4', '6', '13', '17', '18', '105', 'f', 'ff', 'fb', 'f5', 'be', 'bd', 'bb', 'b9', 'b8', 'b6'], function (_export) {
   var $, HTML, L, Sidebar, _getIterator, App, MELODIES_DCAT_CATALOG_URL, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, app, catalogUrl, sidebar;
 
   function letItSnow() {
@@ -40251,17 +40761,17 @@ $__System.register('1', ['2', '3', '4', '6', '12', '17', '18', 'e', 'f7', 'ee', 
     }
   }
   return {
-    setters: [function (_7) {}, function (_5) {}, function (_4) {}, function (_6) {
-      $ = _6.$;
-      HTML = _6.HTML;
-    }, function (_2) {
-      L = _2['default'];
+    setters: [function (_8) {}, function (_6) {}, function (_5) {}, function (_7) {
+      $ = _7.$;
+      HTML = _7.HTML;
     }, function (_3) {
-      Sidebar = _3['default'];
-    }, function (_) {}, function (_e) {
-      _getIterator = _e['default'];
-    }, function (_f7) {}, function (_ee) {}, function (_ed) {}, function (_e3) {}, function (_bd) {}, function (_bc) {}, function (_ba) {}, function (_b8) {}, function (_b7) {}, function (_b5) {
-      App = _b5['default'];
+      L = _3['default'];
+    }, function (_4) {
+      Sidebar = _4['default'];
+    }, function (_2) {}, function (_) {}, function (_f) {
+      _getIterator = _f['default'];
+    }, function (_ff) {}, function (_fb) {}, function (_f5) {}, function (_be) {}, function (_bd) {}, function (_bb) {}, function (_b9) {}, function (_b8) {}, function (_b6) {
+      App = _b6['default'];
     }],
     execute: function () {
 
@@ -40347,12 +40857,12 @@ $__System.register('app/css/snow.css!github:systemjs/plugin-css@0.1.20', [], fal
 $__System.register('app/css/styledLayerControl/styledLayerControl.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
 $__System.register('app/css/style.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
 $__System.register('github:Turbo87/sidebar-v2@master/css/leaflet-sidebar.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('github:neothemachine/category-remapper-js@modules/css/remapper.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
+$__System.register('github:guygriffiths/category-remapper-js@master/css/remapper.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
 $__System.register('github:ebrelsford/Leaflet.loading@0.1.16/src/Control.Loading.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
 $__System.register('github:Leaflet/Leaflet@0.7.7/dist/leaflet.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
 $__System.register('github:twbs/bootstrap@3.3.6/css/bootstrap.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
 (function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})
-(".snow{display:none;height:100%;left:0;position:absolute;top:0;width:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}#snow1{background-image:url(http://www.wearewebstars.dk/codepen/img/s1.png);animation:snow1 5s linear infinite}#snow2{background-image:url(http://www.wearewebstars.dk/codepen/img/s2.png);animation:snow2 20s linear infinite}#snow3{background-image:url(http://www.wearewebstars.dk/codepen/img/s3.png);animation:snow3 30s linear infinite}@keyframes snow1{from{background-position:0 0}to{background-position:500px 500px}}@keyframes snow2{from{background-position:0 0}to{background-position:400px 800px}}@keyframes snow3{from{background-position:0 0}to{background-position:-600px 900px}}.ac-container{width:auto;margin:10px auto 10px auto;text-align:left;overflow-y:auto;overflow-x:hidden;height:auto}.ac-container label{font-family:BebasNeueRegular,'Arial Narrow',Arial,sans-serif;padding:5px 20px;position:relative;z-index:20;display:block;cursor:pointer;color:#777;text-shadow:1px 1px 1px rgba(255,255,255,.8);line-height:30px;font-size:17px;background:#fff;background:-moz-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-webkit-gradient(linear,left top,left bottom,color-stop(1%,#fff),color-stop(100%,#eaeaea));background:-webkit-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-o-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-ms-linear-gradient(top,#fff 1%,#eaeaea 100%);background:linear-gradient(top,#fff 1%,#eaeaea 100%);filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea', GradientType=0 );box-shadow:0 0 0 1px rgba(155,155,155,.3),1px 0 0 0 rgba(255,255,255,.9) inset,0 2px 2px rgba(0,0,0,.1);box-sizing:content-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.ac-container label:hover{background:#fff}.ac-container input.menu:checked+label,.ac-container input.menu:checked+label:hover{background:#c6e1ec;color:#3d7489;text-shadow:0 1px 1px rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(155,155,155,.3),0 2px 2px rgba(0,0,0,.1)}.ac-container input.menu:checked+label:after,.ac-container label:hover:after{content:'';position:absolute;width:24px;height:24px;right:13px;top:7px;background:transparent url(app/css/styledLayerControl/images/arrow_down.png) no-repeat center center}.ac-container input.menu:checked+label:after{background-image:url(app/css/styledLayerControl/images/arrow_up.png)}.ac-container input.menu{display:none}.ac-container article{background:rgba(255,255,255,.5);margin-top:-1px;overflow:hidden;height:0;position:relative;z-index:10;-webkit-transition:height .3s ease-in-out,box-shadow .6s linear;-moz-transition:height .3s ease-in-out,box-shadow .6s linear;-o-transition:height .3s ease-in-out,box-shadow .6s linear;-ms-transition:height .3s ease-in-out,box-shadow .6s linear;transition:height .3s ease-in-out,box-shadow .6s linear}.ac-container input.menu:checked~article{-webkit-transition:height .5s ease-in-out,box-shadow .1s linear;-moz-transition:height .5s ease-in-out,box-shadow .1s linear;-o-transition:height .5s ease-in-out,box-shadow .1s linear;-ms-transition:height .5s ease-in-out,box-shadow .1s linear;transition:height .5s ease-in-out,box-shadow .1s linear;box-shadow:0 0 0 1px rgba(155,155,155,.3)}.ac-container input.menu:checked~article.ac-large{height:auto;max-height:200px;padding-top:5px;overflow-y:auto}.menu-item-radio{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.menu-item-checkbox{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.bt_delete{position:relative;float:right;background-image:url(app/css/styledLayerControl/images/delete.png);background-color:transparent;background-repeat:no-repeat;background-position:0 0;border:none;cursor:pointer;height:16px;width:16px;vertical-align:middle}.leaflet-control-layers{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}input[type=radio].leaflet-control-layers-selector,input[type=checkbox].leaflet-control-layers-selector{margin:3px 3px 0 5px}body,html{height:100%;margin:0}#map{height:100%}.info{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}.external{background-image:linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cg%20transform%3D%22translate%28-826.429%20-698.791%29%22%3E%3Crect%20width%3D%225.982%22%20height%3D%225.982%22%20x%3D%22826.929%22%20y%3D%22702.309%22%20fill%3D%22%23fff%22%20stroke%3D%22%2306c%22%2F%3E%3Cg%3E%3Cpath%20d%3D%22M831.194%20698.791h5.234v5.391l-1.571%201.545-1.31-1.31-2.725%202.725-2.689-2.689%202.808-2.808-1.311-1.311z%22%20fill%3D%22%2306f%22%2F%3E%3Cpath%20d%3D%22M835.424%20699.795l.022%204.885-1.817-1.817-2.881%202.881-1.228-1.228%202.881-2.881-1.851-1.851z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E);background-position:right center;background-repeat:no-repeat;padding-right:13px}.dataset-spatial-minimap{height:120px}.code-nowrap{word-wrap:normal;white-space:pre}.sidebar{position:absolute;top:0;bottom:0;width:100%;overflow:hidden;z-index:2000}.sidebar.collapsed{width:40px}@media (min-width:768px){.sidebar{top:10px;bottom:10px;transition:width .5s}}@media (min-width:768px) and (max-width:991px){.sidebar{width:305px}}@media (min-width:992px) and (max-width:1199px){.sidebar{width:390px}}@media (min-width:1200px){.sidebar{width:460px}}.sidebar-left{left:0}@media (min-width:768px){.sidebar-left{left:10px}}.sidebar-right{right:0}@media (min-width:768px){.sidebar-right{right:10px}}.sidebar-tabs{top:0;bottom:0;height:100%;background-color:#fff}.sidebar-left .sidebar-tabs{left:0}.sidebar-right .sidebar-tabs{right:0}.sidebar-tabs,.sidebar-tabs>ul{position:absolute;width:40px;margin:0;padding:0}.sidebar-tabs>li,.sidebar-tabs>ul>li{width:100%;height:40px;color:#333;font-size:12pt;overflow:hidden;transition:all 80ms}.sidebar-tabs>li:hover,.sidebar-tabs>ul>li:hover{color:#000;background-color:#eee}.sidebar-tabs>li.active,.sidebar-tabs>ul>li.active{color:#fff;background-color:#0074d9}.sidebar-tabs>li.disabled,.sidebar-tabs>ul>li.disabled{color:rgba(51,51,51,.4)}.sidebar-tabs>li.disabled:hover,.sidebar-tabs>ul>li.disabled:hover{background:0 0}.sidebar-tabs>li.disabled>a,.sidebar-tabs>ul>li.disabled>a{cursor:default}.sidebar-tabs>li>a,.sidebar-tabs>ul>li>a{display:block;width:100%;height:100%;line-height:40px;color:inherit;text-decoration:none;text-align:center}.sidebar-tabs>ul+ul{bottom:0}.sidebar-content{position:absolute;top:0;bottom:0;background-color:rgba(255,255,255,.95);overflow-x:hidden;overflow-y:auto}.sidebar-left .sidebar-content{left:40px;right:0}.sidebar-right .sidebar-content{left:0;right:40px}.sidebar.collapsed>.sidebar-content{overflow-y:hidden}.sidebar-pane{display:none;left:0;right:0;box-sizing:border-box;padding:10px 20px}.sidebar-pane.active{display:block}@media (min-width:768px) and (max-width:991px){.sidebar-pane{min-width:265px}}@media (min-width:992px) and (max-width:1199px){.sidebar-pane{min-width:350px}}@media (min-width:1200px){.sidebar-pane{min-width:420px}}.sidebar-header{margin:-10px -20px 0;height:40px;padding:0 20px;line-height:40px;font-size:14.4pt;color:#fff;background-color:#0074d9}.sidebar-right .sidebar-header{padding-left:40px}.sidebar-close{position:absolute;top:0;width:40px;height:40px;text-align:center;cursor:pointer}.sidebar-left .sidebar-close{right:0}.sidebar-right .sidebar-close{left:0}.sidebar-left~.sidebar-map{margin-left:40px}@media (min-width:768px){.sidebar-left~.sidebar-map{margin-left:0}}.sidebar-right~.sidebar-map{margin-right:40px}@media (min-width:768px){.sidebar-right~.sidebar-map{margin-right:0}}.sidebar{box-shadow:0 1px 5px rgba(0,0,0,.65)}.sidebar.leaflet-touch{box-shadow:none;border-right:2px solid rgba(0,0,0,.2)}@media (min-width:768px){.sidebar{border-radius:4px}.sidebar.leaflet-touch{border:2px solid rgba(0,0,0,.2)}}@media (min-width:768px){.sidebar-left~.sidebar-map .leaflet-left{transition:left .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-left~.sidebar-map .leaflet-left{left:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-left~.sidebar-map .leaflet-left{left:400px}}@media (min-width:1200px){.sidebar-left~.sidebar-map .leaflet-left{left:470px}}@media (min-width:768px){.sidebar-left.collapsed~.sidebar-map .leaflet-left{left:50px}}@media (min-width:768px){.sidebar-right~.sidebar-map .leaflet-right{transition:right .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-right~.sidebar-map .leaflet-right{right:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-right~.sidebar-map .leaflet-right{right:400px}}@media (min-width:1200px){.sidebar-right~.sidebar-map .leaflet-right{right:470px}}@media (min-width:768px){.sidebar-right.collapsed~.sidebar-map .leaflet-right{right:50px}}.jsplumb-connector{z-index:9040}.jsplumb-endpoint{z-index:9050}.jsplumb-overlay{z-index:9060}.main-remapper{position:fixed;width:100%;height:100%;left:0;top:0;z-index:1000}.remap-froms,.remap-tos{position:absolute;top:0;left:0;width:250px;height:100%;background-color:rgba(150,220,255,.8);color:#000;text-align:right}.remap-tos{left:auto;right:0;width:250px;overflow:hidden;color:#000;text-align:left}.centrecontent{position:absolute;opacity:.8;bottom:0;height:100%;left:250px;right:250px;background:#fff;text-align:center;vertical-align:bottom}.buttonholder{position:absolute;bottom:0;background-color:rgba(255,255,255,0);left:250px;right:250px;text-align:center}.remap-button{font-size:20pt;padding:20px;margin:20px}.map-from,.map-to{margin:2px;border-style:solid;border-width:thin;font-family:sans-serif;background-color:rgba(0,210,255,1)}.map-from{padding-right:10px}.map-to{padding-left:10px}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}.leaflet-image-layer,.leaflet-layer,.leaflet-map-pane,.leaflet-marker-icon,.leaflet-marker-pane,.leaflet-marker-shadow,.leaflet-overlay-pane,.leaflet-overlay-pane svg,.leaflet-popup-pane,.leaflet-shadow-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-tile-pane,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-ms-touch-action:none;touch-action:none}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container img{max-width:none!important}.leaflet-container img.leaflet-image-layer{max-width:15000px!important}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-tile-pane{z-index:2}.leaflet-objects-pane{z-index:3}.leaflet-overlay-pane{z-index:4}.leaflet-shadow-pane{z-index:5}.leaflet-marker-pane{z-index:6}.leaflet-popup-pane{z-index:7}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:7;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup,.leaflet-fade-anim .leaflet-tile{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;-o-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup,.leaflet-fade-anim .leaflet-tile-loaded{opacity:1}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);-o-transition:-o-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-touching .leaflet-zoom-animated,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-clickable{cursor:pointer}.leaflet-container{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-clickable,.leaflet-dragging .leaflet-container{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078A8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font:12px/1.5 \"Helvetica Neue\",Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box;background:#fff;background:rgba(255,255,255,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{margin:0 auto;width:40px;height:20px;position:relative;overflow:hidden}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:0 0}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678, M12=.70710678, M21=-.70710678, M22=.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}/*!\n * Bootstrap v3.3.6 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type=radio],input[type=checkbox]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:0 0!important;-webkit-box-shadow:none!important;box-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000!important}.label{border:1px solid #000}.table{border-collapse:collapse!important}.table td,.table th{background-color:#fff!important}.table-bordered td,.table-bordered th{border:1px solid #ddd!important}}@font-face{font-family:'Glyphicons Halflings';src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot);src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff2) format('woff2'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff) format('woff'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.ttf) format('truetype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-eur:before,.glyphicon-euro:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}:after,:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:transparent}body{font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#337ab7;text-decoration:none}a:focus,a:hover{color:#23527c;text-decoration:underline}a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:6px}.img-thumbnail{display:inline-block;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out}.img-circle{border-radius:50%}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}.h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}.h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}.h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}.h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}.lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}.mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}.page-header{padding-bottom:9px;margin:40px 0 20px;border-bottom:1px solid #eee}ol,ul{margin-top:0;margin-bottom:10px}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;margin-left:-5px;list-style:none}.list-inline>li{display:inline-block;padding-right:5px;padding-left:5px}dl{margin-top:0;margin-bottom:20px}dd,dt{line-height:1.42857143}dt{font-weight:700}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;overflow:hidden;clear:left;text-align:right;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[data-original-title],abbr[title]{cursor:help;border-bottom:1px dotted #777}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10px 20px;margin:0 0 20px;font-size:17.5px;border-left:5px solid #eee}blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{margin-bottom:0}blockquote .small,blockquote footer,blockquote small{display:block;font-size:80%;line-height:1.42857143;color:#777}blockquote .small:before,blockquote footer:before,blockquote small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;text-align:right;border-right:5px solid #eee;border-left:0}.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{content:''}.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{content:'\\00A0 \\2014'}address{margin-bottom:20px;font-style:normal;line-height:1.42857143}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:4px}kbd{padding:2px 4px;font-size:90%;color:#fff;background-color:#333;border-radius:3px;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}kbd kbd{padding:0;font-size:100%;font-weight:700;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:9.5px;margin:0 0 10px;font-size:13px;line-height:1.42857143;color:#333;word-break:break-all;word-wrap:break-word;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{margin-right:-15px;margin-left:-15px}.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{position:relative;min-height:1px;padding-right:15px;padding-left:15px}.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0}@media (min-width:768px){.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0}}@media (min-width:992px){.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0}}@media (min-width:1200px){.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#777;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:20px}.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}.table>caption+thead>tr:first-child>td,.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>td,.table>thead:first-child>tr:first-child>th{border-top:0}.table>tbody+tbody{border-top:2px solid #ddd}.table .table{background-color:#fff}.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:5px}.table-bordered{border:1px solid #ddd}.table-bordered>tbody>tr>td,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>td,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border:1px solid #ddd}.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=col-]{position:static;display:table-column;float:none}table td[class*=col-],table th[class*=col-]{position:static;display:table-cell;float:none}.table>tbody>tr.active>td,.table>tbody>tr.active>th,.table>tbody>tr>td.active,.table>tbody>tr>th.active,.table>tfoot>tr.active>td,.table>tfoot>tr.active>th,.table>tfoot>tr>td.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>thead>tr.active>th,.table>thead>tr>td.active,.table>thead>tr>th.active{background-color:#f5f5f5}.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr.active:hover>th,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover{background-color:#e8e8e8}.table>tbody>tr.success>td,.table>tbody>tr.success>th,.table>tbody>tr>td.success,.table>tbody>tr>th.success,.table>tfoot>tr.success>td,.table>tfoot>tr.success>th,.table>tfoot>tr>td.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>thead>tr.success>th,.table>thead>tr>td.success,.table>thead>tr>th.success{background-color:#dff0d8}.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr.success:hover>th,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover{background-color:#d0e9c6}.table>tbody>tr.info>td,.table>tbody>tr.info>th,.table>tbody>tr>td.info,.table>tbody>tr>th.info,.table>tfoot>tr.info>td,.table>tfoot>tr.info>th,.table>tfoot>tr>td.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>thead>tr.info>th,.table>thead>tr>td.info,.table>thead>tr>th.info{background-color:#d9edf7}.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr.info:hover>th,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover{background-color:#c4e3f3}.table>tbody>tr.warning>td,.table>tbody>tr.warning>th,.table>tbody>tr>td.warning,.table>tbody>tr>th.warning,.table>tfoot>tr.warning>td,.table>tfoot>tr.warning>th,.table>tfoot>tr>td.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>thead>tr.warning>th,.table>thead>tr>td.warning,.table>thead>tr>th.warning{background-color:#fcf8e3}.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr.warning:hover>th,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover{background-color:#faf2cc}.table>tbody>tr.danger>td,.table>tbody>tr.danger>th,.table>tbody>tr>td.danger,.table>tbody>tr>th.danger,.table>tfoot>tr.danger>td,.table>tfoot>tr.danger>th,.table>tfoot>tr>td.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>thead>tr.danger>th,.table>thead>tr>td.danger,.table>thead>tr>th.danger{background-color:#f2dede}.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr.danger:hover>th,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover{background-color:#ebcccc}.table-responsive{min-height:.01%;overflow-x:auto}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #ddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>td,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>thead>tr>th{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}}fieldset{min-width:0;padding:0;margin:0;border:0}legend{display:block;width:100%;padding:0;margin-bottom:20px;font-size:21px;line-height:inherit;color:#333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700}input[type=search]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=radio],input[type=checkbox]{margin:4px 0 0;margin-top:1px\\9;line-height:normal}input[type=file]{display:block}input[type=range]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=file]:focus,input[type=radio]:focus,input[type=checkbox]:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:7px;font-size:14px;line-height:1.42857143;color:#555}.form-control{display:block;width:100%;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control::-ms-expand{background-color:transparent;border:0}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=search]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=date].form-control,input[type=time].form-control,input[type=datetime-local].form-control,input[type=month].form-control{line-height:34px}.input-group-sm input[type=date],.input-group-sm input[type=time],.input-group-sm input[type=datetime-local],.input-group-sm input[type=month],input[type=date].input-sm,input[type=time].input-sm,input[type=datetime-local].input-sm,input[type=month].input-sm{line-height:30px}.input-group-lg input[type=date],.input-group-lg input[type=time],.input-group-lg input[type=datetime-local],.input-group-lg input[type=month],input[type=date].input-lg,input[type=time].input-lg,input[type=datetime-local].input-lg,input[type=month].input-lg{line-height:46px}}.form-group{margin-bottom:15px}.checkbox,.radio{position:relative;display:block;margin-top:10px;margin-bottom:10px}.checkbox label,.radio label{min-height:20px;padding-left:20px;margin-bottom:0;font-weight:400;cursor:pointer}.checkbox input[type=checkbox],.checkbox-inline input[type=checkbox],.radio input[type=radio],.radio-inline input[type=radio]{position:absolute;margin-top:4px\\9;margin-left:-20px}.checkbox+.checkbox,.radio+.radio{margin-top:-5px}.checkbox-inline,.radio-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;font-weight:400;vertical-align:middle;cursor:pointer}.checkbox-inline+.checkbox-inline,.radio-inline+.radio-inline{margin-top:0;margin-left:10px}fieldset[disabled] input[type=radio],fieldset[disabled] input[type=checkbox],input[type=radio].disabled,input[type=radio][disabled],input[type=checkbox].disabled,input[type=checkbox][disabled]{cursor:not-allowed}.checkbox-inline.disabled,.radio-inline.disabled,fieldset[disabled] .checkbox-inline,fieldset[disabled] .radio-inline{cursor:not-allowed}.checkbox.disabled label,.radio.disabled label,fieldset[disabled] .checkbox label,fieldset[disabled] .radio label{cursor:not-allowed}.form-control-static{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}.form-control-static.input-lg,.form-control-static.input-sm{padding-right:0;padding-left:0}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}select[multiple].input-sm,textarea.input-sm{height:auto}.form-group-sm .form-control{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.form-group-sm select.form-control{height:30px;line-height:30px}.form-group-sm select[multiple].form-control,.form-group-sm textarea.form-control{height:auto}.form-group-sm .form-control-static{height:30px;min-height:32px;padding:6px 10px;font-size:12px;line-height:1.5}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-lg{height:46px;line-height:46px}select[multiple].input-lg,textarea.input-lg{height:auto}.form-group-lg .form-control{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.form-group-lg select.form-control{height:46px;line-height:46px}.form-group-lg select[multiple].form-control,.form-group-lg textarea.form-control{height:auto}.form-group-lg .form-control-static{height:46px;min-height:38px;padding:11px 16px;font-size:18px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:42.5px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:34px;height:34px;line-height:34px;text-align:center;pointer-events:none}.form-group-lg .form-control+.form-control-feedback,.input-group-lg+.form-control-feedback,.input-lg+.form-control-feedback{width:46px;height:46px;line-height:46px}.form-group-sm .form-control+.form-control-feedback,.input-group-sm+.form-control-feedback,.input-sm+.form-control-feedback{width:30px;height:30px;line-height:30px}.has-success .checkbox,.has-success .checkbox-inline,.has-success .control-label,.has-success .help-block,.has-success .radio,.has-success .radio-inline,.has-success.checkbox label,.has-success.checkbox-inline label,.has-success.radio label,.has-success.radio-inline label{color:#3c763d}.has-success .form-control{border-color:#3c763d;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-success .form-control:focus{border-color:#2b542c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168}.has-success .input-group-addon{color:#3c763d;background-color:#dff0d8;border-color:#3c763d}.has-success .form-control-feedback{color:#3c763d}.has-warning .checkbox,.has-warning .checkbox-inline,.has-warning .control-label,.has-warning .help-block,.has-warning .radio,.has-warning .radio-inline,.has-warning.checkbox label,.has-warning.checkbox-inline label,.has-warning.radio label,.has-warning.radio-inline label{color:#8a6d3b}.has-warning .form-control{border-color:#8a6d3b;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-warning .form-control:focus{border-color:#66512c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b}.has-warning .input-group-addon{color:#8a6d3b;background-color:#fcf8e3;border-color:#8a6d3b}.has-warning .form-control-feedback{color:#8a6d3b}.has-error .checkbox,.has-error .checkbox-inline,.has-error .control-label,.has-error .help-block,.has-error .radio,.has-error .radio-inline,.has-error.checkbox label,.has-error.checkbox-inline label,.has-error.radio label,.has-error.radio-inline label{color:#a94442}.has-error .form-control{border-color:#a94442;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-error .form-control:focus{border-color:#843534;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483}.has-error .input-group-addon{color:#a94442;background-color:#f2dede;border-color:#a94442}.has-error .form-control-feedback{color:#a94442}.has-feedback label~.form-control-feedback{top:25px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#737373}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .form-control,.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .checkbox,.form-inline .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .checkbox label,.form-inline .radio label{padding-left:0}.form-inline .checkbox input[type=checkbox],.form-inline .radio input[type=radio]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .checkbox,.form-horizontal .checkbox-inline,.form-horizontal .radio,.form-horizontal .radio-inline{padding-top:7px;margin-top:0;margin-bottom:0}.form-horizontal .checkbox,.form-horizontal .radio{min-height:27px}.form-horizontal .form-group{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.form-horizontal .control-label{padding-top:7px;margin-bottom:0;text-align:right}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:11px;font-size:18px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:6px;font-size:12px}}.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px}.btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn.focus,.btn:focus,.btn:hover{color:#333;text-decoration:none}.btn.active,.btn:active{background-image:none;outline:0;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none;opacity:.65}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333;background-color:#fff;border-color:#ccc}.btn-default.focus,.btn-default:focus{color:#333;background-color:#e6e6e6;border-color:#8c8c8c}.btn-default:hover{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active.focus,.btn-default.active:focus,.btn-default.active:hover,.btn-default:active.focus,.btn-default:active:focus,.btn-default:active:hover,.open>.dropdown-toggle.btn-default.focus,.open>.dropdown-toggle.btn-default:focus,.open>.dropdown-toggle.btn-default:hover{color:#333;background-color:#d4d4d4;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled.focus,.btn-default.disabled:focus,.btn-default.disabled:hover,.btn-default[disabled].focus,.btn-default[disabled]:focus,.btn-default[disabled]:hover,fieldset[disabled] .btn-default.focus,fieldset[disabled] .btn-default:focus,fieldset[disabled] .btn-default:hover{background-color:#fff;border-color:#ccc}.btn-default .badge{color:#fff;background-color:#333}.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active.focus,.btn-primary.active:focus,.btn-primary.active:hover,.btn-primary:active.focus,.btn-primary:active:focus,.btn-primary:active:hover,.open>.dropdown-toggle.btn-primary.focus,.open>.dropdown-toggle.btn-primary:focus,.open>.dropdown-toggle.btn-primary:hover{color:#fff;background-color:#204d74;border-color:#122b40}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled.focus,.btn-primary.disabled:focus,.btn-primary.disabled:hover,.btn-primary[disabled].focus,.btn-primary[disabled]:focus,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary.focus,fieldset[disabled] .btn-primary:focus,fieldset[disabled] .btn-primary:hover{background-color:#337ab7;border-color:#2e6da4}.btn-primary .badge{color:#337ab7;background-color:#fff}.btn-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c}.btn-success.focus,.btn-success:focus{color:#fff;background-color:#449d44;border-color:#255625}.btn-success:hover{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active.focus,.btn-success.active:focus,.btn-success.active:hover,.btn-success:active.focus,.btn-success:active:focus,.btn-success:active:hover,.open>.dropdown-toggle.btn-success.focus,.open>.dropdown-toggle.btn-success:focus,.open>.dropdown-toggle.btn-success:hover{color:#fff;background-color:#398439;border-color:#255625}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled.focus,.btn-success.disabled:focus,.btn-success.disabled:hover,.btn-success[disabled].focus,.btn-success[disabled]:focus,.btn-success[disabled]:hover,fieldset[disabled] .btn-success.focus,fieldset[disabled] .btn-success:focus,fieldset[disabled] .btn-success:hover{background-color:#5cb85c;border-color:#4cae4c}.btn-success .badge{color:#5cb85c;background-color:#fff}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn-info.focus,.btn-info:focus{color:#fff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active.focus,.btn-info.active:focus,.btn-info.active:hover,.btn-info:active.focus,.btn-info:active:focus,.btn-info:active:hover,.open>.dropdown-toggle.btn-info.focus,.open>.dropdown-toggle.btn-info:focus,.open>.dropdown-toggle.btn-info:hover{color:#fff;background-color:#269abc;border-color:#1b6d85}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled.focus,.btn-info.disabled:focus,.btn-info.disabled:hover,.btn-info[disabled].focus,.btn-info[disabled]:focus,.btn-info[disabled]:hover,fieldset[disabled] .btn-info.focus,fieldset[disabled] .btn-info:focus,fieldset[disabled] .btn-info:hover{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#fff}.btn-warning{color:#fff;background-color:#f0ad4e;border-color:#eea236}.btn-warning.focus,.btn-warning:focus{color:#fff;background-color:#ec971f;border-color:#985f0d}.btn-warning:hover{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active.focus,.btn-warning.active:focus,.btn-warning.active:hover,.btn-warning:active.focus,.btn-warning:active:focus,.btn-warning:active:hover,.open>.dropdown-toggle.btn-warning.focus,.open>.dropdown-toggle.btn-warning:focus,.open>.dropdown-toggle.btn-warning:hover{color:#fff;background-color:#d58512;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled.focus,.btn-warning.disabled:focus,.btn-warning.disabled:hover,.btn-warning[disabled].focus,.btn-warning[disabled]:focus,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning.focus,fieldset[disabled] .btn-warning:focus,fieldset[disabled] .btn-warning:hover{background-color:#f0ad4e;border-color:#eea236}.btn-warning .badge{color:#f0ad4e;background-color:#fff}.btn-danger{color:#fff;background-color:#d9534f;border-color:#d43f3a}.btn-danger.focus,.btn-danger:focus{color:#fff;background-color:#c9302c;border-color:#761c19}.btn-danger:hover{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active.focus,.btn-danger.active:focus,.btn-danger.active:hover,.btn-danger:active.focus,.btn-danger:active:focus,.btn-danger:active:hover,.open>.dropdown-toggle.btn-danger.focus,.open>.dropdown-toggle.btn-danger:focus,.open>.dropdown-toggle.btn-danger:hover{color:#fff;background-color:#ac2925;border-color:#761c19}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled.focus,.btn-danger.disabled:focus,.btn-danger.disabled:hover,.btn-danger[disabled].focus,.btn-danger[disabled]:focus,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger.focus,fieldset[disabled] .btn-danger:focus,fieldset[disabled] .btn-danger:hover{background-color:#d9534f;border-color:#d43f3a}.btn-danger .badge{color:#d9534f;background-color:#fff}.btn-link{font-weight:400;color:#337ab7;border-radius:0}.btn-link,.btn-link.active,.btn-link:active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:active,.btn-link:focus,.btn-link:hover{border-color:transparent}.btn-link:focus,.btn-link:hover{color:#23527c;text-decoration:underline;background-color:transparent}.btn-link[disabled]:focus,.btn-link[disabled]:hover,fieldset[disabled] .btn-link:focus,fieldset[disabled] .btn-link:hover{color:#777;text-decoration:none}.btn-group-lg>.btn,.btn-lg{padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-group-xs>.btn,.btn-xs{padding:1px 5px;font-size:12px;line-height:1.5;border-radius:3px}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=button].btn-block,input[type=reset].btn-block,input[type=submit].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity .15s linear;-o-transition:opacity .15s linear;transition:opacity .15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease;-webkit-transition-duration:.35s;-o-transition-duration:.35s;transition-duration:.35s;-webkit-transition-property:height,visibility;-o-transition-property:height,visibility;transition-property:height,visibility}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid\\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropdown,.dropup{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;font-size:14px;text-align:left;list-style:none;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.15);border-radius:4px;-webkit-box-shadow:0 6px 12px rgba(0,0,0,.175);box-shadow:0 6px 12px rgba(0,0,0,.175)}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{color:#262626;text-decoration:none;background-color:#f5f5f5}.dropdown-menu>.active>a,.dropdown-menu>.active>a:focus,.dropdown-menu>.active>a:hover{color:#fff;text-decoration:none;background-color:#337ab7;outline:0}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{color:#777}.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{text-decoration:none;cursor:not-allowed;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{right:0;left:auto}.dropdown-menu-left{right:auto;left:0}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.42857143;color:#777;white-space:nowrap}.dropdown-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{content:\"\";border-top:0;border-bottom:4px dashed;border-bottom:4px solid\\9}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{right:0;left:auto}.navbar-right .dropdown-menu-left{right:auto;left:0}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group-vertical>.btn,.btn-group>.btn{position:relative;float:left}.btn-group-vertical>.btn.active,.btn-group-vertical>.btn:active,.btn-group-vertical>.btn:focus,.btn-group-vertical>.btn:hover,.btn-group>.btn.active,.btn-group>.btn:active,.btn-group>.btn:focus,.btn-group>.btn:hover{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-bottom-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-right:8px;padding-left:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-right:12px;padding-left:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-top-right-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{display:table-cell;float:none;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=buttons]>.btn input[type=radio],[data-toggle=buttons]>.btn input[type=checkbox],[data-toggle=buttons]>.btn-group>.btn input[type=radio],[data-toggle=buttons]>.btn-group>.btn input[type=checkbox]{position:absolute;clip:rect(0,0,0,0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=col-]{float:none;padding-right:0;padding-left:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:46px;line-height:46px}select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn,textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:30px;line-height:30px}select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{height:auto}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group .form-control:not(:first-child):not(:last-child),.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:6px 12px;font-size:14px;font-weight:400;line-height:1;color:#555;text-align:center;background-color:#eee;border:1px solid #ccc;border-radius:4px}.input-group-addon.input-sm{padding:5px 10px;font-size:12px;border-radius:3px}.input-group-addon.input-lg{padding:10px 16px;font-size:18px;border-radius:6px}.input-group-addon input[type=radio],.input-group-addon input[type=checkbox]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn-group:not(:last-child)>.btn,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:first-child>.btn-group:not(:first-child)>.btn,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle{border-top-left-radius:0;border-bottom-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:active,.input-group-btn>.btn:focus,.input-group-btn>.btn:hover{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{padding-left:0;margin-bottom:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:focus,.nav>li>a:hover{text-decoration:none;background-color:#eee}.nav>li.disabled>a{color:#777}.nav>li.disabled>a:focus,.nav>li.disabled>a:hover{color:#777;text-decoration:none;cursor:not-allowed;background-color:transparent}.nav .open>a,.nav .open>a:focus,.nav .open>a:hover{background-color:#eee;border-color:#337ab7}.nav .nav-divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #ddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.42857143;border:1px solid transparent;border-radius:4px 4px 0 0}.nav-tabs>li>a:hover{border-color:#eee #eee #ddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:focus,.nav-tabs>li.active>a:hover{color:#555;cursor:default;background-color:#fff;border:1px solid #ddd;border-bottom-color:transparent}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border-bottom-color:#fff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:4px}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:focus,.nav-pills>li.active>a:hover{color:#fff;background-color:#337ab7}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border-bottom-color:#fff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}.navbar{position:relative;min-height:50px;margin-bottom:20px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:4px}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{padding-right:15px;padding-left:15px;overflow-x:visible;-webkit-overflow-scrolling:touch;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block!important;height:auto!important;padding-bottom:0;overflow:visible!important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse{padding-right:0;padding-left:0}}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:200px}}.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-bottom,.navbar-fixed-top{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-bottom,.navbar-fixed-top{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;height:50px;padding:15px 15px;font-size:18px;line-height:20px}.navbar-brand:focus,.navbar-brand:hover{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;padding:9px 10px;margin-top:8px;margin-right:15px;margin-bottom:8px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:4px}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:7.5px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:20px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:20px}.navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:15px;padding-bottom:15px}}.navbar-form{padding:10px 15px;margin-top:8px;margin-right:-15px;margin-bottom:8px;margin-left:-15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1)}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .form-control,.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .checkbox,.navbar-form .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .checkbox label,.navbar-form .radio label{padding-left:0}.navbar-form .checkbox input[type=checkbox],.navbar-form .radio input[type=radio]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;padding-top:0;padding-bottom:0;margin-right:0;margin-left:0;border:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:8px;margin-bottom:8px}.navbar-btn.btn-sm{margin-top:10px;margin-bottom:10px}.navbar-btn.btn-xs{margin-top:14px;margin-bottom:14px}.navbar-text{margin-top:15px;margin-bottom:15px}@media (min-width:768px){.navbar-text{float:left;margin-right:15px;margin-left:15px}}@media (min-width:768px){.navbar-left{float:left!important}.navbar-right{float:right!important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#f8f8f8;border-color:#e7e7e7}.navbar-default .navbar-brand{color:#777}.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{color:#5e5e5e;background-color:transparent}.navbar-default .navbar-text{color:#777}.navbar-default .navbar-nav>li>a{color:#777}.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:focus,.navbar-default .navbar-nav>.disabled>a:hover{color:#ccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:#ddd}.navbar-default .navbar-toggle:focus,.navbar-default .navbar-toggle:hover{background-color:#ddd}.navbar-default .navbar-toggle .icon-bar{background-color:#888}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#e7e7e7}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:focus,.navbar-default .navbar-nav>.open>a:hover{color:#555;background-color:#e7e7e7}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#777}.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#ccc;background-color:transparent}}.navbar-default .navbar-link{color:#777}.navbar-default .navbar-link:hover{color:#333}.navbar-default .btn-link{color:#777}.navbar-default .btn-link:focus,.navbar-default .btn-link:hover{color:#333}.navbar-default .btn-link[disabled]:focus,.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:focus,fieldset[disabled] .navbar-default .btn-link:hover{color:#ccc}.navbar-inverse{background-color:#222;border-color:#080808}.navbar-inverse .navbar-brand{color:#9d9d9d}.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-text{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a:focus,.navbar-inverse .navbar-nav>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:focus,.navbar-inverse .navbar-nav>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:focus,.navbar-inverse .navbar-nav>.disabled>a:hover{color:#444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:#333}.navbar-inverse .navbar-toggle:focus,.navbar-inverse .navbar-toggle:hover{background-color:#333}.navbar-inverse .navbar-toggle .icon-bar{background-color:#fff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#101010}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:focus,.navbar-inverse .navbar-nav>.open>a:hover{color:#fff;background-color:#080808}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#444;background-color:transparent}}.navbar-inverse .navbar-link{color:#9d9d9d}.navbar-inverse .navbar-link:hover{color:#fff}.navbar-inverse .btn-link{color:#9d9d9d}.navbar-inverse .btn-link:focus,.navbar-inverse .btn-link:hover{color:#fff}.navbar-inverse .btn-link[disabled]:focus,.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:focus,fieldset[disabled] .navbar-inverse .btn-link:hover{color:#444}.breadcrumb{padding:8px 15px;margin-bottom:20px;list-style:none;background-color:#f5f5f5;border-radius:4px}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{padding:0 5px;color:#ccc;content:\"/\\00a0\"}.breadcrumb>.active{color:#777}.pagination{display:inline-block;padding-left:0;margin:20px 0;border-radius:4px}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:6px 12px;margin-left:-1px;line-height:1.42857143;color:#337ab7;text-decoration:none;background-color:#fff;border:1px solid #ddd}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination>li:last-child>a,.pagination>li:last-child>span{border-top-right-radius:4px;border-bottom-right-radius:4px}.pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{z-index:2;color:#23527c;background-color:#eee;border-color:#ddd}.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span,.pagination>.active>span:focus,.pagination>.active>span:hover{z-index:3;color:#fff;cursor:default;background-color:#337ab7;border-color:#337ab7}.pagination>.disabled>a,.pagination>.disabled>a:focus,.pagination>.disabled>a:hover,.pagination>.disabled>span,.pagination>.disabled>span:focus,.pagination>.disabled>span:hover{color:#777;cursor:not-allowed;background-color:#fff;border-color:#ddd}.pagination-lg>li>a,.pagination-lg>li>span{padding:10px 16px;font-size:18px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-top-left-radius:6px;border-bottom-left-radius:6px}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-top-right-radius:6px;border-bottom-right-radius:6px}.pagination-sm>li>a,.pagination-sm>li>span{padding:5px 10px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-top-left-radius:3px;border-bottom-left-radius:3px}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-top-right-radius:3px;border-bottom-right-radius:3px}.pager{padding-left:0;margin:20px 0;text-align:center;list-style:none}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:#fff;border:1px solid #ddd;border-radius:15px}.pager li>a:focus,.pager li>a:hover{text-decoration:none;background-color:#eee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:focus,.pager .disabled>a:hover,.pager .disabled>span{color:#777;cursor:not-allowed;background-color:#fff}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:focus,a.label:hover{color:#fff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#777}.label-default[href]:focus,.label-default[href]:hover{background-color:#5e5e5e}.label-primary{background-color:#337ab7}.label-primary[href]:focus,.label-primary[href]:hover{background-color:#286090}.label-success{background-color:#5cb85c}.label-success[href]:focus,.label-success[href]:hover{background-color:#449d44}.label-info{background-color:#5bc0de}.label-info[href]:focus,.label-info[href]:hover{background-color:#31b0d5}.label-warning{background-color:#f0ad4e}.label-warning[href]:focus,.label-warning[href]:hover{background-color:#ec971f}.label-danger{background-color:#d9534f}.label-danger[href]:focus,.label-danger[href]:hover{background-color:#c9302c}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:middle;background-color:#777;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-group-xs>.btn .badge,.btn-xs .badge{top:0;padding:1px 5px}a.badge:focus,a.badge:hover{color:#fff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#337ab7;background-color:#fff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#eee}.jumbotron .h1,.jumbotron h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:21px;font-weight:200}.jumbotron>hr{border-top-color:#d5d5d5}.container .jumbotron,.container-fluid .jumbotron{padding-right:15px;padding-left:15px;border-radius:6px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-right:60px;padding-left:60px}.jumbotron .h1,.jumbotron h1{font-size:63px}}.thumbnail{display:block;padding:4px;margin-bottom:20px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail a>img,.thumbnail>img{margin-right:auto;margin-left:auto}a.thumbnail.active,a.thumbnail:focus,a.thumbnail:hover{border-color:#337ab7}.thumbnail .caption{padding:9px;color:#333}.alert{padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:700}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.alert-success hr{border-top-color:#c9e2b3}.alert-success .alert-link{color:#2b542c}.alert-info{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.alert-info hr{border-top-color:#a6e1ec}.alert-info .alert-link{color:#245269}.alert-warning{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.alert-warning hr{border-top-color:#f7e1b5}.alert-warning .alert-link{color:#66512c}.alert-danger{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.alert-danger hr{border-top-color:#e4b9c0}.alert-danger .alert-link{color:#843534}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{height:20px;margin-bottom:20px;overflow:hidden;background-color:#f5f5f5;border-radius:4px;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.1)}.progress-bar{float:left;width:0;height:100%;font-size:12px;line-height:20px;color:#fff;text-align:center;background-color:#337ab7;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition:width .6s ease;-o-transition:width .6s ease;transition:width .6s ease}.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#5cb85c}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-warning{background-color:#f0ad4e}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-danger{background-color:#d9534f}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{overflow:hidden;zoom:1}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-body,.media-left,.media-right{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{padding-left:0;margin-bottom:20px}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#fff;border:1px solid #ddd}.list-group-item:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}a.list-group-item,button.list-group-item{color:#555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:focus,.list-group-item.disabled:hover{color:#777;cursor:not-allowed;background-color:#eee}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text{color:#777}.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#fff;background-color:#337ab7;border-color:#337ab7}.list-group-item.active .list-group-item-heading,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#c7ddef}.list-group-item-success{color:#3c763d;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#3c763d}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:focus,a.list-group-item-success:hover,button.list-group-item-success:focus,button.list-group-item-success:hover{color:#3c763d;background-color:#d0e9c6}a.list-group-item-success.active,a.list-group-item-success.active:focus,a.list-group-item-success.active:hover,button.list-group-item-success.active,button.list-group-item-success.active:focus,button.list-group-item-success.active:hover{color:#fff;background-color:#3c763d;border-color:#3c763d}.list-group-item-info{color:#31708f;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#31708f}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:focus,a.list-group-item-info:hover,button.list-group-item-info:focus,button.list-group-item-info:hover{color:#31708f;background-color:#c4e3f3}a.list-group-item-info.active,a.list-group-item-info.active:focus,a.list-group-item-info.active:hover,button.list-group-item-info.active,button.list-group-item-info.active:focus,button.list-group-item-info.active:hover{color:#fff;background-color:#31708f;border-color:#31708f}.list-group-item-warning{color:#8a6d3b;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#8a6d3b}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:focus,a.list-group-item-warning:hover,button.list-group-item-warning:focus,button.list-group-item-warning:hover{color:#8a6d3b;background-color:#faf2cc}a.list-group-item-warning.active,a.list-group-item-warning.active:focus,a.list-group-item-warning.active:hover,button.list-group-item-warning.active,button.list-group-item-warning.active:focus,button.list-group-item-warning.active:hover{color:#fff;background-color:#8a6d3b;border-color:#8a6d3b}.list-group-item-danger{color:#a94442;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#a94442}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:focus,a.list-group-item-danger:hover,button.list-group-item-danger:focus,button.list-group-item-danger:hover{color:#a94442;background-color:#ebcccc}a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-group-item-danger.active:hover,button.list-group-item-danger.active,button.list-group-item-danger.active:focus,button.list-group-item-danger.active:hover{color:#fff;background-color:#a94442;border-color:#a94442}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,.05);box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-left-radius:3px;border-top-right-radius:3px}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.panel-title>.small,.panel-title>.small>a,.panel-title>a,.panel-title>small,.panel-title>small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-left-radius:3px;border-top-right-radius:3px}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-left-radius:0;border-top-right-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.panel-collapse>.table,.panel>.table,.panel>.table-responsive>.table{margin-bottom:0}.panel>.panel-collapse>.table caption,.panel>.table caption,.panel>.table-responsive>.table caption{padding-right:15px;padding-left:15px}.panel>.table-responsive:first-child>.table:first-child,.panel>.table:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table:first-child>thead:first-child>tr:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child{border-top-left-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child{border-top-right-radius:3px}.panel>.table-responsive:last-child>.table:last-child,.panel>.table:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:3px}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #ddd}.panel>.table>tbody:first-child>tr:first-child td,.panel>.table>tbody:first-child>tr:first-child th{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{margin-bottom:0;border:0}.panel-group{margin-bottom:20px}.panel-group .panel{margin-bottom:0;border-radius:4px}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.list-group,.panel-group .panel-heading+.panel-collapse>.panel-body{border-top:1px solid #ddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #ddd}.panel-default{border-color:#ddd}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ddd}.panel-primary{border-color:#337ab7}.panel-primary>.panel-heading{color:#fff;background-color:#337ab7;border-color:#337ab7}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#337ab7}.panel-primary>.panel-heading .badge{color:#337ab7;background-color:#fff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#337ab7}.panel-success{border-color:#d6e9c6}.panel-success>.panel-heading{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d6e9c6}.panel-success>.panel-heading .badge{color:#dff0d8;background-color:#3c763d}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d6e9c6}.panel-info{border-color:#bce8f1}.panel-info>.panel-heading{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#bce8f1}.panel-info>.panel-heading .badge{color:#d9edf7;background-color:#31708f}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#bce8f1}.panel-warning{border-color:#faebcc}.panel-warning>.panel-heading{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#faebcc}.panel-warning>.panel-heading .badge{color:#fcf8e3;background-color:#8a6d3b}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#faebcc}.panel-danger{border-color:#ebccd1}.panel-danger>.panel-heading{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ebccd1}.panel-danger>.panel-heading .badge{color:#f2dede;background-color:#a94442}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ebccd1}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video{position:absolute;top:0;bottom:0;left:0;width:100%;height:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.05);box-shadow:inset 0 1px 1px rgba(0,0,0,.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,.15)}.well-lg{padding:24px;border-radius:6px}.well-sm{padding:9px;border-radius:3px}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;filter:alpha(opacity=20);opacity:.2}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;filter:alpha(opacity=50);opacity:.5}button.close{-webkit-appearance:none;padding:0;cursor:pointer;background:0 0;border:0}.modal-open{overflow:hidden}.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;display:none;overflow:hidden;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out;-webkit-transform:translate(0,-25%);-ms-transform:translate(0,-25%);-o-transform:translate(0,-25%);transform:translate(0,-25%)}.modal.in .modal-dialog{-webkit-transform:translate(0,0);-ms-transform:translate(0,0);-o-transform:translate(0,0);transform:translate(0,0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);box-shadow:0 3px 9px rgba(0,0,0,.5)}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000}.modal-backdrop.fade{filter:alpha(opacity=0);opacity:0}.modal-backdrop.in{filter:alpha(opacity=50);opacity:.5}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.42857143}.modal-body{position:relative;padding:15px}.modal-footer{padding:15px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-bottom:0;margin-left:5px}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,.5);box-shadow:0 5px 15px rgba(0,0,0,.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto}.tooltip.in{filter:alpha(opacity=90);opacity:.9}.tooltip.top{padding:5px 0;margin-top:-3px}.tooltip.right{padding:0 5px;margin-left:3px}.tooltip.bottom{padding:5px 0;margin-top:3px}.tooltip.left{padding:0 5px;margin-left:-3px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#fff;text-align:center;background-color:#000;border-radius:4px}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-left .tooltip-arrow{right:5px;bottom:0;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#000}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#000}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.2);border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,.2);box-shadow:0 5px 10px rgba(0,0,0,.2);line-break:auto}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{padding:8px 14px;margin:0;font-size:14px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;border-radius:5px 5px 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{content:\"\";border-width:10px}.popover.top>.arrow{bottom:-11px;left:50%;margin-left:-11px;border-top-color:#999;border-top-color:rgba(0,0,0,.25);border-bottom-width:0}.popover.top>.arrow:after{bottom:1px;margin-left:-10px;content:\" \";border-top-color:#fff;border-bottom-width:0}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-right-color:#999;border-right-color:rgba(0,0,0,.25);border-left-width:0}.popover.right>.arrow:after{bottom:-10px;left:1px;content:\" \";border-right-color:#fff;border-left-width:0}.popover.bottom>.arrow{top:-11px;left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#999;border-bottom-color:rgba(0,0,0,.25)}.popover.bottom>.arrow:after{top:1px;margin-left:-10px;content:\" \";border-top-width:0;border-bottom-color:#fff}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#999;border-left-color:rgba(0,0,0,.25)}.popover.left>.arrow:after{right:1px;bottom:-10px;content:\" \";border-right-width:0;border-left-color:#fff}.carousel{position:relative}.carousel-inner{position:relative;width:100%;overflow:hidden}.carousel-inner>.item{position:relative;display:none;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>a>img,.carousel-inner>.item>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.active.right,.carousel-inner>.item.next{left:0;-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0)}.carousel-inner>.item.active.left,.carousel-inner>.item.prev{left:0;-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0)}.carousel-inner>.item.active,.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right{left:0;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;bottom:0;left:0;width:15%;font-size:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);background-color:rgba(0,0,0,0);filter:alpha(opacity=50);opacity:.5}.carousel-control.left{background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,.0001)));background-image:linear-gradient(to right,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);background-repeat:repeat-x}.carousel-control.right{right:0;left:auto;background-image:-webkit-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.0001)),to(rgba(0,0,0,.5)));background-image:linear-gradient(to right,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);background-repeat:repeat-x}.carousel-control:focus,.carousel-control:hover{color:#fff;text-decoration:none;filter:alpha(opacity=90);outline:0;opacity:.9}.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{position:absolute;top:50%;z-index:5;display:inline-block;margin-top:-10px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{left:50%;margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{right:50%;margin-right:-10px}.carousel-control .icon-next,.carousel-control .icon-prev{width:20px;height:20px;font-family:serif;line-height:1}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;padding-left:0;margin-left:-30%;text-align:center;list-style:none}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;cursor:pointer;background-color:#000\\9;background-color:rgba(0,0,0,0);border:1px solid #fff;border-radius:10px}.carousel-indicators .active{width:12px;height:12px;margin:0;background-color:#fff}.carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:10;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{right:20%;left:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.btn-group-vertical>.btn-group:after,.btn-group-vertical>.btn-group:before,.btn-toolbar:after,.btn-toolbar:before,.clearfix:after,.clearfix:before,.container-fluid:after,.container-fluid:before,.container:after,.container:before,.dl-horizontal dd:after,.dl-horizontal dd:before,.form-horizontal .form-group:after,.form-horizontal .form-group:before,.modal-footer:after,.modal-footer:before,.modal-header:after,.modal-header:before,.nav:after,.nav:before,.navbar-collapse:after,.navbar-collapse:before,.navbar-header:after,.navbar-header:before,.navbar:after,.navbar:before,.pager:after,.pager:before,.panel-body:after,.panel-body:before,.row:after,.row:before{display:table;content:\" \"}.btn-group-vertical>.btn-group:after,.btn-toolbar:after,.clearfix:after,.container-fluid:after,.container:after,.dl-horizontal dd:after,.form-horizontal .form-group:after,.modal-footer:after,.modal-header:after,.nav:after,.navbar-collapse:after,.navbar-header:after,.navbar:after,.pager:after,.panel-body:after,.row:after{clear:both}.center-block{display:block;margin-right:auto;margin-left:auto}.pull-right{float:right!important}.pull-left{float:left!important}.hide{display:none!important}.show{display:block!important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none!important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-lg,.visible-md,.visible-sm,.visible-xs{display:none!important}.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block{display:none!important}@media (max-width:767px){.visible-xs{display:block!important}table.visible-xs{display:table!important}tr.visible-xs{display:table-row!important}td.visible-xs,th.visible-xs{display:table-cell!important}}@media (max-width:767px){.visible-xs-block{display:block!important}}@media (max-width:767px){.visible-xs-inline{display:inline!important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block!important}table.visible-sm{display:table!important}tr.visible-sm{display:table-row!important}td.visible-sm,th.visible-sm{display:table-cell!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block!important}table.visible-md{display:table!important}tr.visible-md{display:table-row!important}td.visible-md,th.visible-md{display:table-cell!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block!important}}@media (min-width:1200px){.visible-lg{display:block!important}table.visible-lg{display:table!important}tr.visible-lg{display:table-row!important}td.visible-lg,th.visible-lg{display:table-cell!important}}@media (min-width:1200px){.visible-lg-block{display:block!important}}@media (min-width:1200px){.visible-lg-inline{display:inline!important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block!important}}@media (max-width:767px){.hidden-xs{display:none!important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none!important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none!important}}@media (min-width:1200px){.hidden-lg{display:none!important}}.visible-print{display:none!important}@media print{.visible-print{display:block!important}table.visible-print{display:table!important}tr.visible-print{display:table-row!important}td.visible-print,th.visible-print{display:table-cell!important}}.visible-print-block{display:none!important}@media print{.visible-print-block{display:block!important}}.visible-print-inline{display:none!important}@media print{.visible-print-inline{display:inline!important}}.visible-print-inline-block{display:none!important}@media print{.visible-print-inline-block{display:inline-block!important}}@media print{.hidden-print{display:none!important}}");
+(".snow{display:none;height:100%;left:0;position:absolute;top:0;width:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}#snow1{background-image:url(http://www.wearewebstars.dk/codepen/img/s1.png);animation:snow1 5s linear infinite}#snow2{background-image:url(http://www.wearewebstars.dk/codepen/img/s2.png);animation:snow2 20s linear infinite}#snow3{background-image:url(http://www.wearewebstars.dk/codepen/img/s3.png);animation:snow3 30s linear infinite}@keyframes snow1{from{background-position:0 0}to{background-position:500px 500px}}@keyframes snow2{from{background-position:0 0}to{background-position:400px 800px}}@keyframes snow3{from{background-position:0 0}to{background-position:-600px 900px}}.ac-container{width:auto;margin:10px auto 10px auto;text-align:left;overflow-y:auto;overflow-x:hidden;height:auto}.ac-container label{font-family:BebasNeueRegular,'Arial Narrow',Arial,sans-serif;padding:5px 20px;position:relative;z-index:20;display:block;cursor:pointer;color:#777;text-shadow:1px 1px 1px rgba(255,255,255,.8);line-height:30px;font-size:17px;background:#fff;background:-moz-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-webkit-gradient(linear,left top,left bottom,color-stop(1%,#fff),color-stop(100%,#eaeaea));background:-webkit-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-o-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-ms-linear-gradient(top,#fff 1%,#eaeaea 100%);background:linear-gradient(top,#fff 1%,#eaeaea 100%);filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea', GradientType=0 );box-shadow:0 0 0 1px rgba(155,155,155,.3),1px 0 0 0 rgba(255,255,255,.9) inset,0 2px 2px rgba(0,0,0,.1);box-sizing:content-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.ac-container label:hover{background:#fff}.ac-container input.menu:checked+label,.ac-container input.menu:checked+label:hover{background:#c6e1ec;color:#3d7489;text-shadow:0 1px 1px rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(155,155,155,.3),0 2px 2px rgba(0,0,0,.1)}.ac-container input.menu:checked+label:after,.ac-container label:hover:after{content:'';position:absolute;width:24px;height:24px;right:13px;top:7px;background:transparent url(app/css/styledLayerControl/images/arrow_down.png) no-repeat center center}.ac-container input.menu:checked+label:after{background-image:url(app/css/styledLayerControl/images/arrow_up.png)}.ac-container input.menu{display:none}.ac-container article{background:rgba(255,255,255,.5);margin-top:-1px;overflow:hidden;height:0;position:relative;z-index:10;-webkit-transition:height .3s ease-in-out,box-shadow .6s linear;-moz-transition:height .3s ease-in-out,box-shadow .6s linear;-o-transition:height .3s ease-in-out,box-shadow .6s linear;-ms-transition:height .3s ease-in-out,box-shadow .6s linear;transition:height .3s ease-in-out,box-shadow .6s linear}.ac-container input.menu:checked~article{-webkit-transition:height .5s ease-in-out,box-shadow .1s linear;-moz-transition:height .5s ease-in-out,box-shadow .1s linear;-o-transition:height .5s ease-in-out,box-shadow .1s linear;-ms-transition:height .5s ease-in-out,box-shadow .1s linear;transition:height .5s ease-in-out,box-shadow .1s linear;box-shadow:0 0 0 1px rgba(155,155,155,.3)}.ac-container input.menu:checked~article.ac-large{height:auto;max-height:200px;padding-top:5px;overflow-y:auto}.menu-item-radio{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.menu-item-checkbox{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.bt_delete{position:relative;float:right;background-image:url(app/css/styledLayerControl/images/delete.png);background-color:transparent;background-repeat:no-repeat;background-position:0 0;border:none;cursor:pointer;height:16px;width:16px;vertical-align:middle}.leaflet-control-layers{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}input[type=radio].leaflet-control-layers-selector,input[type=checkbox].leaflet-control-layers-selector{margin:3px 3px 0 5px}body,html{height:100%;margin:0}#map{height:100%}.info{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}.external{background-image:linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cg%20transform%3D%22translate%28-826.429%20-698.791%29%22%3E%3Crect%20width%3D%225.982%22%20height%3D%225.982%22%20x%3D%22826.929%22%20y%3D%22702.309%22%20fill%3D%22%23fff%22%20stroke%3D%22%2306c%22%2F%3E%3Cg%3E%3Cpath%20d%3D%22M831.194%20698.791h5.234v5.391l-1.571%201.545-1.31-1.31-2.725%202.725-2.689-2.689%202.808-2.808-1.311-1.311z%22%20fill%3D%22%2306f%22%2F%3E%3Cpath%20d%3D%22M835.424%20699.795l.022%204.885-1.817-1.817-2.881%202.881-1.228-1.228%202.881-2.881-1.851-1.851z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E);background-position:right center;background-repeat:no-repeat;padding-right:13px}.dataset-spatial-minimap{height:120px}.code-nowrap{word-wrap:normal;white-space:pre}.sidebar{position:absolute;top:0;bottom:0;width:100%;overflow:hidden;z-index:2000}.sidebar.collapsed{width:40px}@media (min-width:768px){.sidebar{top:10px;bottom:10px;transition:width .5s}}@media (min-width:768px) and (max-width:991px){.sidebar{width:305px}}@media (min-width:992px) and (max-width:1199px){.sidebar{width:390px}}@media (min-width:1200px){.sidebar{width:460px}}.sidebar-left{left:0}@media (min-width:768px){.sidebar-left{left:10px}}.sidebar-right{right:0}@media (min-width:768px){.sidebar-right{right:10px}}.sidebar-tabs{top:0;bottom:0;height:100%;background-color:#fff}.sidebar-left .sidebar-tabs{left:0}.sidebar-right .sidebar-tabs{right:0}.sidebar-tabs,.sidebar-tabs>ul{position:absolute;width:40px;margin:0;padding:0}.sidebar-tabs>li,.sidebar-tabs>ul>li{width:100%;height:40px;color:#333;font-size:12pt;overflow:hidden;transition:all 80ms}.sidebar-tabs>li:hover,.sidebar-tabs>ul>li:hover{color:#000;background-color:#eee}.sidebar-tabs>li.active,.sidebar-tabs>ul>li.active{color:#fff;background-color:#0074d9}.sidebar-tabs>li.disabled,.sidebar-tabs>ul>li.disabled{color:rgba(51,51,51,.4)}.sidebar-tabs>li.disabled:hover,.sidebar-tabs>ul>li.disabled:hover{background:0 0}.sidebar-tabs>li.disabled>a,.sidebar-tabs>ul>li.disabled>a{cursor:default}.sidebar-tabs>li>a,.sidebar-tabs>ul>li>a{display:block;width:100%;height:100%;line-height:40px;color:inherit;text-decoration:none;text-align:center}.sidebar-tabs>ul+ul{bottom:0}.sidebar-content{position:absolute;top:0;bottom:0;background-color:rgba(255,255,255,.95);overflow-x:hidden;overflow-y:auto}.sidebar-left .sidebar-content{left:40px;right:0}.sidebar-right .sidebar-content{left:0;right:40px}.sidebar.collapsed>.sidebar-content{overflow-y:hidden}.sidebar-pane{display:none;left:0;right:0;box-sizing:border-box;padding:10px 20px}.sidebar-pane.active{display:block}@media (min-width:768px) and (max-width:991px){.sidebar-pane{min-width:265px}}@media (min-width:992px) and (max-width:1199px){.sidebar-pane{min-width:350px}}@media (min-width:1200px){.sidebar-pane{min-width:420px}}.sidebar-header{margin:-10px -20px 0;height:40px;padding:0 20px;line-height:40px;font-size:14.4pt;color:#fff;background-color:#0074d9}.sidebar-right .sidebar-header{padding-left:40px}.sidebar-close{position:absolute;top:0;width:40px;height:40px;text-align:center;cursor:pointer}.sidebar-left .sidebar-close{right:0}.sidebar-right .sidebar-close{left:0}.sidebar-left~.sidebar-map{margin-left:40px}@media (min-width:768px){.sidebar-left~.sidebar-map{margin-left:0}}.sidebar-right~.sidebar-map{margin-right:40px}@media (min-width:768px){.sidebar-right~.sidebar-map{margin-right:0}}.sidebar{box-shadow:0 1px 5px rgba(0,0,0,.65)}.sidebar.leaflet-touch{box-shadow:none;border-right:2px solid rgba(0,0,0,.2)}@media (min-width:768px){.sidebar{border-radius:4px}.sidebar.leaflet-touch{border:2px solid rgba(0,0,0,.2)}}@media (min-width:768px){.sidebar-left~.sidebar-map .leaflet-left{transition:left .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-left~.sidebar-map .leaflet-left{left:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-left~.sidebar-map .leaflet-left{left:400px}}@media (min-width:1200px){.sidebar-left~.sidebar-map .leaflet-left{left:470px}}@media (min-width:768px){.sidebar-left.collapsed~.sidebar-map .leaflet-left{left:50px}}@media (min-width:768px){.sidebar-right~.sidebar-map .leaflet-right{transition:right .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-right~.sidebar-map .leaflet-right{right:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-right~.sidebar-map .leaflet-right{right:400px}}@media (min-width:1200px){.sidebar-right~.sidebar-map .leaflet-right{right:470px}}@media (min-width:768px){.sidebar-right.collapsed~.sidebar-map .leaflet-right{right:50px}}.jsplumb-connector{z-index:9040}.jsplumb-endpoint{z-index:9050}.jsplumb-overlay{z-index:9060}.main-remapper{position:fixed;width:100%;height:100%;left:0;top:0;z-index:1000}.remap-froms,.remap-tos{position:absolute;top:0;left:0;width:250px;height:100%;background-color:rgba(150,220,255,.8);color:#000;text-align:right}.remap-tos{left:auto;right:0;width:250px;overflow:hidden;color:#000;text-align:left}.centrecontent{position:absolute;opacity:.8;bottom:0;height:100%;left:250px;right:250px;background:#fff;text-align:center;vertical-align:bottom}.buttonholder{position:absolute;bottom:0;background-color:rgba(255,255,255,0);left:250px;right:250px;text-align:center}.cancel-remap-button,.remap-button{font-size:20pt;padding:20px;margin:20px}.map-from,.map-to{margin:2px;border-style:solid;border-width:thin;font-family:sans-serif;background-color:rgba(0,210,255,1)}.map-from{padding-right:10px}.map-to{padding-left:10px}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}.leaflet-image-layer,.leaflet-layer,.leaflet-map-pane,.leaflet-marker-icon,.leaflet-marker-pane,.leaflet-marker-shadow,.leaflet-overlay-pane,.leaflet-overlay-pane svg,.leaflet-popup-pane,.leaflet-shadow-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-tile-pane,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-ms-touch-action:none;touch-action:none}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container img{max-width:none!important}.leaflet-container img.leaflet-image-layer{max-width:15000px!important}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-tile-pane{z-index:2}.leaflet-objects-pane{z-index:3}.leaflet-overlay-pane{z-index:4}.leaflet-shadow-pane{z-index:5}.leaflet-marker-pane{z-index:6}.leaflet-popup-pane{z-index:7}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:7;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup,.leaflet-fade-anim .leaflet-tile{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;-o-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup,.leaflet-fade-anim .leaflet-tile-loaded{opacity:1}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);-o-transition:-o-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-touching .leaflet-zoom-animated,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-clickable{cursor:pointer}.leaflet-container{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-clickable,.leaflet-dragging .leaflet-container{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078A8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font:12px/1.5 \"Helvetica Neue\",Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box;background:#fff;background:rgba(255,255,255,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{margin:0 auto;width:40px;height:20px;position:relative;overflow:hidden}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:0 0}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678, M12=.70710678, M21=-.70710678, M22=.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}/*!\n * Bootstrap v3.3.6 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type=radio],input[type=checkbox]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:0 0!important;-webkit-box-shadow:none!important;box-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000!important}.label{border:1px solid #000}.table{border-collapse:collapse!important}.table td,.table th{background-color:#fff!important}.table-bordered td,.table-bordered th{border:1px solid #ddd!important}}@font-face{font-family:'Glyphicons Halflings';src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot);src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff2) format('woff2'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff) format('woff'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.ttf) format('truetype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-eur:before,.glyphicon-euro:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}:after,:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:transparent}body{font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#337ab7;text-decoration:none}a:focus,a:hover{color:#23527c;text-decoration:underline}a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:6px}.img-thumbnail{display:inline-block;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out}.img-circle{border-radius:50%}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}.h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}.h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}.h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}.h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}.lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}.mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}.page-header{padding-bottom:9px;margin:40px 0 20px;border-bottom:1px solid #eee}ol,ul{margin-top:0;margin-bottom:10px}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;margin-left:-5px;list-style:none}.list-inline>li{display:inline-block;padding-right:5px;padding-left:5px}dl{margin-top:0;margin-bottom:20px}dd,dt{line-height:1.42857143}dt{font-weight:700}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;overflow:hidden;clear:left;text-align:right;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[data-original-title],abbr[title]{cursor:help;border-bottom:1px dotted #777}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10px 20px;margin:0 0 20px;font-size:17.5px;border-left:5px solid #eee}blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{margin-bottom:0}blockquote .small,blockquote footer,blockquote small{display:block;font-size:80%;line-height:1.42857143;color:#777}blockquote .small:before,blockquote footer:before,blockquote small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;text-align:right;border-right:5px solid #eee;border-left:0}.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{content:''}.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{content:'\\00A0 \\2014'}address{margin-bottom:20px;font-style:normal;line-height:1.42857143}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:4px}kbd{padding:2px 4px;font-size:90%;color:#fff;background-color:#333;border-radius:3px;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}kbd kbd{padding:0;font-size:100%;font-weight:700;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:9.5px;margin:0 0 10px;font-size:13px;line-height:1.42857143;color:#333;word-break:break-all;word-wrap:break-word;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{margin-right:-15px;margin-left:-15px}.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{position:relative;min-height:1px;padding-right:15px;padding-left:15px}.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0}@media (min-width:768px){.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0}}@media (min-width:992px){.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0}}@media (min-width:1200px){.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#777;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:20px}.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}.table>caption+thead>tr:first-child>td,.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>td,.table>thead:first-child>tr:first-child>th{border-top:0}.table>tbody+tbody{border-top:2px solid #ddd}.table .table{background-color:#fff}.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:5px}.table-bordered{border:1px solid #ddd}.table-bordered>tbody>tr>td,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>td,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border:1px solid #ddd}.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=col-]{position:static;display:table-column;float:none}table td[class*=col-],table th[class*=col-]{position:static;display:table-cell;float:none}.table>tbody>tr.active>td,.table>tbody>tr.active>th,.table>tbody>tr>td.active,.table>tbody>tr>th.active,.table>tfoot>tr.active>td,.table>tfoot>tr.active>th,.table>tfoot>tr>td.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>thead>tr.active>th,.table>thead>tr>td.active,.table>thead>tr>th.active{background-color:#f5f5f5}.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr.active:hover>th,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover{background-color:#e8e8e8}.table>tbody>tr.success>td,.table>tbody>tr.success>th,.table>tbody>tr>td.success,.table>tbody>tr>th.success,.table>tfoot>tr.success>td,.table>tfoot>tr.success>th,.table>tfoot>tr>td.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>thead>tr.success>th,.table>thead>tr>td.success,.table>thead>tr>th.success{background-color:#dff0d8}.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr.success:hover>th,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover{background-color:#d0e9c6}.table>tbody>tr.info>td,.table>tbody>tr.info>th,.table>tbody>tr>td.info,.table>tbody>tr>th.info,.table>tfoot>tr.info>td,.table>tfoot>tr.info>th,.table>tfoot>tr>td.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>thead>tr.info>th,.table>thead>tr>td.info,.table>thead>tr>th.info{background-color:#d9edf7}.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr.info:hover>th,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover{background-color:#c4e3f3}.table>tbody>tr.warning>td,.table>tbody>tr.warning>th,.table>tbody>tr>td.warning,.table>tbody>tr>th.warning,.table>tfoot>tr.warning>td,.table>tfoot>tr.warning>th,.table>tfoot>tr>td.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>thead>tr.warning>th,.table>thead>tr>td.warning,.table>thead>tr>th.warning{background-color:#fcf8e3}.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr.warning:hover>th,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover{background-color:#faf2cc}.table>tbody>tr.danger>td,.table>tbody>tr.danger>th,.table>tbody>tr>td.danger,.table>tbody>tr>th.danger,.table>tfoot>tr.danger>td,.table>tfoot>tr.danger>th,.table>tfoot>tr>td.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>thead>tr.danger>th,.table>thead>tr>td.danger,.table>thead>tr>th.danger{background-color:#f2dede}.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr.danger:hover>th,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover{background-color:#ebcccc}.table-responsive{min-height:.01%;overflow-x:auto}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #ddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>td,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>thead>tr>th{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}}fieldset{min-width:0;padding:0;margin:0;border:0}legend{display:block;width:100%;padding:0;margin-bottom:20px;font-size:21px;line-height:inherit;color:#333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700}input[type=search]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=radio],input[type=checkbox]{margin:4px 0 0;margin-top:1px\\9;line-height:normal}input[type=file]{display:block}input[type=range]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=file]:focus,input[type=radio]:focus,input[type=checkbox]:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:7px;font-size:14px;line-height:1.42857143;color:#555}.form-control{display:block;width:100%;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control::-ms-expand{background-color:transparent;border:0}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=search]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=date].form-control,input[type=time].form-control,input[type=datetime-local].form-control,input[type=month].form-control{line-height:34px}.input-group-sm input[type=date],.input-group-sm input[type=time],.input-group-sm input[type=datetime-local],.input-group-sm input[type=month],input[type=date].input-sm,input[type=time].input-sm,input[type=datetime-local].input-sm,input[type=month].input-sm{line-height:30px}.input-group-lg input[type=date],.input-group-lg input[type=time],.input-group-lg input[type=datetime-local],.input-group-lg input[type=month],input[type=date].input-lg,input[type=time].input-lg,input[type=datetime-local].input-lg,input[type=month].input-lg{line-height:46px}}.form-group{margin-bottom:15px}.checkbox,.radio{position:relative;display:block;margin-top:10px;margin-bottom:10px}.checkbox label,.radio label{min-height:20px;padding-left:20px;margin-bottom:0;font-weight:400;cursor:pointer}.checkbox input[type=checkbox],.checkbox-inline input[type=checkbox],.radio input[type=radio],.radio-inline input[type=radio]{position:absolute;margin-top:4px\\9;margin-left:-20px}.checkbox+.checkbox,.radio+.radio{margin-top:-5px}.checkbox-inline,.radio-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;font-weight:400;vertical-align:middle;cursor:pointer}.checkbox-inline+.checkbox-inline,.radio-inline+.radio-inline{margin-top:0;margin-left:10px}fieldset[disabled] input[type=radio],fieldset[disabled] input[type=checkbox],input[type=radio].disabled,input[type=radio][disabled],input[type=checkbox].disabled,input[type=checkbox][disabled]{cursor:not-allowed}.checkbox-inline.disabled,.radio-inline.disabled,fieldset[disabled] .checkbox-inline,fieldset[disabled] .radio-inline{cursor:not-allowed}.checkbox.disabled label,.radio.disabled label,fieldset[disabled] .checkbox label,fieldset[disabled] .radio label{cursor:not-allowed}.form-control-static{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}.form-control-static.input-lg,.form-control-static.input-sm{padding-right:0;padding-left:0}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}select[multiple].input-sm,textarea.input-sm{height:auto}.form-group-sm .form-control{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.form-group-sm select.form-control{height:30px;line-height:30px}.form-group-sm select[multiple].form-control,.form-group-sm textarea.form-control{height:auto}.form-group-sm .form-control-static{height:30px;min-height:32px;padding:6px 10px;font-size:12px;line-height:1.5}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-lg{height:46px;line-height:46px}select[multiple].input-lg,textarea.input-lg{height:auto}.form-group-lg .form-control{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.form-group-lg select.form-control{height:46px;line-height:46px}.form-group-lg select[multiple].form-control,.form-group-lg textarea.form-control{height:auto}.form-group-lg .form-control-static{height:46px;min-height:38px;padding:11px 16px;font-size:18px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:42.5px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:34px;height:34px;line-height:34px;text-align:center;pointer-events:none}.form-group-lg .form-control+.form-control-feedback,.input-group-lg+.form-control-feedback,.input-lg+.form-control-feedback{width:46px;height:46px;line-height:46px}.form-group-sm .form-control+.form-control-feedback,.input-group-sm+.form-control-feedback,.input-sm+.form-control-feedback{width:30px;height:30px;line-height:30px}.has-success .checkbox,.has-success .checkbox-inline,.has-success .control-label,.has-success .help-block,.has-success .radio,.has-success .radio-inline,.has-success.checkbox label,.has-success.checkbox-inline label,.has-success.radio label,.has-success.radio-inline label{color:#3c763d}.has-success .form-control{border-color:#3c763d;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-success .form-control:focus{border-color:#2b542c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168}.has-success .input-group-addon{color:#3c763d;background-color:#dff0d8;border-color:#3c763d}.has-success .form-control-feedback{color:#3c763d}.has-warning .checkbox,.has-warning .checkbox-inline,.has-warning .control-label,.has-warning .help-block,.has-warning .radio,.has-warning .radio-inline,.has-warning.checkbox label,.has-warning.checkbox-inline label,.has-warning.radio label,.has-warning.radio-inline label{color:#8a6d3b}.has-warning .form-control{border-color:#8a6d3b;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-warning .form-control:focus{border-color:#66512c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b}.has-warning .input-group-addon{color:#8a6d3b;background-color:#fcf8e3;border-color:#8a6d3b}.has-warning .form-control-feedback{color:#8a6d3b}.has-error .checkbox,.has-error .checkbox-inline,.has-error .control-label,.has-error .help-block,.has-error .radio,.has-error .radio-inline,.has-error.checkbox label,.has-error.checkbox-inline label,.has-error.radio label,.has-error.radio-inline label{color:#a94442}.has-error .form-control{border-color:#a94442;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-error .form-control:focus{border-color:#843534;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483}.has-error .input-group-addon{color:#a94442;background-color:#f2dede;border-color:#a94442}.has-error .form-control-feedback{color:#a94442}.has-feedback label~.form-control-feedback{top:25px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#737373}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .form-control,.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .checkbox,.form-inline .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .checkbox label,.form-inline .radio label{padding-left:0}.form-inline .checkbox input[type=checkbox],.form-inline .radio input[type=radio]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .checkbox,.form-horizontal .checkbox-inline,.form-horizontal .radio,.form-horizontal .radio-inline{padding-top:7px;margin-top:0;margin-bottom:0}.form-horizontal .checkbox,.form-horizontal .radio{min-height:27px}.form-horizontal .form-group{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.form-horizontal .control-label{padding-top:7px;margin-bottom:0;text-align:right}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:11px;font-size:18px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:6px;font-size:12px}}.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px}.btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn.focus,.btn:focus,.btn:hover{color:#333;text-decoration:none}.btn.active,.btn:active{background-image:none;outline:0;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none;opacity:.65}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333;background-color:#fff;border-color:#ccc}.btn-default.focus,.btn-default:focus{color:#333;background-color:#e6e6e6;border-color:#8c8c8c}.btn-default:hover{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active.focus,.btn-default.active:focus,.btn-default.active:hover,.btn-default:active.focus,.btn-default:active:focus,.btn-default:active:hover,.open>.dropdown-toggle.btn-default.focus,.open>.dropdown-toggle.btn-default:focus,.open>.dropdown-toggle.btn-default:hover{color:#333;background-color:#d4d4d4;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled.focus,.btn-default.disabled:focus,.btn-default.disabled:hover,.btn-default[disabled].focus,.btn-default[disabled]:focus,.btn-default[disabled]:hover,fieldset[disabled] .btn-default.focus,fieldset[disabled] .btn-default:focus,fieldset[disabled] .btn-default:hover{background-color:#fff;border-color:#ccc}.btn-default .badge{color:#fff;background-color:#333}.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active.focus,.btn-primary.active:focus,.btn-primary.active:hover,.btn-primary:active.focus,.btn-primary:active:focus,.btn-primary:active:hover,.open>.dropdown-toggle.btn-primary.focus,.open>.dropdown-toggle.btn-primary:focus,.open>.dropdown-toggle.btn-primary:hover{color:#fff;background-color:#204d74;border-color:#122b40}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled.focus,.btn-primary.disabled:focus,.btn-primary.disabled:hover,.btn-primary[disabled].focus,.btn-primary[disabled]:focus,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary.focus,fieldset[disabled] .btn-primary:focus,fieldset[disabled] .btn-primary:hover{background-color:#337ab7;border-color:#2e6da4}.btn-primary .badge{color:#337ab7;background-color:#fff}.btn-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c}.btn-success.focus,.btn-success:focus{color:#fff;background-color:#449d44;border-color:#255625}.btn-success:hover{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active.focus,.btn-success.active:focus,.btn-success.active:hover,.btn-success:active.focus,.btn-success:active:focus,.btn-success:active:hover,.open>.dropdown-toggle.btn-success.focus,.open>.dropdown-toggle.btn-success:focus,.open>.dropdown-toggle.btn-success:hover{color:#fff;background-color:#398439;border-color:#255625}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled.focus,.btn-success.disabled:focus,.btn-success.disabled:hover,.btn-success[disabled].focus,.btn-success[disabled]:focus,.btn-success[disabled]:hover,fieldset[disabled] .btn-success.focus,fieldset[disabled] .btn-success:focus,fieldset[disabled] .btn-success:hover{background-color:#5cb85c;border-color:#4cae4c}.btn-success .badge{color:#5cb85c;background-color:#fff}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn-info.focus,.btn-info:focus{color:#fff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active.focus,.btn-info.active:focus,.btn-info.active:hover,.btn-info:active.focus,.btn-info:active:focus,.btn-info:active:hover,.open>.dropdown-toggle.btn-info.focus,.open>.dropdown-toggle.btn-info:focus,.open>.dropdown-toggle.btn-info:hover{color:#fff;background-color:#269abc;border-color:#1b6d85}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled.focus,.btn-info.disabled:focus,.btn-info.disabled:hover,.btn-info[disabled].focus,.btn-info[disabled]:focus,.btn-info[disabled]:hover,fieldset[disabled] .btn-info.focus,fieldset[disabled] .btn-info:focus,fieldset[disabled] .btn-info:hover{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#fff}.btn-warning{color:#fff;background-color:#f0ad4e;border-color:#eea236}.btn-warning.focus,.btn-warning:focus{color:#fff;background-color:#ec971f;border-color:#985f0d}.btn-warning:hover{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active.focus,.btn-warning.active:focus,.btn-warning.active:hover,.btn-warning:active.focus,.btn-warning:active:focus,.btn-warning:active:hover,.open>.dropdown-toggle.btn-warning.focus,.open>.dropdown-toggle.btn-warning:focus,.open>.dropdown-toggle.btn-warning:hover{color:#fff;background-color:#d58512;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled.focus,.btn-warning.disabled:focus,.btn-warning.disabled:hover,.btn-warning[disabled].focus,.btn-warning[disabled]:focus,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning.focus,fieldset[disabled] .btn-warning:focus,fieldset[disabled] .btn-warning:hover{background-color:#f0ad4e;border-color:#eea236}.btn-warning .badge{color:#f0ad4e;background-color:#fff}.btn-danger{color:#fff;background-color:#d9534f;border-color:#d43f3a}.btn-danger.focus,.btn-danger:focus{color:#fff;background-color:#c9302c;border-color:#761c19}.btn-danger:hover{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active.focus,.btn-danger.active:focus,.btn-danger.active:hover,.btn-danger:active.focus,.btn-danger:active:focus,.btn-danger:active:hover,.open>.dropdown-toggle.btn-danger.focus,.open>.dropdown-toggle.btn-danger:focus,.open>.dropdown-toggle.btn-danger:hover{color:#fff;background-color:#ac2925;border-color:#761c19}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled.focus,.btn-danger.disabled:focus,.btn-danger.disabled:hover,.btn-danger[disabled].focus,.btn-danger[disabled]:focus,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger.focus,fieldset[disabled] .btn-danger:focus,fieldset[disabled] .btn-danger:hover{background-color:#d9534f;border-color:#d43f3a}.btn-danger .badge{color:#d9534f;background-color:#fff}.btn-link{font-weight:400;color:#337ab7;border-radius:0}.btn-link,.btn-link.active,.btn-link:active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:active,.btn-link:focus,.btn-link:hover{border-color:transparent}.btn-link:focus,.btn-link:hover{color:#23527c;text-decoration:underline;background-color:transparent}.btn-link[disabled]:focus,.btn-link[disabled]:hover,fieldset[disabled] .btn-link:focus,fieldset[disabled] .btn-link:hover{color:#777;text-decoration:none}.btn-group-lg>.btn,.btn-lg{padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-group-xs>.btn,.btn-xs{padding:1px 5px;font-size:12px;line-height:1.5;border-radius:3px}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=button].btn-block,input[type=reset].btn-block,input[type=submit].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity .15s linear;-o-transition:opacity .15s linear;transition:opacity .15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease;-webkit-transition-duration:.35s;-o-transition-duration:.35s;transition-duration:.35s;-webkit-transition-property:height,visibility;-o-transition-property:height,visibility;transition-property:height,visibility}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid\\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropdown,.dropup{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;font-size:14px;text-align:left;list-style:none;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.15);border-radius:4px;-webkit-box-shadow:0 6px 12px rgba(0,0,0,.175);box-shadow:0 6px 12px rgba(0,0,0,.175)}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{color:#262626;text-decoration:none;background-color:#f5f5f5}.dropdown-menu>.active>a,.dropdown-menu>.active>a:focus,.dropdown-menu>.active>a:hover{color:#fff;text-decoration:none;background-color:#337ab7;outline:0}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{color:#777}.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{text-decoration:none;cursor:not-allowed;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{right:0;left:auto}.dropdown-menu-left{right:auto;left:0}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.42857143;color:#777;white-space:nowrap}.dropdown-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{content:\"\";border-top:0;border-bottom:4px dashed;border-bottom:4px solid\\9}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{right:0;left:auto}.navbar-right .dropdown-menu-left{right:auto;left:0}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group-vertical>.btn,.btn-group>.btn{position:relative;float:left}.btn-group-vertical>.btn.active,.btn-group-vertical>.btn:active,.btn-group-vertical>.btn:focus,.btn-group-vertical>.btn:hover,.btn-group>.btn.active,.btn-group>.btn:active,.btn-group>.btn:focus,.btn-group>.btn:hover{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-bottom-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-right:8px;padding-left:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-right:12px;padding-left:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-top-right-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{display:table-cell;float:none;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=buttons]>.btn input[type=radio],[data-toggle=buttons]>.btn input[type=checkbox],[data-toggle=buttons]>.btn-group>.btn input[type=radio],[data-toggle=buttons]>.btn-group>.btn input[type=checkbox]{position:absolute;clip:rect(0,0,0,0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=col-]{float:none;padding-right:0;padding-left:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:46px;line-height:46px}select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn,textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:30px;line-height:30px}select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{height:auto}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group .form-control:not(:first-child):not(:last-child),.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:6px 12px;font-size:14px;font-weight:400;line-height:1;color:#555;text-align:center;background-color:#eee;border:1px solid #ccc;border-radius:4px}.input-group-addon.input-sm{padding:5px 10px;font-size:12px;border-radius:3px}.input-group-addon.input-lg{padding:10px 16px;font-size:18px;border-radius:6px}.input-group-addon input[type=radio],.input-group-addon input[type=checkbox]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn-group:not(:last-child)>.btn,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:first-child>.btn-group:not(:first-child)>.btn,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle{border-top-left-radius:0;border-bottom-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:active,.input-group-btn>.btn:focus,.input-group-btn>.btn:hover{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{padding-left:0;margin-bottom:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:focus,.nav>li>a:hover{text-decoration:none;background-color:#eee}.nav>li.disabled>a{color:#777}.nav>li.disabled>a:focus,.nav>li.disabled>a:hover{color:#777;text-decoration:none;cursor:not-allowed;background-color:transparent}.nav .open>a,.nav .open>a:focus,.nav .open>a:hover{background-color:#eee;border-color:#337ab7}.nav .nav-divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #ddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.42857143;border:1px solid transparent;border-radius:4px 4px 0 0}.nav-tabs>li>a:hover{border-color:#eee #eee #ddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:focus,.nav-tabs>li.active>a:hover{color:#555;cursor:default;background-color:#fff;border:1px solid #ddd;border-bottom-color:transparent}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border-bottom-color:#fff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:4px}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:focus,.nav-pills>li.active>a:hover{color:#fff;background-color:#337ab7}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border-bottom-color:#fff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}.navbar{position:relative;min-height:50px;margin-bottom:20px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:4px}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{padding-right:15px;padding-left:15px;overflow-x:visible;-webkit-overflow-scrolling:touch;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block!important;height:auto!important;padding-bottom:0;overflow:visible!important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse{padding-right:0;padding-left:0}}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:200px}}.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-bottom,.navbar-fixed-top{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-bottom,.navbar-fixed-top{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;height:50px;padding:15px 15px;font-size:18px;line-height:20px}.navbar-brand:focus,.navbar-brand:hover{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;padding:9px 10px;margin-top:8px;margin-right:15px;margin-bottom:8px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:4px}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:7.5px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:20px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:20px}.navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:15px;padding-bottom:15px}}.navbar-form{padding:10px 15px;margin-top:8px;margin-right:-15px;margin-bottom:8px;margin-left:-15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1)}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .form-control,.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .checkbox,.navbar-form .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .checkbox label,.navbar-form .radio label{padding-left:0}.navbar-form .checkbox input[type=checkbox],.navbar-form .radio input[type=radio]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;padding-top:0;padding-bottom:0;margin-right:0;margin-left:0;border:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:8px;margin-bottom:8px}.navbar-btn.btn-sm{margin-top:10px;margin-bottom:10px}.navbar-btn.btn-xs{margin-top:14px;margin-bottom:14px}.navbar-text{margin-top:15px;margin-bottom:15px}@media (min-width:768px){.navbar-text{float:left;margin-right:15px;margin-left:15px}}@media (min-width:768px){.navbar-left{float:left!important}.navbar-right{float:right!important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#f8f8f8;border-color:#e7e7e7}.navbar-default .navbar-brand{color:#777}.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{color:#5e5e5e;background-color:transparent}.navbar-default .navbar-text{color:#777}.navbar-default .navbar-nav>li>a{color:#777}.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:focus,.navbar-default .navbar-nav>.disabled>a:hover{color:#ccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:#ddd}.navbar-default .navbar-toggle:focus,.navbar-default .navbar-toggle:hover{background-color:#ddd}.navbar-default .navbar-toggle .icon-bar{background-color:#888}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#e7e7e7}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:focus,.navbar-default .navbar-nav>.open>a:hover{color:#555;background-color:#e7e7e7}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#777}.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#ccc;background-color:transparent}}.navbar-default .navbar-link{color:#777}.navbar-default .navbar-link:hover{color:#333}.navbar-default .btn-link{color:#777}.navbar-default .btn-link:focus,.navbar-default .btn-link:hover{color:#333}.navbar-default .btn-link[disabled]:focus,.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:focus,fieldset[disabled] .navbar-default .btn-link:hover{color:#ccc}.navbar-inverse{background-color:#222;border-color:#080808}.navbar-inverse .navbar-brand{color:#9d9d9d}.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-text{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a:focus,.navbar-inverse .navbar-nav>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:focus,.navbar-inverse .navbar-nav>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:focus,.navbar-inverse .navbar-nav>.disabled>a:hover{color:#444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:#333}.navbar-inverse .navbar-toggle:focus,.navbar-inverse .navbar-toggle:hover{background-color:#333}.navbar-inverse .navbar-toggle .icon-bar{background-color:#fff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#101010}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:focus,.navbar-inverse .navbar-nav>.open>a:hover{color:#fff;background-color:#080808}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#444;background-color:transparent}}.navbar-inverse .navbar-link{color:#9d9d9d}.navbar-inverse .navbar-link:hover{color:#fff}.navbar-inverse .btn-link{color:#9d9d9d}.navbar-inverse .btn-link:focus,.navbar-inverse .btn-link:hover{color:#fff}.navbar-inverse .btn-link[disabled]:focus,.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:focus,fieldset[disabled] .navbar-inverse .btn-link:hover{color:#444}.breadcrumb{padding:8px 15px;margin-bottom:20px;list-style:none;background-color:#f5f5f5;border-radius:4px}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{padding:0 5px;color:#ccc;content:\"/\\00a0\"}.breadcrumb>.active{color:#777}.pagination{display:inline-block;padding-left:0;margin:20px 0;border-radius:4px}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:6px 12px;margin-left:-1px;line-height:1.42857143;color:#337ab7;text-decoration:none;background-color:#fff;border:1px solid #ddd}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination>li:last-child>a,.pagination>li:last-child>span{border-top-right-radius:4px;border-bottom-right-radius:4px}.pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{z-index:2;color:#23527c;background-color:#eee;border-color:#ddd}.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span,.pagination>.active>span:focus,.pagination>.active>span:hover{z-index:3;color:#fff;cursor:default;background-color:#337ab7;border-color:#337ab7}.pagination>.disabled>a,.pagination>.disabled>a:focus,.pagination>.disabled>a:hover,.pagination>.disabled>span,.pagination>.disabled>span:focus,.pagination>.disabled>span:hover{color:#777;cursor:not-allowed;background-color:#fff;border-color:#ddd}.pagination-lg>li>a,.pagination-lg>li>span{padding:10px 16px;font-size:18px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-top-left-radius:6px;border-bottom-left-radius:6px}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-top-right-radius:6px;border-bottom-right-radius:6px}.pagination-sm>li>a,.pagination-sm>li>span{padding:5px 10px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-top-left-radius:3px;border-bottom-left-radius:3px}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-top-right-radius:3px;border-bottom-right-radius:3px}.pager{padding-left:0;margin:20px 0;text-align:center;list-style:none}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:#fff;border:1px solid #ddd;border-radius:15px}.pager li>a:focus,.pager li>a:hover{text-decoration:none;background-color:#eee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:focus,.pager .disabled>a:hover,.pager .disabled>span{color:#777;cursor:not-allowed;background-color:#fff}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:focus,a.label:hover{color:#fff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#777}.label-default[href]:focus,.label-default[href]:hover{background-color:#5e5e5e}.label-primary{background-color:#337ab7}.label-primary[href]:focus,.label-primary[href]:hover{background-color:#286090}.label-success{background-color:#5cb85c}.label-success[href]:focus,.label-success[href]:hover{background-color:#449d44}.label-info{background-color:#5bc0de}.label-info[href]:focus,.label-info[href]:hover{background-color:#31b0d5}.label-warning{background-color:#f0ad4e}.label-warning[href]:focus,.label-warning[href]:hover{background-color:#ec971f}.label-danger{background-color:#d9534f}.label-danger[href]:focus,.label-danger[href]:hover{background-color:#c9302c}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:middle;background-color:#777;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-group-xs>.btn .badge,.btn-xs .badge{top:0;padding:1px 5px}a.badge:focus,a.badge:hover{color:#fff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#337ab7;background-color:#fff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#eee}.jumbotron .h1,.jumbotron h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:21px;font-weight:200}.jumbotron>hr{border-top-color:#d5d5d5}.container .jumbotron,.container-fluid .jumbotron{padding-right:15px;padding-left:15px;border-radius:6px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-right:60px;padding-left:60px}.jumbotron .h1,.jumbotron h1{font-size:63px}}.thumbnail{display:block;padding:4px;margin-bottom:20px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail a>img,.thumbnail>img{margin-right:auto;margin-left:auto}a.thumbnail.active,a.thumbnail:focus,a.thumbnail:hover{border-color:#337ab7}.thumbnail .caption{padding:9px;color:#333}.alert{padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:700}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.alert-success hr{border-top-color:#c9e2b3}.alert-success .alert-link{color:#2b542c}.alert-info{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.alert-info hr{border-top-color:#a6e1ec}.alert-info .alert-link{color:#245269}.alert-warning{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.alert-warning hr{border-top-color:#f7e1b5}.alert-warning .alert-link{color:#66512c}.alert-danger{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.alert-danger hr{border-top-color:#e4b9c0}.alert-danger .alert-link{color:#843534}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{height:20px;margin-bottom:20px;overflow:hidden;background-color:#f5f5f5;border-radius:4px;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.1)}.progress-bar{float:left;width:0;height:100%;font-size:12px;line-height:20px;color:#fff;text-align:center;background-color:#337ab7;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition:width .6s ease;-o-transition:width .6s ease;transition:width .6s ease}.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#5cb85c}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-warning{background-color:#f0ad4e}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-danger{background-color:#d9534f}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{overflow:hidden;zoom:1}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-body,.media-left,.media-right{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{padding-left:0;margin-bottom:20px}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#fff;border:1px solid #ddd}.list-group-item:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}a.list-group-item,button.list-group-item{color:#555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:focus,.list-group-item.disabled:hover{color:#777;cursor:not-allowed;background-color:#eee}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text{color:#777}.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#fff;background-color:#337ab7;border-color:#337ab7}.list-group-item.active .list-group-item-heading,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#c7ddef}.list-group-item-success{color:#3c763d;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#3c763d}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:focus,a.list-group-item-success:hover,button.list-group-item-success:focus,button.list-group-item-success:hover{color:#3c763d;background-color:#d0e9c6}a.list-group-item-success.active,a.list-group-item-success.active:focus,a.list-group-item-success.active:hover,button.list-group-item-success.active,button.list-group-item-success.active:focus,button.list-group-item-success.active:hover{color:#fff;background-color:#3c763d;border-color:#3c763d}.list-group-item-info{color:#31708f;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#31708f}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:focus,a.list-group-item-info:hover,button.list-group-item-info:focus,button.list-group-item-info:hover{color:#31708f;background-color:#c4e3f3}a.list-group-item-info.active,a.list-group-item-info.active:focus,a.list-group-item-info.active:hover,button.list-group-item-info.active,button.list-group-item-info.active:focus,button.list-group-item-info.active:hover{color:#fff;background-color:#31708f;border-color:#31708f}.list-group-item-warning{color:#8a6d3b;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#8a6d3b}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:focus,a.list-group-item-warning:hover,button.list-group-item-warning:focus,button.list-group-item-warning:hover{color:#8a6d3b;background-color:#faf2cc}a.list-group-item-warning.active,a.list-group-item-warning.active:focus,a.list-group-item-warning.active:hover,button.list-group-item-warning.active,button.list-group-item-warning.active:focus,button.list-group-item-warning.active:hover{color:#fff;background-color:#8a6d3b;border-color:#8a6d3b}.list-group-item-danger{color:#a94442;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#a94442}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:focus,a.list-group-item-danger:hover,button.list-group-item-danger:focus,button.list-group-item-danger:hover{color:#a94442;background-color:#ebcccc}a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-group-item-danger.active:hover,button.list-group-item-danger.active,button.list-group-item-danger.active:focus,button.list-group-item-danger.active:hover{color:#fff;background-color:#a94442;border-color:#a94442}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,.05);box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-left-radius:3px;border-top-right-radius:3px}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.panel-title>.small,.panel-title>.small>a,.panel-title>a,.panel-title>small,.panel-title>small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-left-radius:3px;border-top-right-radius:3px}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-left-radius:0;border-top-right-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.panel-collapse>.table,.panel>.table,.panel>.table-responsive>.table{margin-bottom:0}.panel>.panel-collapse>.table caption,.panel>.table caption,.panel>.table-responsive>.table caption{padding-right:15px;padding-left:15px}.panel>.table-responsive:first-child>.table:first-child,.panel>.table:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table:first-child>thead:first-child>tr:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child{border-top-left-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child{border-top-right-radius:3px}.panel>.table-responsive:last-child>.table:last-child,.panel>.table:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:3px}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #ddd}.panel>.table>tbody:first-child>tr:first-child td,.panel>.table>tbody:first-child>tr:first-child th{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{margin-bottom:0;border:0}.panel-group{margin-bottom:20px}.panel-group .panel{margin-bottom:0;border-radius:4px}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.list-group,.panel-group .panel-heading+.panel-collapse>.panel-body{border-top:1px solid #ddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #ddd}.panel-default{border-color:#ddd}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ddd}.panel-primary{border-color:#337ab7}.panel-primary>.panel-heading{color:#fff;background-color:#337ab7;border-color:#337ab7}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#337ab7}.panel-primary>.panel-heading .badge{color:#337ab7;background-color:#fff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#337ab7}.panel-success{border-color:#d6e9c6}.panel-success>.panel-heading{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d6e9c6}.panel-success>.panel-heading .badge{color:#dff0d8;background-color:#3c763d}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d6e9c6}.panel-info{border-color:#bce8f1}.panel-info>.panel-heading{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#bce8f1}.panel-info>.panel-heading .badge{color:#d9edf7;background-color:#31708f}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#bce8f1}.panel-warning{border-color:#faebcc}.panel-warning>.panel-heading{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#faebcc}.panel-warning>.panel-heading .badge{color:#fcf8e3;background-color:#8a6d3b}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#faebcc}.panel-danger{border-color:#ebccd1}.panel-danger>.panel-heading{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ebccd1}.panel-danger>.panel-heading .badge{color:#f2dede;background-color:#a94442}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ebccd1}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video{position:absolute;top:0;bottom:0;left:0;width:100%;height:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.05);box-shadow:inset 0 1px 1px rgba(0,0,0,.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,.15)}.well-lg{padding:24px;border-radius:6px}.well-sm{padding:9px;border-radius:3px}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;filter:alpha(opacity=20);opacity:.2}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;filter:alpha(opacity=50);opacity:.5}button.close{-webkit-appearance:none;padding:0;cursor:pointer;background:0 0;border:0}.modal-open{overflow:hidden}.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;display:none;overflow:hidden;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out;-webkit-transform:translate(0,-25%);-ms-transform:translate(0,-25%);-o-transform:translate(0,-25%);transform:translate(0,-25%)}.modal.in .modal-dialog{-webkit-transform:translate(0,0);-ms-transform:translate(0,0);-o-transform:translate(0,0);transform:translate(0,0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);box-shadow:0 3px 9px rgba(0,0,0,.5)}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000}.modal-backdrop.fade{filter:alpha(opacity=0);opacity:0}.modal-backdrop.in{filter:alpha(opacity=50);opacity:.5}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.42857143}.modal-body{position:relative;padding:15px}.modal-footer{padding:15px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-bottom:0;margin-left:5px}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,.5);box-shadow:0 5px 15px rgba(0,0,0,.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto}.tooltip.in{filter:alpha(opacity=90);opacity:.9}.tooltip.top{padding:5px 0;margin-top:-3px}.tooltip.right{padding:0 5px;margin-left:3px}.tooltip.bottom{padding:5px 0;margin-top:3px}.tooltip.left{padding:0 5px;margin-left:-3px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#fff;text-align:center;background-color:#000;border-radius:4px}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-left .tooltip-arrow{right:5px;bottom:0;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#000}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#000}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.2);border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,.2);box-shadow:0 5px 10px rgba(0,0,0,.2);line-break:auto}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{padding:8px 14px;margin:0;font-size:14px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;border-radius:5px 5px 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{content:\"\";border-width:10px}.popover.top>.arrow{bottom:-11px;left:50%;margin-left:-11px;border-top-color:#999;border-top-color:rgba(0,0,0,.25);border-bottom-width:0}.popover.top>.arrow:after{bottom:1px;margin-left:-10px;content:\" \";border-top-color:#fff;border-bottom-width:0}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-right-color:#999;border-right-color:rgba(0,0,0,.25);border-left-width:0}.popover.right>.arrow:after{bottom:-10px;left:1px;content:\" \";border-right-color:#fff;border-left-width:0}.popover.bottom>.arrow{top:-11px;left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#999;border-bottom-color:rgba(0,0,0,.25)}.popover.bottom>.arrow:after{top:1px;margin-left:-10px;content:\" \";border-top-width:0;border-bottom-color:#fff}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#999;border-left-color:rgba(0,0,0,.25)}.popover.left>.arrow:after{right:1px;bottom:-10px;content:\" \";border-right-width:0;border-left-color:#fff}.carousel{position:relative}.carousel-inner{position:relative;width:100%;overflow:hidden}.carousel-inner>.item{position:relative;display:none;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>a>img,.carousel-inner>.item>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.active.right,.carousel-inner>.item.next{left:0;-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0)}.carousel-inner>.item.active.left,.carousel-inner>.item.prev{left:0;-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0)}.carousel-inner>.item.active,.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right{left:0;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;bottom:0;left:0;width:15%;font-size:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);background-color:rgba(0,0,0,0);filter:alpha(opacity=50);opacity:.5}.carousel-control.left{background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,.0001)));background-image:linear-gradient(to right,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);background-repeat:repeat-x}.carousel-control.right{right:0;left:auto;background-image:-webkit-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.0001)),to(rgba(0,0,0,.5)));background-image:linear-gradient(to right,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);background-repeat:repeat-x}.carousel-control:focus,.carousel-control:hover{color:#fff;text-decoration:none;filter:alpha(opacity=90);outline:0;opacity:.9}.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{position:absolute;top:50%;z-index:5;display:inline-block;margin-top:-10px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{left:50%;margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{right:50%;margin-right:-10px}.carousel-control .icon-next,.carousel-control .icon-prev{width:20px;height:20px;font-family:serif;line-height:1}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;padding-left:0;margin-left:-30%;text-align:center;list-style:none}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;cursor:pointer;background-color:#000\\9;background-color:rgba(0,0,0,0);border:1px solid #fff;border-radius:10px}.carousel-indicators .active{width:12px;height:12px;margin:0;background-color:#fff}.carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:10;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{right:20%;left:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.btn-group-vertical>.btn-group:after,.btn-group-vertical>.btn-group:before,.btn-toolbar:after,.btn-toolbar:before,.clearfix:after,.clearfix:before,.container-fluid:after,.container-fluid:before,.container:after,.container:before,.dl-horizontal dd:after,.dl-horizontal dd:before,.form-horizontal .form-group:after,.form-horizontal .form-group:before,.modal-footer:after,.modal-footer:before,.modal-header:after,.modal-header:before,.nav:after,.nav:before,.navbar-collapse:after,.navbar-collapse:before,.navbar-header:after,.navbar-header:before,.navbar:after,.navbar:before,.pager:after,.pager:before,.panel-body:after,.panel-body:before,.row:after,.row:before{display:table;content:\" \"}.btn-group-vertical>.btn-group:after,.btn-toolbar:after,.clearfix:after,.container-fluid:after,.container:after,.dl-horizontal dd:after,.form-horizontal .form-group:after,.modal-footer:after,.modal-header:after,.nav:after,.navbar-collapse:after,.navbar-header:after,.navbar:after,.pager:after,.panel-body:after,.row:after{clear:both}.center-block{display:block;margin-right:auto;margin-left:auto}.pull-right{float:right!important}.pull-left{float:left!important}.hide{display:none!important}.show{display:block!important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none!important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-lg,.visible-md,.visible-sm,.visible-xs{display:none!important}.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block{display:none!important}@media (max-width:767px){.visible-xs{display:block!important}table.visible-xs{display:table!important}tr.visible-xs{display:table-row!important}td.visible-xs,th.visible-xs{display:table-cell!important}}@media (max-width:767px){.visible-xs-block{display:block!important}}@media (max-width:767px){.visible-xs-inline{display:inline!important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block!important}table.visible-sm{display:table!important}tr.visible-sm{display:table-row!important}td.visible-sm,th.visible-sm{display:table-cell!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block!important}table.visible-md{display:table!important}tr.visible-md{display:table-row!important}td.visible-md,th.visible-md{display:table-cell!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block!important}}@media (min-width:1200px){.visible-lg{display:block!important}table.visible-lg{display:table!important}tr.visible-lg{display:table-row!important}td.visible-lg,th.visible-lg{display:table-cell!important}}@media (min-width:1200px){.visible-lg-block{display:block!important}}@media (min-width:1200px){.visible-lg-inline{display:inline!important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block!important}}@media (max-width:767px){.hidden-xs{display:none!important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none!important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none!important}}@media (min-width:1200px){.hidden-lg{display:none!important}}.visible-print{display:none!important}@media print{.visible-print{display:block!important}table.visible-print{display:table!important}tr.visible-print{display:table-row!important}td.visible-print,th.visible-print{display:table-cell!important}}.visible-print-block{display:none!important}@media print{.visible-print-block{display:block!important}}.visible-print-inline{display:none!important}@media print{.visible-print-inline{display:inline!important}}.visible-print-inline-block{display:none!important}@media print{.visible-print-inline-block{display:inline-block!important}}@media print{.hidden-print{display:none!important}}");
 })
 (function(factory) {
   factory();
