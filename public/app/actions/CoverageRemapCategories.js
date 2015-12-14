@@ -399,7 +399,7 @@ export default class CoverageRemapCategories extends Action {
     remapper.populateFroms(sourceCategories)
     remapper.populateTos(targetCategories)
     if (mapping) {
-      remapper.linkCategories(mapping)
+      setTimeout(() => remapper.linkCategories(mapping), 100)
     }
     
     remapper.on('apply', data => {
