@@ -3,6 +3,7 @@ import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import {i18n} from '../util.js'
 import Eventable from '../Eventable.js'
+import {EXTERNAL_LINK} from '../actions/Action.js'
 
 let paneHtml = () => `
 <h1 class="sidebar-header">Workspace<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
@@ -90,6 +91,11 @@ const TEMPLATES = {
   'workspace-dataset-distribution-action': 
   `<span class="workspace-dataset-distribution-action">
     <button type="button" class="btn btn-primary"></button>
+  </span>`,
+  
+  'workspace-dataset-distribution-action-external-link': 
+  `<span class="workspace-dataset-distribution-action">
+    <a target="_new" class="btn btn-primary"><span class="glyphicon glyphicon-link"></span> <span class="action-label"></span></a>
   </span>`,
   
   'workspace-dataset-distribution-error': 
@@ -281,7 +287,7 @@ export default class WorkspacePane extends Eventable {
         addVirtualDataset(createVirtualDataset(url))
       })
       
-      let addBlobDataset = (content) => {
+      let addBlobDataset = content => {
         let blob = new Blob([content], {type: format.mediaTypes[0]})
         let url = URL.createObjectURL(blob)
         let virtualDataset = createVirtualDataset(url)
@@ -289,6 +295,7 @@ export default class WorkspacePane extends Eventable {
         var fn = ({dataset}) => {
           if (dataset === virtualDataset) {
             URL.revokeObjectURL(url)
+            delete dataset.distributions[0].url
             this.workspace.off('distributionsLoad', fn)
           }
         }
@@ -407,10 +414,17 @@ export default class WorkspacePane extends Eventable {
     
     if (distribution.actions) {
       for (let action of distribution.actions) {
-        let actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action'])
-        $('button', actionEl).fill(action.label).on('click', () => {
-          action.run()
-        })
+        let actionEl
+        if (action.type === EXTERNAL_LINK) {
+          actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action-external-link'])
+          $('.action-label', actionEl).fill(action.label)
+          $('a', actionEl).set('@href', action.run())
+        } else {
+          actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action'])
+          $('button', actionEl).fill(action.label).on('click', () => {
+            action.run()
+          })
+        }
         $('.distribution-actions', el).add(actionEl)
       }
     }

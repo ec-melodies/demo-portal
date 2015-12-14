@@ -76,16 +76,14 @@ export default class Workspace extends Eventable {
           distribution.formatImpl = format
           let promise = format.load(urlOrData).then(data => {
             let meta = format.getMetadata(data)
-            let actions = format.getActions(data)
             
-            // inject context into actions
-            for (let action of actions) {
-              action.context = {dataset, distribution, workspace: this}
-              
-              for (let key in this._staticActionContext) {
-                action.context[key] = this._staticActionContext[key]
-              }
+            let actionContext = {dataset, distribution, workspace: this}
+            for (let key in this._staticActionContext) {
+              actionContext[key] = this._staticActionContext[key]
             }
+            
+            let actions = format.getActions(data, actionContext)
+            
             distribution.metadata = meta
             distribution.actions = actions
             distribution.data = data

@@ -14,10 +14,11 @@ export default class Format extends Eventable {
     return mediaType && this.mediaTypes.some(m => mediaType.toLowerCase().startsWith(m))
   }
   
-  getActions (obj) {
+  getActions (obj, context) {
     let actions = []
     for (let actionClass of this.actionClasses) {
       let action = new actionClass(obj)
+      action.context = context
       if (action.isSupported) {
         actions.push(action)
         this.fire('actionCreate', {action})

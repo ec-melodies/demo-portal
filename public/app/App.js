@@ -13,6 +13,7 @@ import CoverageView from './actions/CoverageView.js'
 import CoverageRemapCategories from './actions/CoverageRemapCategories.js'
 import GeoJSONView from './actions/GeoJSONView.js'
 import WMSView from './actions/WMSView.js'
+import GoToSource from './actions/GoToSource.js'
 
 /**
  * Something like a main controller.
@@ -30,23 +31,29 @@ export default class App extends Eventable {
     this.formats = [
       new CovJSON([
          CoverageView,
-         CoverageRemapCategories
+         CoverageRemapCategories,
+         GoToSource
       ]),
       new CovCBOR([
          CoverageView,
-         CoverageRemapCategories
+         CoverageRemapCategories,
+         GoToSource
       ]),
       new CoverageData([
          CoverageView,
          CoverageRemapCategories
       ]),
       new GeoJSON([
-        GeoJSONView
+        GeoJSONView,
+        GoToSource
       ]),
       new WMS([
-        WMSView
+        WMSView,
+        GoToSource
       ]),
-      new CatRemap()
+      new CatRemap([
+        GoToSource
+      ])
     ]
     
     this.workspace = new Workspace(this.formats)

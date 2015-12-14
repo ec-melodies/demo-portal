@@ -2,6 +2,7 @@ import Eventable from '../Eventable.js'
 
 export const VIEW = 'view'
 export const PROCESS = 'process'
+export const EXTERNAL_LINK = 'external_link'
 
 /**
  * Every subclass must add a static `type` property with either VIEW or PROCESS.
