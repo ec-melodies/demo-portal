@@ -67,6 +67,7 @@ const TEMPLATES = {
   `<div class="panel workspace-dataset">
     <div class="panel-heading">
       <h4>
+        <span class="glyphicon glyphicon-asterisk virtual-dataset-icon"></span>
         <span class="dataset-title"></span>
         <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </h4>
@@ -384,6 +385,7 @@ export default class WorkspacePane extends Eventable {
       $(el).set('+panel-info')
     } else {
       $(el).set('+panel-default')
+      $('.virtual-dataset-icon', el).remove()
     }
     $('.dataset-title', el).fill(i18n(dataset.title))
     
