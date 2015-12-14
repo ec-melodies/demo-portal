@@ -20,7 +20,7 @@ export default class GeoJSON extends Format {
   getMetadata (geojson) {
     return {
       format: this.label,
-      type: geojson.type
+      content: geojson.type
     }
   }
   

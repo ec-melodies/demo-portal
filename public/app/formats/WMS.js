@@ -24,7 +24,7 @@ export default class WMS extends Format {
   getMetadata (data) {
     return {
       format: this.label,
-      type: data.layers.length + ' layers'
+      content: data.layers.length + ' layers'
     }
   }
 }

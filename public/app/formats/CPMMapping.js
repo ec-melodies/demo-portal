@@ -20,7 +20,7 @@ export default class CPMMapping extends Format {
   getMetadata (data) {
     return {
       format: this.label,
-      type: '1 Mapping'
+      content: '1 Mapping'
     }
   }
 }

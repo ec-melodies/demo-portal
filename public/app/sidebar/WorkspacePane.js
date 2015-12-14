@@ -82,7 +82,7 @@ const TEMPLATES = {
   `<li class="list-group-item workspace-dataset-distribution">
     <p>Title: <em class="distribution-title"></em></p>
     <p>Type: <span class="distribution-format"></span></p>
-    <p>Content: <span class="distribution-metadata"></span></p>
+    <p>Content: <span class="distribution-content"></span></p>
     <div class="distribution-actions"></div>
   </li>`,
   
@@ -401,7 +401,7 @@ export default class WorkspacePane extends Eventable {
     
     $('.distribution-title', el).fill(i18n(distribution.title))
     $('.distribution-format', el).fill(meta.format)
-    $('.distribution-metadata', el).fill(meta.type)
+    $('.distribution-content', el).fill(meta.content)
     
     if (distribution.actions) {
       for (let action of distribution.actions) {
