@@ -2,7 +2,7 @@
 
 A web portal which demonstrates the technologies developed and used within the MELODIES project.
 
-This page outlines the [development plan](./Development-Plan).
+This page outlines the [development plan](./wiki/Development-Plan).
 
 ### Acknowledgments
 
