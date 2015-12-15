@@ -2,7 +2,7 @@ import L from 'leaflet'
 import {$,HTML} from 'minified'
 
 let TEMPLATE = 
-`<div class="info">
+`<div class="info" style="clear:none">
   <strong class="select-title"></strong><br>
   <select></select>
 </div>`
