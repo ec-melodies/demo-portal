@@ -272,16 +272,17 @@ export default class CoverageRemapCategories extends Action {
   }
   
   _getCategoryMappingDefinition (sourceObservedProperty, targetObservedProperty) {
-    return {
+    let remapDef = {
       type: 'CategoryRemappingDefinition',
       label: {
         // TODO do this properly
         en: i18n(sourceObservedProperty.label) + ' / ' + i18n(targetObservedProperty.label) + ' Mapping'
       },
-      sourceObservedProperty: JSON.stringify(sourceObservedProperty, stringifyMapReplacer),
-      destinationObservedProperty: JSON.stringify(targetObservedProperty, stringifyMapReplacer),
+      sourceObservedProperty: JSON.parse(JSON.stringify(sourceObservedProperty, stringifyMapReplacer)),
+      destinationObservedProperty: JSON.parse(JSON.stringify(targetObservedProperty, stringifyMapReplacer)),
       categoryMappings: []
     }
+    return remapDef
   }
   
   _remapModal (sourceParameter) {
