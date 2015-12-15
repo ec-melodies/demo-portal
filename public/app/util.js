@@ -17,7 +17,9 @@ export function i18n (prop) {
 }
 
 export function stringifyMapReplacer (key, value) {
-  // TODO remove the right || condition once https://github.com/zloirock/core-js/issues/148 is fixed
+  // don't ask
+  // see https://github.com/DavidBruant/Map-Set.prototype.toJSON/issues/8
+  // and https://github.com/zloirock/core-js/issues/148
   if (value instanceof Map || ((key === 'label' || key === 'description') && Array.isArray(value))) {
     let obj = {}
     for (let [k,v] of value) {
