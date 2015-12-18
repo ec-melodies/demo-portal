@@ -34640,18 +34640,6 @@ $__System.register('45', ['11', '13', '21', '23', 'b', 'c', 'd', 'e', '1f', 'f',
             }).then(function () {
               return _this._subsetByCoordinatePreference();
             }).then(function () {
-              //  the goal is to avoid reloading data when approximating palette extent via subsetting
-              //  but: memory has to be freed when the layer is removed from the map
-              //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
-              _this.subsetCov.cacheRanges = true;
-            }).then(function () {
-              return _this.subsetCov.loadRange(_this.param.key);
-            }).then(function (subsetRange) {
-              _this.subsetRange = subsetRange;
-              if (!_this.param.observedProperty.categories) {
-                return _this._updatePaletteExtent(_this._paletteExtent);
-              }
-            }).then(function () {
               _this.errored = false;
               _this.fire('add');
               _get(Object.getPrototypeOf(Grid.prototype), 'onAdd', _this).call(_this, map);
@@ -34716,6 +34704,13 @@ $__System.register('45', ['11', '13', '21', '23', 'b', 'c', 'd', 'e', '1f', 'f',
                 return;
               }
               var vals = _this2.domain.axes.get(axis).values;
+              if (axis === 't') {
+                // convert to unix timestamps as we need numbers
+                val = val.getTime();
+                vals = vals.map(function (t) {
+                  return new Date(t).getTime();
+                });
+              }
               var idx = arrays.indexOfNearest(vals, val);
               return idx;
             };
@@ -34752,8 +34747,24 @@ $__System.register('45', ['11', '13', '21', '23', 'b', 'c', 'd', 'e', '1f', 'f',
               }
             }
 
+            this.fire('dataLoading'); // for supporting loading spinners
             return this.cov.subsetByIndex({ t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
               _this2.subsetCov = subsetCov;
+              //  the goal is to avoid reloading data when approximating palette extent via subsetting
+              //  but: memory has to be freed when the layer is removed from the map
+              //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
+              _this2.subsetCov.cacheRanges = true;
+              return _this2.subsetCov.loadRange(_this2.param.key);
+            }).then(function (subsetRange) {
+              _this2.subsetRange = subsetRange;
+              if (!_this2.param.observedProperty.categories) {
+                return _this2._updatePaletteExtent(_this2._paletteExtent);
+              }
+            }).then(function () {
+              _this2.fire('dataLoad');
+            })['catch'](function (e) {
+              _this2.fire('dataLoad');
+              throw e;
             });
           }
         }, {
@@ -35122,7 +35133,17 @@ $__System.register('45', ['11', '13', '21', '23', 'b', 'c', 'd', 'e', '1f', 'f',
            * or null if the grid has no time axis.
            */
           get: function get() {
-            return this._axesSubset.t.coord;
+            return new Date(this._axesSubset.t.coord);
+          }
+        }, {
+          key: 'timeSlices',
+          get: function get() {
+            if (!this.domain.axes.has('t')) {
+              throw new Error('No time axis found');
+            }
+            return this.domain.axes.get('t').values.map(function (t) {
+              return new Date(t);
+            });
           }
 
           /**
@@ -35153,6 +35174,14 @@ $__System.register('45', ['11', '13', '21', '23', 'b', 'c', 'd', 'e', '1f', 'f',
            */
           get: function get() {
             return this._axesSubset.z.coord;
+          }
+        }, {
+          key: 'verticalSlices',
+          get: function get() {
+            if (!this.domain.axes.has('z')) {
+              throw new Error('No vertical axis found');
+            }
+            return this.domain.axes.get('z').values;
           }
         }, {
           key: 'palette',
