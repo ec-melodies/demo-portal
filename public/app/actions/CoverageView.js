@@ -4,6 +4,7 @@ import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
 
 import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
+import SelectControl from './SelectControl.js'
 
 export default class CoverageView extends Action {
   constructor (data) {
@@ -45,6 +46,33 @@ export default class CoverageView extends Action {
               position: 'bottomright'
             }).addTo(map)
           }
+          
+          if (covLayer.time !== null) {
+            let choices = covLayer.timeSlices.map(time => ({
+              value: time.toISOString(),
+              label: time.toISOString()
+            }))
+            new SelectControl(covLayer, choices, {title: 'Time axis'})
+              .on('change', event => {
+                let time = new Date(event.value)
+                covLayer.time = time
+              })
+              .addTo(map)
+          }
+          
+          if (covLayer.vertical !== null) {
+            let choices = covLayer.verticalSlices.map(val => ({
+              value: val,
+              label: val
+            }))
+            new SelectControl(covLayer, choices, {title: 'Vertical axis'})
+              .on('change', event => {
+                let vertical = parseFloat(event.value)
+                covLayer.vertical = vertical
+              })
+              .addTo(map)
+          }
+         
         })
         .on('dataLoading', () => this.fire('loading'))
         .on('dataLoad', () => this.fire('load'))
@@ -58,7 +86,6 @@ export default class CoverageView extends Action {
         
       if (!firstDisplayed) {
         firstDisplayed = true
-        window.layer = layer
         map.addLayer(layer)
       }
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
