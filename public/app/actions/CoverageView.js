@@ -1,5 +1,6 @@
 import LayerFactory from 'leaflet-coverage'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
+import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
 
 import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
@@ -47,9 +48,18 @@ export default class CoverageView extends Action {
         })
         .on('dataLoading', () => this.fire('loading'))
         .on('dataLoad', () => this.fire('load'))
+        
+      // TODO is this a good way to do that?
+      if (cov.domainType.endsWith('Profile')) {
+        // we do that outside of the above 'add' handler since we want to register only once,
+        // not every time the layer is added to the map
+        layer.on('click', () => new ProfilePlot(cov, opts).addTo(map))
+      }
+        
       if (!firstDisplayed) {
         firstDisplayed = true
-        layer.addTo(map)
+        window.layer = layer
+        map.addLayer(layer)
       }
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
       let formatLabel = this.context.distribution.formatImpl.shortLabel
