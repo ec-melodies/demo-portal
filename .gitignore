@@ -4,3 +4,4 @@
 /.tern-project
 /bundle.src.js
 /bundle.min.js
+/npm-debug.log
