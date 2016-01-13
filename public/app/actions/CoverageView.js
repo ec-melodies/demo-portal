@@ -1,5 +1,6 @@
 import LayerFactory from 'leaflet-coverage'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
+import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
 
 import {default as Action, VIEW} from './Action.js'
@@ -48,16 +49,7 @@ export default class CoverageView extends Action {
           }
           
           if (covLayer.time !== null) {
-            let choices = covLayer.timeSlices.map(time => ({
-              value: time.toISOString(),
-              label: time.toISOString()
-            }))
-            new SelectControl(covLayer, choices, {title: 'Time axis'})
-              .on('change', event => {
-                let time = new Date(event.value)
-                covLayer.time = time
-              })
-              .addTo(map)
+            new TimeAxis(covLayer).addTo(map)
           }
           
           if (covLayer.vertical !== null) {
