@@ -26,15 +26,15 @@ export default class Eventable {
 /**
  * A Map which returns a default value for get(key) if key does not exist.
  */
-class DefaultMap extends Map {
+class DefaultMap {
   constructor (defaultFactory, iterable) {
-    super(iterable)
+    this._map = new Map(iterable)
     this.defaultFactory = defaultFactory
   }
   get (key) {
-    if (!this.has(key)) {
-      this.set(key, this.defaultFactory())
+    if (!this._map.has(key)) {
+      this._map.set(key, this.defaultFactory())
     }
-    return super.get(key)
+    return this._map.get(key)
   }
 }
