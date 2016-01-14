@@ -19,7 +19,8 @@ export default class CoverageView extends Action {
   }
   
   get isSupported () {
-    return true
+    // TODO support collections
+    return !this.cov.coverages || this.cov.coverages.length === 1
   }
   
   run () {
@@ -33,6 +34,10 @@ export default class CoverageView extends Action {
     // TODO support collections
     
     let cov = this.cov
+    if (cov.coverages) {
+      cov = cov.coverages[0]
+    }
+    
     let firstDisplayed = false
     // each parameter becomes a layer
     for (let key of cov.parameters.keys()) {
