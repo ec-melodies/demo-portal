@@ -173,7 +173,12 @@ const TEMPLATES = {
 export default class CoverageRemapCategories extends Action {
   constructor (data) {
     super()
-    this.cov = data
+    
+    if (this._isSingleCoverage(data)) {
+      this.cov = this._getSingleCoverage(data)
+    } else {
+      this.cov = data
+    }
     
     this.label = 'Remap Categories'
     this.icon = '<span class="glyphicon glyphicon-random"></span>'
@@ -182,12 +187,31 @@ export default class CoverageRemapCategories extends Action {
   get isSupported () {
     // Use Case: Category Remapping for grids
     // Current restriction: data is single grid coverage with one or more categorical parameters
-    if (!('coverages' in this.cov) && this.cov.domainType.endsWith('Grid')) {
+    if (this._isSingleCoverage(this.cov) && this.cov.domainType.endsWith('Grid')) {
       if (this._getCategoricalParams().length > 0) {
         return true
       }
     }
     return false
+  }
+  
+  _isSingleCoverage (cov) {
+    try {
+      this._getSingleCoverage(cov)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+  
+  _getSingleCoverage (cov) {
+    if (!cov.coverages) {
+      return cov
+    } else if (cov.coverages.length === 1) {
+      return cov.coverages[0]
+    } else {
+      throw new Error('not a single coverage')
+    }
   }
   
   _getCategoricalParams() {
