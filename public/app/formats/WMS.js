@@ -35,10 +35,24 @@ function readLayers (wmsEndpoint) {
 
 function readCapabilities (wmsEndpoint) { 
   // TODO rewrite with fetch
+  var uriParts = document.createElement('a')
+  uriParts.href = wmsEndpoint
+  let user = uriParts.username
+  let pass = uriParts.password
+  if (user) {
+    // remove user and pass from URL and send as Auth header instead
+    let parts = /^(https?:\/\/)(.*)@(.*)/.exec(wmsEndpoint)
+    wmsEndpoint = parts[1] + parts[3]
+  }
   return new Promise((resolve, reject) => {
     let req = new XMLHttpRequest()
     req.open('GET', wmsEndpoint + '?service=wms&version=1.1.1&request=GetCapabilities')
     req.overrideMimeType('text/xml')
+    
+    if (user) {
+      let cred = user + ':' + pass
+      req.setRequestHeader('Authorization', 'Basic ' + btoa(cred)) 
+    }
     
     req.addEventListener('load', () => {
       let xml = req.responseXML
