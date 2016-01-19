@@ -45,7 +45,7 @@ export default class CoverageView extends Action {
       let layer = LayerFactory()(cov, opts)
         .on('add', e => {
           let covLayer = e.target
-          map.fitBounds(covLayer.getBounds())
+          //map.fitBounds(covLayer.getBounds())
           
           if (covLayer.palette) {
             CoverageLegend(layer, {

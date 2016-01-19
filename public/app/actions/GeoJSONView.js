@@ -37,7 +37,7 @@ export default class GeoJSONView extends Action {
     let distTitle = i18n(this.context.distribution.title)
 
     map.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, {groupName: datasetTitle, expanded: true})
-    map.fitBounds(layer.getBounds())
+    //map.fitBounds(layer.getBounds())
     this.layers.push(layer)
   }
   
