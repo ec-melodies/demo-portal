@@ -296,6 +296,18 @@ export default class CoverageRemapCategories extends Action {
   }
   
   _getCategoryMappingDefinition (sourceObservedProperty, targetObservedProperty) {
+    let categoryMappings = []
+    // match up identical categories
+    for (let category of sourceObservedProperty.categories) {
+      let match = targetObservedProperty.categories.some(c => c.id === category.id)
+      if (match) {
+        categoryMappings.push({
+          sourceCategory: category.id,
+          destinationCategory: category.id
+        })
+      }
+    }
+    
     let remapDef = {
       type: 'CategoryRemappingDefinition',
       label: {
@@ -304,7 +316,7 @@ export default class CoverageRemapCategories extends Action {
       },
       sourceObservedProperty: JSON.parse(JSON.stringify(sourceObservedProperty, stringifyMapReplacer)),
       destinationObservedProperty: JSON.parse(JSON.stringify(targetObservedProperty, stringifyMapReplacer)),
-      categoryMappings: []
+      categoryMappings
     }
     return remapDef
   }
