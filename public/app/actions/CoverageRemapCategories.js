@@ -6,7 +6,7 @@ import 'category-remapper/css/remapper.css!'
 
 import {withCategories} from 'leaflet-coverage/util/transform.js'
 
-import {i18n, stringifyMapReplacer, parseLanguageMapReviver} from '../util.js'
+import {i18n} from '../util.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
 import CoverageData from '../formats/CoverageData.js'
 import CatRemap from '../formats/CatRemap.js'
@@ -314,8 +314,8 @@ export default class CoverageRemapCategories extends Action {
         // TODO do this properly
         en: i18n(sourceObservedProperty.label) + ' / ' + i18n(targetObservedProperty.label) + ' Mapping'
       },
-      sourceObservedProperty: JSON.parse(JSON.stringify(sourceObservedProperty, stringifyMapReplacer)),
-      destinationObservedProperty: JSON.parse(JSON.stringify(targetObservedProperty, stringifyMapReplacer)),
+      sourceObservedProperty: sourceObservedProperty,
+      destinationObservedProperty: targetObservedProperty,
       categoryMappings
     }
     return remapDef
@@ -395,7 +395,7 @@ export default class CoverageRemapCategories extends Action {
     }
       
     let sourceParameter = parameter
-    let targetObservedProp = JSON.parse(JSON.stringify(remapDef.destinationObservedProperty), parseLanguageMapReviver)
+    let targetObservedProp = remapDef.destinationObservedProperty
     let mapping = new Map(remapDef.categoryMappings.map(m => [m.sourceCategory, m.destinationCategory]))
     
     this._showRemapper(sourceParameter.observedProperty, targetObservedProp, mapping, data => {
@@ -424,10 +424,10 @@ export default class CoverageRemapCategories extends Action {
       })
       
       let virtualDataset = {
-        title: new Map([['en', prefixTitle + i18n(this.context.dataset.title)]]),
+        title: { en: prefixTitle + i18n(this.context.dataset.title) },
         virtual: true,
         distributions: [{
-          title: new Map([['en', prefixTitle + i18n(this.context.distribution.title)]]),
+          title: { en: prefixTitle + i18n(this.context.distribution.title) },
           mediaType: 'coveragedata',
           data: remappedCov
         }]

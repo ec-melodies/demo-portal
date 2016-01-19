@@ -181,9 +181,9 @@ function transform_i18n (obj, key) {
     obj[key + i18n][UNKNOWN_LANG] = obj[key]
   }
   if (obj[key + i18n]) {
-    let map = new Map()
+    let map = {}
     for (let lang in obj[key + i18n]) {
-      map.set(lang, obj[key + i18n][lang])
+      map[lang] = obj[key + i18n][lang]
     }
     obj[key] = map
     delete obj[key + i18n]

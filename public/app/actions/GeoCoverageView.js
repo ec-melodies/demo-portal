@@ -1,4 +1,5 @@
 import LayerFactory from 'leaflet-coverage'
+import {getLayerClass} from 'leaflet-coverage'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
@@ -7,7 +8,10 @@ import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
 import SelectControl from './SelectControl.js'
 
-export default class CoverageView extends Action {
+/**
+ * Displays geospatial coverages on a map.
+ */
+export default class GeoCoverageView extends Action {
   constructor (data) {
     super()
     this.cov = data
@@ -20,7 +24,18 @@ export default class CoverageView extends Action {
   
   get isSupported () {
     // TODO support collections
-    return !this.cov.coverages || this.cov.coverages.length === 1
+    if (this.cov.coverages && this.cov.coverages.length > 1) {
+      return false
+    }
+    let cov = this.cov
+    if (cov.coverages) {
+      cov = cov.coverages[0]
+    }
+    if (!getLayerClass(cov)) {
+      return false
+    }
+
+    return true
   }
   
   run () {
@@ -106,4 +121,4 @@ export default class CoverageView extends Action {
   }
 }
 
-CoverageView.type = VIEW
+GeoCoverageView.type = VIEW
