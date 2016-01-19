@@ -10,6 +10,7 @@ import CatRemap from './formats/CatRemap.js'
 import WMS from './formats/WMS.js'
 
 import GeoCoverageView from './actions/GeoCoverageView.js'
+import StatisticalCoverageView from './actions/StatisticalCoverageView.js'
 import CoverageRemapCategories from './actions/CoverageRemapCategories.js'
 import CoverageCategoriesStatistics from './actions/CoverageCategoriesStatistics.js'
 import GeoJSONView from './actions/GeoJSONView.js'
@@ -32,18 +33,21 @@ export default class App extends Eventable {
     this.formats = [
       new CovJSON([
          GeoCoverageView,
+         StatisticalCoverageView,
          CoverageRemapCategories,
          CoverageCategoriesStatistics,
          GoToSource
       ]),
       new CovCBOR([
          GeoCoverageView,
+         StatisticalCoverageView,
          CoverageRemapCategories,
          CoverageCategoriesStatistics,
          GoToSource
       ]),
       new CoverageData([
          GeoCoverageView,
+         StatisticalCoverageView,
          CoverageRemapCategories,
          CoverageCategoriesStatistics
       ]),

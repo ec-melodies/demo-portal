@@ -12,7 +12,7 @@ import {i18n} from '../util.js'
 import * as rangeUtil from 'leaflet-coverage/util/range.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 
-import {default as Action, VIEW, PROCESS} from './Action.js'
+import {default as Action, PROCESS} from './Action.js'
 
 let html = `
 <div class="modal fade" id="statisticsOptionsModal" tabindex="-1" role="dialog" aria-labelledby="statisticsOptionsModalLabel">
@@ -20,7 +20,7 @@ let html = `
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="statisticsOptionsModalLabel">Select the reference periods</h4>
+        <h4 class="modal-title" id="statisticsOptionsModalLabel">Select reference periods</h4>
       </div>
       <div class="modal-body">
         
@@ -263,10 +263,14 @@ export default class CoverageCategoriesStatistics extends Action {
       // convert to [category, count] array
       let categoryCounts = []
       for (let category of param.observedProperty.categories) {
-        let count = param.categoryEncoding.get(category.id)
-          .map(val => rawCounts.get(val))
-          .reduce((c1, c2) => c1 + c2)
-        categoryCounts.push([category, count])
+        if (!param.categoryEncoding.has(category.id)) {
+          categoryCounts.push([category, 0])
+        } else {
+          let count = param.categoryEncoding.get(category.id)
+            .map(val => rawCounts.get(val))
+            .reduce((c1, c2) => c1 + c2)
+          categoryCounts.push([category, count])
+        }
       }
       
       // convert to ratios
@@ -362,10 +366,10 @@ export default class CoverageCategoriesStatistics extends Action {
       // add as dataset
       let prefixTitle = 'Statistics of '
       let virtualDataset = {
-        title: new Map([['en', prefixTitle + i18n(this.context.dataset.title)]]),
+        title: { en: prefixTitle + i18n(this.context.dataset.title) },
         virtual: true,
         distributions: [{
-          title: new Map([['en', prefixTitle + i18n(this.context.dataset.title)]]),
+          title: { en: prefixTitle + i18n(this.context.dataset.title) },
           mediaType: 'application/prs.coverage+json',
           url: blobUrl
         }]
