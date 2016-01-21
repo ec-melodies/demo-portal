@@ -267,10 +267,10 @@ export default class WorkspacePane extends Eventable {
       let createVirtualDataset = (url) => {
         let datasetTitle = $('.dataset-title', modalEl).get('value') || '(No title)'
         let virtualDataset = {
-          title: new Map([['en', datasetTitle]]),
+          title: {en: datasetTitle},
           virtual: true,
           distributions: [{
-            title: new Map([['en', 'Data']]),
+            title: {en: 'Data'},
             mediaType: format.mediaTypes[0],
             url
           }]
