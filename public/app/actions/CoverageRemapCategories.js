@@ -491,7 +491,7 @@ export default class CoverageRemapCategories extends Action {
    * Returns all distributions which have categories, including categories contained in coverage data.
    */
   _findCategoryDistributions () {
-    return this._filterDistributions(dist => {
+    return this.context.workspace.filterDistributions(dist => {
       if (dist.formatImpl instanceof CoverageData) {
         let cov = dist.data
         // check for categorical parameters
@@ -511,7 +511,7 @@ export default class CoverageRemapCategories extends Action {
    */
   _findRemappingDistributions (sourceParameter) {
     let sourceCats = new Set(sourceParameter.observedProperty.categories.map(c => c.id))
-    return this._filterDistributions(dist => {
+    return this.context.workspace.filterDistributions(dist => {
       if (!(dist.formatImpl instanceof CatRemap)) return false
       return dist.data.categoryMappings.some(m => sourceCats.has(m.sourceCategory))
     })
@@ -528,19 +528,6 @@ export default class CoverageRemapCategories extends Action {
     if (!this.cov.transformations) return false
     let trans = this.cov.transformations[this.cov.transformations.length-1]
     return trans.operation.type === 'CategoryRemappingOperation'
-  }
-   
-  _filterDistributions (matchFn) {
-    let datasets = this.context.workspace.datasets
-    let dists = []
-    for (let dataset of datasets) {
-      for (let dist of dataset.distributions) {
-        if (matchFn(dist)) {
-          dists.push({distribution: dist, dataset})
-        }
-      }
-    }
-    return dists
   }
   
 }

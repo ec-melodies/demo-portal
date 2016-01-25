@@ -49,6 +49,18 @@ export default class Workspace extends Eventable {
   get datasets () {
     return [...this._datasets.values()]
   }
+  
+  filterDistributions (matchFn) {
+    let dists = []
+    for (let dataset of this.datasets) {
+      for (let dist of dataset.distributions) {
+        if (matchFn(dist)) {
+          dists.push({distribution: dist, dataset})
+        }
+      }
+    }
+    return dists
+  }
     
   /**
    * Loads analysable distributions of a dataset and stores metadata about them
