@@ -444,7 +444,7 @@ export default class CoverageRemapCategories extends Action {
       }
       workspace.on('distributionsLoad', done)
       
-      workspace.addDataset(virtualDataset)
+      workspace.addDataset(virtualDataset, this.context.dataset)
       workspace.requestFocus(virtualDataset)
       
       if (oncreate) oncreate()

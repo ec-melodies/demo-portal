@@ -18,13 +18,20 @@ export default class Workspace extends Eventable {
     }
   }
   
-  addDataset (dataset) {
+  /**
+   * @param {object} dataset The dataset to add.
+   * @param {object} [parent] 
+   *   The parent dataset out of which the dataset creation was triggered.
+   *   This is currently used for UI purposes only to insert the new dataset at
+   *   an appropriate place.
+   */
+  addDataset (dataset, parent) {
     if (!dataset.id) {
       dataset.id = new Date().getTime()
     }
     if (!this._datasets.has(dataset.id)) {
       this._datasets.set(dataset.id, dataset)
-      this.fire('add', {dataset})
+      this.fire('add', {dataset, parent})
       this._loadDistribution(dataset)
     }
   }

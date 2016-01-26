@@ -68,7 +68,6 @@ const TEMPLATES = {
   `<div class="panel workspace-dataset">
     <div class="panel-heading">
       <h4>
-        <span class="glyphicon glyphicon-asterisk virtual-dataset-icon"></span>
         <span class="dataset-title"></span>
         <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </h4>
@@ -156,11 +155,22 @@ const TEMPLATES = {
 
 let css = `
 <style>
+.virtual-dataset > .panel-heading {
+  background: repeating-linear-gradient( -45deg, #d9edf7, #d9edf7 10px, #CCE8F4 10px, #CCE8F4 20px );
+}
 .workspace-dataset-list, .load-input-button, .json-parse-error {
   margin-top: 20px;
 }
 .format-button {
   margin-bottom: 15px;
+}
+.virtual-dataset {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 20s;
+}
+.blind-in {
+  max-height: 10000px;
 }
 @keyframes flash-icon {
   0%   {color: black}
@@ -335,14 +345,14 @@ export default class WorkspacePane extends Eventable {
   }
   
   _registerModelListeners () {
-    this.workspace.on('add', ({dataset}) => {
+    this.workspace.on('add', ({dataset, parent}) => {
       let tab = $('a.sidebar-tab', '#' + this.sidebar.id).filter(t => $(t).get('@href') === '#' + this.id)
       tab.set('-highlight-anim')
       setTimeout(() => { // doesn't work without small delay
         tab.set('+highlight-anim')
       }, 100)
       
-      this._addDataset(dataset)
+      this._addDataset(dataset, parent)
 
       $('.user-hint', '#' + this.id).remove()
     })
@@ -369,30 +379,37 @@ export default class WorkspacePane extends Eventable {
     
     this.workspace.on('requestFocus', ({dataset}) => {
       // not added to dom yet, defer
+      let opts = {behavior: 'smooth'}
       if (!dataset.domEl) {
         var fn = data => {
           if (data.dataset === dataset) {
-            dataset.domEl.scrollIntoView()
+            dataset.domEl.scrollIntoView(opts)
             this.off('add', fn)
           }
         }
         this.on('add', fn)
       } else {
-        dataset.domEl.scrollIntoView()
+        dataset.domEl.scrollIntoView(opts)
       }
     })
   }
   
-  _addDataset (dataset) {
+  _addDataset (dataset, parent) {
     let el = HTML(TEMPLATES['workspace-dataset'])[0] // the outer div
-    $('.workspace-dataset-list', '#' + this.id).add(el)
+    let list = $('.workspace-dataset-list', '#' + this.id)
+    
+    if (parent) {
+      $(parent.domEl).addAfter(el)
+    } else {
+      list.add(el)
+    }
     dataset.domEl = el
     
     if (dataset.virtual) {
-      $(el).set('+panel-info')
+      $(el).set('+panel-info +virtual-dataset')
+      setTimeout(() => $(el).set('+blind-in'), 100)
     } else {
       $(el).set('+panel-default')
-      $('.virtual-dataset-icon', el).remove()
     }
     $('.dataset-title', el).fill(i18n(dataset.title))
     

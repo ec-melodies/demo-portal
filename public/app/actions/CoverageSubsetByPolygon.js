@@ -164,7 +164,7 @@ export default class CoverageSubsetByPolygon extends Action {
         }
         let workspace = this.context.workspace
                 
-        workspace.addDataset(virtualDataset)
+        workspace.addDataset(virtualDataset, this.context.dataset)
         workspace.requestFocus(virtualDataset)
       })
     })
