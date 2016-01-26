@@ -1,3 +1,4 @@
+import L from 'leaflet'
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
@@ -117,7 +118,7 @@ export default class CoverageSubsetByPolygon extends Action {
       $('.polygon-count', el).fill(polygonCount)
       
       $('.select-button', el).on('|click', () => {
-        console.log('foo')
+        this._displayPolygons(distribution)
       })
             
       $('.geojson-distribution-list', modalEl).add(el)
@@ -126,6 +127,49 @@ export default class CoverageSubsetByPolygon extends Action {
     $$('.geojson-distribution-list-empty', modalEl).style.display = geojsonDists.length > 0 ? 'none' : 'block'
     
     new Modal(modalEl[0]).open()
+  }
+  
+  _displayPolygons (distribution) {
+    let features = {
+        type: 'FeatureCollection',
+        features: getPolygonFeatures(distribution.data)
+    }
+    let map = this.context.map
+    
+    var featuresLayer = L.geoJson(features, {
+      onEachFeature: (feature, layer) => {
+        layer.on('click', () => {
+          this._applySubsetAndCreateVirtualDataset(feature)
+          map.removeLayer(featuresLayer)
+        })
+      }
+    }).addTo(map)
+    
+  }
+  
+  _applySubsetAndCreateVirtualDataset (feature) {
+    let prefixTitle = 'Polygon-subsetted: '
+    
+    let bbox = L.geoJson(feature).getBounds()
+    transformUtil.subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
+      //transformUtil.maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
+        let virtualDataset = {
+          title: { en: prefixTitle + i18n(this.context.dataset.title) },
+          virtual: true,
+          distributions: [{
+            title: { en: prefixTitle + i18n(this.context.distribution.title) },
+            mediaType: 'coveragedata',
+            data: bboxSubsetCov
+          }]
+        }
+        let workspace = this.context.workspace
+        
+        window.cov = bboxSubsetCov
+        
+        workspace.addDataset(virtualDataset)
+        workspace.requestFocus(virtualDataset)
+//      })
+    })
   }
   
   _findGeoJSONDistributions () {
@@ -160,7 +204,7 @@ function getPolygonFeatures (geojson) {
       switch (feature.geometry.type) {
       case 'Polygon':
       case 'MultiPolygon':
-        features.push(geojson)
+        features.push(feature)
         break
       }
     }
