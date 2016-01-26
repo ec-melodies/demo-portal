@@ -152,23 +152,21 @@ export default class CoverageSubsetByPolygon extends Action {
     
     let bbox = L.geoJson(feature).getBounds()
     transformUtil.subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
-      //transformUtil.maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
+      transformUtil.maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
         let virtualDataset = {
           title: { en: prefixTitle + i18n(this.context.dataset.title) },
           virtual: true,
           distributions: [{
             title: { en: prefixTitle + i18n(this.context.distribution.title) },
             mediaType: 'coveragedata',
-            data: bboxSubsetCov
+            data: polySubsetCov
           }]
         }
         let workspace = this.context.workspace
-        
-        window.cov = bboxSubsetCov
-        
+                
         workspace.addDataset(virtualDataset)
         workspace.requestFocus(virtualDataset)
-//      })
+      })
     })
   }
   
