@@ -70,31 +70,6 @@ let html = `
   </div>
 </div>
 
-<div class="modal fade" id="statisticsFinishedModal" tabindex="-1" role="dialog" aria-labelledby="statisticsFinishedModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="statisticsFinishedModalLabel">Ready</h4>
-      </div>
-      <div class="modal-body">
-        
-        <div class="panel panel-primary">
-          <div class="panel-body">
-            <p>
-              Blabla
-            </p>    
-          </div>
-        </div>
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <style>
 .calculate-button-container {
   margin-top: 20px;
@@ -379,8 +354,6 @@ export default class CoverageCategoriesStatistics extends Action {
       workspace.requestFocus(virtualDataset)
       
       modal.close()
-      // timeout to fight backdrop issues
-      setTimeout(() => new Modal($$('#statisticsFinishedModal')).open(), 100)
     })
     
   }
