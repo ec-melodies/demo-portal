@@ -323,7 +323,7 @@ export default class CoverageCategoriesStatistics extends Action {
             "t": t
           },
           "referencing": [{
-            "identifiers": ["t"],
+            "dimensions": ["t"],
             "trs": referencingUtil.getRefSystem(domain, ['t'])
           }]
         },
