@@ -1,3 +1,5 @@
+import 'fetch'
+
 export function i18n (prop) {
   if (!prop) return
   // TODO be clever and select proper language
@@ -15,4 +17,35 @@ export function sortByKey (array, keyFn) {
     let y = keyFn(b)
     return ((x < y) ? -1 : ((x > y) ? 1 : 0))
   })
+}
+
+export function loadJSON (urlOrObject, additionalMediaTypes) {
+  if (typeof urlOrObject === 'string') {
+    let mt = additionalMediaTypes.map(m => m + '; q=1.0')
+    mt.push('application/json; q=0.5')
+    mt = mt.join(',')
+    return fetch(urlOrObject, {
+      headers: new Headers({Accept: mt})
+    })
+    .catch(e => {
+      // we only get a response object if there was no network/CORS error, fall-back
+      e.response = {url: urlOrObject}
+      throw e
+    })
+    .then(checkStatus)
+    .then(response => response.json())
+  } else {
+    return Promise.resolve(urlOrObject)
+  }
+}
+
+//https://github.com/github/fetch#handling-http-error-statuses
+export function checkStatus (response) {
+  if (response.ok) { // status 2xx
+    return response
+  } else {
+    let error = new Error(response.statusText)
+    error.response = response
+    throw error
+  }
 }

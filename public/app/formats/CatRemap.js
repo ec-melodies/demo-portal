@@ -1,5 +1,5 @@
 import Format from './Format.js'
-import {loadJSON} from './util.js'
+import {loadJSON} from '../util.js'
 
 export default class CatRemap extends Format {
   constructor (actionFactories) {

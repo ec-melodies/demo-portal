@@ -1,4 +1,5 @@
 import {promises as jsonld} from 'jsonld'
+import {loadJSON} from './util.js'
 
 const DCAT_CONTEXT = [
   // unmodified copy of https://github.com/ec-melodies/wp02-dcat/blob/master/context.jsonld
@@ -107,27 +108,48 @@ const DCAT_DATASET_FRAME = {
   }
 
 /**
- * Load a DCAT catalog or a single dataset that we wrap into a catalog.
+ * Load a DCAT catalog or a single dataset and return the unmodified
+ * JSON-LD source, the frame, and the framed&compacted JSON-LD.
+ */
+export function loadDCATCatalog (url) {
+  return loadJSON(url, ['application/ld+json']).then(raw => {
+    return jsonld.frame(raw, DCAT_CATALOG_FRAME)
+      .then(framed => jsonld.compact(framed, framed['@context']))
+      .then(compacted => {
+        if (compacted['@type'] === 'Catalog') {
+          return {compacted, raw, frame: DCAT_CATALOG_FRAME}
+        } else {
+          // we may have a single Dataset here, so we'll try to frame for that
+          return jsonld.frame(url, DCAT_DATASET_FRAME)
+            .then(framed => jsonld.compact(framed, framed['@context']))
+            .then(compacted => {
+              if (compacted['@type'] !== 'Dataset') {
+                throw new Error('No DCAT data found')
+              }
+              return {compacted, raw, frame: DCAT_DATASET_FRAME}
+            })
+        }
+      })
+  })
+}
+
+/**
+ * Load a DCAT catalog or a single dataset that we wrap into a catalog
+ * and apply some transformations to the catalog data for further use.
+ * The applied changes are CKAN repairs and language map creation.
  */
 export function loadCatalog (url) {
-  return jsonld.frame(url, DCAT_CATALOG_FRAME)
-    .then(framed => jsonld.compact(framed, framed['@context']))
-    .then(compacted => {
-      if (!('datasets' in compacted)) {
-        // we may have a single Dataset here, so we'll try to frame for that
-        return jsonld.frame(url, DCAT_DATASET_FRAME)
-          .then(framed => jsonld.compact(framed, framed['@context']))
-          .then(compacted => {
-            let catalog = {
-                datasets: [compacted]
-            }
-            return catalog
-          })
-      } else {
-        return compacted
+  return loadDCATCatalog(url)
+    .then(({compacted}) => {
+      let catalog
+      if (compacted['@type'] === 'Catalog') {
+        catalog = compacted
+      } else /*if (compacted['@type'] === 'Dataset')*/ {
+        catalog = {
+          datasets: [compacted]
+        }
       }
-    })
-    .then(catalog => {
+      
       // We create our own preferred structure:
       // title/description is always a language map where an untagged string is stored under the "unknown"
       // language key. This is not possible with JSON-LD framing alone.
