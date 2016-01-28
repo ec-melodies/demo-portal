@@ -4778,7 +4778,7 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var _slicedToArray = function() {
+  var _slicedToArray = (function() {
     function sliceIterator(arr, i) {
       var _arr = [];
       var _n = true;
@@ -4814,13 +4814,8 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
         throw new TypeError("Invalid attempt to destructure non-iterable instance");
       }
     };
-  }();
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-    return typeof obj;
-  } : function(obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-  var _createClass = function() {
+  })();
+  var _createClass = (function() {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -4838,7 +4833,7 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
         defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  }();
+  })();
   Object.defineProperty(exports, "__esModule", {value: true});
   exports.transformParameter = transformParameter;
   exports.transformDomain = transformDomain;
@@ -4860,12 +4855,15 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
       return Array.from(arr);
     }
   }
+  function _typeof(obj) {
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  }
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
-  var Coverage = function() {
+  var Coverage = (function() {
     function Coverage(covjson, options) {
       _classCallCheck(this, Coverage);
       this._covjson = covjson;
@@ -4936,13 +4934,13 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
         var promise = undefined;
         if ((typeof domainOrUrl === 'undefined' ? 'undefined' : _typeof(domainOrUrl)) === 'object') {
           var domain = domainOrUrl;
-          transformDomain(domain);
+          transformDomain(domain, this.options.referencing);
           promise = Promise.resolve(domain);
         } else {
           var url = domainOrUrl;
           promise = (0, _http.load)(url).then(function(result) {
             var domain = result.data;
-            transformDomain(domain);
+            transformDomain(domain, _this.options.referencing);
             _this._covjson.domain = domain;
             return domain;
           });
@@ -5061,9 +5059,13 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
               }
             }
           }
-          var newdomain = (0, _util.shallowcopy)(domain);
-          newdomain.axes = new Map(newdomain.axes);
-          newdomain._rangeShape = domain._rangeShape.slice();
+          var newdomain = {
+            type: domain.type,
+            axes: new Map(domain.axes),
+            referencing: domain.referencing,
+            _rangeShape: domain._rangeShape.slice(),
+            _rangeAxisOrder: domain._rangeAxisOrder
+          };
           var _iteratorNormalCompletion3 = true;
           var _didIteratorError3 = false;
           var _iteratorError3 = undefined;
@@ -5071,7 +5073,8 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
             for (var _iterator3 = Object.keys(constraints)[Symbol.iterator](),
                 _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
               var axisName = _step3.value;
-              var coords = domain.axes.get(axisName).values;
+              var axis = domain.axes.get(axisName);
+              var coords = axis.values;
               var isTypedArray = ArrayBuffer.isView(coords);
               var constraint = constraints[axisName];
               var newcoords = undefined;
@@ -5092,8 +5095,11 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
                   newcoords[j] = coords[i];
                 }
               }
-              var newaxis = (0, _util.shallowcopy)(domain.axes.get(axisName));
-              newaxis.values = newcoords;
+              var newaxis = {
+                dataType: axis.dataType,
+                dimensions: axis.dimensions,
+                values: newcoords
+              };
               newdomain.axes.set(axisName, newaxis);
               newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = newcoords.length;
             }
@@ -5126,8 +5132,11 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
               return constraints[name].step;
             });
             var newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
-            var newrange = (0, _util.shallowcopy)(range);
-            newrange._ndarr = newndarr;
+            var newrange = {
+              dataType: range.dataType,
+              get: createRangeGetFunction(newndarr, domain._rangeAxisOrder),
+              _ndarr: newndarr
+            };
             newrange.shape = new Map();
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
@@ -5152,7 +5161,6 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
                 }
               }
             }
-            newrange.get = createRangeGetFunction(newndarr, domain._rangeAxisOrder);
             return newrange;
           };
           var loadRange = function loadRange(key) {
@@ -5168,12 +5176,19 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
               }));
             });
           };
-          var newcov = (0, _util.shallowcopy)(_this4);
-          newcov.loadDomain = function() {
-            return Promise.resolve(newdomain);
+          var newcov = {
+            id: _this4.id,
+            type: _this4.type,
+            domainType: _this4.domainType,
+            parameters: _this4.parameters,
+            loadDomain: function loadDomain() {
+              return Promise.resolve(newdomain);
+            },
+            loadRange: loadRange,
+            loadRanges: loadRanges
           };
-          newcov.loadRange = loadRange;
-          newcov.loadRanges = loadRanges;
+          newcov.subsetByIndex = _this4.subsetByIndex.bind(newcov);
+          newcov.subsetByValue = _this4.subsetByValue.bind(newcov);
           return newcov;
         });
       }
@@ -5276,7 +5291,7 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
       }
     }]);
     return Coverage;
-  }();
+  })();
   exports.default = Coverage;
   function transformParameter(params, key) {
     if ('__transformDone' in params[key])
@@ -5420,7 +5435,7 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
     var fn = new Function('ndarr', 'return function ndarrget (obj) { return ndarr.get(' + ndargs + ') }')(ndarr);
     return fn;
   }
-  function transformDomain(domain) {
+  function transformDomain(domain, referencing) {
     if ('__transformDone' in domain)
       return;
     var profile = domain.profile || 'Domain';
@@ -5460,6 +5475,11 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
       for (var _iterator9 = axes.values()[Symbol.iterator](),
           _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
         var axis = _step9.value;
+        if (axis.dataType === 'Tuple') {
+          axis.dataType = _util.PREFIX + 'Tuple';
+        } else if (axis.dataType === 'Polygon') {
+          axis.dataType = 'http://ld.geojson.org/vocab#Polygon';
+        }
         if ('start' in axis && 'stop' in axis && 'num' in axis) {
           var arr = new Float64Array(axis.num);
           var step = undefined;
@@ -5514,6 +5534,37 @@ $__System.registerDynamic("58", ["59", "5a", "5b"], true, function($__require, e
     domain._rangeShape = domain._rangeAxisOrder.map(function(k) {
       return axes.get(k).values.length;
     });
+    if (referencing) {
+      domain.referencing = referencing;
+    }
+    var _iteratorNormalCompletion10 = true;
+    var _didIteratorError10 = false;
+    var _iteratorError10 = undefined;
+    try {
+      for (var _iterator10 = domain.referencing[Symbol.iterator](),
+          _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+        var obj = _step10.value;
+        if (obj.system)
+          break;
+        obj.system = obj.srs || obj.trs || obj.rs;
+        delete obj.srs;
+        delete obj.trs;
+        delete obj.rs;
+      }
+    } catch (err) {
+      _didIteratorError10 = true;
+      _iteratorError10 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion10 && _iterator10.return) {
+          _iterator10.return();
+        }
+      } finally {
+        if (_didIteratorError10) {
+          throw _iteratorError10;
+        }
+      }
+    }
     domain.__transformDone = true;
     return domain;
   }
@@ -5527,7 +5578,7 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var _slicedToArray = function() {
+  var _slicedToArray = (function() {
     function sliceIterator(arr, i) {
       var _arr = [];
       var _n = true;
@@ -5563,8 +5614,8 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
         throw new TypeError("Invalid attempt to destructure non-iterable instance");
       }
     };
-  }();
-  var _createClass = function() {
+  })();
+  var _createClass = (function() {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -5582,7 +5633,7 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
         defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  }();
+  })();
   Object.defineProperty(exports, "__esModule", {value: true});
   exports.CollectionQuery = undefined;
   var _Coverage = $__require('58');
@@ -5596,7 +5647,7 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
       throw new TypeError("Cannot call a class as a function");
     }
   }
-  var CoverageCollection = function() {
+  var CoverageCollection = (function() {
     function CoverageCollection(covjson) {
       _classCallCheck(this, CoverageCollection);
       this.ld = {};
@@ -5604,6 +5655,10 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
       this.id = covjson.id;
       var covs = [];
       var rootParams = covjson.parameters ? covjson.parameters : {};
+      var covOptions = {};
+      if (covjson.referencing) {
+        covOptions.referencing = covjson.referencing;
+      }
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -5640,7 +5695,7 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
           } else {
             coverage.parameters = rootParams;
           }
-          covs.push(new _Coverage2.default(coverage));
+          covs.push(new _Coverage2.default(coverage, covOptions));
         }
       } catch (err) {
         _didIteratorError = true;
@@ -5706,9 +5761,9 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
       }
     }]);
     return CoverageCollection;
-  }();
+  })();
   exports.default = CoverageCollection;
-  var CollectionQuery = exports.CollectionQuery = function() {
+  var CollectionQuery = exports.CollectionQuery = (function() {
     function CollectionQuery(collection) {
       _classCallCheck(this, CollectionQuery);
       this._collection = collection;
@@ -5737,8 +5792,11 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
       value: function execute() {
         var _this = this;
         var coll = this._collection;
-        var newcoll = (0, _util.shallowcopy)(coll);
-        newcoll.coverages = [];
+        var newcoll = {
+          coverages: [],
+          parameters: coll.parameters,
+          domainTemplate: coll.domainTemplate
+        };
         var promises = [];
         var _iteratorNormalCompletion4 = true;
         var _didIteratorError4 = false;
@@ -5778,12 +5836,15 @@ $__System.registerDynamic("5c", ["58", "5a"], true, function($__require, exports
           }
         }
         return Promise.all(promises).then(function() {
+          newcoll.query = function() {
+            return new CollectionQuery(newcoll);
+          };
           return newcoll;
         });
       }
     }]);
     return CollectionQuery;
-  }();
+  })();
   function matchesFilter(domain, filter) {
     var _iteratorNormalCompletion5 = true;
     var _didIteratorError5 = false;
@@ -6291,7 +6352,7 @@ $__System.registerDynamic("5a", [], true, function($__require, exports, module) 
     } else if (max === -Infinity) {
       max = min;
     }
-    if (min === Infinity) {
+    if (min === Infinity || min === -Infinity) {
       min = null;
       max = null;
     }
@@ -6531,11 +6592,6 @@ $__System.registerDynamic("60", ["58", "5c", "5a", "5b"], true, function($__requ
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-    return typeof obj;
-  } : function(obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
   Object.defineProperty(exports, "__esModule", {value: true});
   exports.load = load;
   exports.read = read;
@@ -6563,6 +6619,9 @@ $__System.registerDynamic("60", ["58", "5c", "5a", "5b"], true, function($__requ
   }
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {default: obj};
+  }
+  function _typeof(obj) {
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
   }
   function load(url, headers) {
     return http.load(url, headers);
@@ -57232,6 +57291,7 @@ $__System.register('ab', ['48', '71', '84', '85', '97', '6b', '8b', 'aa'], funct
                 });
               }
             }).addTo(map);
+            map.fitBounds(featuresLayer.getBounds());
           }
         }, {
           key: '_applySubsetAndCreateVirtualDataset',
