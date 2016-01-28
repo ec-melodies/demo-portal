@@ -30,6 +30,8 @@ export default class Workspace extends Eventable {
       dataset.id = new Date().getTime()
     }
     if (!this._datasets.has(dataset.id)) {
+      // deep copy as we may modify the dataset (e.g. the title)
+      dataset = JSON.parse(JSON.stringify(dataset))
       this._datasets.set(dataset.id, dataset)
       this.fire('add', {dataset, parent})
       this._loadDistribution(dataset)
@@ -51,6 +53,11 @@ export default class Workspace extends Eventable {
   
   requestFocus (dataset) {
     this.fire('requestFocus', {dataset})
+  }
+  
+  setDatasetTitle (dataset, title) {
+    dataset.title = {unknown: title}
+    this.fire('titleChange', {dataset})
   }
   
   get datasets () {

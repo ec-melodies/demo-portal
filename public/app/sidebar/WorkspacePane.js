@@ -1,4 +1,4 @@
-import {$, HTML} from 'minified'
+import {$, $$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import {i18n} from '../util.js'
@@ -66,11 +66,21 @@ const TEMPLATES = {
   // Important: No whitespace at beginning as this introduces text nodes and we just get the first node!
   'workspace-dataset': 
   `<div class="panel workspace-dataset">
-    <div class="panel-heading">
+    <div class="panel-heading dataset-title-heading">
       <h4>
         <span class="dataset-title"></span>
+        <small><a href="#" class="dataset-title-edit"><i class="glyphicon glyphicon-pencil"></i></a></small>
         <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </h4>
+    </div>
+    <div class="panel-heading dataset-title-edit-form" style="display:none">
+      <form>
+        <div class="form-group">
+          <input type="text" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-default">Rename</button>
+        <button type="button" name="cancel" class="btn btn-default">Cancel</button>
+      </form>
     </div>
     <div class="panel-body" style="text-align: center">
       <div class="throbber-loader loader">Loading...</div>
@@ -392,6 +402,10 @@ export default class WorkspacePane extends Eventable {
         dataset.domEl.scrollIntoView(opts)
       }
     })
+    
+    this.workspace.on('titleChange', ({dataset}) => {
+      $('.dataset-title', dataset.domEl).fill(i18n(dataset.title))
+    })
   }
   
   _addDataset (dataset, parent) {
@@ -416,6 +430,23 @@ export default class WorkspacePane extends Eventable {
     $('.close', el).on('click', () => {
       this.workspace.removeDataset(dataset)
     })
+    
+    let titleInput = $$('input', $('.dataset-title-edit-form', el))
+    $('.dataset-title-edit', el).on('click', () => {
+      $('.dataset-title-heading', el).hide()
+      $('.dataset-title-edit-form', el).show()
+      titleInput.value = i18n(dataset.title)
+    }) 
+    $('form', $('.dataset-title-edit-form', el)).on('submit', () => {
+      this.workspace.setDatasetTitle(dataset, titleInput.value)
+      $('.dataset-title-heading', el).show()
+      $('.dataset-title-edit-form', el).hide()
+    })
+    $('button', $('.dataset-title-edit-form', el)).filter(b => b.name === 'cancel').on('click', () => {
+      $('.dataset-title-heading', el).show()
+      $('.dataset-title-edit-form', el).hide()
+    })
+    
     this.fire('add', {dataset})
   }
   
