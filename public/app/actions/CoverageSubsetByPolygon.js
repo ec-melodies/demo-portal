@@ -144,6 +144,7 @@ export default class CoverageSubsetByPolygon extends Action {
         })
       }
     }).addTo(map)
+    map.fitBounds(featuresLayer.getBounds())
     
   }
   
