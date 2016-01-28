@@ -16,10 +16,23 @@ export default class GeoCoverageView extends Action {
     super()
     this.cov = data
     
-    this.label = 'View'
-    this.icon = '<span class="glyphicon glyphicon-eye-open"></span>'
+    this._setHidden()
       
     this.layers = []
+  }
+  
+  _setVisible () {
+    this.visible = true
+    this.label = 'Hide'
+    this.icon = '<span class="glyphicon glyphicon-eye-close"></span>'
+    this.fire('labelChange')
+  }
+  
+  _setHidden () {
+    this.visible = false
+    this.label = 'View'
+    this.icon = '<span class="glyphicon glyphicon-eye-open"></span>'
+    this.fire('labelChange')
   }
   
   get isSupported () {
@@ -38,14 +51,20 @@ export default class GeoCoverageView extends Action {
     return true
   }
   
-  run () {
-    if (this.hasRun) return
-    this.hasRun = true
-    
+  run () {    
     let map = this.context.map
     
     let dataset = this.context.dataset
     let datasetTitle = i18n(dataset.title)
+    
+    if (this.visible) {
+      this.remove()
+      this._setHidden()
+      return
+    }
+    
+    this._setVisible()
+
     // TODO support collections
     
     let cov = this.cov

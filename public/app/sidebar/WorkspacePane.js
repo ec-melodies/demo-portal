@@ -470,10 +470,15 @@ export default class WorkspacePane extends Eventable {
           actionEl = HTML(TEMPLATES['workspace-dataset-distribution-action'])
           $('button', actionEl).on('click', () => action.run())
         }
-        $('.action-label', actionEl).fill(action.label)
-        if (action.icon) {
-          $('.action-icon', actionEl).fill(HTML(action.icon))
+        let setLabelAndIcon = () => {
+          $('.action-label', actionEl).fill(action.label)
+          if (action.icon) {
+            $('.action-icon', actionEl).fill(HTML(action.icon))
+          }
         }
+        setLabelAndIcon()
+        action.on('labelChange', () => setLabelAndIcon())
+        
         $('.distribution-actions', el).add(actionEl)
       }
     }
