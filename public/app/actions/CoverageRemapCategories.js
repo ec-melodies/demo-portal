@@ -278,9 +278,9 @@ export default class CoverageRemapCategories extends Action {
     let sourceCov = trans.source
     let param  = trans.operation.parameter
     let remapDef = trans.operation.categoryRemappingDefinition
-    let prefixTitle = false
+    let modifyTitle = false
     
-    this._createVirtualRemappedDataset(sourceCov, param, remapDef, prefixTitle, () => {
+    this._createVirtualRemappedDataset(sourceCov, param, remapDef, modifyTitle, () => {
       this.context.workspace.removeDataset(this.context.dataset)
     })
   }
@@ -387,16 +387,12 @@ export default class CoverageRemapCategories extends Action {
     new Modal(modalEl[0]).open()
   }
   
-  _createVirtualRemappedDataset (cov, parameter, remapDef, prefixTitle, oncreate) {
-    if (prefixTitle) {
-      prefixTitle = 'Remapped: '
-    } else {
-      prefixTitle = ''
-    }
-      
+  _createVirtualRemappedDataset (cov, parameter, remapDef, modifyTitle, oncreate) {      
     let sourceParameter = parameter
     let targetObservedProp = remapDef.destinationObservedProperty
     let mapping = new Map(remapDef.categoryMappings.map(m => [m.sourceCategory, m.destinationCategory]))
+    
+    let titleAppend = modifyTitle ? ' [remapped to: ' + i18n(targetObservedProp.label) + ']' : ''
     
     this._showRemapper(sourceParameter.observedProperty, targetObservedProp, mapping, data => {
       // use the mapping that was potentially modified by the user 
@@ -424,10 +420,10 @@ export default class CoverageRemapCategories extends Action {
       })
       
       let virtualDataset = {
-        title: { en: prefixTitle + i18n(this.context.dataset.title) },
+        title: { en: i18n(this.context.dataset.title) + titleAppend },
         virtual: true,
         distributions: [{
-          title: { en: prefixTitle + i18n(this.context.distribution.title) },
+          title: { en: i18n(this.context.distribution.title) + titleAppend },
           mediaType: 'coveragedata',
           data: remappedCov
         }]

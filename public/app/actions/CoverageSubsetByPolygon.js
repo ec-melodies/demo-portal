@@ -149,16 +149,16 @@ export default class CoverageSubsetByPolygon extends Action {
   }
   
   _applySubsetAndCreateVirtualDataset (feature) {
-    let prefixTitle = 'Polygon-subsetted: '
+    let appendTitle = ' [subsetted by polygon]'
     
     let bbox = L.geoJson(feature).getBounds()
     transformUtil.subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
       transformUtil.maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
         let virtualDataset = {
-          title: { en: prefixTitle + i18n(this.context.dataset.title) },
+          title: { en: i18n(this.context.dataset.title) + appendTitle },
           virtual: true,
           distributions: [{
-            title: { en: prefixTitle + i18n(this.context.distribution.title) },
+            title: { en: i18n(this.context.distribution.title) + appendTitle },
             mediaType: 'coveragedata',
             data: polySubsetCov
           }]
