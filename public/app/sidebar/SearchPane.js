@@ -50,13 +50,13 @@ let html = `
         <!-- Tab panes -->
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="dcat-original">
-            <code><pre class="dcat-original"></pre></code>
+            <pre><code class="dcat-original"></code></pre>
           </div>
           <div role="tabpanel" class="tab-pane" id="dcat-framed">
-            <code><pre class="dcat-framed"></pre></code>
+            <pre><code class="dcat-framed"></code></pre>
           </div>
           <div role="tabpanel" class="tab-pane" id="dcat-frame">
-            <code><pre class="dcat-frame"></pre></code>
+            <pre><code class="dcat-frame"></code></pre>
           </div>
         </div>
       </div>
