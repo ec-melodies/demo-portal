@@ -19,7 +19,7 @@
     },
     "dependencies": {
       "bootstrap": "github:twbs/bootstrap@^3.3.5",
-      "bootstrap-native": "github:thednp/bootstrap.native@^1.0.0",
+      "bootstrap-native": "npm:bootstrap.native@^1.0.1",
       "c3": "npm:c3@^0.4.11-rc4",
       "category-remapper": "github:guygriffiths/category-remapper-js@master",
       "core-js": "npm:core-js@^1.1.4",
