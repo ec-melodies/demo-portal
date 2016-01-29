@@ -31,7 +31,9 @@ export default class Workspace extends Eventable {
     }
     if (!this._datasets.has(dataset.id)) {
       // deep copy as we may modify the dataset (e.g. the title)
-      dataset = JSON.parse(JSON.stringify(dataset))
+      if (!dataset.virtual) {
+        dataset = JSON.parse(JSON.stringify(dataset))
+      }
       this._datasets.set(dataset.id, dataset)
       this.fire('add', {dataset, parent})
       this._loadDistribution(dataset)
