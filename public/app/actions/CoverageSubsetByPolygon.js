@@ -151,6 +151,7 @@ export default class CoverageSubsetByPolygon extends Action {
   _applySubsetAndCreateVirtualDataset (feature) {
     let appendTitle = ' [subsetted by polygon]'
     
+    this.fire('loading')
     let bbox = L.geoJson(feature).getBounds()
     transformUtil.subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
       transformUtil.maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
@@ -167,6 +168,8 @@ export default class CoverageSubsetByPolygon extends Action {
                 
         workspace.addDataset(virtualDataset, this.context.dataset)
         workspace.requestFocus(virtualDataset)
+        
+        this.fire('load')
       })
     })
   }
