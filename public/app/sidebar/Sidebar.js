@@ -12,7 +12,7 @@ let sidebarHtml = (sidebarId, searchPaneId, workspacePaneId) => `
   <!-- Nav tabs -->
   <div class="sidebar-tabs">
       <ul role="tablist">
-          <li><a href="#${searchPaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-align-justify"></i></a></li>
+          <li><a href="#${searchPaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-search"></i></a></li>
           <li><a href="#${workspacePaneId}" role="tab" class="sidebar-tab"><i class="glyphicon glyphicon-flash"></i></a></li>
       </ul>
   </div>

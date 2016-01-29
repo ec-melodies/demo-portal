@@ -1,8 +1,11 @@
 import {$, HTML} from 'minified'
 import L from 'leaflet'
+import Modal from 'bootstrap-native/lib/modal-native.js'
+import Tab from 'bootstrap-native/lib/tab-native.js'
 
 import {PROCESS} from '../actions/Action.js'
 import {i18n, sortByKey} from '../util.js'
+import {loadDCATCatalog} from '../dcat.js'
 
 const TEMPLATES = {
   'dataset-list-item': `
@@ -28,7 +31,42 @@ const TEMPLATES = {
   </li>
   `
 }
-let css = `
+let html = `
+<div class="modal fade" id="dcatSourceModal" tabindex="-1" role="dialog" aria-labelledby="dcatSourceModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="dcatSourceModalLabel">DCAT Source View</h4>
+      </div>
+      <div class="modal-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#dcat-original" role="tab" data-toggle="tab">Original</a></li>
+          <li role="presentation"><a href="#dcat-framed" role="tab" data-toggle="tab">Framed</a></li>
+          <li role="presentation"><a href="#dcat-frame" role="tab" data-toggle="tab">Frame</a></li>
+        </ul>
+  
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="dcat-original">
+            <code><pre class="dcat-original"></pre></code>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="dcat-framed">
+            <code><pre class="dcat-framed"></pre></code>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="dcat-frame">
+            <code><pre class="dcat-frame"></pre></code>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
 .catalog-url-panel {
   margin-top: 20px;
@@ -38,7 +76,7 @@ let css = `
 }
 </style>
 `
-$('head').add(HTML(css))
+$('body').add(HTML(html))
 
 let paneHtml = () => `
 <h1 class="sidebar-header">Search<div class="sidebar-close"><i class="glyphicon glyphicon-menu-left"></i></div></h1>
@@ -50,6 +88,7 @@ let paneHtml = () => `
       <span style="vertical-align:middle">
         <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a> Catalogue
       </span>
+      <button type="button" class="btn btn-primary pull-right jsonld-view-button"><i class="glyphicon glyphicon-eye-open"></i> JSON-LD</button>
     </h3>
   </div>
   <div class="panel-body catalog-url-info">
@@ -104,6 +143,28 @@ export default class SearchPane {
       $('.catalog-url-info', el).show()
       $('.catalog-url-form', el).hide()
     })
+    $('.jsonld-view-button', el).on('click', () => {
+      this._showDCATInfoModal()
+    })
+    
+    // work-around as bootstrap.native only scans for tabs once, but we add the modal HTML later
+    var tabs = document.querySelectorAll("#dcatSourceModal [data-toggle='tab']")
+    for (let tab of tabs) {
+      new Tab(tab)
+    }
+  }
+  
+  _showDCATInfoModal () {
+    let modalEl = $('#dcatSourceModal')
+    new Modal(modalEl[0]).open()
+    
+    let asJSON = obj => JSON.stringify(obj, null, 2)
+    loadDCATCatalog(this.catalogue.url)
+      .then(({raw, compacted, frame}) => {    
+        $('.dcat-original', modalEl).fill(asJSON(raw))
+        $('.dcat-framed', modalEl).fill(asJSON(compacted))
+        $('.dcat-frame', modalEl).fill(asJSON(frame))
+      })
   }
   
   _registerModelListeners () {

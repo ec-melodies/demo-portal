@@ -85,8 +85,12 @@ app.on('dataLoad', () => map.fire('dataload'))
 // Sidebar setup
 let catalogUrl
 if (window.location.hash) {
-  catalogUrl = window.location.hash.substr(1)
-} else {
+  let url = window.location.hash.substr(1)
+  if (url.toLowerCase().startsWith('http://') || url.toLowerCase().startsWith('https://')) {
+    catalogUrl = url
+  }
+}
+if (!catalogUrl) {
   catalogUrl = MELODIES_DCAT_CATALOG_URL
 }
 
