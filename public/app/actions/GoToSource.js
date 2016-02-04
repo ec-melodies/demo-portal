@@ -1,8 +1,8 @@
 import {default as Action, EXTERNAL_LINK} from './Action.js'
 
 export default class GoToSource extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     
     this.icon = '<span class="glyphicon glyphicon-link"></span>'
     this.label = 'Source'

@@ -11,6 +11,7 @@ import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 import 'leaflet-styledlayercontrol'
 
+import {i18n, DefaultMap} from './util.js'
 import App from './App.js'
 import Sidebar from './sidebar/Sidebar.js'
 import './css/style.css!'
@@ -75,12 +76,53 @@ let layerControl = L.Control.styledLayerControl(baseMaps, [], {
   collapsed: false
 })
 map.addControl(layerControl)
-// probably not the best idea
-map.layerControl = layerControl
+
+/**
+ * Proxy around StyledLayerControl that keeps track of groups and layers
+ * to allow some added features:
+ * - once a group has no layers anymore, it gets removed
+ * - allow renaming of groups by re-adding them under the new name
+ */
+class SmartLayerControl {
+  constructor(styledLayerControl) {
+    this._control = styledLayerControl
+    this._groups = new DefaultMap(() => [])
+    this._layers = new Map()
+  }
+  addOverlay (layer, name, options) {
+    let groupName = options.groupName
+    this._groups.get(groupName).push({layer, name})
+    this._layers.set(layer, groupName)
+    this._control.addOverlay(layer, name, options)
+  }
+  removeLayer (layer) {
+    this._control.removeLayer(layer)
+    let groupName = this._layers.get(layer)
+    this._layers.delete(layer)
+    let group = this._groups.get(groupName)
+    let newGroup = group.filter(obj => obj.layer !== layer)
+    this._groups.set(groupName, newGroup)
+    if (newGroup.length === 0) {
+      this._control.removeGroup(groupName)
+      this._groups.delete(groupName)
+    }
+  }
+  renameGroup (oldName, newName) {
+    for (let {layer, name} of this._groups.get(oldName).slice()) {
+      this.removeLayer(layer)
+      this.addOverlay(layer, name, {groupName: newName, expanded: true})
+    }
+  }
+}
+map.layerControl = new SmartLayerControl(layerControl)
 
 let app = new App(map)
 app.on('dataLoading', () => map.fire('dataloading'))
 app.on('dataLoad', () => map.fire('dataload'))
+app.workspace.on('titleChange', ({oldTitle, newTitle}) => {
+  // by convention, group names are dataset titles
+  map.layerControl.renameGroup(i18n(oldTitle), i18n(newTitle))
+})
 
 // Sidebar setup
 let catalogUrl

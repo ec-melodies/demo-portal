@@ -439,6 +439,7 @@ export default class WorkspacePane extends Eventable {
     }) 
     $('form', $('.dataset-title-edit-form', el)).on('submit', () => {
       this.workspace.setDatasetTitle(dataset, titleInput.value)
+      
       $('.dataset-title-heading', el).show()
       $('.dataset-title-edit-form', el).hide()
     })

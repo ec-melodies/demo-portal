@@ -86,8 +86,8 @@ const TEMPLATES = {
 }
 
 export default class CoverageCategoriesStatistics extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     
     if (this._isSingleCoverage(data)) {
       this.cov = this._getSingleCoverage(data)

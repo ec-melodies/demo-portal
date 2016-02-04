@@ -9,8 +9,8 @@ import {default as Action, PROCESS} from './Action.js'
  * Compare a model grid against an observation collection.
  */
 export default class CoverageModelObservationCompare extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     
     if (this._isSingleCoverage(data)) {
       this.cov = this._getSingleCoverage(data)

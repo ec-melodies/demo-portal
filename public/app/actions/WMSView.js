@@ -5,8 +5,8 @@ import ImageLegend from '../ImageLegend.js'
 import {default as Action, VIEW} from './Action.js'
 
 export default class WMSView extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     this.data = data
     
     this._setHidden()
@@ -75,11 +75,13 @@ export default class WMSView extends Action {
   remove () {
     let map = this.context.map
     
-    let datasetTitle = i18n(this.context.dataset.title)
-    map.layerControl.removeGroup(datasetTitle)
     for (let layer of this.layers) {
-      map.removeLayer(layer)
+      if (map.hasLayer(layer)) {
+        map.removeLayer(layer)
+      }
+      map.layerControl.removeLayer(layer)
     }
+    this.layers = []
   }
 }
 

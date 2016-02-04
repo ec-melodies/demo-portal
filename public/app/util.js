@@ -1,5 +1,27 @@
 import 'fetch'
 
+/**
+ * A Map which returns a default value for get(key) if key does not exist.
+ */
+export class DefaultMap {
+  constructor (defaultFactory, iterable) {
+    this._map = new Map(iterable)
+    this.defaultFactory = defaultFactory
+  }
+  get (key) {
+    if (!this._map.has(key)) {
+      this._map.set(key, this.defaultFactory())
+    }
+    return this._map.get(key)
+  }
+  set (key, val) {
+    this._map.set(key, val)
+  }
+  delete (key) {
+    this._map.delete(key)
+  }
+}
+
 export function i18n (prop) {
   if (!prop) return
   // TODO be clever and select proper language

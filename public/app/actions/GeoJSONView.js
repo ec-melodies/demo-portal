@@ -4,8 +4,8 @@ import {i18n} from '../util.js'
 import {default as Action, VIEW} from './Action.js'
 
 export default class GeoJSONView extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     this.data = data
     
     this._setHidden()
@@ -54,7 +54,8 @@ export default class GeoJSONView extends Action {
     let datasetTitle = i18n(this.context.dataset.title)
     let distTitle = i18n(this.context.distribution.title)
 
-    map.layerControl.addOverlay(layer, '<span class="label label-success">GeoJSON</span> ' + distTitle, {groupName: datasetTitle, expanded: true})
+    let layerName = '<span class="label label-success">GeoJSON</span> ' + distTitle
+    map.layerControl.addOverlay(layer, layerName, {groupName: datasetTitle, expanded: true})
     //map.fitBounds(layer.getBounds())
     this.layers.push(layer)
   }
@@ -62,11 +63,13 @@ export default class GeoJSONView extends Action {
   remove () {
     let map = this.context.map
     
-    let datasetTitle = i18n(this.context.dataset.title)
-    map.layerControl.removeGroup(datasetTitle)
     for (let layer of this.layers) {
-      map.removeLayer(layer)
+      if (map.hasLayer(layer)) {
+        map.removeLayer(layer)
+      }
+      map.layerControl.removeLayer(layer)
     }
+    this.layers = []
   }
 }
 

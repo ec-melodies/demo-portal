@@ -41,8 +41,8 @@ const TEMPLATES = {
  * 
  */
 export default class StatisticalCoverageView extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     this.cov = data
     
     this.label = 'View'

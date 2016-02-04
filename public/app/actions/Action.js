@@ -12,20 +12,10 @@ export const EXTERNAL_LINK = 'external_link'
  * should be fired.
  */
 export default class Action extends Eventable {
-  constructor () {
+  constructor (context) {
     super()
-    this._context = {}
+    this.context = context || {}
     this.type = this.constructor.type
-  }
-  /**
-   * Set by Workspace._loadDistribution().
-   */
-  set context (val) {
-    this._context = val
-  }
-  
-  get context () {
-    return this._context
   }
   
   /**

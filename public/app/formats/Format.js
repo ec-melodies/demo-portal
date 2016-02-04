@@ -17,12 +17,10 @@ export default class Format extends Eventable {
   getActions (obj, context) {
     let actions = []
     for (let actionClass of this.actionClasses) {
-      let action = new actionClass(obj)
-      action.context = context
+      let action = new actionClass(obj, context)
       if (action.isSupported) {
         actions.push(action)
         this.fire('actionCreate', {action})
-        action.fire('contextSet')
       }
     }
     return actions

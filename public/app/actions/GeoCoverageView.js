@@ -12,31 +12,15 @@ import SelectControl from './SelectControl.js'
  * Displays geospatial coverages on a map.
  */
 export default class GeoCoverageView extends Action {
-  constructor (data) {
-    super()
+  constructor (data, context) {
+    super(context)
     this.cov = data
     
     this._setHidden()
       
     this.layers = []
-    
-    /*
-    this._titleChangeHandler =  => {
-      this._onDatasetTitleChange()
-    }
-    this.on('contextSet', () => {
-      this.context.workspace.on('titleChange', ({dataset, oldTitle, newTitle}) => {
-        if (dataset === this.context.dataset) {
-          this._
-        }
-      })
-    })*/
   }
-  
-  _onDatasetTitleChange () {
     
-  }
-  
   _setVisible () {
     this.visible = true
     this.label = 'Hide'
@@ -137,10 +121,9 @@ export default class GeoCoverageView extends Action {
       }
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
       let formatLabel = this.context.distribution.formatImpl.shortLabel
+      let fullLayerName = '<span class="label label-success">' + formatLabel + '</span> ' + layerName
       map.layerControl.addOverlay(
-          layer,
-          '<span class="label label-success">' + formatLabel + '</span> ' + layerName,
-          {groupName: datasetTitle, expanded: true})
+          layer, fullLayerName, {groupName: datasetTitle, expanded: true})
       this.layers.push(layer)
     }
   }
@@ -148,11 +131,13 @@ export default class GeoCoverageView extends Action {
   remove () {
     let map = this.context.map
     
-    let datasetTitle = i18n(this.context.dataset.title)
-    map.layerControl.removeGroup(datasetTitle)
     for (let layer of this.layers) {
-      map.removeLayer(layer)
+      if (map.hasLayer(layer)) {
+        map.removeLayer(layer)
+      }
+      map.layerControl.removeLayer(layer)
     }
+    this.layers = []
   }
 }
 
