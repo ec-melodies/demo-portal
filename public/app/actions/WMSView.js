@@ -44,6 +44,8 @@ export default class WMSView extends Action {
     let map = this.context.map
     
     let wmsLayers = this.data.layers
+    // FIXME this is not necessarily the endpoint url
+    //      -> read the endpoint url directly from the GetCapabilities document
     let url = this.data.url
     
     let datasetTitle = i18n(this.context.dataset.title)

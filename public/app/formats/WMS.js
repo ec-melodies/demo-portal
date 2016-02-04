@@ -44,9 +44,16 @@ function readCapabilities (wmsEndpoint) {
     let parts = /^(https?:\/\/)(.*)@(.*)/.exec(wmsEndpoint)
     wmsEndpoint = parts[1] + parts[3]
   }
+  let getCapabilitiesUrl
+  if (wmsEndpoint.startsWith('blob:') || wmsEndpoint.indexOf('GetCapabilities') !== -1) {
+    getCapabilitiesUrl = wmsEndpoint
+  } else {
+    getCapabilitiesUrl = wmsEndpoint + '?service=wms&version=1.1.1&request=GetCapabilities'
+  }
+  
   return new Promise((resolve, reject) => {
     let req = new XMLHttpRequest()
-    req.open('GET', wmsEndpoint + '?service=wms&version=1.1.1&request=GetCapabilities')
+    req.open('GET', getCapabilitiesUrl)
     req.overrideMimeType('text/xml')
     
     if (user) {
