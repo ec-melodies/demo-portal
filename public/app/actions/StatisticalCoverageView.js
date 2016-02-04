@@ -154,7 +154,7 @@ export default class StatisticalCoverageView extends Action {
             max: 100,
             padding: 0,
             label: {
-              text: 'Ratio (%)',
+              text: 'Percentage (%)',
               position: 'outer-middle'
             },
             tick: {
@@ -179,14 +179,22 @@ export default class StatisticalCoverageView extends Action {
       // timeseries of single parameter
       let param = this.cov.parameters.get(key)
       
-      let ratioColumn = [key].concat(ranges.get(key).values.map(v => v*100))
-      let obsPropLabel = i18n(param.observedProperty.label)
+      // convert from ratio to percentage
+      let percentageColumn = [key].concat(ranges.get(key).values.map(v => v*100))
+     
+      let obsPropLabel
+      let cats = param.observedProperty.statisticalCategories
+      if (cats && cats.length === 1) {
+        obsPropLabel = i18n(cats[0].label) + ' Percentage'
+      } else {
+        obsPropLabel = i18n(param.observedProperty.label)
+      }
       
       c3.generate({
         bindto: $$('.chart-container', modalEl),
         data: {
           x: 't',
-          columns: [tColumn, ratioColumn],
+          columns: [tColumn, percentageColumn],
           names: {
             [key]: obsPropLabel
           }
