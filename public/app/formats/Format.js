@@ -22,6 +22,7 @@ export default class Format extends Eventable {
       if (action.isSupported) {
         actions.push(action)
         this.fire('actionCreate', {action})
+        action.fire('contextSet')
       }
     }
     return actions

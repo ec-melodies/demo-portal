@@ -58,8 +58,10 @@ export default class Workspace extends Eventable {
   }
   
   setDatasetTitle (dataset, title) {
-    dataset.title = {unknown: title}
-    this.fire('titleChange', {dataset})
+    let oldTitle = dataset.title
+    let newTitle = {unknown: title}
+    dataset.title = newTitle
+    this.fire('titleChange', {dataset, oldTitle, newTitle})
   }
   
   get datasets () {

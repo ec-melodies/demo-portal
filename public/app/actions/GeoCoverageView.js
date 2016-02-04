@@ -19,6 +19,22 @@ export default class GeoCoverageView extends Action {
     this._setHidden()
       
     this.layers = []
+    
+    /*
+    this._titleChangeHandler =  => {
+      this._onDatasetTitleChange()
+    }
+    this.on('contextSet', () => {
+      this.context.workspace.on('titleChange', ({dataset, oldTitle, newTitle}) => {
+        if (dataset === this.context.dataset) {
+          this._
+        }
+      })
+    })*/
+  }
+  
+  _onDatasetTitleChange () {
+    
   }
   
   _setVisible () {
