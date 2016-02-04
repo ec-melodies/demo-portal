@@ -35,6 +35,7 @@ export default class Workspace extends Eventable {
         dataset = JSON.parse(JSON.stringify(dataset))
       }
       this._datasets.set(dataset.id, dataset)
+      // TODO check if dataset has same title as another one, if yes, rename it (e.g. append number)
       this.fire('add', {dataset, parent})
       this._loadDistribution(dataset)
     }
