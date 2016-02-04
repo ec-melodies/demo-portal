@@ -214,6 +214,10 @@ export default class StatisticalCoverageView extends Action {
         },
         axis: {
           y: {
+            min: 0,
+            padding: {
+              bottom: 0
+            },
             label: {
               text: obsPropLabel + ' (%)',
               position: 'outer-middle'
