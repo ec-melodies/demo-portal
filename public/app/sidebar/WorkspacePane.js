@@ -412,7 +412,7 @@ export default class WorkspacePane extends Eventable {
     let el = HTML(TEMPLATES['workspace-dataset'])[0] // the outer div
     let list = $('.workspace-dataset-list', '#' + this.id)
     
-    if (parent) {
+    if (parent && this.workspace.datasets.indexOf(parent) !== -1) {
       $(parent.domEl).addAfter(el)
     } else {
       list.add(el)
