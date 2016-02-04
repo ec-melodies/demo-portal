@@ -3,6 +3,50 @@ import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 
 import {i18n} from '../util.js'
 
+import {default as Action, PROCESS} from './Action.js'
+
+/**
+ * Compare a model grid against an observation collection.
+ */
+export default class CoverageModelObservationCompare extends Action {
+  constructor (data) {
+    super()
+    
+    if (this._isSingleCoverage(data)) {
+      this.cov = this._getSingleCoverage(data)
+    } else {
+      this.cov = data
+    }
+    
+    this.label = 'Intercompare'
+    this.icon = '<span class="glyphicon glyphicon-stats"></span>'
+  }
+  
+  get isSupported () {
+    
+  }
+  
+  run () {
+    // Step 1: determine if this dataset is the model grid or the observation collection
+    // Step 2: display modal for selecting the dataset to compare against
+    //         (filter appropriately by coverage type / collection)
+    // Step 3: display modal for selecting the parameters to compare against (if more than one)
+    // Step 4: interactive map display
+    //         - if there is a model time dimension, display that as an axis selector
+    //           and have an observation time dimension extent selector (e.g. +- 1h)
+    //         - the intercomparison data is calculated for the current model time step and observation time extent
+    //           (don't subset by bounding box for now, do globally, we'll see how it goes)
+    //         - the result is a virtual dataset which is NOT added to the workspace,
+    //           it is just used for displaying the data as if it was added as a dataset
+    //         - there is a button "Store as Dataset" which adds the current virtual comparison dataset
+    //           to the workspace
+    //         - when clicking on a comparison point, a popup is shown with plots etc.
+  }
+  
+}
+
+CoverageModelObservationCompare.type = PROCESS
+
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
   
   // Basic requirements:
