@@ -5,6 +5,10 @@ import {i18n} from '../util.js'
 
 import {default as Action, PROCESS} from './Action.js'
 
+// TODO use full URIs
+const PointCollection = 'PointCoverageCollection'
+const ProfileCollection = 'VerticalProfileCoverageCollection'
+
 /**
  * Compare a model grid against an observation collection.
  */
@@ -12,18 +16,24 @@ export default class CoverageModelObservationCompare extends Action {
   constructor (data, context) {
     super(context)
     
-    if (this._isSingleCoverage(data)) {
-      this.cov = this._getSingleCoverage(data)
-    } else {
-      this.cov = data
-    }
+    this.data = data
     
     this.label = 'Intercompare'
     this.icon = '<span class="glyphicon glyphicon-stats"></span>'
   }
   
   get isSupported () {
+    // either a Grid or a collection of Point or VerticalProfile coverages
     
+    if (this.data.coverages) {
+      if (this.data.profiles.some(p => p.endsWith(PointCollection) || p.endsWith(ProfileCollection))) {
+        return true
+      }
+    } else {
+      // check if Grid, unpack single-cov-collection if necessary
+      
+    }
+    return false
   }
   
   run () {

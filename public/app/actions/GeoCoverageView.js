@@ -108,8 +108,8 @@ export default class GeoCoverageView extends Action {
         .on('dataLoading', () => this.fire('loading'))
         .on('dataLoad', () => this.fire('load'))
         
-      // TODO is this a good way to do that?
-      if (cov.domainType.endsWith('Profile')) {
+      // TODO use full URI
+      if (cov.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
         // we do that outside of the above 'add' handler since we want to register only once,
         // not every time the layer is added to the map
         layer.on('click', () => new ProfilePlot(cov, opts).addTo(map))

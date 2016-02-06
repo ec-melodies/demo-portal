@@ -5,6 +5,7 @@ import Remapper from 'category-remapper'
 import 'category-remapper/css/remapper.css!'
 
 import {withCategories} from 'leaflet-coverage/util/transform.js'
+import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 
 import {i18n} from '../util.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
@@ -187,7 +188,7 @@ export default class CoverageRemapCategories extends Action {
   get isSupported () {
     // Use Case: Category Remapping for grids
     // Current restriction: data is single grid coverage with one or more categorical parameters
-    if (this._isSingleCoverage(this.cov) && this.cov.domainType.endsWith('Grid')) {
+    if (this._isSingleCoverage(this.cov) && this.cov.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
       if (this._getCategoricalParams().length > 0) {
         return true
       }

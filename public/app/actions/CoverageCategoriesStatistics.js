@@ -11,6 +11,7 @@ import {i18n} from '../util.js'
 
 import * as rangeUtil from 'leaflet-coverage/util/range.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
+import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 
 import {default as Action, PROCESS} from './Action.js'
 
@@ -104,7 +105,7 @@ export default class CoverageCategoriesStatistics extends Action {
     // TODO check if there are other multi-valued axes except x,y,t -> if yes, unsupported
     
     // data is single grid coverage with one or more categorical parameters
-    if (this._isSingleCoverage(this.cov) && this.cov.domainType.endsWith('Grid')) {
+    if (this._isSingleCoverage(this.cov) && this.cov.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
       if (this._getCategoricalParams().length > 0) {
         return true
       }
