@@ -1,13 +1,74 @@
 import {indexOfNearest} from 'leaflet-coverage/util/arrays.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
+import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 
-import {i18n} from '../util.js'
+import {$,$$, HTML} from 'minified'
+import Modal from 'bootstrap-native/lib/modal-native.js'
 
+import {i18n, COVJSON_PREFIX} from '../util.js'
+import CoverageData from '../formats/CoverageData.js'
 import {default as Action, PROCESS} from './Action.js'
 
-// TODO use full URIs
-const PointCollection = 'PointCoverageCollection'
-const ProfileCollection = 'VerticalProfileCoverageCollection'
+const PointCollection = COVJSON_PREFIX + 'PointCoverageCollection'
+const ProfileCollection = COVJSON_PREFIX + 'VerticalProfileCoverageCollection'
+
+const TYPE = {
+    MODEL: 1,
+    OBSERVATIONS: 2
+}
+
+let html = `
+<div class="modal fade" id="comparisonDatasetSelectModal" tabindex="-1" role="dialog" aria-labelledby="comparisonDatasetSelectModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="comparisonDatasetSelectModalLabel">Select a dataset to compare against</h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h4>Model-Observation comparison</h4>
+          </div>
+          <div class="panel-body">
+            <p class="help-text-model">
+              The gridded input dataset that you selected is assumed to be the model dataset that is compared
+              against an observation collection dataset (point or vertical profile observations).
+              Please select the observation dataset below.
+            </p>
+            <p class="help-text-observations">
+              The collection-type input dataset that you selected is assumed to be the observation set that is
+              compared against a model grid dataset.
+              Please select the model dataset below.
+            </p>
+            <div class="alert alert-info comparison-distribution-empty" role="alert"><strong>None found.</strong></div>
+          </div>
+          
+          <ul class="list-group comparison-distribution-list"></ul>
+        </div>
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+`
+$('body').add(HTML(html))
+
+const TEMPLATES = {
+  'comparison-distribution-item': `
+  <li class="list-group-item">
+    <h4 class="list-group-item-heading dataset-title"></h4>
+    <p>Distribution: <span class="distribution-title"></span></p>
+    <button type="button" class="btn btn-primary select-button" data-dismiss="modal">
+      Select
+    </button>
+  </li>
+  `
+}
 
 /**
  * Compare a model grid against an observation collection.
@@ -23,17 +84,7 @@ export default class CoverageModelObservationCompare extends Action {
   }
   
   get isSupported () {
-    // either a Grid or a collection of Point or VerticalProfile coverages
-    
-    if (this.data.coverages) {
-      if (this.data.profiles.some(p => p.endsWith(PointCollection) || p.endsWith(ProfileCollection))) {
-        return true
-      }
-    } else {
-      // check if Grid, unpack single-cov-collection if necessary
-      
-    }
-    return false
+    return getCovData(this.data)
   }
   
   run () {
@@ -51,11 +102,99 @@ export default class CoverageModelObservationCompare extends Action {
     //         - there is a button "Store as Dataset" which adds the current virtual comparison dataset
     //           to the workspace
     //         - when clicking on a comparison point, a popup is shown with plots etc.
+    
+    let {data, type} = getCovData(this.data)
+    
+    let modalEl = $('#comparisonDatasetSelectModal')
+    
+    let dists
+    if (type === TYPE.MODEL) {
+      $('.help-text-model', modalEl).show()
+      $('.help-text-observations', modalEl).hide()
+      
+      dists = this.context.workspace.filterDistributions(dist => {
+        if (dist.formatImpl instanceof CoverageData) {
+          let covdata = getCovData(dist.data)
+          return covdata && covdata.type === TYPE.OBSERVATIONS
+        }
+      })
+    } else {
+      $('.help-text-model', modalEl).hide()
+      $('.help-text-observations', modalEl).show()
+      
+      dists = this.context.workspace.filterDistributions(dist => {
+        if (dist.formatImpl instanceof CoverageData) {
+          let covdata = getCovData(dist.data)
+          return covdata && covdata.type === TYPE.MODEL
+        }
+      })
+    }
+    
+    $('.comparison-distribution-list', modalEl).fill()
+    for (let {distribution,dataset} of dists) {
+      let el = $(HTML(TEMPLATES['comparison-distribution-item']))
+      
+      $('.dataset-title', el).fill(i18n(dataset.title))
+      $('.distribution-title', el).fill(i18n(distribution.title))
+      
+      $('.select-button', el).on('click', () => {
+        if (type === TYPE.MODEL) {
+          this.displayParameterSelectModal(data, distribution.data)
+        } else {
+          // extract grid from 1-element collection if necessary 
+          let modelCov = getCovData(distribution.data).data
+          this.displayParameterSelectModal(modelCov, data)
+        }
+      })
+            
+      $('.comparison-distribution-list', modalEl).add(el)
+    }
+    $$('.comparison-distribution-list-empty', modalEl).style.display = dists.length > 0 ? 'none' : 'block'
+    
+    new Modal(modalEl[0]).open()
+  }
+  
+  displayParameterSelectModal (modelCov, observationsColl) {
+    console.log('Model:', modelCov)
+    console.log('Observation collection:', observationsColl)
+    
+    // TODO display modal if multiple non-categorical parameters, otherwise skip to next step
   }
   
 }
 
 CoverageModelObservationCompare.type = PROCESS
+
+/**
+ * Prepares coverage data for comparison, i.e. assigns the semantic type (model or observations)
+ * and also extracts grids from 1-element collections.
+ * If the coverage data is not suitable for intercomparison, then undefined is returned.
+ */
+function getCovData (data) {
+  // either a Grid (=model) or a collection of Point or VerticalProfile coverages (=observations)
+  // also, there must be non-categorical parameters
+  let res
+  if (data.coverages) {
+    if (data.profiles.indexOf(PointCollection) !== -1 || data.profiles.indexOf(ProfileCollection) !== -1) {
+      res = {type: TYPE.OBSERVATIONS, data}
+    }
+    // check if Grid in a 1-element collection
+    if (data.coverages.length === 1 && data.coverages[0].domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+      res = {type: TYPE.MODEL, data: data.coverages[0]}
+    }
+  } else if (data.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+    res = {type: TYPE.MODEL, data}      
+  }
+  if (res && getNonCategoricalParams(res.data).length === 0) {
+    res = undefined
+  }
+  return res
+}
+
+function getNonCategoricalParams (cov) {
+  let params = [...cov.parameters.values()]
+  return params.filter(param => !param.observedProperty.categories)
+}
 
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
   

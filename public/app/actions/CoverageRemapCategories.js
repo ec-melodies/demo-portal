@@ -498,7 +498,6 @@ export default class CoverageRemapCategories extends Action {
             return true
           }
         }
-        return false
       }
     })
   }

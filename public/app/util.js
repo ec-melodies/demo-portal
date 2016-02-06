@@ -1,5 +1,7 @@
 import 'fetch'
 
+export const COVJSON_PREFIX = 'http://coveragejson.org/def#'
+
 /**
  * A Map which returns a default value for get(key) if key does not exist.
  */
