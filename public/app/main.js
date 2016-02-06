@@ -9,12 +9,13 @@ import 'leaflet/dist/leaflet.css!'
 import 'leaflet-providers'
 import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
-import 'leaflet-styledlayercontrol'
 
 import {i18n, DefaultMap} from './util.js'
 import App from './App.js'
 import Sidebar from './sidebar/Sidebar.js'
 import './css/style.css!'
+
+import './styledLayerControl.js'
 import './css/styledLayerControl/styledLayerControl.css!'
 
 // Xmas magic
