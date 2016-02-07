@@ -42,12 +42,55 @@ let html = `
               compared against a model grid dataset.
               Please select the model dataset below.
             </p>
-            <div class="alert alert-info comparison-distribution-empty" role="alert"><strong>None found.</strong></div>
+            <div class="alert alert-info comparison-distribution-list-empty" role="alert"><strong>None found.</strong></div>
           </div>
           
           <ul class="list-group comparison-distribution-list"></ul>
         </div>
        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="comparisonParametersSelectModal" tabindex="-1" role="dialog" aria-labelledby="comparisonParametersSelectModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="comparisonParametersSelectModalLabel">Select parameters</h4>
+      </div>
+      <div class="modal-body">
+        
+        <div class="panel panel-primary">
+          <div class="panel-body">
+            <p>
+              Select the parameters you wish to compare.
+              Note that currently no unit conversion is done.
+            </p>
+              
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="modelComparisonParameter" class="col-sm-2 control-label">Model</label>
+                <div class="col-sm-10">
+                  <select id="modelComparisonParameter" class="form-control model-parameter-select"></select>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="observationComparisonParameter" class="col-sm-2 control-label">Observations</label>
+                <div class="col-sm-10">
+                  <select id="observationComparisonParameter" class="form-control observation-parameter-select"></select>
+                </div>
+              </div>
+            </div>
+                          
+            <div class="parameter-select-button-container"></div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -67,8 +110,10 @@ const TEMPLATES = {
       Select
     </button>
   </li>
-  `
+  `,
+  'params-select-button': `<button type="button" class="btn btn-primary params-select-button" data-dismiss="modal">Select</button>`
 }
+
 
 /**
  * Compare a model grid against an observation collection.
@@ -139,11 +184,11 @@ export default class CoverageModelObservationCompare extends Action {
       
       $('.select-button', el).on('click', () => {
         if (type === TYPE.MODEL) {
-          this.displayParameterSelectModal(data, distribution.data)
+          this._displayParameterSelectModal(data, distribution.data)
         } else {
           // extract grid from 1-element collection if necessary 
           let modelCov = getCovData(distribution.data).data
-          this.displayParameterSelectModal(modelCov, data)
+          this._displayParameterSelectModal(modelCov, data)
         }
       })
             
@@ -154,11 +199,42 @@ export default class CoverageModelObservationCompare extends Action {
     new Modal(modalEl[0]).open()
   }
   
-  displayParameterSelectModal (modelCov, observationsColl) {
+  _displayParameterSelectModal (modelCov, observationsColl) {
     console.log('Model:', modelCov)
     console.log('Observation collection:', observationsColl)
+        
+    let modelParams = getNonCategoricalParams(modelCov)
+    let observationsParams = getNonCategoricalParams(observationsColl)
     
-    // TODO display modal if multiple non-categorical parameters, otherwise skip to next step
+    let modalEl = $('#comparisonParametersSelectModal')
+    
+    let fillSelect = (el, params) => {
+      el.fill()
+      for (let param of params) {
+        let unit = (param.unit.symbol || i18n(param.unit.label)) || 'unknown unit'
+        let label = i18n(param.observedProperty.label) + ' (' + unit + ')'
+        el.add(HTML('<option value="' + param.key + '">' + label + '</option>'))
+      }
+    }
+    
+    fillSelect($('.model-parameter-select', modalEl), modelParams)
+    fillSelect($('.observation-parameter-select', modalEl), observationsParams)
+    
+    // we add this anew each time to get rid of old event listeners
+    $('.parameter-select-button-container', modalEl).fill(HTML(TEMPLATES['params-select-button']))
+    
+    $('.params-select-button', modalEl).on('|click', () => {
+      let modelParamKey = $$('.model-parameter-select', modalEl).value
+      let observationsParamKey = $$('.observation-parameter-select', modalEl).value
+      this._displayIntercomparisonUI (modelCov, observationsColl, modelParamKey, observationsParamKey)
+    })
+    
+    new Modal(modalEl[0]).open()
+  }
+  
+  _displayIntercomparisonUI (modelCov, observationsColl, modelParamKey, observationsParamKey) {
+    console.log('start intercomparison UI:')
+    console.log(modelCov, observationsColl, modelParamKey, observationsParamKey)
   }
   
 }
