@@ -1,6 +1,8 @@
 import {indexOfNearest} from 'leaflet-coverage/util/arrays.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
+import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
+import SelectControl from './SelectControl.js'
 
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
@@ -74,15 +76,15 @@ let html = `
               
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="modelComparisonParameter" class="col-sm-2 control-label">Model</label>
-                <div class="col-sm-10">
+                <label for="modelComparisonParameter" class="col-sm-3 control-label">Model</label>
+                <div class="col-sm-9">
                   <select id="modelComparisonParameter" class="form-control model-parameter-select"></select>
                 </div>
               </div>
               
               <div class="form-group">
-                <label for="observationComparisonParameter" class="col-sm-2 control-label">Observations</label>
-                <div class="col-sm-10">
+                <label for="observationComparisonParameter" class="col-sm-3 control-label">Observations</label>
+                <div class="col-sm-9">
                   <select id="observationComparisonParameter" class="form-control observation-parameter-select"></select>
                 </div>
               </div>
@@ -148,6 +150,10 @@ export default class CoverageModelObservationCompare extends Action {
     //           to the workspace
     //         - when clicking on a comparison point, a popup is shown with plots etc.
     
+    this._displayDistributionSelectModal()
+  }
+  
+  _displayDistributionSelectModal () {
     let {data, type} = getCovData(this.data)
     
     let modalEl = $('#comparisonDatasetSelectModal')
@@ -182,7 +188,7 @@ export default class CoverageModelObservationCompare extends Action {
       $('.dataset-title', el).fill(i18n(dataset.title))
       $('.distribution-title', el).fill(i18n(distribution.title))
       
-      $('.select-button', el).on('click', () => {
+      $('.select-button', el).on('|click', () => {
         if (type === TYPE.MODEL) {
           this._displayParameterSelectModal(data, distribution.data)
         } else {
@@ -199,10 +205,7 @@ export default class CoverageModelObservationCompare extends Action {
     new Modal(modalEl[0]).open()
   }
   
-  _displayParameterSelectModal (modelCov, observationsColl) {
-    console.log('Model:', modelCov)
-    console.log('Observation collection:', observationsColl)
-        
+  _displayParameterSelectModal (modelCov, observationsColl) {        
     let modelParams = getNonCategoricalParams(modelCov)
     let observationsParams = getNonCategoricalParams(observationsColl)
     
@@ -233,9 +236,74 @@ export default class CoverageModelObservationCompare extends Action {
   }
   
   _displayIntercomparisonUI (modelCov, observationsColl, modelParamKey, observationsParamKey) {
-    console.log('start intercomparison UI:')
-    console.log(modelCov, observationsColl, modelParamKey, observationsParamKey)
+    let map = this.context.map
+    
+    this._intercomparisonActive = true
+    
+    let doIntercomparison = (modelTime, obsTimeDelta) => {
+      let promises
+      if (modelTime) {
+        // subset model + filter observations
+        let obsStart = new Date(modelTime - obsTimeDelta*1000)
+        let obsStop = new Date(modelTime + obsTimeDelta*1000)
+        promises = [
+          modelCov.subsetByValue({t: modelTime}),
+          observationsColl.query().filter({t: {start: obsStart, stop: obsStop}}).execute()
+        ]
+      } else {
+        promises = [modelCov, observationsColl]
+      }
+      Promise.all(promises).then(([modelCovSubset, obsCollFiltered]) => {
+        deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(covjson => {
+          // TODO implement
+          console.log(covjson)
+        })
+      })
+    }
+    
+    // UI
+    modelCov.loadDomain().then(modelDomain => {
+      if (modelDomain.axes.has('t')) {
+        // display time controls
+        
+        // Model: simple time axis control
+        let modelTimeSlices = modelDomain.axes.get('t').values.map(t => new Date(t))
+        this._modelTimeControl = new TimeAxis({timeSlices: modelTimeSlices}, {title: 'Model time'})
+          .on('change', ({time}) => {
+            let obsTimeDelta = parseInt(this._obsTimeDeltaControl.value)
+            doIntercomparison(time, obsTimeDelta)
+          })
+          .addTo(map)
+        
+        // Observations: time delta control
+        let choices = [
+          { value: 60, label: '± 1 min' },
+          { value: 60*10, label: '± 10 min' },
+          { value: 60*30, label: '± 30 min' }, 
+          { value: 60*60, label: '± 1 hour' },
+          { value: 60*60*24, label: '± 1 day' }, 
+          { value: 60*60*24*30, label: '± 30 days' }]
+        this._obsTimeDeltaControl = new SelectControl(null, choices, {title: 'Observation time delta'})
+          .on('change', event => {
+            let obsTimeDelta = parseInt(event.value)
+            let modelTime = this._modelTimeControl.time
+            doIntercomparison(modelTime, obsTimeDelta)
+          })
+          .addTo(map)
+          
+        // to start, apply first model time slice and first delta choice
+        doIntercomparison(modelTimeSlices[0], choices[0].value)
+      } else {
+        doIntercomparison()
+      }
+    })
+    
+    // add "finish intercomparison" control
+    // -> this._intercomparisonActive = false
+    
+    // add "store as dataset" control
   }
+  
   
 }
 
@@ -365,11 +433,13 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
       if (!insituHasZ && modelHasZ && modelZ.length > 1) {
         throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
       }
+      
+      // TODO handle nodata values
           
-      // TODO we want the geographically closest grid cell, but subsetByValue is defined numerically only
-      //  -> for x (longitude, wrap-around) we could implement our own search algorithm and use subsetByIndex then
-      //  -> this gets complicated for arbitrary projected CRSs though
-      let promise = model.subsetByValue({x: {target: insituX}, y: {target: insituY}}).then(modelSubset => {
+      // we want exactly the grid cell in which the observation is located
+      let modelX = {start: insituX, stop: insituX}
+      let modelY = {start: insituY, stop: insituY}
+      let promise = model.subsetByValue({x: modelX, y: modelY}).then(modelSubset => {
         return Promise.all([modelSubset.loadDomain(), modelSubset.loadRange(modelParamKey)])
           .then(([modelSubsetDomain, modelSubsetRange]) => {
             

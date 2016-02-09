@@ -24,9 +24,19 @@ export default class CoverageData extends Format {
   }
   
   getMetadata (cov) {
+    let count
+    if (cov.coverages)  {
+      if (cov.paging) {
+        count = cov.paging.total
+      } else {
+        count = cov.coverages.length
+      }
+    } else {
+      count = 1
+    }
     return {
       format: this.label,
-      content: cov.coverages ? cov.coverages.length + ' coverages' : '1 coverage'
+      content: count === 1 ? '1 coverage' : count + ' coverages'
     }
   }
 }

@@ -1,12 +1,18 @@
+import L from 'leaflet'
+
 import LayerFactory from 'leaflet-coverage'
 import {getLayerClass} from 'leaflet-coverage'
+import ParameterSync from 'leaflet-coverage/renderers/ParameterSync.js'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
 
 import {default as Action, VIEW} from './Action.js'
-import {i18n} from '../util.js'
+import {i18n, COVJSON_PREFIX} from '../util.js'
 import SelectControl from './SelectControl.js'
+
+const PROFILE_COLLECTION = COVJSON_PREFIX + 'VerticalProfileCoverageCollection'
+const POINT_COLLECTION = COVJSON_PREFIX + 'PointCoverageCollection'
 
 /**
  * Displays geospatial coverages on a map.
@@ -36,9 +42,16 @@ export default class GeoCoverageView extends Action {
   }
   
   get isSupported () {
-    // TODO support collections
     if (this.cov.coverages && this.cov.coverages.length > 1) {
-      return false
+      // limited collection support
+      if (this.cov.profiles.indexOf(PROFILE_COLLECTION) !== -1 || this.cov.profiles.indexOf(POINT_COLLECTION) !== -1) {
+        // only support collections with root-level parameters (where we then assume a uniform collection)
+        if (!this.cov.parameters) {
+          return false
+        }
+      } else {
+        return false
+      }
     }
     let cov = this.cov
     if (cov.coverages) {
@@ -64,34 +77,76 @@ export default class GeoCoverageView extends Action {
     }
     
     this._setVisible()
-
-    // TODO support collections
     
     let cov = this.cov
-    if (cov.coverages) {
+    if (cov.coverages && cov.coverages.length === 1) {
       cov = cov.coverages[0]
     }
     
-    let firstDisplayed = false
+    let formatLabel = this.context.distribution.formatImpl.shortLabel
+    let layerNamePrefix = '<span class="label label-success">' + formatLabel + '</span> '
+    
+    this.paramSync = new ParameterSync({
+      syncProperties: {
+        palette: (p1, p2) => p1,
+        paletteExtent: (e1, e2) => e1 && e2 ? [Math.min(e1[0], e2[0]), Math.max(e1[1], e2[1])] : null
+      }
+    }).on('parameterAdd', e => {
+        // The virtual sync layer proxies the synced palette, paletteExtent, and parameter.
+        // The sync layer will fire a 'remove' event if all real layers for that parameter were removed.
+        let layer = e.syncLayer
+        if (layer.palette) {
+          CoverageLegend(layer, {
+            position: 'bottomright'
+          }).addTo(map)
+        }
+      })
+    
     // each parameter becomes a layer
     for (let key of cov.parameters.keys()) {
       let opts = {keys: [key]}
-      let layer = LayerFactory()(cov, opts)
-        .on('add', e => {
-          let covLayer = e.target
-          //map.fitBounds(covLayer.getBounds())
-          
-          if (covLayer.palette) {
-            CoverageLegend(layer, {
-              position: 'bottomright'
-            }).addTo(map)
-          }
-          
-          if (covLayer.time !== null) {
+      let layerName = i18n(cov.parameters.get(key).observedProperty.label)
+      let fullLayerName = layerNamePrefix + layerName
+      let layer
+      if (cov.coverages) {
+        let layers = cov.coverages.map(coverage => this._createLayer(coverage, opts, true))
+        // TODO this should be more clever and be oriented towards uniform collections
+        //     then it would make sense to expose properties like palette etc.
+        layer = L.layerGroup(layers)  
+      } else {
+        layer = this._createLayer(cov, opts)
+      }
+      map.layerControl.addOverlay(
+          layer, fullLayerName, {groupName: datasetTitle, expanded: true})
+      this.layers.push(layer) 
+    }
+    
+    // display the first layer
+    let firstLayer = this.layers[0]
+    map.addLayer(firstLayer)
+  }
+  
+  _createLayer (cov, opts, inCollection) {
+    let map = this.context.map
+    let layer = LayerFactory()(cov, opts)
+      .on('add', e => {
+        let covLayer = e.target
+        
+        // This registers the layer with the sync manager.
+        // By doing that, the palette and extent get unified (if existing)
+        // and an event gets fired if a new parameter was added.
+        // See the code above where ParameterSync gets instantiated.
+        this.paramSync.addLayer(covLayer)
+        
+        if (inCollection) {
+          // we could display a time range control for filtering the displayed collection items
+          // same for vertical axis where in addition a target value could be chosen
+        } else {
+          if (covLayer.timeSlices) {
             new TimeAxis(covLayer).addTo(map)
           }
           
-          if (covLayer.vertical !== null) {
+          if (covLayer.verticalSlices) {
             let choices = covLayer.verticalSlices.map(val => ({
               value: val,
               label: val
@@ -103,29 +158,18 @@ export default class GeoCoverageView extends Action {
               })
               .addTo(map)
           }
-         
-        })
-        .on('dataLoading', () => this.fire('loading'))
-        .on('dataLoad', () => this.fire('load'))
-        
-      // TODO use full URI
-      if (cov.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
-        // we do that outside of the above 'add' handler since we want to register only once,
-        // not every time the layer is added to the map
-        layer.on('click', () => new ProfilePlot(cov, opts).addTo(map))
-      }
-        
-      if (!firstDisplayed) {
-        firstDisplayed = true
-        map.addLayer(layer)
-      }
-      let layerName = i18n(cov.parameters.get(key).observedProperty.label)
-      let formatLabel = this.context.distribution.formatImpl.shortLabel
-      let fullLayerName = '<span class="label label-success">' + formatLabel + '</span> ' + layerName
-      map.layerControl.addOverlay(
-          layer, fullLayerName, {groupName: datasetTitle, expanded: true})
-      this.layers.push(layer)
+        }
+      })
+      .on('dataLoading', () => this.fire('loading'))
+      .on('dataLoad', () => this.fire('load'))
+    
+    // TODO use full URI
+    if (cov.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
+      // we do that outside of the above 'add' handler since we want to register only once,
+      // not every time the layer is added to the map
+      layer.on('click', () => new ProfilePlot(cov, opts).addTo(map))
     }
+    return layer
   }
   
   remove () {

@@ -13,13 +13,18 @@ export default class SelectControl extends L.Control {
     this._title = options.title || ''
     this.covLayer = covLayer
     this._choices = choices
+    this.value = choices[0].value
 
     this._remove = () => this.removeFrom(this._map)
-    covLayer.on('remove', this._remove)
+    if (covLayer && covLayer.on) {
+      covLayer.on('remove', this._remove)
+    }
   }
     
   onRemove (map) {
-    this.covLayer.off('remove', this._remove)
+    if (this.covLayer && this.covLayer.off) {
+      this.covLayer.off('remove', this._remove)
+    }
   }
   
   onAdd (map) {
@@ -34,6 +39,7 @@ export default class SelectControl extends L.Control {
     
     $('select', el).on('change', event => {
       this.fire('change', {value: event.target.value})
+      this.value = event.target.value
     })
     
     return el
