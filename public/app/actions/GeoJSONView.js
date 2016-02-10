@@ -42,9 +42,37 @@ export default class GeoJSONView extends Action {
     
     let map = this.context.map
     
+    let color = '#CC2222'
+    let defaultStyle = {
+      color: color,
+      weight: 2,
+      opacity: 0.6,
+      fillOpacity: 0,
+      fillColor: color
+    }
+    
+    let highlightStyle = {
+      color: color, 
+      weight: 3,
+      opacity: 0.6,
+      fillOpacity: 0.65,
+      fillColor: color
+    }
+    
+    let mouseoverFn = e => {
+      e.target.setStyle(highlightStyle)
+    }
+    
+    let mouseoutFn = e => {
+      e.target.setStyle(defaultStyle)
+    }
+    
     let layer = L.geoJson(this.data, {
       pointToLayer: (feature, latlng) => L.circleMarker(latlng),
       onEachFeature: (feature, layer) => {
+        layer.setStyle(defaultStyle)
+        layer.on('mouseover', mouseoverFn)
+        layer.on('mouseout', mouseoutFn)
         layer.bindPopup(
             '<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>',
             { maxWidth: 400, maxHeight: 300 })
@@ -56,7 +84,6 @@ export default class GeoJSONView extends Action {
 
     let layerName = '<span class="label label-success">GeoJSON</span> ' + distTitle
     map.layerControl.addOverlay(layer, layerName, {groupName: datasetTitle, expanded: true})
-    //map.fitBounds(layer.getBounds())
     this.layers.push(layer)
   }
   

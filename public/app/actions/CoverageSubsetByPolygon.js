@@ -137,8 +137,37 @@ export default class CoverageSubsetByPolygon extends Action {
     }
     let map = this.context.map
     
+    // copied from GeoJSONView
+    let color = '#CC2222'
+    let defaultStyle = {
+      color: color,
+      weight: 2,
+      opacity: 0.6,
+      fillOpacity: 0,
+      fillColor: color
+    }
+    
+    let highlightStyle = {
+      color: color, 
+      weight: 3,
+      opacity: 0.6,
+      fillOpacity: 0.65,
+      fillColor: color
+    }
+    
+    let mouseoverFn = e => {
+      e.target.setStyle(highlightStyle)
+    }
+    
+    let mouseoutFn = e => {
+      e.target.setStyle(defaultStyle)
+    }
+    
     var featuresLayer = L.geoJson(features, {
       onEachFeature: (feature, layer) => {
+        layer.setStyle(defaultStyle)
+        layer.on('mouseover', mouseoverFn)
+        layer.on('mouseout', mouseoutFn)
         layer.on('click', () => {
           this._applySubsetAndCreateVirtualDataset(feature)
           map.removeLayer(featuresLayer)
