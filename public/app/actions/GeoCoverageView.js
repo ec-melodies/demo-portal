@@ -2,7 +2,7 @@ import L from 'leaflet'
 
 import LayerFactory from 'leaflet-coverage'
 import {getLayerClass} from 'leaflet-coverage'
-import ParameterSync from 'leaflet-coverage/renderers/ParameterSync.js'
+import ParameterSync from 'leaflet-coverage/layers/ParameterSync.js'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
@@ -143,7 +143,8 @@ export default class GeoCoverageView extends Action {
           // same for vertical axis where in addition a target value could be chosen
         } else {
           if (covLayer.timeSlices) {
-            new TimeAxis(covLayer).addTo(map)
+            let timeAxis = new TimeAxis(covLayer)
+            timeAxis.addTo(map)
           }
           
           if (covLayer.verticalSlices) {
