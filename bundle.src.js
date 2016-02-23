@@ -6412,6 +6412,43 @@ $__System.register('60', ['61', '5f'], function (_export) {
     });
   }
 
+  function checkEmpty(obj, err) {
+    if (Object.keys(obj).length > 0) {
+      throw new Error(err);
+    }
+  }
+
+  function getBboxString(bbox) {
+    return bbox.map(getNumberString).join(',');
+  }
+
+  /**
+   * Converts a number to a decimal string in non-scientific notation.
+   */
+  function getNumberString(num) {
+    // try toString() to avoid trailing zeros from toFixed()
+    var str = num.toString();
+    // if this resulted in scientific notation, use toFixed() instead
+    if (str.indexOf('e') !== -1) {
+      str = num.toFixed(20);
+    }
+    return str;
+  }
+
+  function getIndexSubsetString(axis, spec) {
+    var slice = undefined;
+    if (typeof spec === 'number') {
+      slice = getNumberString(spec);
+    } else if (spec.start === spec.stop && (!spec.step || spec.step === 1)) {
+      slice = getNumberString(spec.start);
+    } else {
+      slice = getNumberString(spec.start) + ':' + getNumberString(stop);
+      if (spec.step) {
+        slice += ':' + getNumberString(spec.step);
+      }
+    }
+    return axis + '[' + slice + ']';
+  }
   return {
     setters: [function (_) {
       jsonld = _.promises;
@@ -6494,6 +6531,7 @@ $__System.register('60', ['61', '5f'], function (_export) {
           if (ld.view && ld.view.type === PartialCollectionView) {
             this.isPaged = true;
             this.paging = ld.view;
+            this.paging.total = ld.totalItems;
 
             console.log(ld.view);
           }
@@ -6542,56 +6580,264 @@ $__System.register('60', ['61', '5f'], function (_export) {
             // server supports optional inclusion via Prefer header
             this.supportsPreferHeaders = true;
           }
+
+          this._createCapabilities();
         }
 
         babelHelpers.createClass(API, [{
-          key: 'getIncludeDomainAndRangeHeaders',
-          value: function getIncludeDomainAndRangeHeaders() {
+          key: '_createCapabilities',
+          value: function _createCapabilities() {
+            var caps = {
+              filter: {},
+              subset: {}
+            };
+            var startstop = function startstop() {
+              return {
+                start: true,
+                stop: true
+              };
+            };
+            if (this.supportsBboxFiltering) {
+              // 'x' is not the axis name, it just represents the x-axis in a horizontal CRS
+              caps.filter.x = {
+                start: true,
+                stop: true,
+                dependency: ['y']
+              };
+              caps.filter.y = {
+                start: true,
+                stop: true,
+                dependency: ['x']
+              };
+            }
+            if (this.supportsTimeFiltering) {
+              caps.filter.time = startstop();
+            }
+            if (this.supportsVerticalFiltering) {
+              caps.filter.vertical = startstop();
+            }
+            if (this.supportsBboxSubsetting) {
+              caps.subset.x = {
+                start: true,
+                stop: true,
+                dependency: ['y']
+              };
+              caps.subset.y = {
+                start: true,
+                stop: true,
+                dependency: ['x']
+              };
+            }
+            if (this.supportsTimeSubsetting) {
+              caps.subset.time = startstop();
+            }
+            if (this.supportsVerticalSubsetting) {
+              caps.subset.vertical = startstop();
+            }
+            if (this.supportsVerticalTargetSubsetting) {
+              if (!caps.subset.vertical) {
+                caps.subset.vertical = {};
+              }
+              caps.subset.vertical.target = true;
+            }
+            if (this.supportsIndexSubsetting) {
+              caps.subset.index = {
+                start: true,
+                stop: true,
+                step: true
+              };
+            }
+            if (this.supportsPreferHeaders) {
+              caps.embed = {
+                domain: true,
+                range: true
+              };
+            }
+            this.capabilities = caps;
+          }
+
+          /**
+           * Option keys: time, x, y, vertical, embed
+           * 
+           * Each value except for 'embed' is one of (check this.capabilities to see which ones are supported!):
+           * 
+           * {start, stop} // intersect match
+           * 
+           * 'embed' is an object {domain: true, range: true} where both members are optional.
+           */
+        }, {
+          key: '_getFilterTemplateVars',
+          value: function _getFilterTemplateVars() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+            var templateVars = {};
+            if (options.time) {
+              if (!this.supportsTimeFiltering) {
+                throw new Error('Time filtering not supported!');
+              }
+              var isoStart = options.time.start;
+              var isoEnd = options.time.stop;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterTimeStart)] = isoStart;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterTimeEnd)] = isoEnd;
+              delete options.time;
+            }
+            if (options.vertical) {
+              if (!this.supportsVerticalFiltering) {
+                throw new Error('Vertical filtering not supported!');
+              }
+              var start = getNumberString(options.vertical.start);
+              var end = getNumberString(options.vertical.stop);
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterVerticalStart)] = start;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterVerticalEnd)] = end;
+              delete options.vertical;
+            }
+            if (options.x) {
+              if (!this.supportsBboxFiltering) {
+                throw new Error('BBOX filtering not supported!');
+              }
+              var bboxStr = getBboxString([options.x.start, options.y.start, options.x.stop, options.y.stop]);
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterBbox)] = bboxStr;
+              delete options.x;
+              delete options.y;
+            }
+            checkEmpty(options, 'Unrecognized filter options');
+
+            return templateVars;
+          }
+
+          /**
+           * Option keys: time, x, y, vertical, index
+           * 
+           * Each value is one of (check this.capabilities to see which ones are supported!):
+           * 
+           * For time, x, y, vertical:
+           * ISO string // exact match (time)
+           * number // exact match (x, y, vertical) <- typically not supported by API
+           * {start, stop} // intersect match
+           * {target} // nearest neighbor match
+           * 
+           * For index:
+           * {<axisName>: integer, ...}
+           * {<axisName>: {start,stop[,step]}, ...}
+           */
+        }, {
+          key: '_getSubsetTemplateVars',
+          value: function _getSubsetTemplateVars() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+            var templateVars = {};
+            if (options.time) {
+              if (!this.supportsTimeSubsetting) {
+                throw new Error('Time subsetting not supported!');
+              }
+              var isoStart = options.time.start;
+              var isoEnd = options.time.stop;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetTimeStart)] = isoStart;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetTimeEnd)] = isoEnd;
+              delete options.time;
+            }
+            if (options.x) {
+              if (!this.supportsBboxSubsetting) {
+                throw new Error('BBOX subsetting not supported!');
+              }
+              var bboxStr = getBboxString([options.x.start, options.y.start, options.x.stop, options.y.stop]);
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetBbox)] = bboxStr;
+              delete options.x;
+              delete options.y;
+            }
+            if (options.vertical) {
+              if (options.vertical.target) {
+                if (!this.supportsVerticalTargetSubsetting) {
+                  throw new Error('vertical target subsetting not supported!');
+                }
+                var target = getNumberString(options.vertical.target);
+                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalTarget)] = target;
+              }
+              if (options.vertical.start) {
+                if (!this.supportsVerticalSubsetting) {
+                  throw new Error('vertical subsetting not supported!');
+                }
+                var start = getNumberString(options.vertical.start);
+                var end = getNumberString(options.vertical.stop);
+                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalStart)] = start;
+                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalEnd)] = end;
+              }
+              delete options.vertical;
+            }
+            if (options.index) {
+              if (!this.supportsIndexSubsetting) {
+                throw new Error('index subsetting not supported!');
+              }
+              var strings = [];
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = Object.keys(options.index)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var axis = _step2.value;
+
+                  strings.push(getIndexSubsetString(axis, options.index[axis]));
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                    _iterator2['return']();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetIndex)] = strings;
+            }
+            checkEmpty(options, 'Unrecognized subset options');
+
+            return templateVars;
+          }
+        }, {
+          key: '_getIncludeDomainAndRangeHeaders',
+          value: function _getIncludeDomainAndRangeHeaders() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
             if (!this.supportsPreferHeaders) {
               return {};
             }
+            var uris = [];
+            if (options.domain) {
+              uris.push(Domain);
+            }
+            if (options.range) {
+              uris.push(Range);
+            }
             return {
-              Prefer: 'return=representation; ' + 'include="' + Domain + ' ' + Range + '"'
+              Prefer: 'return=representation; ' + 'include="' + uris.join(' ') + '"'
             };
           }
         }, {
-          key: 'getTimeFilterUrl',
-          value: function getTimeFilterUrl(timeStart, timeEnd) {
-            var _urltemplate$parse$expand;
+          key: 'getUrlAndHeaders',
+          value: function getUrlAndHeaders(options) {
+            var subsetTemplateVars = this._getSubsetTemplateVars(options.subset);
+            var filterTemplateVars = this._getFilterTemplateVars(options.filter);
 
-            var isoStart = timeStart.toISOString();
-            var isoEnd = timeEnd.toISOString();
-            return urltemplate.parse(this.urlTemplate.template).expand((_urltemplate$parse$expand = {}, babelHelpers.defineProperty(_urltemplate$parse$expand, this.supportedUrlProps.get(URL_PROPS.filterTimeStart), isoStart), babelHelpers.defineProperty(_urltemplate$parse$expand, this.supportedUrlProps.get(URL_PROPS.filterTimeEnd), isoEnd), _urltemplate$parse$expand));
+            var templateVars = subsetTemplateVars;
+            for (var key in filterTemplateVars) {
+              templateVars[key] = filterTemplateVars[key];
+            }
+
+            var url = urltemplate.parse(this.urlTemplate.template).expand(templateVars);
+            var headers = this._getIncludeDomainAndRangeHeaders(options.embed);
+            return { url: url, headers: headers };
           }
-
-          /**
-           * @param {Date} time The single time slice to subset to.
-           */
         }, {
-          key: 'getTimeSubsetUrl',
-          value: function getTimeSubsetUrl(time) {
-            var _urltemplate$parse$expand2;
-
-            var iso = time.toISOString();
-            return urltemplate.parse(this.urlTemplate.template).expand((_urltemplate$parse$expand2 = {}, babelHelpers.defineProperty(_urltemplate$parse$expand2, this.supportedUrlProps.get(URL_PROPS.subsetTimeStart), iso), babelHelpers.defineProperty(_urltemplate$parse$expand2, this.supportedUrlProps.get(URL_PROPS.subsetTimeEnd), iso), _urltemplate$parse$expand2));
-          }
-
-          /**
-           * @param {array} bbox [minx,miny,maxx,maxy]
-           */
-        }, {
-          key: 'getBboxSubsetUrl',
-          value: function getBboxSubsetUrl(bbox) {
-            var bboxStr = bbox.map(function (v) {
-              // try toString() to avoid trailing zeros from toFixed()
-              var str = v.toString();
-              // if this resulted in scientific notation, use toFixed() instead
-              if (str.indexOf('e') !== -1) {
-                str = v.toFixed(20);
-              }
-              return str;
-            }).join(',');
-            return urltemplate.parse(this.urlTemplate.template).expand(babelHelpers.defineProperty({}, this.supportedUrlProps.get(URL_PROPS.subsetBbox), bboxStr));
+          key: 'supportsBboxFiltering',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.filterBbox);
           }
         }, {
           key: 'supportsBboxSubsetting',
@@ -6608,6 +6854,26 @@ $__System.register('60', ['61', '5f'], function (_export) {
           get: function get() {
             return this.supportedUrlProps.has(URL_PROPS.subsetTimeStart) && this.supportedUrlProps.has(URL_PROPS.subsetTimeEnd);
           }
+        }, {
+          key: 'supportsVerticalFiltering',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.filterVerticalStart) && this.supportedUrlProps.has(URL_PROPS.filterVerticalEnd);
+          }
+        }, {
+          key: 'supportsVerticalSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetVerticalStart) && this.supportedUrlProps.has(URL_PROPS.subsetVerticalEnd);
+          }
+        }, {
+          key: 'supportsVerticalTargetSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetVerticalTarget);
+          }
+        }, {
+          key: 'supportsIndexSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetIndex);
+          }
         }]);
         return API;
       })();
@@ -6617,7 +6883,132 @@ $__System.register('60', ['61', '5f'], function (_export) {
   };
 });
 
-$__System.register('62', ['60'], function (_export) {
+$__System.register('62', [], function (_export) {
+  // TODO this is copied from leaflet-coverage, DRY!
+
+  /***
+   * Return the indices of the two neighbors in the a array closest to x.
+   * The array must be sorted (strictly monotone), either ascending or descending.
+   * 
+   * If x exists in the array, both neighbors point to x.
+   * If x is lower (greated if descending) than the first value, both neighbors point to 0.
+   * If x is greater (lower if descending) than the last value, both neighbors point to the last index.
+   * 
+   * Adapted from https://stackoverflow.com/a/4431347
+   */
+  'use strict';
+
+  /**
+   * Return the index in a of the value closest to x.
+   * The array a must be sorted, either ascending or descending.
+   * If x happens to be exactly between two values, the one that
+   * appears first is returned.
+   */
+
+  _export('indicesOfNearest', indicesOfNearest);
+
+  _export('indexOfNearest', indexOfNearest);
+
+  function indicesOfNearest(a, x) {
+    if (a.length === 0) {
+      throw new Error('Array must have at least one element');
+    }
+    var lo = -1;
+    var hi = a.length;
+    var ascending = a.length === 1 || a[0] < a[1];
+    // we have two separate code paths to help the runtime optimize the loop
+    if (ascending) {
+      while (hi - lo > 1) {
+        var mid = Math.round((lo + hi) / 2);
+        if (a[mid] <= x) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    } else {
+      while (hi - lo > 1) {
+        var mid = Math.round((lo + hi) / 2);
+        if (a[mid] >= x) {
+          // here's the difference
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    }
+    if (a[lo] === x) hi = lo;
+    if (lo === -1) lo = hi;
+    if (hi === a.length) hi = lo;
+    return [lo, hi];
+  }
+
+  function indexOfNearest(a, x) {
+    var i = indicesOfNearest(a, x);
+    var lo = i[0];
+    var hi = i[1];
+    if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
+      return lo;
+    } else {
+      return hi;
+    }
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+
+$__System.register("63", [], function (_export) {
+  "use strict";
+
+  _export("shallowcopy", shallowcopy);
+
+  _export("mergeInto", mergeInto);
+
+  function shallowcopy(obj) {
+    var copy = Object.create(Object.getPrototypeOf(obj));
+    for (var prop in obj) {
+      copy[prop] = obj[prop];
+    }
+    return copy;
+  }
+
+  function mergeInto(inputObj, targetObj) {
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = Object.keys(inputObj)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var k = _step.value;
+
+        targetObj[k] = inputObj[k];
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator["return"]) {
+          _iterator["return"]();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+
+$__System.register('64', ['60', '62', '63'], function (_export) {
 
   // Note: We currently can't handle Hydra data in non-default graphs due to lack of support in JSON-LD framing.
 
@@ -6631,13 +7022,13 @@ $__System.register('62', ['60'], function (_export) {
    *   The function to use for loading coverage data from a URL.
    *   It is called as loader(url, headers) where headers is an optional object
    *   of HTTP headers to send.
-   *   It must return a Promise succeeding with a Coverage API object.
+   *   It must return a Promise succeeding with a Coverage Data API object.
    *   
-   * @returns {object} The wrapped Coverage API object.
+   * @returns {object} The wrapped Coverage Data API object.
    */
   'use strict';
 
-  var API, QueryProxy;
+  var API, arrays, shallowcopy, mergeInto, QueryProxy;
 
   _export('wrap', wrap);
 
@@ -6653,8 +7044,6 @@ $__System.register('62', ['60'], function (_export) {
   }
 
   function wrapCollection(collection, options) {
-    var _this = this;
-
     // TODO wrap each individual coverage as well!
     return API.discover(collection).then(function (api) {
       var newcoll = shallowcopy(collection);
@@ -6664,21 +7053,19 @@ $__System.register('62', ['60'], function (_export) {
       };
       if (api.isPaged) {
         (function () {
-          var _load = _this._options.loader;
+          var _load = options.loader;
           var wrapPageLink = function wrapPageLink(url) {
             if (!url) return;
             return {
-              // FIXME send Prefer header if used in query()
-              //  -> would be a lot easier if this was a URL parameter
               load: function load() {
-                return _load(url).then(function (coll) {
-                  return wrap(coll, _this._options);
+                return _load(url, options.headers).then(function (coll) {
+                  return wrap(coll, options);
                 });
               }
             };
           };
           newcoll.paging = {
-            total: api.paging.totalItems,
+            total: api.paging.total,
             previous: wrapPageLink(api.paging.previous),
             next: wrapPageLink(api.paging.next),
             first: wrapPageLink(api.paging.first),
@@ -6695,31 +7082,447 @@ $__System.register('62', ['60'], function (_export) {
    * if possible.
    */
 
-  function cleanedConstraints(constraints) {
-    var cleanConstraints = shallowcopy(constraints);
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+  function wrapCoverage(coverage, options) {
+    return API.discover(coverage).then(function (api) {
+      var wrappedCoverage = shallowcopy(coverage);
+      wrappedCoverage.subsetByIndex = wrappedSubsetByIndex(coverage, wrappedCoverage, api, options);
+      wrappedCoverage.subsetByValue = wrappedSubsetByValue(coverage, wrappedCoverage, api, options);
+      return wrappedCoverage;
+    });
+  }
+
+  function wrappedSubsetByIndex(coverage, wrappedCoverage, api, wrapOptions) {
+    return function (constraints) {
+      return coverage.loadDomain().then(function (domain) {
+        constraints = cleanedConstraints(constraints);
+
+        if (!requiresSubsetting(domain, constraints)) {
+          return wrappedCoverage;
+        }
+
+        var caps = api.capabilities.subset;
+        var axisMap = getAxisConcepts(domain);
+
+        /*
+         * If the API supports generic index-based subsetting, then this is used.
+         * If not, several emulation strategies are used instead (if possible).
+         */
+
+        // we split the subsetting constraints into API-compatible and local ones
+        var apiConstraints = {}; // API concept -> spec
+        var localConstraints = {}; // axis name -> spec
+
+        if (caps.index) {
+          apiConstraints.index = constraints;
+        } else {
+          // try to emulate some constraints
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = Object.keys(constraints)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var axis = _step3.value;
+
+              var useApi = false;
+              var constraint = constraints[axis];
+              var cap = caps[axisMap[axis]];
+
+              if (!cap) {
+                // leave useApi = false
+              } else if (typeof constraint !== 'object') {
+                  if (cap.start && cap.stop) {
+                    // emulate identity match via start/stop
+                    var val = domain.axes.get(axis).values[constraint];
+                    constraint = { start: val, stop: val };
+                    useApi = true;
+                  }
+                } else if (!constraint.step) {
+                  // start / stop
+                  if (cap.start && cap.stop) {
+                    var start = domain.axes.get(axis).values[constraint.start];
+                    var _stop = domain.axes.get(axis).values[constraint.stop];
+                    constraint = { start: start, stop: _stop };
+                    useApi = true;
+                  }
+                }
+
+              if (useApi) {
+                apiConstraints[axisMap[axis]] = constraint;
+              } else {
+                localConstraints[axis] = constraint;
+              }
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                _iterator3['return']();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+        }
+
+        toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, caps, axisMap);
+
+        if (Object.keys(apiConstraints).length === 0) {
+          // Note that we DON'T wrap the locally subsetted coverage again.
+          // This would be incorrect as a partially applied local subset would not be
+          // known by the API metadata and therefore a subsequent API subset operation would
+          // return wrong data (too much).
+          // A way out would be to attach the original API info to the original coverage identity,
+          // which can be established with "subsetOf".
+          // Somewhere the constraints used for subsetting would have to be stored as well,
+          // so that we can reproduce them.
+          // E.g.:
+          // 1. Coverage A with API info
+          // 2. Subset Coverage A by bounding box without API -> Coverage B with subset relationship to Coverage A
+          // 3. Subset Coverage B by time
+          //  3.1. Subset Coverage A by time with API -> Coverage C with API info
+          //  3.2. Subset Coverage C by bounding box without API -> Coverage D with subset relationship to Coverage C
+          // TODO implement that or think of something simpler
+          return coverage.subsetByIndex(constraints);
+        }
+
+        var _api$getUrlAndHeaders2 = api.getUrlAndHeaders({ subset: apiConstraints });
+
+        var url = _api$getUrlAndHeaders2.url;
+        var headers = _api$getUrlAndHeaders2.headers;
+
+        return wrapOptions.loader(url, headers).then(function (subset) {
+          // apply remaining subset constraints
+          if (Object.keys(localConstraints).length > 0) {
+            // again, we DON'T wrap the locally subsetted coverage again, see above
+            return subset.subsetByIndex(localConstraints);
+          } else {
+            return wrap(subset, wrapOptions);
+          }
+        });
+      });
+    };
+  }
+
+  function wrappedSubsetByValue(coverage, wrappedCoverage, api, wrapOptions) {
+    return function (constraints) {
+      return coverage.loadDomain().then(function (domain) {
+        constraints = cleanedConstraints(constraints);
+
+        if (!requiresSubsetting(domain, constraints)) {
+          return wrappedCoverage;
+        }
+
+        var caps = api.capabilities.subset;
+        var axisMap = getAxisConcepts(domain);
+
+        /* If the API does not support target-based subsetting, then this can be emulated
+         * via intersection-based subsetting by inspecting the domain locally first
+         * and then subsetting with equal start/stop with the identified domain value.
+         * The same is done for exact match subsetting.
+         * 
+         * FIXME this approach will return invalid results (two instead of one axis step)
+         * if the axis has bounds and they are aligned such that a bound start or end
+         * is identical to the axis value and the neighboring bounds share their start/end.
+         * This is common in WaterML. To account for that, this scenario could be explicitly checked for.
+         * A safe start/stop would then be a newly calculated axis value which is in the middle
+         * of the bounds.
+         */
+
+        // we split the subsetting constraints into API-compatible and local ones
+        var apiConstraints = {}; // API concept -> spec
+        var localConstraints = {}; // axis name -> spec
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+
+        try {
+          for (var _iterator4 = Object.keys(constraints)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var axis = _step4.value;
+
+            var useApi = false;
+            var constraint = constraints[axis];
+            var cap = caps[axisMap[axis]];
+            var isTimeString = axisMap[axis] === 'time';
+
+            if (!cap) {
+              // leave useApi = false
+            } else if (typeof constraint !== 'object') {
+                if (cap.identity) {
+                  useApi = true;
+                } else if (cap.start && cap.stop) {
+                  // emulate identity match via start/stop if we find a matching axis value
+                  var idx = getClosestIndex(domain, axis, constraint.target, isTimeString);
+                  var val = domain.axes.get(axis).values[idx];
+                  if (isTimeString) {
+                    if (new Date(val).getTime() === new Date(constraint).getTime()) {
+                      constraint = { start: constraint, stop: constraint };
+                      useApi = true;
+                    }
+                  } else if (val === constraint) {
+                    constraint = { start: constraint, stop: constraint };
+                    useApi = true;
+                  }
+                }
+              } else if ('target' in constraint) {
+                if (cap.target) {
+                  useApi = true;
+                } else if (cap.start && cap.stop) {
+                  // emulate target via start/stop
+                  var idx = getClosestIndex(domain, axis, constraint.target, isTimeString);
+                  var val = domain.axes.get(axis).values[idx];
+                  constraint = { start: val, stop: val };
+                  useApi = true;
+                }
+              } else {
+                // start / stop
+                useApi = cap.start && cap.stop;
+              }
+
+            if (useApi) {
+              apiConstraints[axisMap[axis]] = constraint;
+            } else {
+              localConstraints[axis] = constraint;
+            }
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+              _iterator4['return']();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+
+        toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, caps, axisMap);
+
+        if (Object.keys(apiConstraints).length === 0) {
+          // again, we DON'T wrap the locally subsetted coverage again, see above
+          return coverage.subsetByValue(constraints);
+        }
+
+        var _api$getUrlAndHeaders3 = api.getUrlAndHeaders({ subset: apiConstraints });
+
+        var url = _api$getUrlAndHeaders3.url;
+        var headers = _api$getUrlAndHeaders3.headers;
+
+        return wrapOptions.loader(url, headers).then(function (subset) {
+          // apply remaining subset constraints
+          if (Object.keys(localConstraints).length > 0) {
+            // again, we DON'T wrap the locally subsetted coverage again, see above
+            return subset.subsetByValue(localConstraints);
+          } else {
+            return wrap(subset, wrapOptions);
+          }
+        });
+      });
+    };
+  }
+
+  /**
+   * Returns an object that maps axis keys to API concept names by
+   * interpreting domain referencing info.
+   * An axis with unknown concept is mapped to undefined.
+   */
+  function getAxisConcepts(domain) {
+    var axisConcepts = {};
+    var referencing = domain.referencing;
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
 
     try {
-      for (var _iterator = Object.keys(constraints)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var key = _step.value;
+      var _loop = function () {
+        var axis = _step5.value;
+
+        var concept = undefined;
+
+        var ref = referencing.filter(function (ref) {
+          return ref.dimensions.indexOf(axis) !== -1;
+        });
+        if (ref.length === 1) {
+          var _ref$0 = ref[0];
+          var dimensions = _ref$0.dimensions;
+          var system = _ref$0.system;
+
+          if (system.type === 'TemporalRS') {
+            // The assumption is that if the API offers filtering/subsetting by time,
+            // then this happens in the same concrete temporal system (calendar etc.).
+            // Also, it is assumed that there is only one time axis.
+            // TODO how to locate the "main" time axis if there are multiple?
+            //      see https://github.com/Reading-eScience-Centre/coveragejson/issues/45
+            concept = 'time';
+          } else if (system.type === 'VerticalCRS') {
+            concept = 'vertical';
+          } else if (system.type === 'GeodeticCRS' || system.type === 'ProjectedCRS') {
+            // a geodetic crs can be x,y or x,y,z
+            // a projected crs is x,y
+            var idx = dimensions.indexOf(axis);
+            if (idx === 0) {
+              concept = 'x';
+            } else if (idx === 1) {
+              concept = 'y';
+            } else if (idx === 2) {
+              concept = 'vertical';
+            }
+          }
+        }
+
+        axisConcepts[axis] = concept;
+      };
+
+      for (var _iterator5 = domain.axes.keys()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        _loop();
+      }
+    } catch (err) {
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+          _iterator5['return']();
+        }
+      } finally {
+        if (_didIteratorError5) {
+          throw _iteratorError5;
+        }
+      }
+    }
+
+    return axisConcepts;
+  }
+
+  /**
+   *  Check if all API dependencies between concepts are met.
+   *  This is mainly for the bounding box case which needs both x and y.
+   *  If a dependency is missing, then the constraint is moved to the
+   *  locally applied ones.
+   */
+  function toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, capabilities, axisConcepts) {
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
+
+    try {
+      var _loop2 = function () {
+        var concept = _step6.value;
+
+        var depends = capabilities[concept].dependency;
+        if (depends && depends.some(function (concept_) {
+          return !apiConstraints[concept_];
+        })) {
+          var axis = Object.keys(axisConcepts).filter(function (axis) {
+            return axisConcepts[axis] === concept;
+          })[0];
+          localConstraints[axis] = apiConstraints[concept];
+          delete apiConstraints[concept];
+        }
+      };
+
+      for (var _iterator6 = Object.keys(apiConstraints)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        _loop2();
+      }
+    } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+          _iterator6['return']();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+  }
+
+  function getClosestIndex(domain, axis, val, isTimeString) {
+    var vals = domain.axes.get(axis).values;
+    if (isTimeString) {
+      // convert to unix timestamps as we need numbers
+      val = new Date(val).getTime();
+      vals = vals.map(function (t) {
+        return new Date(t).getTime();
+      });
+    }
+    var idx = arrays.indexOfNearest(vals, val);
+    return idx;
+  }
+
+  /**
+   * Checks whether the constraints may result in an actual
+   * subsetting of the coverage (=true), or whether they are guaranteed
+   * to have no effect (=false). 
+   */
+  function requiresSubsetting(domain, constraints) {
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+
+    try {
+      for (var _iterator7 = Object.keys(constraints)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var axisKey = _step7.value;
+
+        var len = domain.axes.get(axisKey).values.length;
+        if (len > 1) {
+          return true;
+        }
+      }
+    } catch (err) {
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+          _iterator7['return']();
+        }
+      } finally {
+        if (_didIteratorError7) {
+          throw _iteratorError7;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  function cleanedConstraints(constraints) {
+    var cleanConstraints = shallowcopy(constraints);
+    var _iteratorNormalCompletion8 = true;
+    var _didIteratorError8 = false;
+    var _iteratorError8 = undefined;
+
+    try {
+      for (var _iterator8 = Object.keys(constraints)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+        var key = _step8.value;
 
         if (constraints[key] === undefined || constraints[key] === null) {
           delete cleanConstraints[key];
         }
       }
     } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
+      _didIteratorError8 = true;
+      _iteratorError8 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion && _iterator['return']) {
-          _iterator['return']();
+        if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+          _iterator8['return']();
         }
       } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
+        if (_didIteratorError8) {
+          throw _iteratorError8;
         }
       }
     }
@@ -6727,169 +7530,22 @@ $__System.register('62', ['60'], function (_export) {
     return cleanConstraints;
   }
 
-  function wrapCoverage(coverage, options) {
-    var load = options.loader;
-    return API.discover(coverage).then(function (api) {
-      // we implement this ad-hoc as we need it and refactor later
-
-      // TODO wrap subsetByValue
-
-      if (api.supportsTimeSubsetting || api.supportsBboxSubsetting) {
-        // wrap subsetByIndex and use API if only time is subsetted
-        var newcov = shallowcopy(coverage);
-
-        newcov.subsetByIndex = function (constraints) {
-          return coverage.loadDomain().then(function (domain) {
-            var useApi = true;
-
-            if (!api.supportsTimeSubsetting) {
-              useApi = false;
-            }
-
-            constraints = cleanedConstraints(constraints);
-
-            if (useApi && Object.keys(constraints).length !== 1) {
-              useApi = false;
-            }
-            // TODO don't hardcode the time axis key, search for it with referencing system info
-            //  -> this is not standardized in the Coverage JS API spec yet
-            var timeAxis = 't';
-            if (useApi && !(timeAxis in constraints)) {
-              useApi = false;
-            }
-            if (useApi && typeof constraints[timeAxis] !== 'number') {
-              // TODO normalize before checking (could be start/stop/step)
-              useApi = false;
-            }
-            var timeVal = undefined;
-            if (useApi) {
-              timeVal = domain.axes.get(timeAxis).values[constraints[timeAxis]];
-              if (isNaN(Date.parse(timeVal))) {
-                useApi = false;
-              }
-            }
-
-            if (!useApi) {
-              // Note that we DON'T wrap the locally subsetted coverage again.
-              // This would be incorrect as a partially applied local subset would not be
-              // known by the API metadata and therefore a subsequent API subset operation would
-              // return wrong data (too much).
-              // A way out would be to attach the original API info to the original coverage identity,
-              // which can be established with "subsetOf".
-              // Somewhere the constraints used for subsetting would have to be stored as well,
-              // so that we can reproduce them.
-              // E.g.:
-              // 1. Coverage A with API info
-              // 2. Subset Coverage A by bounding box without API -> Coverage B with subset relationship to Coverage A
-              // 3. Subset Coverage B by time
-              //  3.1. Subset Coverage A by time with API -> Coverage C with API info
-              //  3.2. Subset Coverage C by bounding box without API -> Coverage D with subset relationship to Coverage C
-              // TODO implement that or think of something simpler
-              return coverage.subsetByIndex(constraints);
-            }
-
-            var url = api.getTimeSubsetUrl(new Date(timeVal));
-            return load(url).then(function (subset) {
-              // apply remaining subset constraints
-              delete constraints[timeAxis];
-              if (Object.keys(constraints).length > 0) {
-                // again, we DON'T wrap the locally subsetted coverage again, see above
-                return subset.subsetByIndex(constraints);
-              } else {
-                return wrap(subset, options);
-              }
-            });
-          });
-        };
-
-        newcov.subsetByValue = function (constraints) {
-          return coverage.loadDomain().then(function (domain) {
-            var useApi = true;
-
-            constraints = cleanedConstraints(constraints);
-
-            // TODO don't hardcode
-            var xAxis = 'x';
-            var yAxis = 'y';
-
-            if (!(xAxis in constraints) || !(yAxis in constraints)) {
-              useApi = false;
-            }
-
-            if (useApi && (typeof constraints[xAxis] !== 'object' || typeof constraints[yAxis] !== 'object')) {
-              useApi = false;
-            }
-
-            if (useApi && ('target' in constraints[xAxis] || 'target' in constraints[yAxis])) {
-              useApi = false;
-            }
-
-            if (!useApi) {
-              // again, we DON'T wrap the locally subsetted coverage again, see above
-              return coverage.subsetByValue(constraints);
-            }
-
-            var bbox = [constraints[xAxis].start, constraints[yAxis].start, constraints[xAxis].stop, constraints[yAxis].stop];
-
-            var url = api.getBboxSubsetUrl(bbox);
-            return load(url).then(function (subset) {
-              // apply remaining subset constraints
-              delete constraints[xAxis];
-              delete constraints[yAxis];
-              if (Object.keys(constraints).length > 0) {
-                // again, we DON'T wrap the locally subsetted coverage again, see above
-                return subset.subsetByValue(constraints);
-              } else {
-                return wrap(subset, options);
-              }
-            });
-          });
-        };
-
-        return newcov;
-      }
-
-      return coverage;
-    });
-  }
-
-  function shallowcopy(obj) {
-    var copy = Object.create(Object.getPrototypeOf(obj));
-    for (var prop in obj) {
-      copy[prop] = obj[prop];
+  function getOptionsWithHeaders(options, headers) {
+    options = shallowcopy(options);
+    if (!options.headers) {
+      options.headers = {};
     }
-    return copy;
-  }
-
-  function mergeInto(inputObj, targetObj) {
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
-
-    try {
-      for (var _iterator2 = Object.keys(inputObj)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-        var k = _step2.value;
-
-        targetObj[k] = inputObj[k];
-      }
-    } catch (err) {
-      _didIteratorError2 = true;
-      _iteratorError2 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-          _iterator2['return']();
-        }
-      } finally {
-        if (_didIteratorError2) {
-          throw _iteratorError2;
-        }
-      }
-    }
+    mergeInto(headers, options.headers);
+    return options;
   }
   return {
     setters: [function (_) {
       API = _;
+    }, function (_2) {
+      arrays = _2;
+    }, function (_3) {
+      shallowcopy = _3.shallowcopy;
+      mergeInto = _3.mergeInto;
     }],
     execute: function () {
       QueryProxy = (function () {
@@ -6910,27 +7566,27 @@ $__System.register('62', ['60'], function (_export) {
           key: 'filter',
           value: function filter(spec) {
             this._query.filter(spec);
-            this._filter = mergeInto(spec, this._filter);
+            mergeInto(spec, this._filter);
             return this;
           }
         }, {
           key: 'subset',
           value: function subset(spec) {
             this._query.subset(spec);
-            this._subset = mergeInto(spec, this._subset);
+            mergeInto(spec, this._subset);
             return this;
           }
         }, {
           key: 'embed',
           value: function embed(spec) {
             this._query.embed(spec);
-            this._embed = mergeInto(spec, this._embed);
+            mergeInto(spec, this._embed);
             return this;
           }
         }, {
           key: 'execute',
           value: function execute() {
-            var _this2 = this;
+            var _this = this;
 
             var domainTemplate = this._collection.domainTemplate;
             if (domainTemplate) {
@@ -6938,8 +7594,8 @@ $__System.register('62', ['60'], function (_export) {
             } else {
               // inspect domain of first coverage and assume uniform collection
               if (this._collection.coverages.length > 0) {
-                return this._collection.coverages[0].loadDomain(function (domain) {
-                  _this2._doExecute(domain);
+                return this._collection.coverages[0].loadDomain().then(function (domain) {
+                  return _this._doExecute(domain);
                 });
               } else {
                 return this._query.execute();
@@ -6949,54 +7605,131 @@ $__System.register('62', ['60'], function (_export) {
         }, {
           key: '_doExecute',
           value: function _doExecute(domainTemplate) {
-            var _this3 = this;
+            var _this2 = this;
 
             var load = this._options.loader;
-            var useApi = true;
 
-            // we implement this ad-hoc as we need it and refactor later
-            // currently only time filtering support
+            var filterCaps = this._api.capabilities.filter;
+            var subsetCaps = this._api.capabilities.subset;
+            var embedCaps = this._api.capabilities.embed;
+            var axisMap = getAxisConcepts(domainTemplate);
 
-            // filter by time
-            if (!this._api.supportsTimeFiltering) {
-              useApi = false;
+            // split constraints into API and locally applied ones
+            var apiConstraints = {
+              filter: {},
+              subset: {},
+              embed: {}
+            };
+
+            var localFilterConstraints = {}; // axis name -> spec
+            var localSubsetConstraints = {}; // axis name -> spec
+
+            // embedding
+            // makes only sense when using the API, hence there is no local fall-back
+            if (embedCaps.domain && embedCaps.range) {
+              apiConstraints.embed = this._embed;
             }
 
-            // TODO don't hardcode the time axis key, search for it with referencing system info
-            //  -> this is not standardized in the Coverage JS API spec yet
-            var timeAxis = 't';
-            if (useApi && !(timeAxis in this._filter)) {
-              useApi = false;
+            // filtering
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = Object.keys(this._filter)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var axis = _step.value;
+
+                var constraint = this._filter[axis];
+                var cap = filterCaps[axisMap[axis]];
+                if (cap && cap.start && cap.stop) {
+                  apiConstraints.filter[axisMap[axis]] = constraint;
+                } else {
+                  localFilterConstraints[axis] = constraint;
+                }
+              }
+
+              // subsetting
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
             }
 
-            if (useApi && !this._filter[timeAxis]) {
-              useApi = false;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = Object.keys(this._subset)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var axis = _step2.value;
+
+                var constraint = this._subset[axis];
+                var cap = subsetCaps[axisMap[axis]];
+                var useApi = false;
+
+                if (!cap) {
+                  // leave useApi = false
+                } else if (typeof constraint !== 'object' && cap.identity) {
+                    useApi = true;
+                  } else if ('target' in constraint && cap.target) {
+                    useApi = true;
+                  } else if ('start' in constraint && 'stop' in constraint && cap.start && cap.stop) {
+                    useApi = true;
+                  }
+
+                if (useApi) {
+                  apiConstraints.subset[axisMap[axis]] = constraint;
+                } else {
+                  localSubsetConstraints[axis] = constraint;
+                }
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                  _iterator2['return']();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
             }
 
-            if (!useApi) {
+            toLocalConstraintsIfDependencyMissing(apiConstraints.filter, localFilterConstraints, filterCaps, axisMap);
+            toLocalConstraintsIfDependencyMissing(apiConstraints.subset, localSubsetConstraints, subsetCaps, axisMap);
+
+            // TODO if only embed is requested, check if this is already applied and return the original collection in that case
+            if (Object.keys(apiConstraints.filter).length === 0 && Object.keys(apiConstraints.subset).length === 0 && Object.keys(apiConstraints.embed).length === 0) {
               return this._query.execute();
             }
 
-            var _filter$timeAxis = this._filter[timeAxis];
-            var start = _filter$timeAxis.start;
-            var stop = _filter$timeAxis.stop;
+            var _api$getUrlAndHeaders = this._api.getUrlAndHeaders(apiConstraints);
 
-            var url = this._api.getTimeFilterUrl(new Date(start), new Date(stop));
+            var url = _api$getUrlAndHeaders.url;
+            var headers = _api$getUrlAndHeaders.headers;
 
-            var headers = {};
-            if (this._embed['range']) {
-              // TODO this should be applied independent of whether the time filter
-              //  is applied
-              mergeInto(this._api.getIncludeDomainAndRangeHeaders(), headers);
-            }
-
-            return load(url, headers).then(function (filtered) {
+            return load(url, headers).then(function (resultCollection) {
               // apply remaining query parts
-              var newfilter = shallowcopy(_this3._filter);
-              delete newfilter[timeAxis];
-              return filtered.query().filter(newfilter).subset(_this3._subset).embed(_this3._embed).execute().then(function (newcoll) {
-                return wrap(newcoll, _this3._options);
-              });
+              if (Object.keys(localSubsetConstraints).length > 0 || Object.keys(localFilterConstraints).length > 0) {
+                // the locally queried collection is NOT wrapped! see comment for coverage subsetting below
+                return resultCollection.query().filter(localFilterConstraints).subset(localSubsetConstraints).execute();
+              } else {
+                // carry-over headers for paging
+                var options = getOptionsWithHeaders(_this2._options, headers);
+                return wrap(resultCollection, options);
+              }
             });
           }
         }]);
@@ -7006,7 +7739,7 @@ $__System.register('62', ['60'], function (_export) {
   };
 });
 
-$__System.register("53", ["62"], function (_export) {
+$__System.register("53", ["64"], function (_export) {
   "use strict";
 
   return {
@@ -7025,7 +7758,7 @@ $__System.register("53", ["62"], function (_export) {
   };
 });
 
-$__System.register('63', ['52', '53', '54'], function (_export) {
+$__System.register('65', ['52', '53', '54'], function (_export) {
   'use strict';
 
   var CovJSONReader, RestAPI, CoverageData, CovJSON;
@@ -7080,7 +7813,7 @@ $__System.register('63', ['52', '53', '54'], function (_export) {
   };
 });
 
-$__System.register('64', ['65', '66'], function (_export) {
+$__System.register('66', ['67', '68'], function (_export) {
   'use strict';
 
   var $, Format, WMS;
@@ -7193,11 +7926,11 @@ $__System.register('64', ['65', '66'], function (_export) {
   };
 });
 
-$__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_export) {
+$__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export) {
   /* */
   'use strict';
 
-  var L, ndarray, linearPalette, directPalette, scale, arrays, rangeutil, referencingutil, COVJSON_GRID, checkProfile, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
+  var L, ndarray, linearPalette, directPalette, scale, arrays, rangeutil, referencingutil, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
 
   function wrapLongitude(lon, range) {
     return wrapNum(lon, range, true);
@@ -7216,19 +7949,16 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
       L = _['default'];
     }, function (_2) {
       ndarray = _2['default'];
-    }, function (_3) {
-      linearPalette = _3.linearPalette;
-      directPalette = _3.directPalette;
-      scale = _3.scale;
-    }, function (_4) {
-      arrays = _4;
     }, function (_a) {
-      rangeutil = _a;
+      linearPalette = _a.linearPalette;
+      directPalette = _a.directPalette;
+      scale = _a.scale;
     }, function (_b) {
-      referencingutil = _b;
+      arrays = _b;
     }, function (_c) {
-      COVJSON_GRID = _c.COVJSON_GRID;
-      checkProfile = _c.checkProfile;
+      rangeutil = _c;
+    }, function (_d) {
+      referencingutil = _d;
     }],
     execute: function () {
       DEFAULT_CONTINUOUS_PALETTE = function DEFAULT_CONTINUOUS_PALETTE() {
@@ -7283,12 +8013,11 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
           babelHelpers.classCallCheck(this, Grid);
 
           babelHelpers.get(Object.getPrototypeOf(Grid.prototype), 'constructor', this).call(this);
-          checkProfile(cov.domainProfiles, COVJSON_GRID);
 
           this.cov = cov;
           this.param = cov.parameters.get(options.keys[0]);
           this._axesSubset = { // x and y are not subsetted
-            t: { coordPref: options.time },
+            t: { coordPref: options.time ? options.time.toISOString() : undefined },
             z: { coordPref: options.vertical }
           };
           this._initCategoryIdxMap();
@@ -7320,23 +8049,13 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
               throw new Error('paletteExtent cannot be given for categorical parameters');
             }
           } else {
-            if (options.paletteExtent === undefined) {
+            if (!options.paletteExtent) {
               this._paletteExtent = 'subset';
             } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
               this._paletteExtent = options.paletteExtent;
             } else {
               throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted');
             }
-          }
-
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
           }
         }
 
@@ -7524,27 +8243,7 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
           value: function _subsetByCoordinatePreference() {
             var _this2 = this;
 
-            /**
-             * Return the index of the coordinate value closest to the given value
-             * within the given axis. Supports ascending and descending axes.
-             * If the axis does not exist, then undefined is returned.
-             */
-            var getClosestIndex = function getClosestIndex(axis, val) {
-              if (!_this2.domain.axes.has(axis)) {
-                return;
-              }
-              var vals = _this2.domain.axes.get(axis).values;
-              if (axis === 't') {
-                // convert to unix timestamps as we need numbers
-                val = val.getTime();
-                vals = vals.map(function (t) {
-                  return new Date(t).getTime();
-                });
-              }
-              var idx = arrays.indexOfNearest(vals, val);
-              return idx;
-            };
-
+            var spec = {};
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
@@ -7554,13 +8253,15 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
                 var axis = _step4.value;
 
                 var ax = this._axesSubset[axis];
-                if (ax.coordPref == undefined && this.domain.axes.has(axis)) {
-                  // == also handles null
-                  ax.idx = 0;
-                } else {
-                  ax.idx = getClosestIndex(axis, ax.coordPref);
+                if (!this.domain.axes.has(axis)) {
+                  continue;
                 }
-                ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null;
+                if (ax.coordPref == undefined) {
+                  // == also handles null
+                  spec[axis] = this.domain.axes.get(axis).values[0];
+                } else {
+                  spec[axis] = { target: ax.coordPref };
+                }
               }
             } catch (err) {
               _didIteratorError4 = true;
@@ -7578,14 +8279,20 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
             }
 
             this.fire('dataLoading'); // for supporting loading spinners
-            return this.cov.subsetByIndex({ t: this._axesSubset.t.idx, z: this._axesSubset.z.idx }).then(function (subsetCov) {
+            return this.cov.subsetByValue(spec).then(function (subsetCov) {
               _this2.subsetCov = subsetCov;
               //  the goal is to avoid reloading data when approximating palette extent via subsetting
               //  but: memory has to be freed when the layer is removed from the map
               //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
-              _this2.subsetCov.cacheRanges = true;
-              return _this2.subsetCov.loadRange(_this2.param.key);
-            }).then(function (subsetRange) {
+              subsetCov.cacheRanges = true;
+              return Promise.all([subsetCov.loadDomain(), subsetCov.loadRange(_this2.param.key)]);
+            }).then(function (_ref) {
+              var _ref2 = babelHelpers.slicedToArray(_ref, 2);
+
+              var subsetDomain = _ref2[0];
+              var subsetRange = _ref2[1];
+
+              _this2.subsetDomain = subsetDomain;
               _this2.subsetRange = subsetRange;
               if (!_this2.param.observedProperty.categories) {
                 return _this2._updatePaletteExtent(_this2._paletteExtent);
@@ -7660,6 +8367,39 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
             } else {
               throw new Error('Unknown extent specification: ' + extent);
             }
+          }
+        }, {
+          key: 'getValueAt',
+
+          /**
+           * Return the displayed value at a given geographic position.
+           * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
+           */
+          value: function getValueAt(latlng) {
+            if (!latlng) throw new Error('latlng parameter missing');
+            // TODO see drawTile(), domain must be lat/lon for now
+            var x = this.domain.axes.get('x').values;
+            var y = this.domain.axes.get('y').values;
+            var bbox = this._getDomainBbox();
+            var lonRange = [bbox[0], bbox[0] + 360];
+            var lat = latlng.lat;
+            var lon = latlng.lon;
+
+            // we first check whether the tile pixel is outside the domain bounding box
+            // in that case we skip it as we do not want to extrapolate
+            if (lat < bbox[1] || lat > bbox[3]) {
+              return;
+            }
+
+            lon = wrapLongitude(lon, lonRange);
+            if (lon < bbox[0] || lon > bbox[2]) {
+              return;
+            }
+
+            var iLat = arrays.indexOfNearest(y, lat);
+            var iLon = arrays.indexOfNearest(x, lon);
+
+            return this.subsetRange.get({ y: iLat, x: iLon });
           }
         }, {
           key: 'drawTile',
@@ -7745,8 +8485,7 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
               } else {
                   // TODO if the map projection base CRS matches the CRS of the domain,
                   //      could we still draw the grid in projected coordinates?
-                  // -> e.g. UK domain CRS (not projected! easting, northing) and
-                  //         UK basemap in that CRS
+                  // -> e.g. UK domain CRS and UK basemap in that CRS
 
                   throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 'and no geodetic transform data is available');
                 }
@@ -7783,14 +8522,14 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
               ymax += Math.abs(y[yend] - y[yend - 1]) / 2;
             }
             if (xmin > xmax) {
-              var _ref = [xmax, xmin];
-              xmin = _ref[0];
-              xmax = _ref[1];
+              var _ref3 = [xmax, xmin];
+              xmin = _ref3[0];
+              xmax = _ref3[1];
             }
             if (ymin > ymax) {
-              var _ref2 = [ymax, ymin];
-              ymin = _ref2[0];
-              ymax = _ref2[1];
+              var _ref4 = [ymax, ymin];
+              ymin = _ref4[0];
+              ymax = _ref4[1];
             }
             return [xmin, ymin, xmax, ymax];
           }
@@ -7935,11 +8674,11 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
             return false;
           }
         }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
+          key: '_redraw',
+          value: function _redraw() {
             // we check getContainer() to prevent errors when trying to redraw when the layer has not
             // fully initialized yet
-            if (this._autoRedraw && this.getContainer()) {
+            if (this.getContainer()) {
               this.redraw();
             }
           }
@@ -7951,7 +8690,7 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
 
           /**
            * Sets the currently active time to the one closest to the given Date object.
-           * This has no effect if the grid has no time axis.
+           * Throws an exception if there is no time axis.
            */
         }, {
           key: 'time',
@@ -7962,35 +8701,36 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
               throw new Error('No time axis found');
             }
             var old = this.time;
-            this._axesSubset.t.coordPref = val;
+            this._axesSubset.t.coordPref = val.toISOString();
             this._subsetByCoordinatePreference().then(function () {
               if (old === _this5.time) return;
-              _this5._doAutoRedraw();
+              _this5._redraw();
               _this5.fire('axisChange', { axis: 'time' });
             });
           },
 
           /**
            * The currently active time on the temporal axis as Date object, 
-           * or null if the grid has no time axis.
+           * or undefined if the grid has no time axis.
            */
           get: function get() {
-            return this.domain.axes.has('t') ? new Date(this._axesSubset.t.coord) : null;
+            if (this.domain.axes.has('t')) {
+              var time = this.subsetDomain.axes.get('t').values[0];
+              return new Date(time);
+            }
           }
         }, {
           key: 'timeSlices',
           get: function get() {
-            if (!this.domain.axes.has('t')) {
-              return null;
+            if (this.domain.axes.has('t')) {
+              return this.domain.axes.get('t').values.map(function (t) {
+                return new Date(t);
+              });
             }
-            return this.domain.axes.get('t').values.map(function (t) {
-              return new Date(t);
-            });
           }
 
           /**
            * Sets the currently active vertical coordinate to the one closest to the given value.
-           * This has no effect if the grid has no vertical axis.
            */
         }, {
           key: 'vertical',
@@ -8004,31 +8744,38 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
             this._axesSubset.z.coordPref = val;
             this._subsetByCoordinatePreference().then(function () {
               if (old === _this6.vertical) return;
-              _this6._doAutoRedraw();
+              _this6._redraw();
               _this6.fire('axisChange', { axis: 'vertical' });
             });
           },
 
           /**
            * The currently active vertical coordinate as a number, 
-           * or null if the grid has no vertical axis.
+           * or undefined if the grid has no vertical axis.
            */
           get: function get() {
-            return this._axesSubset.z.coord;
+            if (this.domain.axes.has('z')) {
+              var val = this.subsetDomain.axes.get('z').values[0];
+              return val;
+            }
           }
         }, {
           key: 'verticalSlices',
           get: function get() {
-            if (!this.domain.axes.has('z')) {
-              throw new Error('No vertical axis found');
+            if (this.domain.axes.has('z')) {
+              var vals = this.domain.axes.get('z').values;
+              if (ArrayBuffer.isView(vals)) {
+                // convert to plain Array to allow easier use
+                vals = [].concat(babelHelpers.toConsumableArray(vals));
+              }
+              return vals;
             }
-            return this.domain.axes.get('z').values;
           }
         }, {
           key: 'palette',
           set: function set(p) {
             this._palette = p;
-            this._doAutoRedraw();
+            this._redraw();
             this.fire('paletteChange');
           },
           get: function get() {
@@ -8044,7 +8791,7 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
             }
             this._updatePaletteExtent(extent).then(function (changed) {
               if (!changed) return;
-              _this7._doAutoRedraw();
+              _this7._redraw();
               _this7.fire('paletteExtentChange');
             });
           },
@@ -8060,24 +8807,21 @@ $__System.register('67', ['48', '56', '68', '69', '6a', '6b', '6c'], function (_
   };
 });
 
-$__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
+$__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
   /* */
   'use strict';
 
-  var L, linearPalette, scale, rangeutil, referencingutil, COVJSON_TRAJECTORY, checkProfile, DEFAULT_PALETTE, Trajectory;
+  var L, linearPalette, scale, rangeutil, referencingutil, DEFAULT_PALETTE, Trajectory;
   return {
     setters: [function (_) {
       L = _['default'];
-    }, function (_2) {
-      linearPalette = _2.linearPalette;
-      scale = _2.scale;
     }, function (_a) {
-      rangeutil = _a;
-    }, function (_b) {
-      referencingutil = _b;
+      linearPalette = _a.linearPalette;
+      scale = _a.scale;
     }, function (_c) {
-      COVJSON_TRAJECTORY = _c.COVJSON_TRAJECTORY;
-      checkProfile = _c.checkProfile;
+      rangeutil = _c;
+    }, function (_d) {
+      referencingutil = _d;
     }],
     execute: function () {
       DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
@@ -8110,13 +8854,12 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
           babelHelpers.classCallCheck(this, Trajectory);
 
           babelHelpers.get(Object.getPrototypeOf(Trajectory.prototype), 'constructor', this).call(this);
-          checkProfile(cov.domainProfiles, COVJSON_TRAJECTORY);
 
           this.cov = cov;
           this.param = cov.parameters.get(options.keys[0]);
 
           if (this.param.categories) {
-            throw new Error('category parameters are currently not support for Trajectory');
+            throw new Error('category parameters are currently not supported for Trajectory');
           }
 
           this._palette = options.palette || DEFAULT_PALETTE;
@@ -8127,18 +8870,6 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
           } else {
             throw new Error('paletteExtent must either be a 2-element array, ' + 'one of "full", "subset" (identical to "full" for trajectories) or "fov", or be omitted');
           }
-          // TODO remove code duplication
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
-          }
-
-          console.log('Trajectory layer created');
         }
 
         babelHelpers.createClass(Trajectory, [{
@@ -8181,6 +8912,17 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
             this.fire('remove');
             console.log('removing trajectory from map');
             babelHelpers.get(Object.getPrototypeOf(Trajectory.prototype), 'onRemove', this).call(this, map);
+          }
+        }, {
+          key: 'getValueAt',
+
+          /**
+           * Return the displayed value closest to the circle centre.
+           * If no point exists within the circle, undefined is returned,
+           * otherwise a number or null (for no-data).
+           */
+          value: function getValueAt(latlng, radius) {
+            // TODO implement   
           }
         }, {
           key: '_updatePaletteExtent',
@@ -8251,13 +8993,6 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
             this.addLayer(polyline);
           }
         }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
-            if (this._autoRedraw) {
-              this.redraw();
-            }
-          }
-        }, {
           key: 'redraw',
           value: function redraw() {
             this.clearLayers();
@@ -8272,7 +9007,7 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
           key: 'palette',
           set: function set(p) {
             this._palette = p;
-            this._doAutoRedraw();
+            this.redraw();
             this.fire('paletteChange');
           },
           get: function get() {
@@ -8282,7 +9017,7 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
           key: 'paletteExtent',
           set: function set(extent) {
             this._updatePaletteExtent(extent);
-            this._doAutoRedraw();
+            this.redraw();
             this.fire('paletteExtentChange');
           },
           get: function get() {
@@ -8292,66 +9027,1039 @@ $__System.register('6d', ['48', '68', '6a', '6b', '6c'], function (_export) {
         return Trajectory;
       })(L.FeatureGroup);
 
-      Trajectory.include(L.Mixin.Events);
-
-      // work-around for Babel bug, otherwise Trajectory cannot be referenced here
-
       _export('default', Trajectory);
     }
   };
 });
 
-$__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export) {
+$__System.register('6f', [], function (_export) {
   /* */
   'use strict';
 
-  var L, linearPalette, scale, arrays, rangeutil, referencingutil, COVJSON_VERTICALPROFILE, checkProfile, DEFAULT_COLOR, DEFAULT_PALETTE, VerticalProfile;
+  "format esm";
+  // 2016-02-23 Maik Riechert - adjust boilerplate to make it node compatible
+
+  /**
+   * k-d Tree JavaScript - V 1.01
+   *
+   * https://github.com/ubilabs/kd-tree-javascript
+   *
+   * @author Mircea Pricop <pricop@ubilabs.net>, 2012
+   * @author Martin Kleppe <kleppe@ubilabs.net>, 2012
+   * @author Ubilabs http://ubilabs.net, 2012
+   * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
+   */
+
+  return {
+    setters: [],
+    execute: function () {
+      (function (root, factory) {
+        if (typeof define === 'function' && define.amd) {
+          // AMD. Register as an anonymous module.
+          define([], factory);
+        } else if (typeof module === 'object' && module.exports) {
+          // Node. Does not work with strict CommonJS, but
+          // only CommonJS-like environments that support module.exports,
+          // like Node.
+          module.exports = factory();
+        }
+      })(undefined, function () {
+        function Node(obj, dimension, parent) {
+          this.obj = obj;
+          this.left = null;
+          this.right = null;
+          this.parent = parent;
+          this.dimension = dimension;
+        }
+
+        function kdTree(points, metric, dimensions) {
+
+          var self = this;
+
+          function buildTree(points, depth, parent) {
+            var dim = depth % dimensions.length,
+                median,
+                node;
+
+            if (points.length === 0) {
+              return null;
+            }
+            if (points.length === 1) {
+              return new Node(points[0], dim, parent);
+            }
+
+            points.sort(function (a, b) {
+              return a[dimensions[dim]] - b[dimensions[dim]];
+            });
+
+            median = Math.floor(points.length / 2);
+            node = new Node(points[median], dim, parent);
+            node.left = buildTree(points.slice(0, median), depth + 1, node);
+            node.right = buildTree(points.slice(median + 1), depth + 1, node);
+
+            return node;
+          }
+
+          // Reloads a serialied tree
+          function loadTree(data) {
+            // Just need to restore the `parent` parameter
+            self.root = data;
+
+            function restoreParent(root) {
+              if (root.left) {
+                root.left.parent = root;
+                restoreParent(root.left);
+              }
+
+              if (root.right) {
+                root.right.parent = root;
+                restoreParent(root.right);
+              }
+            }
+
+            restoreParent(self.root);
+          }
+
+          // If points is not an array, assume we're loading a pre-built tree
+          if (!Array.isArray(points)) loadTree(points, metric, dimensions);else this.root = buildTree(points, 0, null);
+
+          // Convert to a JSON serializable structure; this just requires removing
+          // the `parent` property
+          this.toJSON = function (src) {
+            if (!src) src = this.root;
+            var dest = new Node(src.obj, src.dimension, null);
+            if (src.left) dest.left = self.toJSON(src.left);
+            if (src.right) dest.right = self.toJSON(src.right);
+            return dest;
+          };
+
+          this.insert = function (point) {
+            function innerSearch(_x, _x2) {
+              var _again = true;
+
+              _function: while (_again) {
+                var node = _x,
+                    parent = _x2;
+                _again = false;
+
+                if (node === null) {
+                  return parent;
+                }
+
+                var dimension = dimensions[node.dimension];
+                if (point[dimension] < node.obj[dimension]) {
+                  _x = node.left;
+                  _x2 = node;
+                  _again = true;
+                  dimension = undefined;
+                  continue _function;
+                } else {
+                  _x = node.right;
+                  _x2 = node;
+                  _again = true;
+                  dimension = undefined;
+                  continue _function;
+                }
+              }
+            }
+
+            var insertPosition = innerSearch(this.root, null),
+                newNode,
+                dimension;
+
+            if (insertPosition === null) {
+              this.root = new Node(point, 0, null);
+              return;
+            }
+
+            newNode = new Node(point, (insertPosition.dimension + 1) % dimensions.length, insertPosition);
+            dimension = dimensions[insertPosition.dimension];
+
+            if (point[dimension] < insertPosition.obj[dimension]) {
+              insertPosition.left = newNode;
+            } else {
+              insertPosition.right = newNode;
+            }
+          };
+
+          this.remove = function (point) {
+            var node;
+
+            function nodeSearch(_x3) {
+              var _again2 = true;
+
+              _function2: while (_again2) {
+                var node = _x3;
+                _again2 = false;
+
+                if (node === null) {
+                  return null;
+                }
+
+                if (node.obj === point) {
+                  return node;
+                }
+
+                var dimension = dimensions[node.dimension];
+
+                if (point[dimension] < node.obj[dimension]) {
+                  _x3 = node.left;
+                  _again2 = true;
+                  dimension = undefined;
+                  continue _function2;
+                } else {
+                  _x3 = node.right;
+                  _again2 = true;
+                  dimension = undefined;
+                  continue _function2;
+                }
+              }
+            }
+
+            function removeNode(node) {
+              var nextNode, nextObj, pDimension;
+
+              function findMin(_x4, _x5) {
+                var _again3 = true;
+
+                _function3: while (_again3) {
+                  var node = _x4,
+                      dim = _x5;
+                  _again3 = false;
+
+                  var dimension, own, left, right, min;
+
+                  if (node === null) {
+                    return null;
+                  }
+
+                  dimension = dimensions[dim];
+
+                  if (node.dimension === dim) {
+                    if (node.left !== null) {
+                      _x4 = node.left;
+                      _x5 = dim;
+                      _again3 = true;
+                      dimension = own = left = right = min = undefined;
+                      continue _function3;
+                    }
+                    return node;
+                  }
+
+                  own = node.obj[dimension];
+                  left = findMin(node.left, dim);
+                  right = findMin(node.right, dim);
+                  min = node;
+
+                  if (left !== null && left.obj[dimension] < own) {
+                    min = left;
+                  }
+                  if (right !== null && right.obj[dimension] < min.obj[dimension]) {
+                    min = right;
+                  }
+                  return min;
+                }
+              }
+
+              if (node.left === null && node.right === null) {
+                if (node.parent === null) {
+                  self.root = null;
+                  return;
+                }
+
+                pDimension = dimensions[node.parent.dimension];
+
+                if (node.obj[pDimension] < node.parent.obj[pDimension]) {
+                  node.parent.left = null;
+                } else {
+                  node.parent.right = null;
+                }
+                return;
+              }
+
+              // If the right subtree is not empty, swap with the minimum element on the
+              // node's dimension. If it is empty, we swap the left and right subtrees and
+              // do the same.
+              if (node.right !== null) {
+                nextNode = findMin(node.right, node.dimension);
+                nextObj = nextNode.obj;
+                removeNode(nextNode);
+                node.obj = nextObj;
+              } else {
+                nextNode = findMin(node.left, node.dimension);
+                nextObj = nextNode.obj;
+                removeNode(nextNode);
+                node.right = node.left;
+                node.left = null;
+                node.obj = nextObj;
+              }
+            }
+
+            node = nodeSearch(self.root);
+
+            if (node === null) {
+              return;
+            }
+
+            removeNode(node);
+          };
+
+          this.nearest = function (point, maxNodes, maxDistance) {
+            var i, result, bestNodes;
+
+            bestNodes = new BinaryHeap(function (e) {
+              return -e[1];
+            });
+
+            function nearestSearch(node) {
+              var bestChild,
+                  dimension = dimensions[node.dimension],
+                  ownDistance = metric(point, node.obj),
+                  linearPoint = {},
+                  linearDistance,
+                  otherChild,
+                  i;
+
+              function saveNode(node, distance) {
+                bestNodes.push([node, distance]);
+                if (bestNodes.size() > maxNodes) {
+                  bestNodes.pop();
+                }
+              }
+
+              for (i = 0; i < dimensions.length; i += 1) {
+                if (i === node.dimension) {
+                  linearPoint[dimensions[i]] = point[dimensions[i]];
+                } else {
+                  linearPoint[dimensions[i]] = node.obj[dimensions[i]];
+                }
+              }
+
+              linearDistance = metric(linearPoint, node.obj);
+
+              if (node.right === null && node.left === null) {
+                if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
+                  saveNode(node, ownDistance);
+                }
+                return;
+              }
+
+              if (node.right === null) {
+                bestChild = node.left;
+              } else if (node.left === null) {
+                bestChild = node.right;
+              } else {
+                if (point[dimension] < node.obj[dimension]) {
+                  bestChild = node.left;
+                } else {
+                  bestChild = node.right;
+                }
+              }
+
+              nearestSearch(bestChild);
+
+              if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
+                saveNode(node, ownDistance);
+              }
+
+              if (bestNodes.size() < maxNodes || Math.abs(linearDistance) < bestNodes.peek()[1]) {
+                if (bestChild === node.left) {
+                  otherChild = node.right;
+                } else {
+                  otherChild = node.left;
+                }
+                if (otherChild !== null) {
+                  nearestSearch(otherChild);
+                }
+              }
+            }
+
+            if (maxDistance) {
+              for (i = 0; i < maxNodes; i += 1) {
+                bestNodes.push([null, maxDistance]);
+              }
+            }
+
+            if (self.root) nearestSearch(self.root);
+
+            result = [];
+
+            for (i = 0; i < Math.min(maxNodes, bestNodes.content.length); i += 1) {
+              if (bestNodes.content[i][0]) {
+                result.push([bestNodes.content[i][0].obj, bestNodes.content[i][1]]);
+              }
+            }
+            return result;
+          };
+
+          this.balanceFactor = function () {
+            function height(node) {
+              if (node === null) {
+                return 0;
+              }
+              return Math.max(height(node.left), height(node.right)) + 1;
+            }
+
+            function count(node) {
+              if (node === null) {
+                return 0;
+              }
+              return count(node.left) + count(node.right) + 1;
+            }
+
+            return height(self.root) / (Math.log(count(self.root)) / Math.log(2));
+          };
+        }
+
+        // Binary heap implementation from:
+        // http://eloquentjavascript.net/appendix2.html
+
+        function BinaryHeap(scoreFunction) {
+          this.content = [];
+          this.scoreFunction = scoreFunction;
+        }
+
+        BinaryHeap.prototype = {
+          push: function push(element) {
+            // Add the new element to the end of the array.
+            this.content.push(element);
+            // Allow it to bubble up.
+            this.bubbleUp(this.content.length - 1);
+          },
+
+          pop: function pop() {
+            // Store the first element so we can return it later.
+            var result = this.content[0];
+            // Get the element at the end of the array.
+            var end = this.content.pop();
+            // If there are any elements left, put the end element at the
+            // start, and let it sink down.
+            if (this.content.length > 0) {
+              this.content[0] = end;
+              this.sinkDown(0);
+            }
+            return result;
+          },
+
+          peek: function peek() {
+            return this.content[0];
+          },
+
+          remove: function remove(node) {
+            var len = this.content.length;
+            // To remove a value, we must search through the array to find
+            // it.
+            for (var i = 0; i < len; i++) {
+              if (this.content[i] == node) {
+                // When it is found, the process seen in 'pop' is repeated
+                // to fill up the hole.
+                var end = this.content.pop();
+                if (i != len - 1) {
+                  this.content[i] = end;
+                  if (this.scoreFunction(end) < this.scoreFunction(node)) this.bubbleUp(i);else this.sinkDown(i);
+                }
+                return;
+              }
+            }
+            throw new Error("Node not found.");
+          },
+
+          size: function size() {
+            return this.content.length;
+          },
+
+          bubbleUp: function bubbleUp(n) {
+            // Fetch the element that has to be moved.
+            var element = this.content[n];
+            // When at 0, an element can not go up any further.
+            while (n > 0) {
+              // Compute the parent element's index, and fetch it.
+              var parentN = Math.floor((n + 1) / 2) - 1,
+                  parent = this.content[parentN];
+              // Swap the elements if the parent is greater.
+              if (this.scoreFunction(element) < this.scoreFunction(parent)) {
+                this.content[parentN] = element;
+                this.content[n] = parent;
+                // Update 'n' to continue at the new position.
+                n = parentN;
+              }
+              // Found a parent that is less, no need to move it further.
+              else {
+                  break;
+                }
+            }
+          },
+
+          sinkDown: function sinkDown(n) {
+            // Look up the target element and its score.
+            var length = this.content.length,
+                element = this.content[n],
+                elemScore = this.scoreFunction(element);
+
+            while (true) {
+              // Compute the indices of the child elements.
+              var child2N = (n + 1) * 2,
+                  child1N = child2N - 1;
+              // This is used to store the new position of the element,
+              // if any.
+              var swap = null;
+              // If the first child exists (is inside the array)...
+              if (child1N < length) {
+                // Look it up and compute its score.
+                var child1 = this.content[child1N],
+                    child1Score = this.scoreFunction(child1);
+                // If the score is less than our element's, we need to swap.
+                if (child1Score < elemScore) swap = child1N;
+              }
+              // Do the same checks for the other child.
+              if (child2N < length) {
+                var child2 = this.content[child2N],
+                    child2Score = this.scoreFunction(child2);
+                if (child2Score < (swap == null ? elemScore : child1Score)) {
+                  swap = child2N;
+                }
+              }
+
+              // If the element needs to be moved, swap it, and continue.
+              if (swap != null) {
+                this.content[n] = this.content[swap];
+                this.content[swap] = element;
+                n = swap;
+              }
+              // Otherwise, we are done.
+              else {
+                  break;
+                }
+            }
+          }
+        };
+
+        return { kdTree: kdTree, BinaryHeap: BinaryHeap };
+      });
+    }
+  };
+});
+
+$__System.register('70', ['48', '71', '6f'], function (_export) {
+  /* */
+
+  // We implement this specifically for vertical profiles for now and see what we can move into
+  // a common class later.
+
+  /**
+   * A collection of vertical profiles sharing the same parameters / referencing.
+   * 
+   */
+  'use strict';
+
+  var L, Point, DEFAULT_COLOR, DEFAULT_PALETTE, kdTree, PointCollection;
   return {
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      linearPalette = _2.linearPalette;
-      scale = _2.scale;
+      Point = _2['default'];
+      DEFAULT_COLOR = _2.DEFAULT_COLOR;
+      DEFAULT_PALETTE = _2.DEFAULT_PALETTE;
+    }, function (_f) {
+      kdTree = _f['default'];
+    }],
+    execute: function () {
+      PointCollection = (function (_L$Class) {
+        babelHelpers.inherits(PointCollection, _L$Class);
+
+        function PointCollection(covcoll, options) {
+          babelHelpers.classCallCheck(this, PointCollection);
+
+          babelHelpers.get(Object.getPrototypeOf(PointCollection.prototype), 'constructor', this).call(this);
+
+          // TODO how should we handle collection paging?
+
+          this.covcoll = covcoll;
+          this.param = options.keys ? covcoll.parameters.get(options.keys[0]) : null;
+          this.defaultColor = options.color || DEFAULT_COLOR;
+          this.pointClass = options.pointClass || Point;
+          this.pointOptionsFn = options.pointOptionsFn;
+
+          if (this.param && this.param.categories) {
+            throw new Error('category parameters are currently not supported for VerticalProfileCollection');
+          }
+
+          this._palette = options.palette || DEFAULT_PALETTE;
+
+          if (!options.paletteExtent) {
+            this._paletteExtent = 'full';
+          } else if (Array.isArray(options.paletteExtent) || ['full', 'fov'].indexOf(options.paletteExtent) !== -1) {
+            this._paletteExtent = options.paletteExtent;
+          } else {
+            throw new Error('paletteExtent must either be a 2-element array, one of "full" or "fov", or be omitted');
+          }
+
+          this._layerGroup = L.layerGroup();
+          this._layers = [];
+          this._kdtree = undefined;
+        }
+
+        babelHelpers.createClass(PointCollection, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            this._map = map;
+            this._layerAddCount = 0;
+            this._layerErrors = [];
+
+            var options = {
+              keys: this.param ? [this.param.key] : undefined,
+              color: this.defaultColor,
+              palette: this._palette,
+              paletteExtent: this._paletteExtent
+            };
+            if (this.pointOptionsFn) {
+              var opts = this.pointOptionsFn();
+              for (var key in opts) {
+                options[key] = opts[key];
+              }
+            }
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = this.covcoll[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var cov = _step.value;
+
+                var layer = new this.pointClass(cov, options);
+                this._attachListeners(layer, cov);
+                this._layerGroup.addLayer(layer);
+                this._layers.push(layer);
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          }
+        }, {
+          key: '_attachListeners',
+          value: function _attachListeners(layer, cov) {
+            var _this = this;
+
+            layer.once('add', function () {
+              ++_this._layerAddCount;
+              _this._fireIfOnAddDone();
+            }).once('error', function (e) {
+              _this._layerErrors.push(e);
+              _this._fireIfOnAddDone();
+            }).on('click', function (e) {
+              e.coverage = cov;
+              _this.fire('click', e);
+            });
+          }
+        }, {
+          key: '_fireIfOnAddDone',
+          value: function _fireIfOnAddDone() {
+            if (this._layerAddCount + this._layerErrors.length === this._layers.length) {
+              if (this._layerErrors.length > 0) {
+                this.fire('error', { errors: this._layerErrors });
+              } else {
+                this._initKdtree();
+                if (this.param && this._vertical) {
+                  this._updatePaletteExtent();
+                }
+                this._layerGroup.addTo(this._map);
+                this.fire('add');
+              }
+            }
+          }
+        }, {
+          key: '_initKdtree',
+          value: function _initKdtree() {
+            var points = this._layers.map(function (layer) {
+              var point = layer.getLatLng();
+              point.layer = layer;
+            });
+            var distance = function distance(point1, point2) {
+              return point1.distanceTo(point2);
+            };
+            var dimensions = ['lat', 'lng'];
+            this._kdtree = new kdTree(points, distance, dimensions);
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            map.removeLayer(this._layerGroup);
+            this.fire('remove');
+          }
+        }, {
+          key: 'getBounds',
+          value: function getBounds() {
+            return this._layerGroup.getBounds();
+          }
+
+          /**
+           * Return the displayed value of the vertical profile closest to
+           * the given position and within the given maximum distance.
+           * If no profile is found, undefined is returned, otherwise
+           * a number or null (no-data).
+           * 
+           * @param {number} maxDistance
+           *   Maximum distance in meters that the vertical profile may be
+           *   apart from the given position.
+           */
+        }, {
+          key: 'getValueAt',
+          value: function getValueAt(latlng, maxDistance) {
+            var points = this._kdtree.nearest(latlng, 1, maxDistance);
+            if (points.length > 0) {
+              var point = points[0][0];
+              var val = point.layer.getValue();
+              return val;
+            }
+          }
+        }, {
+          key: '_updatePaletteExtent',
+          value: function _updatePaletteExtent(extent) {
+            var _this2 = this;
+
+            if (Array.isArray(extent) && extent.length === 2) {
+              this._paletteExtent = extent;
+              return;
+            }
+
+            if (!this.param) {
+              throw new Error('palette extent cannot be set when no parameter has been chosen');
+            }
+
+            var layers = undefined;
+            if (extent === 'full') {
+              layers = this._layers;
+            } else if (extent === 'fov') {
+              (function () {
+                var bounds = _this2._map.getBounds();
+                layers = _this2._layers.filter(function (layer) {
+                  return bounds.contains(layer.getLatLng());
+                });
+              })();
+            } else {
+              throw new Error('Unsupported: ' + extent);
+            }
+
+            var min = Infinity;
+            var max = -Infinity;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = layers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var layer = _step2.value;
+
+                var val = layer.getValue();
+                min = Math.min(min, val);
+                max = Math.max(max, val);
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                  _iterator2['return']();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+
+            this._paletteExtent = [min, max];
+          }
+        }, {
+          key: 'redraw',
+          value: function redraw() {
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+              for (var _iterator3 = this._layers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                var layer = _step3.value;
+
+                layer.redraw();
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                  _iterator3['return']();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+          }
+        }, {
+          key: 'parameter',
+          get: function get() {
+            return this.param;
+          }
+        }, {
+          key: 'palette',
+          get: function get() {
+            return this.param ? this._palette : undefined;
+          },
+          set: function set(val) {
+            this._palette = val;
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+              for (var _iterator4 = this._layers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                var layer = _step4.value;
+
+                layer.palette = val;
+              }
+            } catch (err) {
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                  _iterator4['return']();
+                }
+              } finally {
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
+                }
+              }
+            }
+
+            this.fire('paletteChange');
+          }
+        }, {
+          key: 'paletteExtent',
+          set: function set(extent) {
+            this._updatePaletteExtent(extent);
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+              for (var _iterator5 = this._layers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                var layer = _step5.value;
+
+                layer.paletteExtent = this._paletteExtent;
+              }
+            } catch (err) {
+              _didIteratorError5 = true;
+              _iteratorError5 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+                  _iterator5['return']();
+                }
+              } finally {
+                if (_didIteratorError5) {
+                  throw _iteratorError5;
+                }
+              }
+            }
+
+            this.fire('paletteExtentChange');
+          },
+          get: function get() {
+            return this._paletteExtent;
+          }
+        }]);
+        return PointCollection;
+      })(L.Class);
+
+      PointCollection.include(L.Mixin.Events);
+
+      //work-around for Babel bug, otherwise PointCollection cannot be referenced here
+
+      _export('default', PointCollection);
+    }
+  };
+});
+
+$__System.register('72', ['48'], function (_export) {
+  /* */
+
+  /**
+   * A mixin that encapsulates the creation, update, and removal
+   * of a CircleMarker.
+   * 
+   * See Point and VerticalProfile for usage.
+   * 
+   * @param {class} base The base class.
+   * @return {class} The base class with CircleMarkerMixin.
+   */
+  'use strict';
+
+  var L;
+
+  _export('default', CircleMarkerMixin);
+
+  function CircleMarkerMixin(base) {
+    return (function (_base) {
+      babelHelpers.inherits(_class, _base);
+
+      function _class() {
+        babelHelpers.classCallCheck(this, _class);
+        babelHelpers.get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
+      }
+
+      babelHelpers.createClass(_class, [{
+        key: '_addMarker',
+
+        /*
+         * The base class must supply the following:
+         * 
+         * getValue()
+         * _getColor(val)
+         * getLatLng()
+         */
+
+        value: function _addMarker() {
+          var _this = this;
+
+          // TODO do coordinate transformation to lat/lon if necessary
+
+          var val = this.getValue();
+          if (val === null && !this.showNoData) {
+            return;
+          }
+          var color = this._getColor(val);
+          var latlng = this.getLatLng();
+
+          this._marker = L.circleMarker(latlng, { color: color }).on('click', function (e) {
+            return _this.fire('click', e);
+          }).addTo(this._map);
+          if (this._deferBindPopup) {
+            var _marker;
+
+            (_marker = this._marker).bindPopup.apply(_marker, babelHelpers.toConsumableArray(this._deferBindPopup));
+          }
+        }
+      }, {
+        key: '_removeMarker',
+        value: function _removeMarker() {
+          if (this._marker) {
+            this._map.removeLayer(this._marker);
+            delete this._marker;
+          }
+        }
+      }, {
+        key: '__updateMarker',
+        value: function __updateMarker() {
+          this._marker.options.color = this._getColor();
+        }
+      }, {
+        key: 'bindPopup',
+        value: function bindPopup() {
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+
+          if (this._marker) {
+            var _marker2;
+
+            (_marker2 = this._marker).bindPopup.apply(_marker2, args);
+          } else {
+            this._deferBindPopup = args;
+          }
+        }
+      }, {
+        key: 'redraw',
+        value: function redraw() {
+          if (this._marker) {
+            this.__updateMarker();
+            this._marker.redraw();
+          }
+        }
+      }]);
+      return _class;
+    })(base);
+  }
+
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }],
+    execute: function () {}
+  };
+});
+
+$__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
+  /* */
+
+  /** @ignore */
+  'use strict';
+
+  var L, CircleMarkerMixin, EventMixin, linearPalette, scale, referencingutil, DEFAULT_COLOR, DEFAULT_PALETTE, Point;
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }, function (_2) {
+      CircleMarkerMixin = _2['default'];
     }, function (_3) {
-      arrays = _3;
+      EventMixin = _3['default'];
     }, function (_a) {
-      rangeutil = _a;
-    }, function (_b) {
-      referencingutil = _b;
-    }, function (_c) {
-      COVJSON_VERTICALPROFILE = _c.COVJSON_VERTICALPROFILE;
-      checkProfile = _c.checkProfile;
+      linearPalette = _a.linearPalette;
+      scale = _a.scale;
+    }, function (_d) {
+      referencingutil = _d;
     }],
     execute: function () {
       DEFAULT_COLOR = 'black';
+
+      _export('DEFAULT_COLOR', DEFAULT_COLOR);
+
+      /** @ignore */
       DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
+
+      _export('DEFAULT_PALETTE', DEFAULT_PALETTE);
+
       // blues
 
       /**
-       * Renderer for Coverages with domain type Profile.
+       * Renderer for Coverages with domain type Point.
        * 
        * This will simply display a dot on the map and fire a click
        * event when a user clicks on it.
        * The dot either has a defined standard color, or it uses
-       * a palette together with a target depth if a parameter is chosen.
+       * a palette if a parameter is chosen.
        */
 
-      VerticalProfile = (function (_L$Class) {
-        babelHelpers.inherits(VerticalProfile, _L$Class);
+      Point = (function (_CircleMarkerMixin) {
+        babelHelpers.inherits(Point, _CircleMarkerMixin);
 
-        function VerticalProfile(cov, options) {
-          babelHelpers.classCallCheck(this, VerticalProfile);
+        function Point(cov, options) {
+          babelHelpers.classCallCheck(this, Point);
 
-          babelHelpers.get(Object.getPrototypeOf(VerticalProfile.prototype), 'constructor', this).call(this);
-          checkProfile(cov.domainProfiles, COVJSON_VERTICALPROFILE);
+          babelHelpers.get(Object.getPrototypeOf(Point.prototype), 'constructor', this).call(this);
 
           this.cov = cov;
           this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
-          this._targetZ = 'targetZ' in options ? options.targetZ : null;
-          this.defaultColor = options.color ? options.color : DEFAULT_COLOR;
+          this.defaultColor = options.color || DEFAULT_COLOR;
+          this.showNoData = options.showNoData; // if true, draw with default color
 
           if (this.param && this.param.categories) {
-            throw new Error('category parameters are currently not support for Profile');
+            throw new Error('category parameters are currently not supported for Point');
           }
 
           this._palette = options.palette || DEFAULT_PALETTE;
@@ -8360,16 +10068,215 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
           } else {
             this._paletteExtent = 'full';
           }
+        }
 
-          // TODO remove code duplication
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
+        babelHelpers.createClass(Point, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this = this;
+
+            this._map = map;
+
+            this.fire('dataLoading'); // for supporting loading spinners
+
+            function checkWGS84(domain) {
+              var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
+              if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+                throw new Error('Unsupported CRS, must be WGS84');
+              }
+            }
+
+            var promise = undefined;
+            if (this.param) {
+              promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
+                var _ref2 = babelHelpers.slicedToArray(_ref, 2);
+
+                var domain = _ref2[0];
+                var range = _ref2[1];
+
+                _this.domain = domain;
+                checkWGS84(domain);
+                _this.range = range;
+                _this._updatePaletteExtent(_this._paletteExtent);
+                _this._addMarker();
+                _this.fire('add');
+                _this.fire('dataLoad');
+              });
+            } else {
+              promise = this.cov.loadDomain().then(function (domain) {
+                _this.domain = domain;
+                checkWGS84(domain);
+                _this._addMarker();
+                _this.fire('add');
+                _this.fire('dataLoad');
+              });
+            }
+
+            promise['catch'](function (e) {
+              console.error(e);
+              _this.fire('error', e);
+              _this.fire('dataLoad');
+            });
+          }
+        }, {
+          key: 'onRemove',
+          value: function onRemove() {
+            this.fire('remove');
+            this._removeMarker();
+          }
+        }, {
+          key: 'getBounds',
+          value: function getBounds() {
+            return L.latLngBounds([this.getLatLng()]);
+          }
+        }, {
+          key: 'getLatLng',
+          value: function getLatLng() {
+            // TODO convert coordinates to lat/lon if necessary
+            var x = this.domain.axes.get('x').values[0];
+            var y = this.domain.axes.get('y').values[0];
+            return L.latLng(y, x);
+          }
+        }, {
+          key: '_updatePaletteExtent',
+          value: function _updatePaletteExtent(extent) {
+            if (Array.isArray(extent) && extent.length === 2) {
+              this._paletteExtent = extent;
+              return;
+            }
+
+            if (!this.param) {
+              throw new Error('palette extent cannot be set when no parameter has been chosen');
+            }
+
+            var val = this.getValue();
+            this._paletteExtent = [val, val];
+          }
+
+          /**
+           * Return the displayed value (number, or null for no-data),
+           * or undefined if not fixed to a z-coordinate or parameter.
+           */
+        }, {
+          key: 'getValue',
+          value: function getValue() {
+            if (this.param) {
+              return this.range.get({});
+            }
+          }
+        }, {
+          key: '_getColor',
+          value: function _getColor(val) {
+            if (val === null) {
+              // no-data
+              return this.defaultColor;
+            } else if (val === undefined) {
+              // not fixed to a param
+              return this.defaultColor;
+            } else {
+              // use a palette
+              var valScaled = scale(val, this.palette, this.paletteExtent);
+              var _palette = this.palette;
+              var red = _palette.red;
+              var green = _palette.green;
+              var blue = _palette.blue;
+
+              return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
+            }
+          }
+        }, {
+          key: 'parameter',
+          get: function get() {
+            return this.param;
+          }
+        }, {
+          key: 'palette',
+          set: function set(p) {
+            this._palette = p;
+            this.redraw();
+            this.fire('paletteChange');
+          },
+          get: function get() {
+            return this.param ? this._palette : undefined;
+          }
+        }, {
+          key: 'paletteExtent',
+          set: function set(extent) {
+            this._updatePaletteExtent(extent);
+            this.redraw();
+            this.fire('paletteExtentChange');
+          },
+          get: function get() {
+            return this._paletteExtent;
+          }
+        }]);
+        return Point;
+      })(CircleMarkerMixin(EventMixin(L.Class)));
+
+      _export('default', Point);
+    }
+  };
+});
+
+$__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], function (_export) {
+  /* */
+
+  /**
+   * Renderer for Coverages with domain type Profile.
+   * 
+   * This will simply display a dot on the map and fire a click
+   * event when a user clicks on it.
+   * The dot either has a defined standard color, or it uses
+   * a palette together with a target depth if a parameter is chosen.
+   */
+  'use strict';
+
+  var L, DEFAULT_COLOR, DEFAULT_PALETTE, CircleMarkerMixin, EventMixin, scale, arrays, rangeutil, referencingutil, VerticalProfile;
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }, function (_4) {
+      DEFAULT_COLOR = _4.DEFAULT_COLOR;
+      DEFAULT_PALETTE = _4.DEFAULT_PALETTE;
+    }, function (_2) {
+      CircleMarkerMixin = _2['default'];
+    }, function (_3) {
+      EventMixin = _3['default'];
+    }, function (_a) {
+      scale = _a.scale;
+    }, function (_b) {
+      arrays = _b;
+    }, function (_c) {
+      rangeutil = _c;
+    }, function (_d) {
+      referencingutil = _d;
+    }],
+    execute: function () {
+      VerticalProfile = (function (_CircleMarkerMixin) {
+        babelHelpers.inherits(VerticalProfile, _CircleMarkerMixin);
+
+        function VerticalProfile(cov, options) {
+          babelHelpers.classCallCheck(this, VerticalProfile);
+
+          babelHelpers.get(Object.getPrototypeOf(VerticalProfile.prototype), 'constructor', this).call(this);
+
+          this.cov = cov;
+          this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
+          this._axesSubset = {
+            z: { coordPref: options.vertical }
+          };
+          this.defaultColor = options.color ? options.color : DEFAULT_COLOR;
+          this.showNoData = options.showNoData; // if true, draw with default color
+
+          if (this.param && this.param.categories) {
+            throw new Error('category parameters are currently not support for VerticalProfile');
+          }
+
+          this._palette = options.palette || DEFAULT_PALETTE;
+          if (Array.isArray(options.paletteExtent)) {
+            this._paletteExtent = options.paletteExtent;
+          } else {
+            this._paletteExtent = 'full';
           }
         }
 
@@ -8397,9 +10304,9 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
                 var domain = _ref2[0];
                 var range = _ref2[1];
 
-                console.log('domain and range loaded');
-                _this.domain = domain;
                 checkWGS84(domain);
+                _this.domain = domain;
+                _this._subsetByCoordinatePreference();
                 _this.range = range;
                 _this._updatePaletteExtent(_this._paletteExtent);
                 _this._addMarker();
@@ -8408,9 +10315,9 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
               });
             } else {
               promise = this.cov.loadDomain().then(function (domain) {
-                console.log('domain loaded');
-                _this.domain = domain;
                 checkWGS84(domain);
+                _this.domain = domain;
+                _this._subsetByCoordinatePreference();
                 _this._addMarker();
                 _this.fire('add');
                 _this.fire('dataLoad');
@@ -8420,20 +10327,42 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
             promise['catch'](function (e) {
               console.error(e);
               _this.fire('error', e);
-
               _this.fire('dataLoad');
             });
           }
         }, {
+          key: '_subsetByCoordinatePreference',
+          value: function _subsetByCoordinatePreference() {
+            // adapted from Grid.js
+            var z = this._axesSubset.z;
+            if (z.coordPref == undefined) {
+              z.idx = z.coord = undefined;
+            } else {
+              var vals = this.domain.axes.get('z').values;
+              z.idx = arrays.indexOfNearest(vals, z.coordPref);
+              z.coord = vals[z.idx];
+            }
+
+            // Note that we don't subset the coverage currently, since there is no real need for it
+          }
+        }, {
           key: 'onRemove',
-          value: function onRemove(map) {
+          value: function onRemove() {
             this.fire('remove');
             this._removeMarker();
           }
         }, {
           key: 'getBounds',
           value: function getBounds() {
-            return this.marker.getBounds();
+            return L.latLngBounds([this.getLatLng()]);
+          }
+        }, {
+          key: 'getLatLng',
+          value: function getLatLng() {
+            // TODO convert coordinates to lat/lon if necessary
+            var x = this.domain.axes.get('x').values[0];
+            var y = this.domain.axes.get('y').values[0];
+            return L.latLng(y, x);
           }
         }, {
           key: '_updatePaletteExtent',
@@ -8444,72 +10373,44 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
             }
 
             if (!this.param) {
-              throw new Error('palette extent cannot be set when no profile parameter has been chosen');
+              throw new Error('palette extent cannot be set when no parameter has been chosen');
             }
 
             this._paletteExtent = rangeutil.minMax(this.range);
           }
+
+          /**
+           * Return the displayed value (number, or null for no-data),
+           * or undefined if not fixed to a z-coordinate or parameter.
+           */
         }, {
-          key: '_addMarker',
-          value: function _addMarker() {
-            var _this2 = this;
-
-            // TODO do coordinate transformation to lat/lon if necessary
-
-            var x = this.domain.axes.get('x').values[0];
-            var y = this.domain.axes.get('y').values[0];
-            this.marker = L.circleMarker(L.latLng(y, x), { color: this._getColor() });
-
-            this.marker.on('click', function () {
-              _this2.fire('click');
-            });
-
-            this.marker.addTo(this._map);
-          }
-        }, {
-          key: '_removeMarker',
-          value: function _removeMarker() {
-            this._map.removeLayer(this.marker);
-            delete this.marker;
+          key: 'getValue',
+          value: function getValue() {
+            if (this.param && this._axesSubset.z.coord !== undefined) {
+              var val = this.range.get({ z: this._axesSubset.z.idx });
+              return val;
+            }
           }
         }, {
           key: '_getColor',
           value: function _getColor() {
-            var z = this.domain.axes.get('z').values.z;
-
-            if (this.param && this.targetZ !== null) {
+            var val = this.getValue();
+            if (val === null) {
+              // no-data
+              return this.defaultColor;
+            } else if (val === undefined) {
+              // not fixed to a param or z-coordinate
+              return this.defaultColor;
+            } else {
               // use a palette
-              // find the value with z nearest to targetZ
-              var val = this.range.get({ z: arrays.indexOfNearest(z, this.targetZ) });
-              if (val !== null) {
-                var valScaled = scale(val, this.palette, this.paletteExtent);
-                var _palette = this.palette;
-                var red = _palette.red;
-                var green = _palette.green;
-                var blue = _palette.blue;
+              var valScaled = scale(val, this.palette, this.paletteExtent);
+              var _palette = this.palette;
+              var red = _palette.red;
+              var green = _palette.green;
+              var blue = _palette.blue;
 
-                return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
-              }
+              return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
             }
-            return this.defaultColor;
-          }
-        }, {
-          key: '_updateMarker',
-          value: function _updateMarker() {
-            this.marker.options.color = this._getColor();
-          }
-        }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
-            if (this._autoRedraw) {
-              this.redraw();
-            }
-          }
-        }, {
-          key: 'redraw',
-          value: function redraw() {
-            this._updateMarker();
-            this.marker.redraw();
           }
         }, {
           key: 'parameter',
@@ -8517,30 +10418,41 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
             return this.param;
           }
         }, {
-          key: 'targetZ',
+          key: 'vertical',
           get: function get() {
-            return this._targetZ;
+            return this._axesSubset.z.coord;
           },
-          set: function set(z) {
-            this._targetZ = z;
-            this._doAutoRedraw();
-            this.fire('targetZChange');
+          set: function set(val) {
+            this._axesSubset.z.coordPref = val;
+            this._subsetByCoordinatePreference();
+            this.redraw();
+            this.fire('axisChange', { axis: 'vertical' });
+          }
+        }, {
+          key: 'verticalSlices',
+          get: function get() {
+            var vals = this.domain.axes.get('z').values;
+            if (ArrayBuffer.isView(vals)) {
+              // convert to plain Array to allow easier use
+              vals = [].concat(babelHelpers.toConsumableArray(vals));
+            }
+            return vals;
           }
         }, {
           key: 'palette',
           set: function set(p) {
             this._palette = p;
-            this._doAutoRedraw();
+            this.redraw();
             this.fire('paletteChange');
           },
           get: function get() {
-            return this.param && this.targetZ !== null ? this._palette : null;
+            return this.param && this.vertical !== undefined ? this._palette : undefined;
           }
         }, {
           key: 'paletteExtent',
           set: function set(extent) {
             this._updatePaletteExtent(extent);
-            this._doAutoRedraw();
+            this.redraw();
             this.fire('paletteExtentChange');
           },
           get: function get() {
@@ -8548,32 +10460,112 @@ $__System.register('6e', ['48', '68', '69', '6a', '6b', '6c'], function (_export
           }
         }]);
         return VerticalProfile;
-      })(L.Class);
-
-      VerticalProfile.include(L.Mixin.Events);
-
-      // work-around for Babel bug, otherwise Profile cannot be referenced here
+      })(CircleMarkerMixin(EventMixin(L.Class)));
 
       _export('default', VerticalProfile);
     }
   };
 });
 
-$__System.register('68', [], function (_export) {
+$__System.register('75', ['70', '74'], function (_export) {
+  /* */
+
+  // We implement this specifically for vertical profiles for now and see what we can move into
+  // a common class later.
+
   /**
-   * Calculates a linear palette of the given size (default 256) from the given
-   * CSS color specifications.
+   * A collection of vertical profiles sharing the same parameters / referencing.
    * 
-   * Example:
-   * <pre><code>
-   * var grayscale = linearPalette(['#FFFFFF', '#000000'], 10) // 10-step palette
+   */
+  'use strict';
+
+  var PointCollection, VerticalProfile, VerticalProfileCollection;
+  return {
+    setters: [function (_) {
+      PointCollection = _['default'];
+    }, function (_2) {
+      VerticalProfile = _2['default'];
+    }],
+    execute: function () {
+      VerticalProfileCollection = (function (_PointCollection) {
+        babelHelpers.inherits(VerticalProfileCollection, _PointCollection);
+
+        function VerticalProfileCollection(covcoll, options) {
+          var _this = this;
+
+          babelHelpers.classCallCheck(this, VerticalProfileCollection);
+
+          babelHelpers.get(Object.getPrototypeOf(VerticalProfileCollection.prototype), 'constructor', this).call(this, covcoll, options);
+
+          // set some options for PointCollection
+          this.pointClass = VerticalProfile;
+          this.pointOptionsFn = function () {
+            return {
+              vertical: _this._vertical
+            };
+          };
+
+          this._vertical = options.vertical;
+        }
+
+        babelHelpers.createClass(VerticalProfileCollection, [{
+          key: 'vertical',
+          set: function set(val) {
+            this._vertical = val;
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = this._layers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var layer = _step.value;
+
+                layer.vertical = val;
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          }
+
+          // overrides PointCollection.palette
+        }, {
+          key: 'palette',
+          get: function get() {
+            return this.param && this._vertical !== undefined ? this._palette : undefined;
+          }
+        }]);
+        return VerticalProfileCollection;
+      })(PointCollection);
+
+      _export('default', VerticalProfileCollection);
+    }
+  };
+});
+
+$__System.register('6a', [], function (_export) {
+  /**
+   * Returns a linearly interpolated palette out of CSS colors.
+   * 
+   * @example
+   * var grayscale = linearPalette(['#FFFFFF', '#000000'])
    * var rainbow = linearPalette(['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000'])
-   * </code></pre>
    * 
-   * @param {Array} colors An array of CSS color specifications
-   * @param {number} steps The number of palette colors to calculate
-   * @return An object with members ncolors, red, green, blue, usable with
-   *         the PaletteManager class.
+   * @param {Array<string>} colors An array of CSS colors.
+   * @param {number} [steps=256] The number of palette colors to generate.
+   * @return {object}
+   *   An object with members <code>steps</code>, <code>red</code>,
+   *   <code>green</code>, and <code>blue</code>.
    */
   'use strict';
 
@@ -8581,30 +10573,46 @@ $__System.register('68', [], function (_export) {
 
   /**
    * Converts an array of CSS colors to a palette of the same size.
+   * 
+   * @example
+   * var bw = directPalette(['#000000', '#FFFFFF'])
+   * // bw.steps == 2
+   * 
+   * @param {Array<string>} colors An array of CSS colors.
+   * @return {object}
+   *   An object with members <code>steps</code>, <code>red</code>,
+   *   <code>green</code>, and <code>blue</code>.
    */
 
   _export('linearPalette', linearPalette);
+
+  /**
+   * Linearly scales a value to a given palette and value extent.
+   * 
+   * @example
+   * var value = 20
+   * var grayscale = linearPalette(['#FFFFFF', '#000000'], 50) // 50 steps
+   * var scaled = scale(value, grayscale, [0,100])
+   * // scaled == 10
+   * 
+   * @param {number} val The value to scale.
+   * @param {object} palette The palette onto which the value is scaled.
+   * @param {Array} extent The lower and upper bound within which the value is scaled,
+   *   typically the value extent of a legend.
+   * @return {number} The scaled value.
+   */
 
   _export('directPalette', directPalette);
 
   /**
    * Manages palettes under common names.
-   * 
-   * Palettes can have different numbers of steps.
-   * Linear palettes can be conveniently added by supplying an array of CSS color specifications.
-   * Generic palettes can be added by directly supplying the step colors as RGB arrays. 
-   * 
-   * Example:
-   * <pre><code>
+   *  
+   * @example
    * var palettes = new PaletteManager({defaultSteps: 10})
-   * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // has 10 steps
-   * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps=1000}) // high-resolution palette
-   * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of exactly those 3 colors
+   * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // 10 steps
+   * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps: 200}) // high-resolution palette
+   * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of those 3 colors
    * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
-   * </code></pre>
-   * 
-   * Note that Uint8Array typed arrays should be used for custom palettes (added via add()) to avoid
-   * internal transformation.
    */
 
   _export('scale', scale);
@@ -8719,16 +10727,17 @@ $__System.register('68', [], function (_export) {
         /**
          * Store a supplied generic palette under the given name.
          * 
-         * @param name The unique name of the palette.
-         * @param palette An object with red, green, and blue properties (each an array of [0,255] values),
-         *                or an array of CSS color specifications.
+         * @example
+         * var palettes = new PaletteManager()
+         * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of those 3 colors
+         * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
+         * 
+         * @param {string} name The unique name of the palette.
+         * @param {object|Array<string>} palette A palette object or an array of CSS colors.
          */
         babelHelpers.createClass(PaletteManager, [{
           key: 'add',
           value: function add(name, palette) {
-            if (this._palettes.has(name)) {
-              console.warn('A palette with name "' + name + '" already exists! Overwriting...');
-            }
             if (Array.isArray(palette)) {
               palette = directPalette(palette);
             }
@@ -8750,9 +10759,14 @@ $__System.register('68', [], function (_export) {
           /**
            * Store a linear palette under the given name created with the given CSS color specifications.
            * 
+           * @example
+           * var palettes = new PaletteManager()
+           * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // 10 steps
+           * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps: 200})
+           * 
            * @param {String} name The unique name of the palette
-           * @param {Array} colors An array of CSS color specifications
-           * @param {Integer} steps Use a different number of steps than the default of this manager.
+           * @param {Array<string>} colors An array of CSS color specifications
+           * @param {number} steps Use a different number of steps than the default of this manager.
            */
         }, {
           key: 'addLinear',
@@ -8765,7 +10779,7 @@ $__System.register('68', [], function (_export) {
           }
 
           /**
-           * Return the palette stored under the given name, or throws an error if not found.
+           * Return the palette stored under the given name, or throw an error if not found.
            * The palette is an object with properties steps, red, green, and blue.
            * Each of the color arrays is an Uint8Array of length steps.
            */
@@ -8792,41 +10806,39 @@ $__System.register('68', [], function (_export) {
   };
 });
 
-$__System.register('6f', ['48', '68', '6a', '6b', '6c'], function (_export) {
+$__System.register('76', ['48', '73', '6a', '6c', '6d'], function (_export) {
   /* */
   'use strict';
 
-  var L, linearPalette, scale, rangeutil, referencingutil, COVJSON_MULTIPOLYGON, checkProfile, DEFAULT_PALETTE, MultiPolygon;
+  var L, EventMixin, linearPalette, scale, rangeutil, referencingutil, DEFAULT_PALETTE, MultiPolygon;
   return {
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      linearPalette = _2.linearPalette;
-      scale = _2.scale;
+      EventMixin = _2['default'];
     }, function (_a) {
-      rangeutil = _a;
-    }, function (_b) {
-      referencingutil = _b;
+      linearPalette = _a.linearPalette;
+      scale = _a.scale;
     }, function (_c) {
-      COVJSON_MULTIPOLYGON = _c.COVJSON_MULTIPOLYGON;
-      checkProfile = _c.checkProfile;
+      rangeutil = _c;
+    }, function (_d) {
+      referencingutil = _d;
     }],
     execute: function () {
       DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
       // blues
 
       /**
-       * Renderer for Coverages with domain type MultiPolygon.
+       * Renderer for coverages with domain profile MultiPolygon.
        */
 
-      MultiPolygon = (function (_L$Class) {
-        babelHelpers.inherits(MultiPolygon, _L$Class);
+      MultiPolygon = (function (_EventMixin) {
+        babelHelpers.inherits(MultiPolygon, _EventMixin);
 
         function MultiPolygon(cov, options) {
           babelHelpers.classCallCheck(this, MultiPolygon);
 
           babelHelpers.get(Object.getPrototypeOf(MultiPolygon.prototype), 'constructor', this).call(this);
-          checkProfile(cov.domainProfiles, COVJSON_MULTIPOLYGON);
 
           this.cov = cov;
           this.param = cov.parameters.get(options.keys[0]);
@@ -8836,17 +10848,6 @@ $__System.register('6f', ['48', '68', '6a', '6b', '6c'], function (_export) {
             this._paletteExtent = options.paletteExtent;
           } else {
             this._paletteExtent = 'full';
-          }
-
-          // TODO remove code duplication
-          switch (options.redraw) {
-            case 'manual':
-              this._autoRedraw = false;break;
-            case undefined:
-            case 'onchange':
-              this._autoRedraw = true;break;
-            default:
-              throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")');
           }
         }
 
@@ -8977,13 +10978,6 @@ $__System.register('6f', ['48', '68', '6a', '6b', '6c'], function (_export) {
             this._addPolygons();
           }
         }, {
-          key: '_doAutoRedraw',
-          value: function _doAutoRedraw() {
-            if (this._autoRedraw) {
-              this.redraw();
-            }
-          }
-        }, {
           key: 'redraw',
           value: function redraw() {
             this._updatePolygons();
@@ -8998,17 +10992,17 @@ $__System.register('6f', ['48', '68', '6a', '6b', '6c'], function (_export) {
           key: 'palette',
           set: function set(p) {
             this._palette = p;
-            this._doAutoRedraw();
+            this.redraw();
             this.fire('paletteChange');
           },
           get: function get() {
-            return this.param && this.targetZ !== null ? this._palette : null;
+            return this.param ? this._palette : null;
           }
         }, {
           key: 'paletteExtent',
           set: function set(extent) {
             this._updatePaletteExtent(extent);
-            this._doAutoRedraw();
+            this.redraw();
             this.fire('paletteExtentChange');
           },
           get: function get() {
@@ -9016,100 +11010,146 @@ $__System.register('6f', ['48', '68', '6a', '6b', '6c'], function (_export) {
           }
         }]);
         return MultiPolygon;
-      })(L.Class);
-
-      MultiPolygon.include(L.Mixin.Events);
-
-      // work-around for Babel bug, otherwise MultiPolygon cannot be referenced here
+      })(EventMixin(L.Class));
 
       _export('default', MultiPolygon);
     }
   };
 });
 
-$__System.register('70', ['67', '6d', '6e', '6f', '6c'], function (_export) {
+$__System.register('77', ['69', '70', '71', '74', '75', '76', '78', '6e'], function (_export) {
   /* */
   'use strict';
 
-  var Grid, Trajectory, VerticalProfile, MultiPolygon, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, DEFAULT_RENDERERS;
+  var Grid, PointCollection, Point, VerticalProfile, VerticalProfileCollection, MultiPolygon, COVJSON_POINT, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, COVJSON_VERTICALPROFILECOLLECTION, COVJSON_POINTCOLLECTION, Trajectory, DEFAULT_DOMAIN_LAYER_CLASSES, DEFAULT_COLLECTION_LAYER_CLASSES;
 
-  var _DEFAULT_RENDERERS;
+  var _DEFAULT_DOMAIN_LAYER_CLASSES, _DEFAULT_COLLECTION_LAYER_CLASSES;
 
   /**
-   * Return a layer class usable for the given coverage,
-   * or null if none was found.
-   * If multiple renderers match, then an arbitrary is returned. 
+   * Return a layer class usable for the given coverage data object,
+   * or <code>undefined</code> if none was found.
+   * If multiple layers match, then an arbitrary one is returned.
+   *  
+   * @example
+   * var cov = ...
+   * var clazz = getLayerClass(cov)
+   * if (clazz) {
+   *   var layer = new clazz(cov, {keys: ['temperature']}).addTo(map)
+   * }
+   * 
+   * @param {object} cov The coverage data object.
+   * @param {object} [options] Options for influencing the matching algorithm.
+   * @param {object} [options.classes] An object that maps profile URIs to layer classes.
+   *   Those classes are preferred over the default layer classes.
+   * @return {class|undefined} The layer class.
    */
 
   _export('default', LayerFactory);
 
   _export('getLayerClass', getLayerClass);
 
+  /**
+   * Return a factory function that creates a layer for a given coverage data object
+   * or throws an error if no layer class could be found.
+   * 
+   * This is a convenience function over using {@link getLayerClass} and manually
+   * instantiating the layer.
+   * 
+   * @example
+   * var factory = LayerFactory() // has to be defined just once
+   * var cov = ...
+   * var layer = factory(cov, {keys: ['temperature']}).addTo(map)
+   * 
+   * @example <caption>Non-module access</caption>
+   * L.coverage.LayerFactory
+   * 
+   * @param {object} [options] Options for influencing the layer class matching algorithm.
+   * @param {object} [options.classes] An object that maps profile URIs to layer classes.
+   *   Those classes are preferred over the default layer classes.
+   * @return {function} A function fn(cov, options) which returns a new layer for
+   *   the given coverage data object and which is initialized with the given layer options.
+   * @throws {Error} If no layer class could be found.
+   */
+
   function LayerFactory() {
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
     return function (cov, opts) {
-      var rendererClass = getLayerClass(cov, options);
-      if (!rendererClass) {
-        throw new Error('No renderer found for type=' + cov.type + ' or domainType=' + cov.domainType + ',\n            available: ' + Object.keys(DEFAULT_RENDERERS) + ', ' + Object.keys(options.renderers));
+      var clazz = getLayerClass(cov, options);
+      if (!clazz) {
+        throw new Error('No layer class found for profiles=' + cov.profiles + ' or domainProfiles=' + cov.domainProfiles);
       }
-      return new rendererClass(cov, opts);
+      return new clazz(cov, opts);
     };
   }
 
   function getLayerClass(cov) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-    if (options.renderers) {
+    if (options.classes) {
       if (cov.profiles.some(function (p) {
-        return options.renderers[p];
+        return options.classes[p];
       })) {
-        return options.renderers[cov.profiles.find(function (p) {
-          return options.renderers[p];
+        return options.classes[cov.profiles.find(function (p) {
+          return options.classes[p];
         })];
       }
       if (cov.domainProfiles.some(function (p) {
-        return options.renderers[p];
+        return options.classes[p];
       })) {
-        return options.renderers[cov.domainProfiles.find(function (p) {
-          return options.renderers[p];
+        return options.classes[cov.domainProfiles.find(function (p) {
+          return options.classes[p];
         })];
       }
     }
     if (cov.domainProfiles.some(function (p) {
-      return DEFAULT_RENDERERS[p];
+      return DEFAULT_DOMAIN_LAYER_CLASSES[p];
     })) {
-      return DEFAULT_RENDERERS[cov.domainProfiles.find(function (p) {
-        return DEFAULT_RENDERERS[p];
+      return DEFAULT_DOMAIN_LAYER_CLASSES[cov.domainProfiles.find(function (p) {
+        return DEFAULT_DOMAIN_LAYER_CLASSES[p];
       })];
     }
-    return null;
+    if (cov.profiles.some(function (p) {
+      return DEFAULT_COLLECTION_LAYER_CLASSES[p];
+    })) {
+      return DEFAULT_COLLECTION_LAYER_CLASSES[cov.profiles.find(function (p) {
+        return DEFAULT_COLLECTION_LAYER_CLASSES[p];
+      })];
+    }
   }
 
   return {
     setters: [function (_) {
       Grid = _['default'];
-    }, function (_d) {
-      Trajectory = _d['default'];
+    }, function (_3) {
+      PointCollection = _3['default'];
+    }, function (_2) {
+      Point = _2['default'];
+    }, function (_4) {
+      VerticalProfile = _4['default'];
+    }, function (_5) {
+      VerticalProfileCollection = _5['default'];
+    }, function (_6) {
+      MultiPolygon = _6['default'];
+    }, function (_7) {
+      COVJSON_POINT = _7.COVJSON_POINT;
+      COVJSON_VERTICALPROFILE = _7.COVJSON_VERTICALPROFILE;
+      COVJSON_GRID = _7.COVJSON_GRID;
+      COVJSON_TRAJECTORY = _7.COVJSON_TRAJECTORY;
+      COVJSON_MULTIPOLYGON = _7.COVJSON_MULTIPOLYGON;
+      COVJSON_VERTICALPROFILECOLLECTION = _7.COVJSON_VERTICALPROFILECOLLECTION;
+      COVJSON_POINTCOLLECTION = _7.COVJSON_POINTCOLLECTION;
     }, function (_e) {
-      VerticalProfile = _e['default'];
-    }, function (_f) {
-      MultiPolygon = _f['default'];
-    }, function (_c) {
-      COVJSON_VERTICALPROFILE = _c.COVJSON_VERTICALPROFILE;
-      COVJSON_GRID = _c.COVJSON_GRID;
-      COVJSON_TRAJECTORY = _c.COVJSON_TRAJECTORY;
-      COVJSON_MULTIPOLYGON = _c.COVJSON_MULTIPOLYGON;
+      Trajectory = _e['default'];
     }],
     execute: function () {
-      DEFAULT_RENDERERS = (_DEFAULT_RENDERERS = {}, babelHelpers.defineProperty(_DEFAULT_RENDERERS, COVJSON_GRID, Grid), babelHelpers.defineProperty(_DEFAULT_RENDERERS, COVJSON_VERTICALPROFILE, VerticalProfile), babelHelpers.defineProperty(_DEFAULT_RENDERERS, COVJSON_TRAJECTORY, Trajectory), babelHelpers.defineProperty(_DEFAULT_RENDERERS, COVJSON_MULTIPOLYGON, MultiPolygon), _DEFAULT_RENDERERS);
-
-      _export('DEFAULT_RENDERERS', DEFAULT_RENDERERS);
+      DEFAULT_DOMAIN_LAYER_CLASSES = (_DEFAULT_DOMAIN_LAYER_CLASSES = {}, babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_GRID, Grid), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_POINT, Point), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_VERTICALPROFILE, VerticalProfile), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_TRAJECTORY, Trajectory), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_MULTIPOLYGON, MultiPolygon), _DEFAULT_DOMAIN_LAYER_CLASSES);
+      DEFAULT_COLLECTION_LAYER_CLASSES = (_DEFAULT_COLLECTION_LAYER_CLASSES = {}, babelHelpers.defineProperty(_DEFAULT_COLLECTION_LAYER_CLASSES, COVJSON_POINTCOLLECTION, PointCollection), babelHelpers.defineProperty(_DEFAULT_COLLECTION_LAYER_CLASSES, COVJSON_VERTICALPROFILECOLLECTION, VerticalProfileCollection), _DEFAULT_COLLECTION_LAYER_CLASSES);
     }
   };
 });
 
-$__System.register("71", ["70"], function (_export) {
+$__System.register("79", ["77"], function (_export) {
   "use strict";
 
   return {
@@ -9128,7 +11168,544 @@ $__System.register("71", ["70"], function (_export) {
   };
 });
 
-$__System.register('72', ['48', '65', '73', '74'], function (_export) {
+$__System.register('7a', ['48'], function (_export) {
+  /* */
+
+  /**
+   * Default function that checks if two Parameter objects describe
+   * the same thing. No magic is applied here. Exact match or nothing.
+   */
+  'use strict';
+
+  var L, ParameterSync, SyncLayer;
+  function defaultMatch(p1, p2) {
+    if (!p1.observedProperty.id || !p2.observedProperty.id) {
+      return false;
+    }
+    if (p1.observedProperty.id !== p2.observedProperty.id) {
+      return false;
+    }
+    if (p1.unit && p2.unit) {
+      if (p1.unit.id && p2.unit.id && p1.unit.id !== p2.unit.id) {
+        return false;
+      }
+      if (p1.unit.symbol && p2.unit.symbol && p1.unit.symbol !== p2.unit.symbol) {
+        return false;
+      }
+    } else if (p1.unit || p2.unit) {
+      // only one of both has units
+      return false;
+    }
+    if (p1.categories && p2.categories) {
+      if (p1.categories.length !== p2.categories.length) {
+        return false;
+      }
+      var idMissing = function idMissing(cat) {
+        return !cat.id;
+      };
+      if (p1.categories.some(idMissing) || p2.categories.some(idMissing)) {
+        return false;
+      }
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        var _loop = function () {
+          var cat1 = _step.value;
+
+          if (!p2.categories.some(function (cat2) {
+            return cat1.id === cat2.id;
+          })) {
+            return {
+              v: false
+            };
+          }
+        };
+
+        for (var _iterator = p1.categories[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _ret = _loop();
+
+          if (typeof _ret === 'object') return _ret.v;
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator['return']) {
+            _iterator['return']();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    } else if (p1.categories || p2.categories) {
+      // only one of both has categories
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Synchronizes visualization options of multiple renderer layers with matching Parameter
+   * and exposes a combined view of those options in form of a virtual layer object.
+   * 
+   * A common use case for this is to have equal palettes and only a single legend
+   * for multiple layers describing the same parameter.
+   * 
+   * Synchronizing visualization options means synchronizing certain common properties
+   * of the layer instances. For example, the palette extents of two layers can be
+   * synchronized by merging the extents of both. The logic for doing that has to
+   * be specified in terms of binary functions supplied in the constructor.
+   * 
+   * By default, a simple algorithm determines if two Parameter objects are equivalent
+   * by checking whether things like observedPropery have the same ID, units are the same,
+   * etc. This default algorithm can be replaced with a custom one. Such a custom
+   * algorithm could relate different vocabularies with each other or perform other checks.
+   * 
+   * @example <caption>Common palettes</caption>
+   * let paramSync = new ParameterSync({
+   *   syncProperties: {
+   *     palette: (p1, p2) => p1,
+   *     paletteExtent: (e1, e2) => e1 && e2 ? [Math.min(e1[0], e2[0]), Math.max(e1[1], e2[1])] : null
+   *   }
+   * }).on('parameterAdd', e => {
+   *   // The virtual sync layer proxies the synced palette, paletteExtent, and parameter.
+   *   // The sync layer will fire a 'remove' event once all real layers for that parameter were removed.
+   *   let layer = e.syncLayer
+   *   if (layer.palette) {
+   *     new Legend(layer, {
+   *       position: 'bottomright'
+   *     }).addTo(map)
+   *   }
+   * })
+   * let layer = layerFactory(cov).on('add', e => {
+   *   // Only add the layer to the ParameterSync instance once it has initialized.
+   *   // We can use the 'add' event for that.
+   *   paramSync.addLayer(e.target)
+   * })
+   */
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }],
+    execute: function () {
+      ParameterSync = (function (_L$Class) {
+        babelHelpers.inherits(ParameterSync, _L$Class);
+
+        /**
+         * @param {Object} options
+         * @param {Object} options.syncProperties - 
+         *   An object that defines which properties shall be synchronized and how.
+         *   Each key is a property name where the value is a binary function that merges
+         *   the values of two such properties.
+         * @param {Function} [options.match] - 
+         *   Custom function that checks if two Parameter objects shall be equivalent.
+         *   The default function is simple and checks for identity of several properties.
+         */
+
+        function ParameterSync(options) {
+          babelHelpers.classCallCheck(this, ParameterSync);
+
+          babelHelpers.get(Object.getPrototypeOf(ParameterSync.prototype), 'constructor', this).call(this);
+          this._syncProps = options.syncProperties || {};
+          this._match = options.match || defaultMatch;
+          this._paramLayers = new Map(); // Map (Parameter -> Set(Layer))
+          this._layerListeners = new Map(); // Map (Layer -> Map(type -> listener))
+          this._propSyncing = new Set(); // Set (property name)
+        }
+
+        /**
+         * Adds a layer that will be synchronized.
+         * 
+         * Synchronization stops automatically when the layer fires a 'remove' event.
+         * 
+         * @param {ILayer} layer - The layer to synchronize.
+         * @fires ParameterSync#parameterAdd - When a layer with a new parameter was added.
+         */
+        babelHelpers.createClass(ParameterSync, [{
+          key: 'addLayer',
+          value: function addLayer(layer) {
+            var _this = this;
+
+            if (!layer.parameter) {
+              console.log('layer has no parameter, skipping parameter sync');
+              return;
+            }
+            var params = Array.from(this._paramLayers.keys());
+            var match = params.find(function (p) {
+              return _this._match(p, layer.parameter);
+            });
+
+            var param = undefined;
+            if (!match) {
+              param = layer.parameter;
+              this._paramLayers.set(param, new Set([layer]));
+            } else {
+              param = match;
+              this._paramLayers.get(param).add(layer);
+              this._syncProperties(param);
+            }
+
+            this._registerLayerListeners(layer, param);
+
+            if (!match) {
+              /**
+               * Parameter Add event.
+               * 
+               * @event ParameterSync#parameterAdd
+               * @type {object}
+               * @property {SyncLayer} syncLayer - 
+               *   A virtual layer that proxies the synchronized properties for a single parameter.
+               *   If all layers of that parameter are removed, this layer fires a 'remove' event,
+               *   signalling that the parameter is not present anymore.
+               */
+              this.fire('parameterAdd', { syncLayer: new SyncLayer(param, this) });
+            }
+          }
+
+          /**
+           * Pause synchronization. This is useful when a property of
+           * many layers has to be set manually (like paletteExtent = 'fov') and
+           * the synchronization shall happen afterwards (see resume()).
+           */
+        }, {
+          key: 'pause',
+          value: function pause() {
+            this.paused = true;
+          }
+
+          /**
+           * Resumes synchronization.
+           * 
+           * @param {bool} [sync] If true, then all layers will be synchronized immediately.
+           */
+        }, {
+          key: 'resume',
+          value: function resume(sync) {
+            this.paused = false;
+            if (sync) {
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = this._paramLayers.keys()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var param = _step2.value;
+
+                  this._syncProperties(param);
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                    _iterator2['return']();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+            }
+          }
+        }, {
+          key: '_removeLayer',
+          value: function _removeLayer(layer, param) {
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+              for (var _iterator3 = this._layerListeners.get(layer)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                var _step3$value = babelHelpers.slicedToArray(_step3.value, 2);
+
+                var type = _step3$value[0];
+                var fn = _step3$value[1];
+
+                layer.off(type, fn);
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                  _iterator3['return']();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+
+            this._layerListeners['delete'](layer);
+            this._paramLayers.get(param)['delete'](layer);
+            if (this._paramLayers.get(param).size === 0) {
+              this._paramLayers['delete'](param);
+              // underscore since the 'remove' event of the syncLayer should be used
+              // from the outside
+              this.fire('_parameterRemove', { param: param });
+            }
+          }
+        }, {
+          key: '_registerLayerListeners',
+          value: function _registerLayerListeners(layer, param) {
+            var _this2 = this;
+
+            var listeners = new Map([['remove', function () {
+              return _this2._removeLayer(layer, param);
+            }]]);
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+              var _loop2 = function () {
+                var prop = _step4.value;
+
+                var type = prop + 'Change'; // our convention is camel case
+                // TODO does it make sense to unify again, or should it just propagate unchanged?
+                listeners.set(type, function () {
+                  return _this2._syncProperty(param, prop);
+                });
+              };
+
+              for (var _iterator4 = Object.keys(this._syncProps)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                _loop2();
+              }
+            } catch (err) {
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                  _iterator4['return']();
+                }
+              } finally {
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
+                }
+              }
+            }
+
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+              for (var _iterator5 = listeners[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                var _step5$value = babelHelpers.slicedToArray(_step5.value, 2);
+
+                var type = _step5$value[0];
+                var fn = _step5$value[1];
+
+                layer.on(type, fn);
+              }
+            } catch (err) {
+              _didIteratorError5 = true;
+              _iteratorError5 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+                  _iterator5['return']();
+                }
+              } finally {
+                if (_didIteratorError5) {
+                  throw _iteratorError5;
+                }
+              }
+            }
+
+            this._layerListeners.set(layer, listeners);
+          }
+        }, {
+          key: '_syncProperties',
+          value: function _syncProperties(param) {
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+              for (var _iterator6 = Object.keys(this._syncProps)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                var prop = _step6.value;
+
+                this._syncProperty(param, prop);
+              }
+            } catch (err) {
+              _didIteratorError6 = true;
+              _iteratorError6 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+                  _iterator6['return']();
+                }
+              } finally {
+                if (_didIteratorError6) {
+                  throw _iteratorError6;
+                }
+              }
+            }
+          }
+        }, {
+          key: '_syncProperty',
+          value: function _syncProperty(param, prop) {
+            if (this.paused || this._propSyncing.has(prop)) {
+              return;
+            }
+            var propreduce = this._syncProps[prop];
+            var unified = [].concat(babelHelpers.toConsumableArray(this._paramLayers.get(param))).map(function (l) {
+              return l[prop];
+            }).reduce(propreduce);
+            // While we unify properties, stop listening for changes to prevent a cycle.
+            this._propSyncing.add(prop);
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
+
+            try {
+              for (var _iterator7 = this._paramLayers.get(param)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                var layer_ = _step7.value;
+
+                layer_[prop] = unified;
+              }
+            } catch (err) {
+              _didIteratorError7 = true;
+              _iteratorError7 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+                  _iterator7['return']();
+                }
+              } finally {
+                if (_didIteratorError7) {
+                  throw _iteratorError7;
+                }
+              }
+            }
+
+            this._propSyncing['delete'](prop);
+            this.fire('_syncPropChange', { param: param, prop: prop });
+          }
+        }]);
+        return ParameterSync;
+      })(L.Class);
+
+      ParameterSync.include(L.Mixin.Events);
+
+      SyncLayer = (function (_L$Class2) {
+        babelHelpers.inherits(SyncLayer, _L$Class2);
+
+        function SyncLayer(param, paramSync) {
+          var _this3 = this;
+
+          babelHelpers.classCallCheck(this, SyncLayer);
+
+          babelHelpers.get(Object.getPrototypeOf(SyncLayer.prototype), 'constructor', this).call(this);
+          this._param = param;
+          paramSync.on('_parameterRemove', function (e) {
+            if (e.param === param) {
+              _this3.fire('remove');
+            }
+          });
+          paramSync.on('_syncPropChange', function (e) {
+            if (e.param === param) {
+              _this3.fire(e.prop + 'Change');
+            }
+          });
+          var layers = function layers() {
+            return paramSync._paramLayers.get(param);
+          };
+          var _iteratorNormalCompletion8 = true;
+          var _didIteratorError8 = false;
+          var _iteratorError8 = undefined;
+
+          try {
+            var _loop3 = function () {
+              var prop = _step8.value;
+
+              Object.defineProperty(_this3, prop, {
+                get: function get() {
+                  return layers().values().next().value[prop];
+                },
+                set: function set(v) {
+                  paramSync._propSyncing.add(prop);
+                  var _iteratorNormalCompletion9 = true;
+                  var _didIteratorError9 = false;
+                  var _iteratorError9 = undefined;
+
+                  try {
+                    for (var _iterator9 = layers()[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                      var layer = _step9.value;
+
+                      layer[prop] = v;
+                    }
+                  } catch (err) {
+                    _didIteratorError9 = true;
+                    _iteratorError9 = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion9 && _iterator9['return']) {
+                        _iterator9['return']();
+                      }
+                    } finally {
+                      if (_didIteratorError9) {
+                        throw _iteratorError9;
+                      }
+                    }
+                  }
+
+                  paramSync._propSyncing['delete'](prop);
+                  _this3.fire(prop + 'Change');
+                },
+                enumerable: true
+              });
+            };
+
+            for (var _iterator8 = Object.keys(paramSync._syncProps)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+              _loop3();
+            }
+          } catch (err) {
+            _didIteratorError8 = true;
+            _iteratorError8 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+                _iterator8['return']();
+              }
+            } finally {
+              if (_didIteratorError8) {
+                throw _iteratorError8;
+              }
+            }
+          }
+        }
+
+        babelHelpers.createClass(SyncLayer, [{
+          key: 'parameter',
+          get: function get() {
+            return this._param;
+          }
+        }]);
+        return SyncLayer;
+      })(L.Class);
+
+      SyncLayer.include(L.Mixin.Events);
+
+      // work-around for Babel bug, otherwise ParameterSync cannot be referenced above for mixins
+
+      _export('default', ParameterSync);
+    }
+  };
+});
+
+$__System.register('7b', ['48', '67', '7c', '7d'], function (_export) {
   /* */
 
   // TODO the default template should be moved outside this module so that it can be easily skipped
@@ -9141,11 +11718,11 @@ $__System.register('72', ['48', '65', '73', '74'], function (_export) {
     }, function (_2) {
       $ = _2.$;
       HTML = _2.HTML;
-    }, function (_3) {
-      inject = _3.inject;
-      fromTemplate = _3.fromTemplate;
-    }, function (_4) {
-      i18n = _4;
+    }, function (_c) {
+      inject = _c.inject;
+      fromTemplate = _c.fromTemplate;
+    }, function (_d) {
+      i18n = _d;
     }],
     execute: function () {
       DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend';
@@ -9156,100 +11733,144 @@ $__System.register('72', ['48', '65', '73', '74'], function (_export) {
        * Displays a discrete palette legend for the parameter displayed by the given
        * Coverage layer. Supports category parameters only at the moment.
        * 
-       * @example
+       * @example <caption>Coverage data layer</caption>
        * new DiscreteLegend(covLayer).addTo(map)
+       * // changing the palette of the layer automatically updates the legend 
+       * covLayer.palette = discretePalette(['red', 'blue'])
        * 
        * @example <caption>Fake layer</caption>
-       * var legend = new DiscreteLegend({parameter: {..}, palette: {...}}).addTo(map)
+       * var fakeLayer = {
+       *   parameter: {
+       *     observedProperty: {
+       *       label: { en: 'Land cover' },
+       *       categories: [{
+       *         label: { en: 'Land' }
+       *       }, {
+       *         label: { en: 'Water' }
+       *       }]
+       *     }
+       *   },
+       *   palette: directPalette(['gray', 'blue']) // CSS colors in category order
+       * }
+       * var legend = new DiscreteLegend(fakeLayer).addTo(map)
        * 
-       * // either recreate the legend or update the fake layer in place:
-       * legend.covLayer = {..}
-       * legend.updateLegend()
+       * // change the palette and trigger a manual update
+       * fakeLayer.palette = discretePalette(['red', 'blue'])
+       * legend.update()
+       * 
+       * @example <caption>Non-module access</caption>
+       * L.coverage.control.DiscreteLegend
        */
 
       DiscreteLegend = (function (_L$Control) {
         babelHelpers.inherits(DiscreteLegend, _L$Control);
 
-        function DiscreteLegend(covLayer, options) {
+        /**
+         * Creates a discrete legend control.
+         * 
+         * @param {object} covLayer 
+         *   The coverage data layer, or any object with <code>palette</code>
+         *   and <code>parameter</code> properties.
+         *   If the object has <code>on</code>/<code>off</code> methods, then the legend will
+         *   listen for <code>"paletteChange"</code> events and update itself automatically.
+         *   If the layer fires a <code>"remove"</code> event, then the legend will remove itself
+         *   from the map. 
+         * @param {object} [options] Legend options.
+         * @param {string} [options.position='bottomright'] The initial position of the control (see Leaflet docs).
+         * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+         * @param {string} [options.id] Uses the HTML element with the given id as template.
+         */
+
+        function DiscreteLegend(covLayer) {
           var _this = this;
 
+          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
           babelHelpers.classCallCheck(this, DiscreteLegend);
 
-          babelHelpers.get(Object.getPrototypeOf(DiscreteLegend.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : {});
-          this.covLayer = covLayer;
-          this.id = options.id || DEFAULT_TEMPLATE_ID;
-          this.language = options.language || i18n.DEFAULT_LANGUAGE;
+          babelHelpers.get(Object.getPrototypeOf(DiscreteLegend.prototype), 'constructor', this).call(this, { position: options.position || 'bottomright' });
+          this._covLayer = covLayer;
+          this._id = options.id || DEFAULT_TEMPLATE_ID;
+          this._language = options.language || i18n.DEFAULT_LANGUAGE;
 
           if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
             inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS);
           }
 
           if (covLayer.on) {
-            (function () {
-              // arrow function is broken here with traceur, this is a workaround
-              // see https://github.com/google/traceur-compiler/issues/1987
-              var self = _this;
-              _this._remove = function () {
-                self.removeFrom(self._map);
-              };
-              covLayer.on('remove', _this._remove);
-            })();
+            this._remove = function () {
+              return _this.removeFrom(_this._map);
+            };
+            this._update = function () {
+              return _this._doUpdate(false);
+            };
+            covLayer.on('remove', this._remove);
           }
         }
 
+        /**
+         * Triggers a manual update of the legend.
+         * 
+         * Useful if the supplied coverage data layer is not a real layer
+         * and won't fire the necessary events for automatic updates.
+         */
         babelHelpers.createClass(DiscreteLegend, [{
-          key: 'updateLegend',
-          value: function updateLegend() {
+          key: 'update',
+          value: function update() {
+            this._doUpdate(true);
+          }
+        }, {
+          key: '_doUpdate',
+          value: function _doUpdate(fullUpdate) {
             var el = this._el;
 
-            var palette = this.covLayer.palette;
-            var param = this.covLayer.parameter;
+            if (fullUpdate) {
+              var _param = this._covLayer.parameter;
+              // if requested language doesn't exist, use the returned one for all other labels
+              this._language = i18n.getLanguageTag(_param.observedProperty.label, this._language);
+              var title = i18n.getLanguageString(_param.observedProperty.label, this._language);
+              $('.legend-title', el).fill(title);
+            }
+
+            var palette = this._covLayer.palette;
+            var param = this._covLayer.parameter;
 
             var html = '';
 
             for (var i = 0; i < palette.steps; i++) {
-              var cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this.language);
+              var cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this._language);
               html += '\n        <i style="background:rgb(' + palette.red[i] + ', ' + palette.green[i] + ', ' + palette.blue[i] + ')"></i>\n        ' + cat + '\n        <br>';
             }
 
             $('.legend-palette', el).fill(HTML(html));
           }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            var _this2 = this;
 
-            if (this.covLayer.off) {
-              this.covLayer.off('remove', this._remove);
-              this.covLayer.off('paletteChange', function () {
-                return _this2.updateLegend();
-              });
-            }
-          }
+          /**
+           * @ignore
+           */
         }, {
           key: 'onAdd',
           value: function onAdd(map) {
-            var _this3 = this;
-
             this._map = map;
 
-            if (this.covLayer.on) {
-              this.covLayer.on('paletteChange', function () {
-                return _this3.updateLegend();
-              });
+            if (this._covLayer.on) {
+              this._covLayer.on('paletteChange', this._update);
             }
 
-            var param = this.covLayer.parameter;
-            // if requested language doesn't exist, use the returned one for all other labels
-            this.language = i18n.getLanguageTag(param.observedProperty.label, this.language);
-            var title = i18n.getLanguageString(param.observedProperty.label, this.language);
+            this._el = fromTemplate(this._id);
+            this.update();
+            return this._el;
+          }
 
-            var el = fromTemplate(this.id);
-            this._el = el;
-            $('.legend-title', el).fill(title);
-            this.updateLegend();
-
-            return el;
+          /**
+           * @ignore
+           */
+        }, {
+          key: 'onRemove',
+          value: function onRemove() {
+            if (this._covLayer.off) {
+              this._covLayer.off('remove', this._remove);
+              this._covLayer.off('paletteChange', this._update);
+            }
           }
         }]);
         return DiscreteLegend;
@@ -9260,7 +11881,7 @@ $__System.register('72', ['48', '65', '73', '74'], function (_export) {
   };
 });
 
-$__System.register('73', ['65'], function (_export) {
+$__System.register('7c', ['67'], function (_export) {
   /* */
 
   /**
@@ -9268,10 +11889,16 @@ $__System.register('73', ['65'], function (_export) {
    * 
    * @param html The html to inject at the end of the body element.
    * @param css The CSS styles to inject at the end of the head element.
+   * 
+   * @ignore
    */
   'use strict';
 
   var $, HTML;
+
+  /**
+   * @ignore
+   */
 
   _export('inject', inject);
 
@@ -9313,7 +11940,7 @@ $__System.register('73', ['65'], function (_export) {
   };
 });
 
-$__System.register('75', ['48', '65', '73', '74'], function (_export) {
+$__System.register('7e', ['48', '67', '7c', '7d'], function (_export) {
   /* */
 
   // TODO the default template should be moved outside this module so that it can be easily skipped
@@ -9325,11 +11952,11 @@ $__System.register('75', ['48', '65', '73', '74'], function (_export) {
       L = _['default'];
     }, function (_2) {
       $ = _2.$;
-    }, function (_3) {
-      inject = _3.inject;
-      fromTemplate = _3.fromTemplate;
-    }, function (_4) {
-      i18n = _4;
+    }, function (_c) {
+      inject = _c.inject;
+      fromTemplate = _c.fromTemplate;
+    }, function (_d) {
+      i18n = _d;
     }],
     execute: function () {
       DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend';
@@ -9337,42 +11964,119 @@ $__System.register('75', ['48', '65', '73', '74'], function (_export) {
       DEFAULT_TEMPLATE_CSS = '\n.legend {\n  color: #555;\n}\n';
 
       /**
-       * Displays a palette legend for the parameter displayed by the given
-       * Coverage layer.
+       * Displays a continuous legend for the parameter displayed by the given
+       * coverage data layer.
+       * 
+       * Note that this class should only be used if the palette is continuous
+       * by nature, typically having at least 100-200 color steps.
+       * If there are only a few color steps (e.g. 10), then this class
+       * will still show a continuous legend due to its rendering technique
+       * (CSS gradient based).
+       * 
+       * @example <caption>Coverage data layer</caption>
+       * new ContinuousLegend(covLayer).addTo(map)
+       * // changing the palette of the layer automatically updates the legend 
+       * covLayer.palette = linearPalette(['blue', 'red'])
+       * 
+       * @example <caption>Fake layer</caption>
+       * var fakeLayer = {
+       *   parameter: {
+       *     observedProperty: {
+       *       label: { en: 'Temperature' }
+       *     },
+       *     unit: {
+       *       symbol: 'K',
+       *       label: { en: 'Kelvin' }
+       *     }
+       *   },
+       *   palette: linearPalette(['#FFFFFF', '#000000']),
+       *   paletteExtent: [0, 10]
+       * }
+       * var legend = new ContinuousLegend(fakeLayer).addTo(map)
+       * 
+       * // change the palette and trigger a manual update
+       * fakeLayer.palette = linearPalette(['blue', 'red'])
+       * legend.update()
+       * 
+       * @example <caption>Non-module access</caption>
+       * L.coverage.control.ContinuousLegend
        */
 
       ContinuousLegend = (function (_L$Control) {
         babelHelpers.inherits(ContinuousLegend, _L$Control);
 
-        function ContinuousLegend(covLayer, options) {
+        /**
+         * Creates a continuous legend control.
+         * 
+         * @param {object} covLayer 
+         *   The coverage data layer, or any object with <code>palette</code>,
+         *   <code>paletteExtent</code>, and <code>parameter</code> properties.
+         *   If the object has <code>on</code>/<code>off</code> methods, then the legend will
+         *   listen for <code>"paletteChange"</code> and <code>"paletteExtentChange"</code>
+         *   events and update itself automatically.
+         *   If the layer fires a <code>"remove"</code> event, then the legend will remove itself
+         *   from the map. 
+         * @param {object} [options] Legend options.
+         * @param {string} [options.position='bottomright'] The initial position of the control (see Leaflet docs).
+         * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+         * @param {string} [options.id] Uses the HTML element with the given id as template.
+         */
+
+        function ContinuousLegend(covLayer) {
+          var _this = this;
+
+          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
           babelHelpers.classCallCheck(this, ContinuousLegend);
 
-          babelHelpers.get(Object.getPrototypeOf(ContinuousLegend.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : {});
-          this.covLayer = covLayer;
-          this.id = options.id || DEFAULT_TEMPLATE_ID;
-          this.language = options.language || i18n.DEFAULT_LANGUAGE;
+          babelHelpers.get(Object.getPrototypeOf(ContinuousLegend.prototype), 'constructor', this).call(this, { position: options.position || 'bottomright' });
+          this._covLayer = covLayer;
+          this._id = options.id || DEFAULT_TEMPLATE_ID;
+          this._language = options.language || i18n.DEFAULT_LANGUAGE;
 
           if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
             inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS);
           }
 
-          // arrow function is broken here with traceur, this is a workaround
-          // see https://github.com/google/traceur-compiler/issues/1987
-          var self = this;
-          this._remove = function () {
-            self.removeFrom(self._map);
-          };
-          covLayer.on('remove', this._remove);
+          if (covLayer.on) {
+            this._remove = function () {
+              return _this.removeFrom(_this._map);
+            };
+            this._update = function () {
+              return _this._doUpdate(false);
+            };
+            covLayer.on('remove', this._remove);
+          }
         }
 
+        /**
+         * Triggers a manual update of the legend.
+         * 
+         * Useful if the supplied coverage data layer is not a real layer
+         * and won't fire the necessary events for automatic updates.
+         */
         babelHelpers.createClass(ContinuousLegend, [{
-          key: 'updateLegend',
-          value: function updateLegend() {
+          key: 'update',
+          value: function update() {
+            this._doUpdate(true);
+          }
+        }, {
+          key: '_doUpdate',
+          value: function _doUpdate(fullUpdate) {
             var el = this._el;
 
-            var palette = this.covLayer.palette;
+            if (fullUpdate) {
+              var param = this._covLayer.parameter;
+              // if requested language doesn't exist, use the returned one for all other labels
+              var language = i18n.getLanguageTag(param.observedProperty.label, this._language);
+              var title = i18n.getLanguageString(param.observedProperty.label, language);
+              var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language) : '';
+              $('.legend-title', el).fill(title);
+              $('.legend-uom', el).fill(unit);
+            }
 
-            var _covLayer$paletteExtent = babelHelpers.slicedToArray(this.covLayer.paletteExtent, 2);
+            var palette = this._covLayer.palette;
+
+            var _covLayer$paletteExtent = babelHelpers.slicedToArray(this._covLayer.paletteExtent, 2);
 
             var low = _covLayer$paletteExtent[0];
             var high = _covLayer$paletteExtent[1];
@@ -9388,46 +12092,36 @@ $__System.register('75', ['48', '65', '73', '74'], function (_export) {
 
             $('.legend-palette', el).set('$background', 'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%');
           }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            var _this = this;
 
-            this.covLayer.off('remove', this._remove);
-            this.covLayer.off('paletteChange', function () {
-              return _this.updateLegend();
-            });
-            this.covLayer.off('paletteExtentChange', function () {
-              return _this.updateLegend();
-            });
-          }
+          /**
+           * @ignore
+           */
         }, {
           key: 'onAdd',
           value: function onAdd(map) {
-            var _this2 = this;
-
             this._map = map;
 
-            this.covLayer.on('paletteChange', function () {
-              return _this2.updateLegend();
-            });
-            this.covLayer.on('paletteExtentChange', function () {
-              return _this2.updateLegend();
-            });
+            if (this._covLayer.on) {
+              this._covLayer.on('paletteChange', this._update);
+              this._covLayer.on('paletteExtentChange', this._update);
+            }
 
-            var param = this.covLayer.parameter;
-            // if requested language doesn't exist, use the returned one for all other labels
-            var language = i18n.getLanguageTag(param.observedProperty.label, this.language);
-            var title = i18n.getLanguageString(param.observedProperty.label, language);
-            var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language) : '';
+            this._el = fromTemplate(this._id);
+            this.update();
+            return this._el;
+          }
 
-            var el = fromTemplate(this.id);
-            this._el = el;
-            $('.legend-title', el).fill(title);
-            $('.legend-uom', el).fill(unit);
-            this.updateLegend();
-
-            return el;
+          /**
+           * @ignore
+           */
+        }, {
+          key: 'onRemove',
+          value: function onRemove() {
+            if (this._covLayer.off) {
+              this._covLayer.off('remove', this._remove);
+              this._covLayer.off('paletteChange', this._update);
+              this._covLayer.off('paletteExtentChange', this._update);
+            }
           }
         }]);
         return ContinuousLegend;
@@ -9438,19 +12132,48 @@ $__System.register('75', ['48', '65', '73', '74'], function (_export) {
   };
 });
 
-$__System.register('76', ['72', '75'], function (_export) {
+$__System.register('7f', ['7b', '7e'], function (_export) {
   /* */
+
+  /**
+   * Convenience function that returns a legend control
+   * based on the coverage parameter type.
+   * For categorical parameters this returns a {@link DiscreteLegend},
+   * otherwise a {@link ContinuousLegend} instance.
+   * 
+   * Note that custom HTML templates cannot be used with this function.
+   * If this is necessary, consider using the individual legend classes
+   * instead. 
+   * 
+   * @example <caption>Coverage data layer</caption>
+   * var legend = Legend(covLayer).addTo(map)
+   * 
+   * @example <caption>Fake layer</caption>
+   * // see DiscreteLegend and ContinuousLegend docs
+   * 
+   * @example <caption>Non-module access</caption>
+   * L.coverage.control.Legend
+   * 
+   * @param {object} covLayer The coverage data layer.
+   * @param {object} [options] Legend options.
+   * @param {string} [options.position='bottomright'] The initial position of the control (see Leaflet docs).
+   * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+   * @return {DiscreteLegend|ContinuousLegend}
+   */
   'use strict';
 
   var DiscreteLegend, ContinuousLegend;
   return {
-    setters: [function (_) {
-      DiscreteLegend = _['default'];
-    }, function (_2) {
-      ContinuousLegend = _2['default'];
+    setters: [function (_b) {
+      DiscreteLegend = _b['default'];
+    }, function (_e) {
+      ContinuousLegend = _e['default'];
     }],
     execute: function () {
-      _export('default', function (layer, options) {
+      _export('default', function (layer) {
+        var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+        options.position = options.position || 'bottomright';
         if (layer.parameter.observedProperty.categories) {
           return new DiscreteLegend(layer, options);
         } else {
@@ -9461,222 +12184,7 @@ $__System.register('76', ['72', '75'], function (_export) {
   };
 });
 
-$__System.register('77', ['48', '65'], function (_export) {
-  /* */
-  'use strict';
-
-  var L, $, HTML, TEMPLATE, TimeAxis;
-
-  function getUTCTimestampDateOnly(dateStr) {
-    var year = parseInt(dateStr.substr(0, 4));
-    var month = parseInt(dateStr.substr(5, 2));
-    var day = parseInt(dateStr.substr(8, 2));
-    return Date.UTC(year, month - 1, day);
-  }
-
-  function getUTCDateString(timestamp) {
-    var iso = new Date(timestamp).toISOString();
-    var date = iso.substr(0, 10);
-    return date;
-  }
-
-  return {
-    setters: [function (_) {
-      L = _['default'];
-    }, function (_2) {
-      $ = _2.$;
-      HTML = _2.HTML;
-    }],
-    execute: function () {
-      TEMPLATE = '<div class="info" style="clear:none">\n  <strong class="title">Time</strong><br>\n  <select name="date" class="date"></select>\n  <select name="time" class="time"></select>\n</div>';
-
-      TimeAxis = (function (_L$Control) {
-        babelHelpers.inherits(TimeAxis, _L$Control);
-
-        function TimeAxis(covLayer, options) {
-          var _this = this;
-
-          babelHelpers.classCallCheck(this, TimeAxis);
-
-          options = options || {};
-          babelHelpers.get(Object.getPrototypeOf(TimeAxis.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : { position: 'topleft' });
-          this._title = options.title;
-          this.covLayer = covLayer;
-
-          this._remove = function () {
-            return _this.removeFrom(_this._map);
-          };
-          covLayer.on('remove', this._remove);
-
-          this._axisListener = function (e) {
-            if (e.axis === 'time') _this.updateAxis(covLayer.time);
-          };
-
-          var timeSlices = this.covLayer.timeSlices;
-          var dateMap = new Map(); // UTC timestamp (representing the date only) -> array of Date objects
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = timeSlices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var t = _step.value;
-
-              var dateTimestamp = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate())).getTime();
-              if (!dateMap.has(dateTimestamp)) {
-                dateMap.set(dateTimestamp, []);
-              }
-              dateMap.get(dateTimestamp).push(t);
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator['return']) {
-                _iterator['return']();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          this._dateMap = dateMap;
-        }
-
-        babelHelpers.createClass(TimeAxis, [{
-          key: 'onRemove',
-          value: function onRemove(map) {
-            this.covLayer.off('remove', this._remove);
-            this.covLayer.off('axisChange', this._axisListener);
-          }
-        }, {
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this2 = this;
-
-            this.covLayer.on('axisChange', this._axisListener);
-
-            var el = HTML(TEMPLATE)[0];
-            this._el = el;
-            L.DomEvent.disableClickPropagation(el);
-
-            if (this._title) {
-              $('.title', el).fill(this._title);
-            }
-
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = this._dateMap.keys()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var dateTimestamp = _step2.value;
-
-                var dateStr = getUTCDateString(dateTimestamp);
-                $('.date', el).add(HTML('<option value="' + dateStr + '">' + dateStr + '</option>'));
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                  _iterator2['return']();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
-            }
-
-            $('.date', el)[0].disabled = this._dateMap.size === 1;
-
-            $('.date', el).on('change', function (event) {
-              var dateTimestamp = getUTCTimestampDateOnly(event.target.value);
-              var timeSlice = _this2._dateMap.get(dateTimestamp)[0];
-              _this2.covLayer.time = timeSlice;
-              _this2.initTimeSelect(dateTimestamp);
-            });
-            $('.time', el).on('change', function (event) {
-              var dateStr = $('.date', el)[0].value;
-              var timeStr = event.target.value;
-              var time = new Date(dateStr + 'T' + timeStr);
-              _this2.covLayer.time = time;
-            });
-
-            this.updateAxis(this.covLayer.time);
-
-            return el;
-          }
-        }, {
-          key: 'updateAxis',
-          value: function updateAxis(covTime) {
-            var el = this._el;
-            // selects the date set in the cov layer, populates the time select, and selects the time
-            var dateTimestamp = getUTCTimestampDateOnly(covTime.toISOString());
-            var dateStr = getUTCDateString(dateTimestamp);
-            $('.date', el)[0].value = dateStr;
-
-            this.initTimeSelect(dateTimestamp);
-
-            var timeStr = covTime.toISOString().substr(11);
-            $('.time', el)[0].value = timeStr;
-          }
-        }, {
-          key: 'initTimeSelect',
-          value: function initTimeSelect(dateTimestamp) {
-            var el = this._el;
-            var timeSelect = $('.time', el);
-            timeSelect.fill();
-            var times = this._dateMap.get(dateTimestamp);
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-              for (var _iterator3 = times[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                var timeSlice = _step3.value;
-
-                var timeStr = timeSlice.toISOString().substr(11);
-                timeSelect.add(HTML('<option value="' + timeStr + '">' + timeStr + '</option>'));
-              }
-            } catch (err) {
-              _didIteratorError3 = true;
-              _iteratorError3 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                  _iterator3['return']();
-                }
-              } finally {
-                if (_didIteratorError3) {
-                  throw _iteratorError3;
-                }
-              }
-            }
-
-            timeSelect[0].disabled = times.length === 1;
-          }
-        }]);
-        return TimeAxis;
-      })(L.Control);
-
-      _export('default', TimeAxis);
-
-      TimeAxis.include(L.Mixin.Events);
-
-      //work-around for Babel bug, otherwise SelectControl cannot be referenced here
-
-      _export('default', TimeAxis);
-    }
-  };
-});
-
-$__System.registerDynamic("78", ["79"], true, function($__require, exports, module) {
+$__System.registerDynamic("80", ["81"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -9717,7 +12225,7 @@ $__System.registerDynamic("78", ["79"], true, function($__require, exports, modu
     }
     function ChartInternal(api) {
       var $$ = this;
-      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('79') : undefined;
+      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('81') : undefined;
       $$.api = api;
       $$.config = $$.getDefaultConfig();
       $$.data = {};
@@ -16441,49 +18949,77 @@ $__System.registerDynamic("78", ["79"], true, function($__require, exports, modu
   return module.exports;
 });
 
-$__System.registerDynamic("7a", ["78"], true, function($__require, exports, module) {
+$__System.registerDynamic("82", ["80"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('78');
+  module.exports = $__require('80');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("7b", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("83", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('74', [], function (_export) {
-  /* */
+$__System.register('7d', [], function (_export) {
+  /** @ignore */
   'use strict';
 
   var DEFAULT_LANGUAGE;
 
+  /**
+   * @example
+   * var labels = {'en': 'Temperature', 'de': 'Temperatur'}
+   * var label = getLanguageString(labels, 'en-GB')
+   * // label == 'Temperature'
+   * 
+   * @param {object} map An object that maps language tags to strings.
+   * @param {string} [preferredLanguage='en'] The preferred language as a language tag, e.g. 'de'.
+   * @return {string} The string within the input map whose language tag best matched.
+   *   If no match was found then this is an arbitrary string of the map.
+   */
+
   _export('getLanguageTag', getLanguageTag);
 
   _export('getLanguageString', getLanguageString);
+
+  /**
+   * @example
+   * var labels = {'en': 'Temperature', 'de': 'Temperatur'}
+   * var tag = getLanguageTag(labels, 'en-GB')
+   * // tag == 'en'
+   * 
+   * @param {object} map An object that maps language tags to strings.
+   * @param {string} [preferredLanguage='en'] The preferred language as a language tag, e.g. 'de'.
+   * @return {string} The best matched language tag of the input map.
+   *   If no match was found then this is an arbitrary tag of the map.
+   */
 
   function getLanguageTag(map) {
     var preferredLanguage = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_LANGUAGE : arguments[1];
 
     if (preferredLanguage in map) {
       return preferredLanguage;
-    } else {
-      // could be more clever here for cases like 'de' vs 'de-DE'
-      return Object.keys(map)[0];
     }
+
+    // cut off any subtags following the language subtag and try to find a match
+    var prefTag = preferredLanguage.split('-')[0];
+    var matches = Object.keys(map).filter(function (tag) {
+      return prefTag === tag.split('-')[0];
+    });
+    if (matches.length) {
+      return matches[0];
+    }
+
+    // no luck, return a random tag
+    return Object.keys(map)[0];
   }
 
   function getLanguageString(map) {
     var preferredLanguage = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_LANGUAGE : arguments[1];
 
-    if (preferredLanguage in map) {
-      return map[preferredLanguage];
-    } else {
-      // random language
-      // this case should not happen as all labels should have common languages
-      return map[Object.keys(map)[0]];
-    }
+    var tag = getLanguageTag(map, preferredLanguage);
+    return map[tag];
   }
 
   return {
@@ -16496,43 +19032,65 @@ $__System.register('74', [], function (_export) {
   };
 });
 
-$__System.register('7c', ['48', '74', '7a', '7b', '6b'], function (_export) {
+$__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
   /* */
 
-  // not used currently
+  /**
+   * Displays a popup with an interactive plot showing the data
+   * of the vertical profile coverage.
+   * 
+   * @example
+   * layer.bindPopup(new VerticalProfilePlot(coverage))
+   * 
+   * @example <caption>Non-module access</caption>
+   * L.coverage.popup.VerticalProfilePlot
+   */
   'use strict';
 
-  var L, i18n, c3, referencingUtil, DEFAULT_PLOT_OPTIONS, VerticalProfilePlot;
+  var L, c3, i18n, referencingUtil, VerticalProfilePlot;
   return {
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      i18n = _2;
-    }, function (_a) {
-      c3 = _a['default'];
-    }, function (_b) {}, function (_b2) {
-      referencingUtil = _b2;
+      c3 = _2['default'];
+    }, function (_3) {}, function (_d) {
+      i18n = _d;
+    }, function (_d2) {
+      referencingUtil = _d2;
     }],
     execute: function () {
-      DEFAULT_PLOT_OPTIONS = {};
-
       VerticalProfilePlot = (function (_L$Popup) {
         babelHelpers.inherits(VerticalProfilePlot, _L$Popup);
 
-        function VerticalProfilePlot(cov, options, plotOptions) {
+        // TODO rethink options.keys, feels weird
+
+        /**
+         * Creates a vertical profile plot popup.
+         * 
+         * @param {object} coverage The vertical profile coverage to visualize.
+         * @param {object} [options] Popup options. See also http://leafletjs.com/reference.html#popup-options.
+         * @param {Array} [options.keys] A single-element array of a parameter key
+         * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+         */
+
+        function VerticalProfilePlot(coverage) {
+          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
           babelHelpers.classCallCheck(this, VerticalProfilePlot);
 
-          babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'constructor', this).call(this, { maxWidth: 350 });
-          this._cov = cov;
-          this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
-          this.language = options.language || i18n.DEFAULT_LANGUAGE;
-          this.plotOptions = plotOptions || DEFAULT_PLOT_OPTIONS;
+          options.maxWidth = options.maxWidth || 350;
+          babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'constructor', this).call(this, options);
+          this._cov = coverage;
+          this._param = options.keys ? coverage.parameters.get(options.keys[0]) : null;
+          this._language = options.language || i18n.DEFAULT_LANGUAGE;
 
-          if (this.param === null) {
+          if (this._param === null) {
             throw new Error('multiple params not supported yet');
           }
         }
 
+        /**
+         * @ignore
+         */
         babelHelpers.createClass(VerticalProfilePlot, [{
           key: 'onAdd',
           value: function onAdd(map) {
@@ -16545,8 +19103,8 @@ $__System.register('7c', ['48', '74', '7a', '7b', '6b'], function (_export) {
               var domain = _ref2[0];
               var ranges = _ref2[1];
 
-              _this.domain = domain;
-              _this.ranges = ranges;
+              _this._domain = domain;
+              _this._ranges = ranges;
               _this._addPlotToPopup();
               babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'onAdd', _this).call(_this, map);
               _this.fire('add');
@@ -16561,21 +19119,24 @@ $__System.register('7c', ['48', '74', '7a', '7b', '6b'], function (_export) {
           key: '_addPlotToPopup',
           value: function _addPlotToPopup() {
             // TODO transform if necessary
-            var x = this.domain.axes.get('x');
-            var y = this.domain.axes.get('y');
-            this.setLatLng(L.latLng(y.values[0], x.values[0]));
+            if (!this.getLatLng()) {
+              // in case bindPopup is not used and the caller did not set a position
+              var x = this._domain.axes.get('x');
+              var y = this._domain.axes.get('y');
+              this.setLatLng(L.latLng(y.values[0], x.values[0]));
+            }
             var el = this._getPlotElement();
             this.setContent(el);
           }
         }, {
           key: '_getPlotElement',
           value: function _getPlotElement() {
-            var param = this.param;
+            var param = this._param;
 
             var zName = 'Vertical';
             var zUnit = '';
 
-            var vertSrs = referencingUtil.getRefSystem(this.domain, ['z']);
+            var vertSrs = referencingUtil.getRefSystem(this._domain, ['z']);
             if (vertSrs) {
               if (vertSrs.cs && vertSrs.cs.axes) {
                 var ax = vertSrs.cs.axes[0];
@@ -16592,15 +19153,15 @@ $__System.register('7c', ['48', '74', '7a', '7b', '6b'], function (_export) {
               xLabel += ' (' + zUnit + ')';
             }
 
-            var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language) : '';
-            var obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this.language);
+            var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this._language) : '';
+            var obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this._language);
             var x = ['x'];
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
 
             try {
-              for (var _iterator = this.domain.axes.get('z').values[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              for (var _iterator = this._domain.axes.get('z').values[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                 var z = _step.value;
 
                 x.push(z);
@@ -16621,8 +19182,8 @@ $__System.register('7c', ['48', '74', '7a', '7b', '6b'], function (_export) {
             }
 
             var y = [param.key];
-            for (var i = 0; i < this.domain.axes.get('z').values.length; i++) {
-              y.push(this.ranges.get(param.key).get({ z: i }));
+            for (var i = 0; i < this._domain.axes.get('z').values.length; i++) {
+              y.push(this._ranges.get(param.key).get({ z: i }));
             }
 
             var el = document.createElement('div');
@@ -16691,129 +19252,41 @@ $__System.register('7c', ['48', '74', '7a', '7b', '6b'], function (_export) {
   };
 });
 
-$__System.register('7d', ['48', '65'], function (_export) {
+$__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'], function (_export) {
   'use strict';
 
-  var L, $, HTML, TEMPLATE, SelectControl;
+  var L, LayerFactory, getLayerClass, ProfilePlot, Action, VIEW, i18n, COVJSON_PREFIX, SelectControl, TimeAxis, ParameterSync, CoverageLegend, PROFILE_COLLECTION, POINT_COLLECTION, GeoCoverageView;
   return {
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      $ = _2.$;
-      HTML = _2.HTML;
-    }],
-    execute: function () {
-      TEMPLATE = '<div class="info" style="clear:none">\n  <strong class="select-title"></strong><br>\n  <select></select>\n</div>';
-
-      SelectControl = (function (_L$Control) {
-        babelHelpers.inherits(SelectControl, _L$Control);
-
-        function SelectControl(covLayer, choices, options) {
-          var _this = this;
-
-          babelHelpers.classCallCheck(this, SelectControl);
-
-          babelHelpers.get(Object.getPrototypeOf(SelectControl.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : { position: 'topleft' });
-          this._title = options.title || '';
-          this.covLayer = covLayer;
-          this._choices = choices;
-
-          this._remove = function () {
-            return _this.removeFrom(_this._map);
-          };
-          covLayer.on('remove', this._remove);
-        }
-
-        babelHelpers.createClass(SelectControl, [{
-          key: 'onRemove',
-          value: function onRemove(map) {
-            this.covLayer.off('remove', this._remove);
-          }
-        }, {
-          key: 'onAdd',
-          value: function onAdd(map) {
-            var _this2 = this;
-
-            var el = HTML(TEMPLATE)[0];
-            L.DomEvent.disableClickPropagation(el);
-
-            $('.select-title', el).fill(this._title);
-
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-              for (var _iterator = this._choices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var _step$value = _step.value;
-                var value = _step$value.value;
-                var label = _step$value.label;
-
-                $('select', el).add(HTML('<option value="' + value + '">' + label + '</option>'));
-              }
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
-            }
-
-            $('select', el).on('change', function (event) {
-              _this2.fire('change', { value: event.target.value });
-            });
-
-            return el;
-          }
-        }]);
-        return SelectControl;
-      })(L.Control);
-
-      _export('default', SelectControl);
-
-      SelectControl.include(L.Mixin.Events);
-
-      //work-around for Babel bug, otherwise SelectControl cannot be referenced here
-
-      _export('default', SelectControl);
-    }
-  };
-});
-
-$__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_export) {
-
-  /**
-   * Displays geospatial coverages on a map.
-   */
-  'use strict';
-
-  var LayerFactory, getLayerClass, CoverageLegend, TimeAxis, i18n, ProfilePlot, Action, VIEW, SelectControl, GeoCoverageView;
-  return {
-    setters: [function (_) {
-      LayerFactory = _['default'];
-      getLayerClass = _.getLayerClass;
-    }, function (_2) {
-      CoverageLegend = _2['default'];
+      LayerFactory = _2['default'];
+      getLayerClass = _2.getLayerClass;
+    }, function (_4) {
+      ProfilePlot = _4['default'];
+    }, function (_5) {
+      Action = _5['default'];
+      VIEW = _5.VIEW;
+    }, function (_6) {
+      i18n = _6.i18n;
+      COVJSON_PREFIX = _6.COVJSON_PREFIX;
+    }, function (_7) {
+      SelectControl = _7['default'];
     }, function (_3) {
       TimeAxis = _3['default'];
-    }, function (_4) {
-      i18n = _4.i18n;
-    }, function (_c) {
-      ProfilePlot = _c['default'];
+    }, function (_a) {
+      ParameterSync = _a['default'];
     }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
-    }, function (_d) {
-      SelectControl = _d['default'];
+      CoverageLegend = _f['default'];
     }],
     execute: function () {
+      PROFILE_COLLECTION = COVJSON_PREFIX + 'VerticalProfileCoverageCollection';
+      POINT_COLLECTION = COVJSON_PREFIX + 'PointCoverageCollection';
+
+      /**
+       * Displays geospatial coverages on a map.
+       */
+
       GeoCoverageView = (function (_Action) {
         babelHelpers.inherits(GeoCoverageView, _Action);
 
@@ -16862,14 +19335,34 @@ $__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_
 
             this._setVisible();
 
-            // TODO support collections
-
             var cov = this.cov;
-            if (cov.coverages) {
+            if (cov.coverages && cov.coverages.length === 1) {
               cov = cov.coverages[0];
             }
 
-            var firstDisplayed = false;
+            var formatLabel = this.context.distribution.formatImpl.shortLabel;
+            var layerNamePrefix = '<span class="label label-success">' + formatLabel + '</span> ';
+
+            this.paramSync = new ParameterSync({
+              syncProperties: {
+                palette: function palette(p1, p2) {
+                  return p1;
+                },
+                paletteExtent: function paletteExtent(e1, e2) {
+                  return e1 && e2 ? [Math.min(e1[0], e2[0]), Math.max(e1[1], e2[1])] : null;
+                }
+              }
+            }).on('parameterAdd', function (e) {
+              // The virtual sync layer proxies the synced palette, paletteExtent, and parameter.
+              // The sync layer will fire a 'remove' event if all real layers for that parameter were removed.
+              var layer = e.syncLayer;
+              if (layer.palette) {
+                CoverageLegend(layer, {
+                  position: 'bottomright'
+                }).addTo(map);
+              }
+            });
+
             // each parameter becomes a layer
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -16880,56 +19373,19 @@ $__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_
                 var key = _step.value;
 
                 var opts = { keys: [key] };
-                var layer = LayerFactory()(cov, opts).on('add', function (e) {
-                  var covLayer = e.target;
-                  //map.fitBounds(covLayer.getBounds())
-
-                  if (covLayer.palette) {
-                    CoverageLegend(layer, {
-                      position: 'bottomright'
-                    }).addTo(map);
-                  }
-
-                  if (covLayer.time !== null) {
-                    new TimeAxis(covLayer).addTo(map);
-                  }
-
-                  if (covLayer.vertical !== null) {
-                    var choices = covLayer.verticalSlices.map(function (val) {
-                      return {
-                        value: val,
-                        label: val
-                      };
-                    });
-                    new SelectControl(covLayer, choices, { title: 'Vertical axis' }).on('change', function (event) {
-                      var vertical = parseFloat(event.value);
-                      covLayer.vertical = vertical;
-                    }).addTo(map);
-                  }
-                }).on('dataLoading', function () {
-                  return _this.fire('loading');
-                }).on('dataLoad', function () {
-                  return _this.fire('load');
-                });
-
-                // TODO use full URI
-                if (cov.domainProfiles.some(function (p) {
-                  return p.endsWith('VerticalProfile');
-                })) {
-                  // we do that outside of the above 'add' handler since we want to register only once,
-                  // not every time the layer is added to the map
-                  layer.on('click', function () {
-                    return new ProfilePlot(cov, opts).addTo(map);
-                  });
-                }
-
-                if (!firstDisplayed) {
-                  firstDisplayed = true;
-                  map.addLayer(layer);
-                }
                 var layerName = i18n(cov.parameters.get(key).observedProperty.label);
-                var formatLabel = _this.context.distribution.formatImpl.shortLabel;
-                var fullLayerName = '<span class="label label-success">' + formatLabel + '</span> ' + layerName;
+                var fullLayerName = layerNamePrefix + layerName;
+                var layer = undefined;
+                if (cov.coverages) {
+                  var layers = cov.coverages.map(function (coverage) {
+                    return _this._createLayer(coverage, opts, true);
+                  });
+                  // TODO this should be more clever and be oriented towards uniform collections
+                  //     then it would make sense to expose properties like palette etc.
+                  layer = L.layerGroup(layers);
+                } else {
+                  layer = _this._createLayer(cov, opts);
+                }
                 map.layerControl.addOverlay(layer, fullLayerName, { groupName: datasetTitle, expanded: true });
                 _this.layers.push(layer);
               };
@@ -16937,6 +19393,8 @@ $__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_
               for (var _iterator = cov.parameters.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                 _loop();
               }
+
+              // display the first layer
             } catch (err) {
               _didIteratorError = true;
               _iteratorError = err;
@@ -16951,6 +19409,64 @@ $__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_
                 }
               }
             }
+
+            var firstLayer = this.layers[0];
+            map.addLayer(firstLayer);
+          }
+        }, {
+          key: '_createLayer',
+          value: function _createLayer(cov, opts, inCollection) {
+            var _this2 = this;
+
+            var map = this.context.map;
+            var layer = LayerFactory()(cov, opts).on('add', function (e) {
+              var covLayer = e.target;
+
+              // This registers the layer with the sync manager.
+              // By doing that, the palette and extent get unified (if existing)
+              // and an event gets fired if a new parameter was added.
+              // See the code above where ParameterSync gets instantiated.
+              _this2.paramSync.addLayer(covLayer);
+
+              if (inCollection) {
+                // we could display a time range control for filtering the displayed collection items
+                // same for vertical axis where in addition a target value could be chosen
+              } else {
+                  if (covLayer.timeSlices) {
+                    var timeAxis = new TimeAxis(covLayer);
+                    timeAxis.addTo(map);
+                  }
+
+                  if (covLayer.verticalSlices) {
+                    var choices = covLayer.verticalSlices.map(function (val) {
+                      return {
+                        value: val,
+                        label: val
+                      };
+                    });
+                    new SelectControl(covLayer, choices, { title: 'Vertical axis' }).on('change', function (event) {
+                      var vertical = parseFloat(event.value);
+                      covLayer.vertical = vertical;
+                    }).addTo(map);
+                  }
+                }
+            }).on('dataLoading', function () {
+              return _this2.fire('loading');
+            }).on('dataLoad', function () {
+              return _this2.fire('load');
+            });
+
+            // TODO use full URI
+            if (cov.domainProfiles.some(function (p) {
+              return p.endsWith('VerticalProfile');
+            })) {
+              // we do that outside of the above 'add' handler since we want to register only once,
+              // not every time the layer is added to the map
+              layer.on('click', function () {
+                return new ProfilePlot(cov, opts).addTo(map);
+              });
+            }
+            return layer;
           }
         }, {
           key: 'remove',
@@ -16990,9 +19506,16 @@ $__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_
         }, {
           key: 'isSupported',
           get: function get() {
-            // TODO support collections
             if (this.cov.coverages && this.cov.coverages.length > 1) {
-              return false;
+              // limited collection support
+              if (this.cov.profiles.indexOf(PROFILE_COLLECTION) !== -1 || this.cov.profiles.indexOf(POINT_COLLECTION) !== -1) {
+                // only support collections with root-level parameters (where we then assume a uniform collection)
+                if (!this.cov.parameters) {
+                  return false;
+                }
+              } else {
+                return false;
+              }
             }
             var cov = this.cov;
             if (cov.coverages) {
@@ -17015,7 +19538,7 @@ $__System.register('7e', ['71', '76', '77', '80', '7c', '7f', '7d'], function (_
   };
 });
 
-$__System.registerDynamic("81", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("8a", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, "d3", null);
   (function() {
     "format global";
@@ -28839,17 +31362,17 @@ $__System.registerDynamic("81", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("79", ["81"], true, function($__require, exports, module) {
+$__System.registerDynamic("81", ["8a"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('81');
+  module.exports = $__require('8a');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("82", ["79"], true, function($__require, exports, module) {
+$__System.registerDynamic("8b", ["81"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -28892,7 +31415,7 @@ $__System.registerDynamic("82", ["79"], true, function($__require, exports, modu
     }
     function ChartInternal(api) {
       var $$ = this;
-      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('79') : undefined;
+      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('81') : undefined;
       $$.api = api;
       $$.config = $$.getDefaultConfig();
       $$.data = {};
@@ -35859,37 +38382,37 @@ $__System.registerDynamic("82", ["79"], true, function($__require, exports, modu
   return module.exports;
 });
 
-$__System.registerDynamic("83", ["82"], true, function($__require, exports, module) {
+$__System.registerDynamic("8c", ["8b"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('82');
+  module.exports = $__require('8b');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("84", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("8d", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('85', ['65', '80', '83', '84', '86', '7f'], function (_export) {
+$__System.register('8e', ['67', '86', '87', '8f', '8c', '8d'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, c3, Modal, Action, VIEW, DISCRETE_PROB, html, TEMPLATES, StatisticalCoverageView;
+  var $, $$, HTML, Action, VIEW, i18n, Modal, c3, DISCRETE_PROB, html, TEMPLATES, StatisticalCoverageView;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_5) {
-      i18n = _5.i18n;
+    }, function (_2) {
+      Action = _2['default'];
+      VIEW = _2.VIEW;
     }, function (_3) {
-      c3 = _3['default'];
-    }, function (_4) {}, function (_2) {
-      Modal = _2['default'];
+      i18n = _3.i18n;
     }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
-    }],
+      Modal = _f['default'];
+    }, function (_c) {
+      c3 = _c['default'];
+    }, function (_d) {}],
     execute: function () {
       DISCRETE_PROB = 'http://www.uncertml.org/statistics/discrete-probability';
       html = '\n<div class="modal fade" id="statisticsViewModal" tabindex="-1" role="dialog" aria-labelledby="statisticsViewModalLabel">\n  <div class="modal-dialog modal-lg" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="statisticsViewModalLabel">Statistics View</h4>\n      </div>\n      <div class="modal-body">\n        <div class="param-selector"></div>\n      \n        <div class="chart-container"></div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
@@ -36226,7 +38749,7 @@ $__System.register('85', ['65', '80', '83', '84', '86', '7f'], function (_export
   };
 });
 
-$__System.registerDynamic("87", ["3b"], true, function($__require, exports, module) {
+$__System.registerDynamic("90", ["3b"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -46332,17 +48855,17 @@ $__System.registerDynamic("87", ["3b"], true, function($__require, exports, modu
   return module.exports;
 });
 
-$__System.registerDynamic("88", ["87"], true, function($__require, exports, module) {
+$__System.registerDynamic("91", ["90"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('87');
+  module.exports = $__require('90');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("89", ["88"], true, function($__require, exports, module) {
+$__System.registerDynamic("92", ["91"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -46352,7 +48875,7 @@ $__System.registerDynamic("89", ["88"], true, function($__require, exports, modu
     if (typeof define === 'function' && define.amd) {
       define(['jsplumb'], factory);
     } else if (typeof module === 'object' && module.exports) {
-      module.exports = factory($__require('88').jsPlumb);
+      module.exports = factory($__require('91').jsPlumb);
     } else {
       root.Remapper = factory(root.jsPlumb);
     }
@@ -46508,19 +49031,19 @@ $__System.registerDynamic("89", ["88"], true, function($__require, exports, modu
   return module.exports;
 });
 
-$__System.registerDynamic("8a", ["89"], true, function($__require, exports, module) {
+$__System.registerDynamic("93", ["92"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('89');
+  module.exports = $__require('92');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register("8b", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("94", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('8c', ['66', '80'], function (_export) {
+$__System.register('95', ['68', '87'], function (_export) {
   'use strict';
 
   var Format, loadJSON, CatRemap;
@@ -46569,33 +49092,33 @@ $__System.register('8c', ['66', '80'], function (_export) {
   };
 });
 
-$__System.register('8d', ['54', '65', '80', '86', '8a', '8b', '8e', '6c', '7f', '8c'], function (_export) {
+$__System.register('96', ['54', '67', '78', '86', '87', '93', '94', '95', '97', '8f'], function (_export) {
   'use strict';
 
-  var CoverageData, $, $$, HTML, i18n, Modal, Remapper, withCategories, COVJSON_GRID, Action, VIEW, PROCESS, CatRemap, html, TEMPLATES, CoverageRemapCategories;
+  var CoverageData, $, $$, HTML, COVJSON_GRID, Action, VIEW, PROCESS, i18n, Remapper, CatRemap, withCategories, Modal, html, TEMPLATES, CoverageRemapCategories;
   return {
-    setters: [function (_4) {
-      CoverageData = _4['default'];
+    setters: [function (_8) {
+      CoverageData = _8['default'];
     }, function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_3) {
-      i18n = _3.i18n;
+    }, function (_5) {
+      COVJSON_GRID = _5.COVJSON_GRID;
+    }, function (_7) {
+      Action = _7['default'];
+      VIEW = _7.VIEW;
+      PROCESS = _7.PROCESS;
+    }, function (_6) {
+      i18n = _6.i18n;
     }, function (_2) {
-      Modal = _2['default'];
-    }, function (_a) {
-      Remapper = _a['default'];
-    }, function (_b) {}, function (_e) {
-      withCategories = _e.withCategories;
-    }, function (_c) {
-      COVJSON_GRID = _c.COVJSON_GRID;
+      Remapper = _2['default'];
+    }, function (_3) {}, function (_9) {
+      CatRemap = _9['default'];
+    }, function (_4) {
+      withCategories = _4.withCategories;
     }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
-      PROCESS = _f.PROCESS;
-    }, function (_c2) {
-      CatRemap = _c2['default'];
+      Modal = _f['default'];
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="paramSelectModalLabel">Select a categorical parameter</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n      \n        <div class="panel panel-primary parameter-select">\n          <div class="panel-body">\n            <p>\n              Which of the following categorical parameters do you like to remap?\n            </p>\n          </div>\n          <ul class="list-group parameter-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="remapModal" tabindex="-1" role="dialog" aria-labelledby="remapModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="remapModalLabel">Remap <strong class="parameter-label"></strong> Categories</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n        \n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Option A: Apply ready-made remapping definitions</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Using a ready-made remapping definition is the fastest way to apply a remapping.\n              The remapping definition defines both the target categories and their mapping\n              from the source categories.\n            </p>\n            <div class="alert alert-info remapping-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group remapping-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-primary remap-categorical-distributions">\n          <div class="panel-heading">\n            <h4>Option B: Remap manually with categories from existing datasets</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              A manual remapping can be done more quickly by loading the desired\n              target categories from an existing dataset. The connections then have\n              to be created manually via drag and drop.\n            </p>\n            <div class="alert alert-info categorical-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group categorical-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-default remap-manual">\n          <div class="panel-heading">\n            <h4>Option C: Fully manual remapping</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              When the above methods cannot be used then the only option left is\n              to manually create the target categories and connect\n              them to the source categories. NOTE: This is currently not supported.\n            </p>\n          </div>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n<div id="remapper"></div>\n<style>\n/* above sidebar */\n.modal, #remapper {\n  z-index: 3000; \n}\n.modal-backdrop {\n  z-index: 2500;\n}\n.categorical-distribution-list-empty, .remapping-distribution-list-empty {\n  margin-bottom: 0;\n}\n.workspace-dataset-distribution-action .btn {\n  margin-bottom: 5px;\n}\n</style>\n';
@@ -47204,15 +49727,27 @@ $__System.register('8d', ['54', '65', '80', '86', '8a', '8b', '8e', '6c', '7f', 
   };
 });
 
-$__System.register('6a', [], function (_export) {
+$__System.register('6c', [], function (_export) {
   /**
-   * Return the minimum/maximum across all range values,
-   * ignoring null's.
+   * @external {Range} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Range.md
+   */
+
+  /**
+   * Return the minimum/maximum across all range values, ignoring null's.
+   * 
+   * @param {Range<number>} range The numeric coverage data range.
+   * @return {[min,max]} The minimum and maximum values of the range,
+   *   or [undefined, undefined] if the range contains only `null` values.
    */
   'use strict';
 
   /**
    * Apply a reduce function over the range values.
+   * 
+   * @param {Range} range The coverage data range.
+   * @param {function} callback Function to execute on each value in the array with arguments `(previousValue, currentValue)`.
+   * @param start Value to use as the first argument to the first call of the `callback`.
+   * @return The reduced value.
    */
 
   _export('minMax', minMax);
@@ -47260,13 +49795,13 @@ $__System.register('6a', [], function (_export) {
       if (val > max) max = val;
     };
     iterate(range, fn);
-    return [min, max];
+    return min === Infinity ? [undefined, undefined] : [min, max];
   }
 
-  function reduce(range, fn, start) {
+  function reduce(range, callback, start) {
     var v1 = start;
     var iterFn = function iterFn(v2) {
-      v1 = fn(v1, v2);
+      v1 = callback(v1, v2);
     };
     iterate(range, iterFn);
     return v1;
@@ -47336,7 +49871,7 @@ $__System.register('6a', [], function (_export) {
   };
 });
 
-$__System.register('8f', ['65', '80', '86', '6a', '6b', '6c', '7f'], function (_export) {
+$__System.register('98', ['67', '78', '86', '87', '8f', '6c', '6d'], function (_export) {
   /*
    * For a given categorical coverage parameter, calculate and show
    * percentages of each category for a given time step or combined
@@ -47345,25 +49880,25 @@ $__System.register('8f', ['65', '80', '86', '6a', '6b', '6c', '7f'], function (_
 
   'use strict';
 
-  var $, $$, HTML, i18n, Modal, rangeUtil, referencingUtil, COVJSON_GRID, Action, PROCESS, html, TEMPLATES, CoverageCategoriesStatistics;
+  var $, $$, HTML, COVJSON_GRID, Action, PROCESS, i18n, Modal, rangeUtil, referencingUtil, html, TEMPLATES, CoverageCategoriesStatistics;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
     }, function (_3) {
-      i18n = _3.i18n;
+      COVJSON_GRID = _3.COVJSON_GRID;
+    }, function (_4) {
+      Action = _4['default'];
+      PROCESS = _4.PROCESS;
     }, function (_2) {
-      Modal = _2['default'];
-    }, function (_a) {
-      rangeUtil = _a;
-    }, function (_b) {
-      referencingUtil = _b;
-    }, function (_c) {
-      COVJSON_GRID = _c.COVJSON_GRID;
+      i18n = _2.i18n;
     }, function (_f) {
-      Action = _f['default'];
-      PROCESS = _f.PROCESS;
+      Modal = _f['default'];
+    }, function (_c) {
+      rangeUtil = _c;
+    }, function (_d) {
+      referencingUtil = _d;
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="statisticsOptionsModal" tabindex="-1" role="dialog" aria-labelledby="statisticsOptionsModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="statisticsOptionsModalLabel">Select reference periods</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Select the reference periods for which the summary statistics shall be calculated.\n              The more periods you select, the longer the processing time will be.\n            </p>\n              \n            <select multiple class="form-control ref-periods-select">\n            </select>\n            \n            <div class="calculate-button-container"></div>\n          </div>\n          \n       \n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="statisticsProgressModal" tabindex="-1" role="dialog" aria-labelledby="statisticsProgressModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <h4 class="modal-title" id="statisticsProgressModalLabel">Progress</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Please wait until the operation is finished.\n            </p>\n            <progress max="1" value="0"></progress>\n          </div>\n        </div>\n       \n      </div>\n    </div>\n  </div>\n</div>\n\n<style>\n.calculate-button-container {\n  margin-top: 20px;\n}\n#statisticsProgressModal progress {\n  width: 100%;\n}\n</style>\n';
@@ -47823,7 +50358,7 @@ $__System.register('8f', ['65', '80', '86', '6a', '6b', '6c', '7f'], function (_
   };
 });
 
-$__System.registerDynamic("90", [], true, function($__require, exports, module) {
+$__System.registerDynamic("99", [], true, function($__require, exports, module) {
   "use strict";
   ;
   var global = this,
@@ -47841,17 +50376,17 @@ $__System.registerDynamic("90", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("91", ["90"], true, function($__require, exports, module) {
+$__System.registerDynamic("9a", ["99"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('90');
+  module.exports = $__require('99');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("92", [], true, function($__require, exports, module) {
+$__System.registerDynamic("9b", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -47957,17 +50492,17 @@ $__System.registerDynamic("92", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("93", ["92"], true, function($__require, exports, module) {
+$__System.registerDynamic("9c", ["9b"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('92');
+  module.exports = $__require('9b');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("94", [], true, function($__require, exports, module) {
+$__System.registerDynamic("9d", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -48052,17 +50587,17 @@ $__System.registerDynamic("94", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("95", ["94"], true, function($__require, exports, module) {
+$__System.registerDynamic("9e", ["9d"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('94');
+  module.exports = $__require('9d');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("96", [], true, function($__require, exports, module) {
+$__System.registerDynamic("9f", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -48075,25 +50610,25 @@ $__System.registerDynamic("96", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("97", ["96"], true, function($__require, exports, module) {
+$__System.registerDynamic("a0", ["9f"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('96');
+  module.exports = $__require('9f');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("98", ["93", "95", "97"], true, function($__require, exports, module) {
+$__System.registerDynamic("a1", ["9c", "9e", "a0"], true, function($__require, exports, module) {
   "use strict";
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var base64 = $__require('93');
-  var ieee754 = $__require('95');
-  var isArray = $__require('97');
+  var base64 = $__require('9c');
+  var ieee754 = $__require('9e');
+  var isArray = $__require('a0');
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
   exports.INSPECT_MAX_BYTES = 50;
@@ -49390,37 +51925,37 @@ $__System.registerDynamic("98", ["93", "95", "97"], true, function($__require, e
   return module.exports;
 });
 
-$__System.registerDynamic("99", ["98"], true, function($__require, exports, module) {
+$__System.registerDynamic("a2", ["a1"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('98');
+  module.exports = $__require('a1');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9a", ["99"], true, function($__require, exports, module) {
+$__System.registerDynamic("a3", ["a2"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('99');
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('a2');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9b", ["9a"], true, function($__require, exports, module) {
+$__System.registerDynamic("a4", ["a3"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('9a');
+  module.exports = $__require('a3');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9c", ["9b"], true, function($__require, exports, module) {
+$__System.registerDynamic("a5", ["a4"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -49429,28 +51964,28 @@ $__System.registerDynamic("9c", ["9b"], true, function($__require, exports, modu
     module.exports = function(obj) {
       return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
     };
-  })($__require('9b').Buffer);
+  })($__require('a4').Buffer);
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9d", ["9c"], true, function($__require, exports, module) {
+$__System.registerDynamic("a6", ["a5"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('9c');
+  module.exports = $__require('a5');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9e", ["91", "9d"], true, function($__require, exports, module) {
+$__System.registerDynamic("a7", ["9a", "a6"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  var iota = $__require('91');
-  var isBuffer = $__require('9d');
+  var iota = $__require('9a');
+  var isBuffer = $__require('a6');
   var hasTypedArrays = ((typeof Float64Array) !== "undefined");
   function compare1st(a, b) {
     return a[0] - b[0];
@@ -49741,17 +52276,17 @@ b" + i + "*=d\
   return module.exports;
 });
 
-$__System.registerDynamic("56", ["9e"], true, function($__require, exports, module) {
+$__System.registerDynamic("56", ["a7"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('9e');
+  module.exports = $__require('a7');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('8e', ['56', '6c'], function (_export) {
+$__System.register('97', ['56', '78'], function (_export) {
   /* */
 
   /**
@@ -49799,7 +52334,7 @@ $__System.register('8e', ['56', '6c'], function (_export) {
    * domain types only.
    * 
    * @param {Coverage} cov A Coverage object.
-   * @param {Object} polygon A GeoJSON Polygon or MultiPolygon object without holes.
+   * @param {Object} polygon A GeoJSON Polygon or MultiPolygon object.
    * @returns {Promise<Coverage>}
    */
 
@@ -49828,7 +52363,8 @@ $__System.register('8e', ['56', '6c'], function (_export) {
    *
    * @param {number} x x coordinate of point
    * @param {number} y y coordinate of point
-   * @param {Array} polygon an array of 2-item arrays of coordinates.
+   * @param {Array} vertx array of polygon x coordinates.
+   * @param {Array} verty array of polygon y coordinates.
    * @returns {boolean} true if point is inside or false if not
    */
 
@@ -50020,28 +52556,60 @@ $__System.register('8e', ['56', '6c'], function (_export) {
         coordinates: [polygon.coordinates]
       };
     }
+    // prepare polygon coordinates for pnpoly algorithm
+    // each polygon component is surrounded by (0,0) vertices
+    var nvert = 1 + polygon.coordinates.map(function (poly) {
+      return poly.map(function (comp) {
+        return comp.length + 1;
+      }).reduce(function (n1, n2) {
+        return n1 + n2;
+      });
+    }).reduce(function (n1, n2) {
+      return n1 + n2;
+    });
+    var vertx = new Float64Array(nvert);
+    var verty = new Float64Array(nvert);
+    var vertIdx = 1;
+    var _iteratorNormalCompletion3 = true;
+    var _didIteratorError3 = false;
+    var _iteratorError3 = undefined;
 
-    if (polygon.coordinates.some(function (poly) {
-      return poly.length > 1;
-    })) {
-      throw new Error('Polygons cannot have holes currently');
+    try {
+      for (var _iterator3 = polygon.coordinates[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+        var coords = _step3.value;
+
+        for (var p = 0; p < coords.length; p++) {
+          var comp = coords[p];
+          for (var i = 0; i < comp.length; i++, vertIdx++) {
+            vertx[vertIdx] = comp[i][0];
+            verty[vertIdx] = comp[i][1];
+          }
+          vertIdx++; // jump over (0,0)
+        }
+      }
+    } catch (err) {
+      _didIteratorError3 = true;
+      _iteratorError3 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+          _iterator3['return']();
+        }
+      } finally {
+        if (_didIteratorError3) {
+          throw _iteratorError3;
+        }
+      }
     }
-    var polycoords = polygon.coordinates;
-    var polycount = polycoords.length;
 
     return cov.loadDomain().then(function (domain) {
       var x = domain.axes.get('x').values;
       var y = domain.axes.get('y').values;
       var pnpolyCache = ndarray(new Uint8Array(x.length * y.length), [x.length, y.length]);
+
       for (var i = 0; i < x.length; i++) {
         for (var j = 0; j < y.length; j++) {
-          var inside = undefined;
-          for (var p = 0; p < polycount; p++) {
-            inside = pnpoly(x[i], y[j], polycoords[p][0]);
-            if (inside) {
-              break;
-            }
-          }
+          var inside = pnpoly(x[i], y[j], vertx, verty);
           pnpolyCache.set(i, j, inside);
         }
       }
@@ -50055,27 +52623,27 @@ $__System.register('8e', ['56', '6c'], function (_export) {
       };
 
       var newcov = cov;
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
       try {
-        for (var _iterator3 = cov.parameters.keys()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var key = _step3.value;
+        for (var _iterator4 = cov.parameters.keys()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var key = _step4.value;
 
           newcov = mapRange(newcov, key, fn);
         }
       } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-            _iterator3['return']();
+          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+            _iterator4['return']();
           }
         } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
@@ -50095,18 +52663,14 @@ $__System.register('8e', ['56', '6c'], function (_export) {
     return cov.subsetByValue({ x: { start: xmin, stop: xmax }, y: { start: ymin, stop: ymax } });
   }
 
-  function pnpoly(x, y, polygon) {
+  function pnpoly(x, y, vertx, verty) {
     var inside = false;
-    for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      var _polygon$i = babelHelpers.slicedToArray(polygon[i], 2);
-
-      var xi = _polygon$i[0];
-      var yi = _polygon$i[1];
-
-      var _polygon$j = babelHelpers.slicedToArray(polygon[j], 2);
-
-      var xj = _polygon$j[0];
-      var yj = _polygon$j[1];
+    var nvert = vertx.length;
+    for (var i = 0, j = nvert - 1; i < nvert; j = i++) {
+      var xi = vertx[i];
+      var yi = verty[i];
+      var xj = vertx[j];
+      var yj = verty[j];
 
       if (yi > y !== yj > y && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
         inside = !inside;
@@ -50130,14 +52694,14 @@ $__System.register('8e', ['56', '6c'], function (_export) {
   return {
     setters: [function (_) {
       ndarray = _['default'];
-    }, function (_c) {
-      COVJSON_GRID = _c.COVJSON_GRID;
+    }, function (_2) {
+      COVJSON_GRID = _2.COVJSON_GRID;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('9f', ['66', '80'], function (_export) {
+$__System.register('a8', ['68', '87'], function (_export) {
   'use strict';
 
   var Format, loadJSON, GeoJSON;
@@ -50186,10 +52750,10 @@ $__System.register('9f', ['66', '80'], function (_export) {
   };
 });
 
-$__System.register('a0', ['48', '65', '80', '86', '8e', '6b', '6c', '9f', '7f'], function (_export) {
+$__System.register('a9', ['48', '67', '78', '86', '87', '97', '8f', '6d', 'a8'], function (_export) {
   'use strict';
 
-  var L, $, $$, HTML, i18n, Modal, transformUtil, referencingUtil, COVJSON_GRID, GeoJSON, Action, PROCESS, html, TEMPLATES, CoverageSubsetByPolygon;
+  var L, $, $$, HTML, COVJSON_GRID, Action, PROCESS, i18n, transformUtil, Modal, referencingUtil, GeoJSON, html, TEMPLATES, CoverageSubsetByPolygon;
 
   function getPolygonFeatures(geojson) {
     var features = []; // array of GeoJSON feature objects with (Multi)Polygon geometries
@@ -50252,20 +52816,20 @@ $__System.register('a0', ['48', '65', '80', '86', '8e', '6b', '6c', '9f', '7f'],
       $$ = _2.$$;
       HTML = _2.HTML;
     }, function (_4) {
-      i18n = _4.i18n;
+      COVJSON_GRID = _4.COVJSON_GRID;
+    }, function (_6) {
+      Action = _6['default'];
+      PROCESS = _6.PROCESS;
+    }, function (_5) {
+      i18n = _5.i18n;
     }, function (_3) {
-      Modal = _3['default'];
-    }, function (_e) {
-      transformUtil = _e;
-    }, function (_b) {
-      referencingUtil = _b;
-    }, function (_c) {
-      COVJSON_GRID = _c.COVJSON_GRID;
+      transformUtil = _3;
     }, function (_f) {
-      GeoJSON = _f['default'];
-    }, function (_f2) {
-      Action = _f2['default'];
-      PROCESS = _f2.PROCESS;
+      Modal = _f['default'];
+    }, function (_d) {
+      referencingUtil = _d;
+    }, function (_a8) {
+      GeoJSON = _a8['default'];
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="geojsonSelectModal" tabindex="-1" role="dialog" aria-labelledby="geojsonSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="geojsonSelectModalLabel">Select a GeoJSON resource</h4>\n      </div>\n      <div class="modal-body">\n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Select the GeoJSON resource containing the subsetting polygon</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Only those GeoJSON resources are shown which contain at least one (multi)polygon.\n              After selecting a GeoJSON resource, all polygons will be displayed on the map\n              and you can pick the one that should be used for subsetting.\n            </p>\n            <div class="alert alert-info geojson-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group geojson-distribution-list"></ul>\n        </div>\n               \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
@@ -50387,8 +52951,37 @@ $__System.register('a0', ['48', '65', '80', '86', '8e', '6b', '6c', '9f', '7f'],
             };
             var map = this.context.map;
 
+            // copied from GeoJSONView
+            var color = '#CC2222';
+            var defaultStyle = {
+              color: color,
+              weight: 2,
+              opacity: 0.6,
+              fillOpacity: 0,
+              fillColor: color
+            };
+
+            var highlightStyle = {
+              color: color,
+              weight: 3,
+              opacity: 0.6,
+              fillOpacity: 0.65,
+              fillColor: color
+            };
+
+            var mouseoverFn = function mouseoverFn(e) {
+              e.target.setStyle(highlightStyle);
+            };
+
+            var mouseoutFn = function mouseoutFn(e) {
+              e.target.setStyle(defaultStyle);
+            };
+
             var featuresLayer = L.geoJson(features, {
               onEachFeature: function onEachFeature(feature, layer) {
+                layer.setStyle(defaultStyle);
+                layer.on('mouseover', mouseoverFn);
+                layer.on('mouseout', mouseoutFn);
                 layer.on('click', function () {
                   _this2._applySubsetAndCreateVirtualDataset(feature);
                   map.removeLayer(featuresLayer);
@@ -50454,24 +53047,44 @@ $__System.register('a0', ['48', '65', '80', '86', '8e', '6b', '6c', '9f', '7f'],
   };
 });
 
-$__System.register('69', [], function (_export) {
+$__System.register('6b', [], function (_export) {
   /***
-   * Return the indices of the two neighbors in the a array closest to x.
-   * The array must be sorted (strictly monotone), either ascending or descending.
+   * Return the indices of the two neighbors in the sorted array closest to the given number.
    * 
-   * If x exists in the array, both neighbors point to x.
-   * If x is lower (greated if descending) than the first value, both neighbors point to 0.
-   * If x is greater (lower if descending) than the last value, both neighbors point to the last index.
+   * @example
+   * var a = [2,5,8,12,13]
+   * var i = indicesOfNearest(a, 6)
+   * // i == [1,2]
+   * var j = indicesOfNearest(a, 5)
+   * // j == [1,1]
+   * var k = indicesOfNearest(a, 50)
+   * // k == [4,4] 
    * 
-   * Adapted from https://stackoverflow.com/a/4431347
+   * @param {Array<number>} a The array to search through. Must be sorted, ascending or descending.
+   * @param {number} x The target number.
+   * @return {[lo,hi]} The indices of the two closest values, may be equal.
+   *   If `x` exists in the array, both neighbors point to `x`.
+   *   If `x` is lower (greater if descending) than the first value, both neighbors point to 0.
+   *   If `x` is greater (lower if descending) than the last value, both neighbors point to the last index.
    */
   'use strict';
 
   /**
-   * Return the index in a of the value closest to x.
-   * The array a must be sorted, either ascending or descending.
-   * If x happens to be exactly between two values, the one that
-   * appears first is returned.
+   * Return the index of the value closest to the given number in a sorted array.
+   * 
+   * @example
+   * var a = [2,5,8,12,13]
+   * var i = indexOfNearest(a, 6)
+   * // i == 1
+   * var j = indexOfNearest(a, 7)
+   * // j == 2
+   * var k = indexOfNearest(a, 50)
+   * // k == 4
+   * 
+   * @param {Array<number>} a The array to search through. Must be sorted, ascending or descending.
+   * @param {number} x The target number.
+   * @return {number} The array index whose value is closest to `x`.
+   *   If `x` happens to be exactly between two values, then the lower index is returned.
    */
 
   _export('indicesOfNearest', indicesOfNearest);
@@ -50479,6 +53092,7 @@ $__System.register('69', [], function (_export) {
   _export('indexOfNearest', indexOfNearest);
 
   function indicesOfNearest(a, x) {
+    // adapted from https://stackoverflow.com/a/4431347
     if (a.length === 0) {
       throw new Error('Array must have at least one element');
     }
@@ -50514,8 +53128,12 @@ $__System.register('69', [], function (_export) {
 
   function indexOfNearest(a, x) {
     var i = indicesOfNearest(a, x);
-    var lo = i[0];
-    var hi = i[1];
+
+    var _i = babelHelpers.slicedToArray(i, 2);
+
+    var lo = _i[0];
+    var hi = _i[1];
+
     if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
       return lo;
     } else {
@@ -50529,7 +53147,7 @@ $__System.register('69', [], function (_export) {
   };
 });
 
-$__System.register('6b', [], function (_export) {
+$__System.register('6d', [], function (_export) {
   /** 3D WGS84 in lat-lon-height order */
   'use strict';
 
@@ -50577,31 +53195,31 @@ $__System.register('6b', [], function (_export) {
   };
 });
 
-$__System.register('6c', [], function (_export) {
+$__System.register('78', [], function (_export) {
   /* */
   'use strict';
 
-  var COVJSON_PREFIX, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON;
-
-  _export('checkProfile', checkProfile);
-
-  /**
-   * Checks whether profile is included in the given profiles.
-   */
-
-  function checkProfile(profiles, profile) {
-    if (profiles.indexOf(profile) === -1) {
-      throw new Error('Unsupported domain profiles: ' + profiles + ', must contain: ' + profile);
-    }
-  }
-
+  var COVJSON_PREFIX, COLLECTION_SUFFIX, COVJSON_POINT, COVJSON_POINTCOLLECTION, COVJSON_VERTICALPROFILE, COVJSON_VERTICALPROFILECOLLECTION, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON;
   return {
     setters: [],
     execute: function () {
       COVJSON_PREFIX = 'http://coveragejson.org/def#';
+      COLLECTION_SUFFIX = 'CoverageCollection';
+      COVJSON_POINT = COVJSON_PREFIX + 'Point';
+
+      _export('COVJSON_POINT', COVJSON_POINT);
+
+      COVJSON_POINTCOLLECTION = COVJSON_POINT + COLLECTION_SUFFIX;
+
+      _export('COVJSON_POINTCOLLECTION', COVJSON_POINTCOLLECTION);
+
       COVJSON_VERTICALPROFILE = COVJSON_PREFIX + 'VerticalProfile';
 
       _export('COVJSON_VERTICALPROFILE', COVJSON_VERTICALPROFILE);
+
+      COVJSON_VERTICALPROFILECOLLECTION = COVJSON_VERTICALPROFILE + COLLECTION_SUFFIX;
+
+      _export('COVJSON_VERTICALPROFILECOLLECTION', COVJSON_VERTICALPROFILECOLLECTION);
 
       COVJSON_GRID = COVJSON_PREFIX + 'Grid';
 
@@ -50618,7 +53236,482 @@ $__System.register('6c', [], function (_export) {
   };
 });
 
-$__System.register('66', ['4f'], function (_export) {
+$__System.register('73', ['48'], function (_export) {
+  /* */
+
+  /**
+   * Wraps Leaflet's L.Mixin.Events for use within class expressions.
+   * 
+   * @see http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/
+   * 
+   * @param {class} base The base class.
+   * @return {class} The base class with EventMixin.
+   */
+  'use strict';
+
+  var L;
+
+  _export('default', EventMixin);
+
+  function EventMixin(base) {
+    return (function (_base) {
+      babelHelpers.inherits(_class, _base);
+
+      function _class() {
+        babelHelpers.classCallCheck(this, _class);
+        babelHelpers.get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
+      }
+
+      babelHelpers.createClass(_class, [{
+        key: 'on',
+        value: function on() {
+          var _L$Mixin$Events$on;
+
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+
+          return (_L$Mixin$Events$on = L.Mixin.Events.on).call.apply(_L$Mixin$Events$on, [this].concat(args));
+        }
+      }, {
+        key: 'off',
+        value: function off() {
+          var _L$Mixin$Events$off;
+
+          for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+          }
+
+          return (_L$Mixin$Events$off = L.Mixin.Events.off).call.apply(_L$Mixin$Events$off, [this].concat(args));
+        }
+      }, {
+        key: 'once',
+        value: function once() {
+          var _L$Mixin$Events$once;
+
+          for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+          }
+
+          return (_L$Mixin$Events$once = L.Mixin.Events.once).call.apply(_L$Mixin$Events$once, [this].concat(args));
+        }
+      }, {
+        key: 'fire',
+        value: function fire() {
+          var _L$Mixin$Events$fire;
+
+          for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
+          }
+
+          return (_L$Mixin$Events$fire = L.Mixin.Events.fire).call.apply(_L$Mixin$Events$fire, [this].concat(args));
+        }
+      }, {
+        key: 'hasEventListeners',
+        value: function hasEventListeners() {
+          var _L$Mixin$Events$hasEventListeners;
+
+          for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+            args[_key5] = arguments[_key5];
+          }
+
+          return (_L$Mixin$Events$hasEventListeners = L.Mixin.Events.hasEventListeners).call.apply(_L$Mixin$Events$hasEventListeners, [this].concat(args));
+        }
+      }]);
+      return _class;
+    })(base);
+  }
+
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }],
+    execute: function () {}
+  };
+});
+
+$__System.register('89', ['48', '67', '73'], function (_export) {
+  /* */
+  'use strict';
+
+  var L, $, HTML, EventMixin, TEMPLATE, TimeAxis;
+
+  function getUTCTimestampDateOnly(dateStr) {
+    var year = parseInt(dateStr.substr(0, 4));
+    var month = parseInt(dateStr.substr(5, 2));
+    var day = parseInt(dateStr.substr(8, 2));
+    return Date.UTC(year, month - 1, day);
+  }
+
+  function getUTCDateString(timestamp) {
+    var iso = new Date(timestamp).toISOString();
+    var date = iso.substr(0, 10);
+    return date;
+  }
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }, function (_2) {
+      $ = _2.$;
+      HTML = _2.HTML;
+    }, function (_3) {
+      EventMixin = _3['default'];
+    }],
+    execute: function () {
+      TEMPLATE = '<div class="info" style="clear:none">\n  <strong class="title">Time</strong><br>\n  <select name="date" class="date"></select>\n  <select name="time" class="time"></select>\n</div>';
+
+      /**
+       * Displays a simple date/time picker for a coverage data layer by grouping
+       * time steps into dates and times.
+       * 
+       * @example <caption>Coverage data layer</caption>
+       * new TimeAxis(covLayer).addTo(map)
+       * // Selecting a date/time automatically sets the 'time' property in the layer.
+       * // Similarly, when the layer fires an 'axisChange' event with {axis: 'time'}
+       * // the control reflects that change.
+       * 
+       * @example <caption>Fake layer</caption>
+       * var times = ['2000-01-01T00:00:00Z','2000-01-01T05:00:00Z'].map(s => new Date(s))
+       * var fakeLayer = {
+       *   timeSlices: times,
+       *   time: times[1] // select the second time step initially
+       * }
+       * var timeAxis = new TimeAxis(fakeLayer).addTo(map)
+       * 
+       * // change the time and trigger a manual update
+       * fakeLayer.time = times[0]
+       * timeAxis.update()
+       * 
+       * @example <caption>Non-module access</caption>
+       * L.coverage.control.TimeAxis
+       */
+
+      TimeAxis = (function (_EventMixin) {
+        babelHelpers.inherits(TimeAxis, _EventMixin);
+
+        /**
+         * Creates a time axis control.
+         * 
+         * @param {object} covLayer 
+         *   The coverage data layer, or any object with <code>timeSlices</code>
+         *   and <code>time</code> properties.
+         *   If the object has <code>on</code>/<code>off</code> methods, then the control will
+         *   listen for <code>"axisChange"</code> events with <code>{axis: 'time'}</code>
+         *   and update itself automatically.
+         *   If the layer fires a <code>"remove"</code> event, then the legend will remove itself
+         *   from the map.
+         * @param {object} [options] Control options.
+         * @param {string} [options.position='topleft'] The initial position of the control (see Leaflet docs).
+         * @param {string} [options.title='Time'] The label to show above the date/time picker.
+         */
+
+        function TimeAxis(covLayer) {
+          var _this = this;
+
+          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+          babelHelpers.classCallCheck(this, TimeAxis);
+
+          babelHelpers.get(Object.getPrototypeOf(TimeAxis.prototype), 'constructor', this).call(this, { position: options.position || 'topleft' });
+          this._title = options.title || 'Time';
+          this._covLayer = covLayer;
+
+          if (covLayer.on) {
+            this._remove = function () {
+              return _this.removeFrom(_this._map);
+            };
+            covLayer.on('remove', this._remove);
+
+            this._axisListener = function (e) {
+              if (e.axis === 'time') _this.update();
+            };
+          }
+
+          var timeSlices = this._covLayer.timeSlices;
+          var dateMap = new Map(); // UTC timestamp (representing the date only) -> array of Date objects
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = timeSlices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var t = _step.value;
+
+              var dateTimestamp = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate())).getTime();
+              if (!dateMap.has(dateTimestamp)) {
+                dateMap.set(dateTimestamp, []);
+              }
+              dateMap.get(dateTimestamp).push(t);
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator['return']) {
+                _iterator['return']();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          this._dateMap = dateMap;
+        }
+
+        /**
+         * @ignore
+         */
+        babelHelpers.createClass(TimeAxis, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this2 = this;
+
+            this._map = map;
+
+            if (this._covLayer.on) {
+              this._covLayer.on('axisChange', this._axisListener);
+            }
+
+            var el = HTML(TEMPLATE)[0];
+            this._el = el;
+            L.DomEvent.disableClickPropagation(el);
+
+            if (this._title) {
+              $('.title', el).fill(this._title);
+            }
+
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = this._dateMap.keys()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var dateTimestamp = _step2.value;
+
+                var dateStr = getUTCDateString(dateTimestamp);
+                $('.date', el).add(HTML('<option value="' + dateStr + '">' + dateStr + '</option>'));
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                  _iterator2['return']();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+
+            $('.date', el)[0].disabled = this._dateMap.size === 1;
+
+            $('.date', el).on('change', function (event) {
+              var dateTimestamp = getUTCTimestampDateOnly(event.target.value);
+              var timeSlice = _this2._dateMap.get(dateTimestamp)[0];
+              _this2._covLayer.time = timeSlice;
+              _this2._initTimeSelect(dateTimestamp);
+              _this2.fire('change', { time: timeSlice });
+            });
+            $('.time', el).on('change', function (event) {
+              var dateStr = $('.date', el)[0].value;
+              var timeStr = event.target.value;
+              var time = new Date(dateStr + 'T' + timeStr);
+              _this2._covLayer.time = time;
+              _this2.fire('change', { time: time });
+            });
+
+            this.update();
+
+            return el;
+          }
+
+          /**
+           * @ignore
+           */
+        }, {
+          key: 'onRemove',
+          value: function onRemove() {
+            if (this._covLayer.off) {
+              this._covLayer.off('remove', this._remove);
+              this._covLayer.off('axisChange', this._axisListener);
+            }
+          }
+
+          /**
+           * Triggers a manual update of the date/time picker based on the
+           * <code>time</code> property of the layer.
+           * 
+           * Useful if the supplied coverage data layer is not a real layer
+           * and won't fire the necessary events for automatic updates.
+           */
+        }, {
+          key: 'update',
+          value: function update() {
+            var covTime = this._covLayer.time;
+            if (!covTime) return;
+            var el = this._el;
+            // selects the date set in the cov layer, populates the time select, and selects the time
+            var dateTimestamp = getUTCTimestampDateOnly(covTime.toISOString());
+            var dateStr = getUTCDateString(dateTimestamp);
+            $('.date', el)[0].value = dateStr;
+
+            this._initTimeSelect(dateTimestamp);
+
+            var timeStr = covTime.toISOString().substr(11);
+            $('.time', el)[0].value = timeStr;
+          }
+        }, {
+          key: '_initTimeSelect',
+          value: function _initTimeSelect(dateTimestamp) {
+            var el = this._el;
+            var timeSelect = $('.time', el);
+            timeSelect.fill();
+            var times = this._dateMap.get(dateTimestamp);
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+              for (var _iterator3 = times[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                var timeSlice = _step3.value;
+
+                var timeStr = timeSlice.toISOString().substr(11);
+                timeSelect.add(HTML('<option value="' + timeStr + '">' + timeStr + '</option>'));
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                  _iterator3['return']();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+
+            timeSelect[0].disabled = times.length === 1;
+          }
+        }]);
+        return TimeAxis;
+      })(EventMixin(L.Control));
+
+      _export('default', TimeAxis);
+    }
+  };
+});
+
+$__System.register('88', ['48', '67'], function (_export) {
+  'use strict';
+
+  var L, $, HTML, TEMPLATE, SelectControl;
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }, function (_2) {
+      $ = _2.$;
+      HTML = _2.HTML;
+    }],
+    execute: function () {
+      TEMPLATE = '<div class="info" style="clear:none">\n  <strong class="select-title"></strong><br>\n  <select></select>\n</div>';
+
+      SelectControl = (function (_L$Control) {
+        babelHelpers.inherits(SelectControl, _L$Control);
+
+        function SelectControl(covLayer, choices, options) {
+          var _this = this;
+
+          babelHelpers.classCallCheck(this, SelectControl);
+
+          babelHelpers.get(Object.getPrototypeOf(SelectControl.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : { position: 'topleft' });
+          this._title = options.title || '';
+          this.covLayer = covLayer;
+          this._choices = choices;
+          this.value = choices[0].value;
+
+          this._remove = function () {
+            return _this.removeFrom(_this._map);
+          };
+          if (covLayer && covLayer.on) {
+            covLayer.on('remove', this._remove);
+          }
+        }
+
+        babelHelpers.createClass(SelectControl, [{
+          key: 'onRemove',
+          value: function onRemove(map) {
+            if (this.covLayer && this.covLayer.off) {
+              this.covLayer.off('remove', this._remove);
+            }
+          }
+        }, {
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this2 = this;
+
+            var el = HTML(TEMPLATE)[0];
+            L.DomEvent.disableClickPropagation(el);
+
+            $('.select-title', el).fill(this._title);
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = this._choices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var _step$value = _step.value;
+                var value = _step$value.value;
+                var label = _step$value.label;
+
+                $('select', el).add(HTML('<option value="' + value + '">' + label + '</option>'));
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            $('select', el).on('change', function (event) {
+              _this2.fire('change', { value: event.target.value });
+              _this2.value = event.target.value;
+            });
+
+            return el;
+          }
+        }]);
+        return SelectControl;
+      })(L.Control);
+
+      _export('default', SelectControl);
+
+      SelectControl.include(L.Mixin.Events);
+
+      //work-around for Babel bug, otherwise SelectControl cannot be referenced here
+
+      _export('default', SelectControl);
+    }
+  };
+});
+
+$__System.register('68', ['4f'], function (_export) {
   'use strict';
 
   var Eventable, Format;
@@ -50707,7 +53800,7 @@ $__System.register('66', ['4f'], function (_export) {
   };
 });
 
-$__System.register('54', ['66'], function (_export) {
+$__System.register('54', ['68'], function (_export) {
 
   /**
    * An object-only format that is used for derived data.
@@ -50749,9 +53842,19 @@ $__System.register('54', ['66'], function (_export) {
         }, {
           key: 'getMetadata',
           value: function getMetadata(cov) {
+            var count = undefined;
+            if (cov.coverages) {
+              if (cov.paging) {
+                count = cov.paging.total;
+              } else {
+                count = cov.coverages.length;
+              }
+            } else {
+              count = 1;
+            }
             return {
               format: this.label,
-              content: cov.coverages ? cov.coverages.length + ' coverages' : '1 coverage'
+              content: count === 1 ? '1 coverage' : count + ' coverages'
             };
           }
         }]);
@@ -50763,10 +53866,10 @@ $__System.register('54', ['66'], function (_export) {
   };
 });
 
-$__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], function (_export) {
+$__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', '8f'], function (_export) {
   'use strict';
 
-  var CoverageData, $, $$, HTML, indexOfNearest, i18n, COVJSON_PREFIX, Modal, referencingUtil, COVJSON_GRID, Action, PROCESS, PointCollection, ProfileCollection, TYPE, html, TEMPLATES, CoverageModelObservationCompare;
+  var CoverageData, $, $$, HTML, COVJSON_GRID, Action, PROCESS, i18n, COVJSON_PREFIX, SelectControl, TimeAxis, indexOfNearest, referencingUtil, Modal, PointCollection, ProfileCollection, TYPE, html, TEMPLATES, CoverageModelObservationCompare;
 
   /**
    * Prepares coverage data for comparison, i.e. assigns the semantic type (model or observations)
@@ -50859,12 +53962,12 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
       return cov.loadRange(insituParamKey);
     }))];
 
-    return Promise.all(promises).then(function (_ref) {
-      var _ref2 = babelHelpers.slicedToArray(_ref, 3);
+    return Promise.all(promises).then(function (_ref4) {
+      var _ref42 = babelHelpers.slicedToArray(_ref4, 3);
 
-      var modelDomain = _ref2[0];
-      var insituDomains = _ref2[1];
-      var insituRanges = _ref2[2];
+      var modelDomain = _ref42[0];
+      var insituDomains = _ref42[1];
+      var insituRanges = _ref42[2];
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
       var _iteratorError3 = undefined;
@@ -50956,15 +54059,17 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
             throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis');
           }
 
-          // TODO we want the geographically closest grid cell, but subsetByValue is defined numerically only
-          //  -> for x (longitude, wrap-around) we could implement our own search algorithm and use subsetByIndex then
-          //  -> this gets complicated for arbitrary projected CRSs though
-          var promise = model.subsetByValue({ x: { target: insituX }, y: { target: insituY } }).then(function (modelSubset) {
-            return Promise.all([modelSubset.loadDomain(), modelSubset.loadRange(modelParamKey)]).then(function (_ref3) {
-              var _ref32 = babelHelpers.slicedToArray(_ref3, 2);
+          // TODO handle nodata values
 
-              var modelSubsetDomain = _ref32[0];
-              var modelSubsetRange = _ref32[1];
+          // we want exactly the grid cell in which the observation is located
+          var modelX = { start: insituX, stop: insituX };
+          var modelY = { start: insituY, stop: insituY };
+          var promise = model.subsetByValue({ x: modelX, y: modelY }).then(function (modelSubset) {
+            return Promise.all([modelSubset.loadDomain(), modelSubset.loadRange(modelParamKey)]).then(function (_ref5) {
+              var _ref52 = babelHelpers.slicedToArray(_ref5, 2);
+
+              var modelSubsetDomain = _ref52[0];
+              var modelSubsetRange = _ref52[1];
 
               // collect the values to compare against each other
               var modelVals = [];
@@ -51017,11 +54122,11 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
 
               // calculate RMSE = sqrt ( ( sum_{i=1}^n (x_i - y_i)^2 ) / n)
               var n = modelVals.length;
-              var sum = zip(modelVals, insituVals).map(function (_ref4) {
-                var _ref42 = babelHelpers.slicedToArray(_ref4, 2);
+              var sum = zip(modelVals, insituVals).map(function (_ref6) {
+                var _ref62 = babelHelpers.slicedToArray(_ref6, 2);
 
-                var v1 = _ref42[0];
-                var v2 = _ref42[1];
+                var v1 = _ref62[0];
+                var v2 = _ref62[1];
                 return Math.pow(v1 - v2, 2);
               }).reduce(function (l, r) {
                 return l + r;
@@ -51140,26 +54245,30 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
     });
   }
   return {
-    setters: [function (_5) {
-      CoverageData = _5['default'];
-    }, function (_2) {
-      $ = _2.$;
-      $$ = _2.$$;
-      HTML = _2.HTML;
-    }, function (_) {
-      indexOfNearest = _.indexOfNearest;
+    setters: [function (_6) {
+      CoverageData = _6['default'];
     }, function (_4) {
-      i18n = _4.i18n;
-      COVJSON_PREFIX = _4.COVJSON_PREFIX;
+      $ = _4.$;
+      $$ = _4.$$;
+      HTML = _4.HTML;
+    }, function (_) {
+      COVJSON_GRID = _.COVJSON_GRID;
+    }, function (_7) {
+      Action = _7['default'];
+      PROCESS = _7.PROCESS;
+    }, function (_5) {
+      i18n = _5.i18n;
+      COVJSON_PREFIX = _5.COVJSON_PREFIX;
     }, function (_3) {
-      Modal = _3['default'];
+      SelectControl = _3['default'];
+    }, function (_2) {
+      TimeAxis = _2['default'];
     }, function (_b) {
-      referencingUtil = _b;
-    }, function (_c) {
-      COVJSON_GRID = _c.COVJSON_GRID;
+      indexOfNearest = _b.indexOfNearest;
+    }, function (_d) {
+      referencingUtil = _d;
     }, function (_f) {
-      Action = _f['default'];
-      PROCESS = _f.PROCESS;
+      Modal = _f['default'];
     }],
     execute: function () {
       PointCollection = COVJSON_PREFIX + 'PointCoverageCollection';
@@ -51168,7 +54277,7 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
         MODEL: 1,
         OBSERVATIONS: 2
       };
-      html = '\n<div class="modal fade" id="comparisonDatasetSelectModal" tabindex="-1" role="dialog" aria-labelledby="comparisonDatasetSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="comparisonDatasetSelectModalLabel">Select a dataset to compare against</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-heading">\n            <h4>Model-Observation comparison</h4>\n          </div>\n          <div class="panel-body">\n            <p class="help-text-model">\n              The gridded input dataset that you selected is assumed to be the model dataset that is compared\n              against an observation collection dataset (point or vertical profile observations).\n              Please select the observation dataset below.\n            </p>\n            <p class="help-text-observations">\n              The collection-type input dataset that you selected is assumed to be the observation set that is\n              compared against a model grid dataset.\n              Please select the model dataset below.\n            </p>\n            <div class="alert alert-info comparison-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group comparison-distribution-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="comparisonParametersSelectModal" tabindex="-1" role="dialog" aria-labelledby="comparisonParametersSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="comparisonParametersSelectModalLabel">Select parameters</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Select the parameters you wish to compare.\n              Note that currently no unit conversion is done.\n            </p>\n              \n            <div class="form-horizontal">\n              <div class="form-group">\n                <label for="modelComparisonParameter" class="col-sm-2 control-label">Model</label>\n                <div class="col-sm-10">\n                  <select id="modelComparisonParameter" class="form-control model-parameter-select"></select>\n                </div>\n              </div>\n              \n              <div class="form-group">\n                <label for="observationComparisonParameter" class="col-sm-2 control-label">Observations</label>\n                <div class="col-sm-10">\n                  <select id="observationComparisonParameter" class="form-control observation-parameter-select"></select>\n                </div>\n              </div>\n            </div>\n                          \n            <div class="parameter-select-button-container"></div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
+      html = '\n<div class="modal fade" id="comparisonDatasetSelectModal" tabindex="-1" role="dialog" aria-labelledby="comparisonDatasetSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="comparisonDatasetSelectModalLabel">Select a dataset to compare against</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-heading">\n            <h4>Model-Observation comparison</h4>\n          </div>\n          <div class="panel-body">\n            <p class="help-text-model">\n              The gridded input dataset that you selected is assumed to be the model dataset that is compared\n              against an observation collection dataset (point or vertical profile observations).\n              Please select the observation dataset below.\n            </p>\n            <p class="help-text-observations">\n              The collection-type input dataset that you selected is assumed to be the observation set that is\n              compared against a model grid dataset.\n              Please select the model dataset below.\n            </p>\n            <div class="alert alert-info comparison-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group comparison-distribution-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="comparisonParametersSelectModal" tabindex="-1" role="dialog" aria-labelledby="comparisonParametersSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="comparisonParametersSelectModalLabel">Select parameters</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Select the parameters you wish to compare.\n              Note that currently no unit conversion is done.\n            </p>\n              \n            <div class="form-horizontal">\n              <div class="form-group">\n                <label for="modelComparisonParameter" class="col-sm-3 control-label">Model</label>\n                <div class="col-sm-9">\n                  <select id="modelComparisonParameter" class="form-control model-parameter-select"></select>\n                </div>\n              </div>\n              \n              <div class="form-group">\n                <label for="observationComparisonParameter" class="col-sm-3 control-label">Observations</label>\n                <div class="col-sm-9">\n                  <select id="observationComparisonParameter" class="form-control observation-parameter-select"></select>\n                </div>\n              </div>\n            </div>\n                          \n            <div class="parameter-select-button-container"></div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
 
       $('body').add(HTML(html));
 
@@ -51198,8 +54307,6 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
         babelHelpers.createClass(CoverageModelObservationCompare, [{
           key: 'run',
           value: function run() {
-            var _this = this;
-
             // Step 1: determine if this dataset is the model grid or the observation collection
             // Step 2: display modal for selecting the dataset to compare against
             //         (filter appropriately by coverage type / collection)
@@ -51214,6 +54321,13 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
             //         - there is a button "Store as Dataset" which adds the current virtual comparison dataset
             //           to the workspace
             //         - when clicking on a comparison point, a popup is shown with plots etc.
+
+            this._displayDistributionSelectModal();
+          }
+        }, {
+          key: '_displayDistributionSelectModal',
+          value: function _displayDistributionSelectModal() {
+            var _this = this;
 
             var _getCovData = getCovData(this.data);
 
@@ -51261,7 +54375,7 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
                 $('.dataset-title', el).fill(i18n(dataset.title));
                 $('.distribution-title', el).fill(i18n(distribution.title));
 
-                $('.select-button', el).on('click', function () {
+                $('.select-button', el).on('|click', function () {
                   if (type === TYPE.MODEL) {
                     _this._displayParameterSelectModal(data, distribution.data);
                   } else {
@@ -51300,9 +54414,6 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
           key: '_displayParameterSelectModal',
           value: function _displayParameterSelectModal(modelCov, observationsColl) {
             var _this2 = this;
-
-            console.log('Model:', modelCov);
-            console.log('Observation collection:', observationsColl);
 
             var modelParams = getNonCategoricalParams(modelCov);
             var observationsParams = getNonCategoricalParams(observationsColl);
@@ -51356,8 +54467,70 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
         }, {
           key: '_displayIntercomparisonUI',
           value: function _displayIntercomparisonUI(modelCov, observationsColl, modelParamKey, observationsParamKey) {
-            console.log('start intercomparison UI:');
-            console.log(modelCov, observationsColl, modelParamKey, observationsParamKey);
+            var _this3 = this;
+
+            var map = this.context.map;
+
+            this._intercomparisonActive = true;
+
+            var doIntercomparison = function doIntercomparison(modelTime, obsTimeDelta) {
+              var promises = undefined;
+              if (modelTime) {
+                // subset model + filter observations
+                var obsStart = new Date(modelTime - obsTimeDelta * 1000);
+                var obsStop = new Date(modelTime + obsTimeDelta * 1000);
+                promises = [modelCov.subsetByValue({ t: modelTime }), observationsColl.query().filter({ t: { start: obsStart, stop: obsStop } }).execute()];
+              } else {
+                promises = [modelCov, observationsColl];
+              }
+              Promise.all(promises).then(function (_ref) {
+                var _ref2 = babelHelpers.slicedToArray(_ref, 2);
+
+                var modelCovSubset = _ref2[0];
+                var obsCollFiltered = _ref2[1];
+
+                deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(function (covjson) {
+                  // TODO implement
+                  console.log(covjson);
+                });
+              });
+            };
+
+            // UI
+            modelCov.loadDomain().then(function (modelDomain) {
+              if (modelDomain.axes.has('t')) {
+                // display time controls
+
+                // Model: simple time axis control
+                var modelTimeSlices = modelDomain.axes.get('t').values.map(function (t) {
+                  return new Date(t);
+                });
+                _this3._modelTimeControl = new TimeAxis({ timeSlices: modelTimeSlices }, { title: 'Model time' }).on('change', function (_ref3) {
+                  var time = _ref3.time;
+
+                  var obsTimeDelta = parseInt(_this3._obsTimeDeltaControl.value);
+                  doIntercomparison(time, obsTimeDelta);
+                }).addTo(map);
+
+                // Observations: time delta control
+                var choices = [{ value: 60, label: '± 1 min' }, { value: 60 * 10, label: '± 10 min' }, { value: 60 * 30, label: '± 30 min' }, { value: 60 * 60, label: '± 1 hour' }, { value: 60 * 60 * 24, label: '± 1 day' }, { value: 60 * 60 * 24 * 30, label: '± 30 days' }];
+                _this3._obsTimeDeltaControl = new SelectControl(null, choices, { title: 'Observation time delta' }).on('change', function (event) {
+                  var obsTimeDelta = parseInt(event.value);
+                  var modelTime = _this3._modelTimeControl.time;
+                  doIntercomparison(modelTime, obsTimeDelta);
+                }).addTo(map);
+
+                // to start, apply first model time slice and first delta choice
+                doIntercomparison(modelTimeSlices[0], choices[0].value);
+              } else {
+                doIntercomparison();
+              }
+            });
+
+            // add "finish intercomparison" control
+            // -> this._intercomparisonActive = false
+
+            // add "store as dataset" control
           }
         }, {
           key: 'isSupported',
@@ -51375,18 +54548,18 @@ $__System.register('a1', ['54', '65', '69', '80', '86', '6b', '6c', '7f'], funct
   };
 });
 
-$__System.register('a2', ['48', '80', '7f'], function (_export) {
+$__System.register('ab', ['48', '86', '87'], function (_export) {
   'use strict';
 
-  var L, i18n, Action, VIEW, GeoJSONView;
+  var L, Action, VIEW, i18n, GeoJSONView;
   return {
     setters: [function (_) {
       L = _['default'];
+    }, function (_3) {
+      Action = _3['default'];
+      VIEW = _3.VIEW;
     }, function (_2) {
       i18n = _2.i18n;
-    }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
     }],
     execute: function () {
       GeoJSONView = (function (_Action) {
@@ -51432,11 +54605,39 @@ $__System.register('a2', ['48', '80', '7f'], function (_export) {
 
             var map = this.context.map;
 
+            var color = '#CC2222';
+            var defaultStyle = {
+              color: color,
+              weight: 2,
+              opacity: 0.6,
+              fillOpacity: 0,
+              fillColor: color
+            };
+
+            var highlightStyle = {
+              color: color,
+              weight: 3,
+              opacity: 0.6,
+              fillOpacity: 0.65,
+              fillColor: color
+            };
+
+            var mouseoverFn = function mouseoverFn(e) {
+              e.target.setStyle(highlightStyle);
+            };
+
+            var mouseoutFn = function mouseoutFn(e) {
+              e.target.setStyle(defaultStyle);
+            };
+
             var layer = L.geoJson(this.data, {
               pointToLayer: function pointToLayer(feature, latlng) {
                 return L.circleMarker(latlng);
               },
               onEachFeature: function onEachFeature(feature, layer) {
+                layer.setStyle(defaultStyle);
+                layer.on('mouseover', mouseoverFn);
+                layer.on('mouseout', mouseoutFn);
                 layer.bindPopup('<pre><code class="code-nowrap">' + JSON.stringify(feature.properties, null, 4) + '</code></pre>', { maxWidth: 400, maxHeight: 300 });
               }
             }).addTo(map);
@@ -51446,7 +54647,6 @@ $__System.register('a2', ['48', '80', '7f'], function (_export) {
 
             var layerName = '<span class="label label-success">GeoJSON</span> ' + distTitle;
             map.layerControl.addOverlay(layer, layerName, { groupName: datasetTitle, expanded: true });
-            //map.fitBounds(layer.getBounds())
             this.layers.push(layer);
           }
         }, {
@@ -51500,7 +54700,7 @@ $__System.register('a2', ['48', '80', '7f'], function (_export) {
   };
 });
 
-$__System.register('a3', ['48', '65'], function (_export) {
+$__System.register('ac', ['48', '67'], function (_export) {
   'use strict';
 
   var L, $, HTML, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, ImageLegend;
@@ -51582,10 +54782,10 @@ $__System.register('a3', ['48', '65'], function (_export) {
   };
 });
 
-$__System.register('a4', ['48', '80', 'a3', '7f'], function (_export) {
+$__System.register('ad', ['48', '86', '87', 'ac'], function (_export) {
   'use strict';
 
-  var L, i18n, ImageLegend, Action, VIEW, WMSView;
+  var L, Action, VIEW, i18n, ImageLegend, WMSView;
 
   function getLegendUrl(wmsEndpoint, layer) {
     return wmsEndpoint + '?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&transparent=true&layer=' + layer;
@@ -51593,13 +54793,13 @@ $__System.register('a4', ['48', '80', 'a3', '7f'], function (_export) {
   return {
     setters: [function (_) {
       L = _['default'];
+    }, function (_3) {
+      Action = _3['default'];
+      VIEW = _3.VIEW;
     }, function (_2) {
       i18n = _2.i18n;
-    }, function (_a3) {
-      ImageLegend = _a3['default'];
-    }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
+    }, function (_ac) {
+      ImageLegend = _ac['default'];
     }],
     execute: function () {
       WMSView = (function (_Action) {
@@ -51756,14 +54956,14 @@ $__System.register('a4', ['48', '80', 'a3', '7f'], function (_export) {
   };
 });
 
-$__System.register('a5', ['7f'], function (_export) {
+$__System.register('ae', ['86'], function (_export) {
   'use strict';
 
   var Action, EXTERNAL_LINK, GoToSource;
   return {
-    setters: [function (_f) {
-      Action = _f['default'];
-      EXTERNAL_LINK = _f.EXTERNAL_LINK;
+    setters: [function (_) {
+      Action = _['default'];
+      EXTERNAL_LINK = _.EXTERNAL_LINK;
     }],
     execute: function () {
       GoToSource = (function (_Action) {
@@ -51799,7 +54999,7 @@ $__System.register('a5', ['7f'], function (_export) {
   };
 });
 
-$__System.register('a6', ['50', '51', '54', '63', '64', '85', '4f', '4d', '9f', '8c', '7e', '8d', '8f', 'a0', 'a1', 'a2', 'a4', 'a5'], function (_export) {
+$__System.register('af', ['50', '51', '54', '65', '66', '85', '95', '96', '98', '4f', '4d', 'a8', '8e', 'a9', 'aa', 'ab', 'ad', 'ae'], function (_export) {
 
   /**
    * Something like a main controller.
@@ -51809,7 +55009,7 @@ $__System.register('a6', ['50', '51', '54', '63', '64', '85', '4f', '4d', '9f', 
    */
   'use strict';
 
-  var Workspace, CovJSON, CoverageData, CovCBOR, WMS, StatisticalCoverageView, Eventable, Catalogue, GeoJSON, CatRemap, GeoCoverageView, CoverageRemapCategories, CoverageCategoriesStatistics, CoverageSubsetByPolygon, CoverageModelObservationCompare, GeoJSONView, WMSView, GoToSource, App;
+  var Workspace, CovJSON, CoverageData, CovCBOR, WMS, GeoCoverageView, CatRemap, CoverageRemapCategories, CoverageCategoriesStatistics, Eventable, Catalogue, GeoJSON, StatisticalCoverageView, CoverageSubsetByPolygon, CoverageModelObservationCompare, GeoJSONView, WMSView, GoToSource, App;
   return {
     setters: [function (_) {
       Workspace = _['default'];
@@ -51819,34 +55019,34 @@ $__System.register('a6', ['50', '51', '54', '63', '64', '85', '4f', '4d', '9f', 
       CoverageData = _2['default'];
     }, function (_4) {
       CovCBOR = _4['default'];
-    }, function (_5) {
-      WMS = _5['default'];
     }, function (_6) {
-      StatisticalCoverageView = _6['default'];
+      WMS = _6['default'];
+    }, function (_7) {
+      GeoCoverageView = _7['default'];
+    }, function (_5) {
+      CatRemap = _5['default'];
+    }, function (_8) {
+      CoverageRemapCategories = _8['default'];
+    }, function (_9) {
+      CoverageCategoriesStatistics = _9['default'];
     }, function (_f) {
       Eventable = _f['default'];
     }, function (_d) {
       Catalogue = _d['default'];
-    }, function (_f2) {
-      GeoJSON = _f2['default'];
-    }, function (_c) {
-      CatRemap = _c['default'];
+    }, function (_a8) {
+      GeoJSON = _a8['default'];
     }, function (_e) {
-      GeoCoverageView = _e['default'];
-    }, function (_d2) {
-      CoverageRemapCategories = _d2['default'];
-    }, function (_f3) {
-      CoverageCategoriesStatistics = _f3['default'];
-    }, function (_a0) {
-      CoverageSubsetByPolygon = _a0['default'];
-    }, function (_a1) {
-      CoverageModelObservationCompare = _a1['default'];
-    }, function (_a2) {
-      GeoJSONView = _a2['default'];
-    }, function (_a4) {
-      WMSView = _a4['default'];
-    }, function (_a5) {
-      GoToSource = _a5['default'];
+      StatisticalCoverageView = _e['default'];
+    }, function (_a9) {
+      CoverageSubsetByPolygon = _a9['default'];
+    }, function (_aa) {
+      CoverageModelObservationCompare = _aa['default'];
+    }, function (_ab) {
+      GeoJSONView = _ab['default'];
+    }, function (_ad) {
+      WMSView = _ad['default'];
+    }, function (_ae) {
+      GoToSource = _ae['default'];
     }],
     execute: function () {
       App = (function (_Eventable) {
@@ -51933,7 +55133,7 @@ $__System.register('a6', ['50', '51', '54', '63', '64', '85', '4f', '4d', '9f', 
   };
 });
 
-$__System.registerDynamic("a7", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("b0", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     "format global";
@@ -52051,11 +55251,11 @@ $__System.registerDynamic("a7", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.register("a8", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("b1", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register("a9", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("b2", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic("aa", [], true, function($__require, exports, module) {
+$__System.registerDynamic("b3", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -52162,7 +55362,7 @@ $__System.registerDynamic("aa", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("ab", ["3b"], true, function($__require, exports, module) {
+$__System.registerDynamic("b4", ["3b"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -52682,17 +55882,17 @@ $__System.registerDynamic("ab", ["3b"], true, function($__require, exports, modu
   return module.exports;
 });
 
-$__System.registerDynamic("ac", ["ab"], true, function($__require, exports, module) {
+$__System.registerDynamic("b5", ["b4"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('ab');
+  module.exports = $__require('b4');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("ad", [], true, function($__require, exports, module) {
+$__System.registerDynamic("b6", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -52702,7 +55902,7 @@ $__System.registerDynamic("ad", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("ae", [], true, function($__require, exports, module) {
+$__System.registerDynamic("b7", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -52794,37 +55994,37 @@ $__System.registerDynamic("ae", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("af", ["ae"], true, function($__require, exports, module) {
+$__System.registerDynamic("b8", ["b7"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('ae');
+  module.exports = $__require('b7');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b0", ["af"], true, function($__require, exports, module) {
+$__System.registerDynamic("b9", ["b8"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__System._nodeRequire ? process : $__require('af');
+  module.exports = $__System._nodeRequire ? process : $__require('b8');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("3b", ["b0"], true, function($__require, exports, module) {
+$__System.registerDynamic("3b", ["b9"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('b0');
+  module.exports = $__require('b9');
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, exports, module) {
+$__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -53684,7 +56884,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
             };
           }
           try {
-            jsonld.Promise = global.Promise || $__require('ac').Promise;
+            jsonld.Promise = global.Promise || $__require('b5').Promise;
           } catch (e) {
             var f = function() {
               throw new Error('Unable to find a Promise implementation.');
@@ -53698,7 +56898,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
         jsonld.promisify = function(op) {
           if (!jsonld.Promise) {
             try {
-              jsonld.Promise = global.Promise || $__require('ac').Promise;
+              jsonld.Promise = global.Promise || $__require('b5').Promise;
             } catch (e) {
               throw new Error('Unable to find a Promise implementation.');
             }
@@ -53975,8 +57175,8 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
           options = options || {};
           var strictSSL = ('strictSSL' in options) ? options.strictSSL : true;
           var maxRedirects = ('maxRedirects' in options) ? options.maxRedirects : -1;
-          var request = $__require('ad');
-          var http = $__require('ad');
+          var request = $__require('b6');
+          var http = $__require('b6');
           var queue = new jsonld.RequestQueue();
           if (options.usePromise) {
             return queue.wrapLoader(function(url) {
@@ -54367,7 +57567,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
           this.details = details || {};
         };
         if (_nodejs) {
-          $__require('ad').inherits(JsonLdError, Error);
+          $__require('b6').inherits(JsonLdError, Error);
         } else if (typeof Error !== 'undefined') {
           JsonLdError.prototype = new Error();
         }
@@ -57492,7 +60692,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
         };
         (function(_nodejs) {
           if (_nodejs) {
-            var crypto = $__require('ad');
+            var crypto = $__require('b6');
             NormalizeHash._init = function(algorithm) {
               if (algorithm === 'URDNA2015') {
                 algorithm = 'sha256';
@@ -57895,7 +61095,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
         })(_nodejs);
         if (!XMLSerializer) {
           var _defineXMLSerializer = function() {
-            XMLSerializer = $__require('ad').XMLSerializer;
+            XMLSerializer = $__require('b6').XMLSerializer;
           };
         }
         jsonld.url = {};
@@ -57954,7 +61154,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
           jsonld.use = function(extension) {
             switch (extension) {
               case 'request':
-                jsonld.request = $__require('ad');
+                jsonld.request = $__require('b6');
                 break;
               default:
                 throw new JsonLdError('Unknown extension.', 'jsonld.UnknownExtension', {extension: extension});
@@ -57964,7 +61164,7 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
             exports: {},
             filename: __dirname
           };
-          $__require('ad')(_module, 'version');
+          $__require('b6')(_module, 'version');
           jsonld.version = _module.exports.version;
         }
         return jsonld;
@@ -57999,17 +61199,17 @@ $__System.registerDynamic("b1", ["ac", "ad", "3b"], true, function($__require, e
   return module.exports;
 });
 
-$__System.registerDynamic("61", ["b1"], true, function($__require, exports, module) {
+$__System.registerDynamic("61", ["ba"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('b1');
+  module.exports = $__require('ba');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('4e', ['61', '80'], function (_export) {
+$__System.register('4e', ['61', '87'], function (_export) {
   'use strict';
 
   var jsonld, loadJSON, DCAT_CONTEXT, DCAT_CATALOG_FRAME, DCAT_DATASET_FRAME, UNKNOWN_LANG, i18n;
@@ -58284,10 +61484,10 @@ $__System.register('4e', ['61', '80'], function (_export) {
   };
 });
 
-$__System.register('b2', ['48', '65', '80', '86', 'aa', '7f', '4e'], function (_export) {
+$__System.register('bb', ['48', '67', '86', '87', '8f', 'b3', '4e'], function (_export) {
   'use strict';
 
-  var L, $, HTML, i18n, sortByKey, Modal, Tab, PROCESS, loadDCATCatalog, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
+  var L, $, HTML, PROCESS, i18n, sortByKey, Modal, Tab, loadDCATCatalog, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
 
   /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
   function getDistFormatLabel(dist) {
@@ -58308,15 +61508,15 @@ $__System.register('b2', ['48', '65', '80', '86', 'aa', '7f', '4e'], function (_
     }, function (_) {
       $ = _.$;
       HTML = _.HTML;
+    }, function (_3) {
+      PROCESS = _3.PROCESS;
     }, function (_4) {
       i18n = _4.i18n;
       sortByKey = _4.sortByKey;
-    }, function (_3) {
-      Modal = _3['default'];
-    }, function (_aa) {
-      Tab = _aa['default'];
     }, function (_f) {
-      PROCESS = _f.PROCESS;
+      Modal = _f['default'];
+    }, function (_b3) {
+      Tab = _b3['default'];
     }, function (_e) {
       loadDCATCatalog = _e.loadDCATCatalog;
     }],
@@ -58687,7 +61887,7 @@ $__System.register('b2', ['48', '65', '80', '86', 'aa', '7f', '4e'], function (_
   };
 });
 
-$__System.registerDynamic("86", [], true, function($__require, exports, module) {
+$__System.registerDynamic("8f", [], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
@@ -58927,7 +62127,7 @@ $__System.registerDynamic("86", [], true, function($__require, exports, module) 
   return module.exports;
 });
 
-$__System.registerDynamic("b3", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("bc", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     (function() {
@@ -59257,17 +62457,17 @@ $__System.registerDynamic("b3", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("b4", ["b3"], true, function($__require, exports, module) {
+$__System.registerDynamic("bd", ["bc"], true, function($__require, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = $__require('b3');
+  module.exports = $__require('bc');
   global.define = __define;
   return module.exports;
 });
 
-$__System.register('80', ['b4'], function (_export) {
+$__System.register('87', ['bd'], function (_export) {
   'use strict';
 
   var COVJSON_PREFIX, DefaultMap;
@@ -59334,7 +62534,7 @@ $__System.register('80', ['b4'], function (_export) {
   }
 
   return {
-    setters: [function (_b4) {}],
+    setters: [function (_bd) {}],
     execute: function () {
       COVJSON_PREFIX = 'http://coveragejson.org/def#';
 
@@ -59379,7 +62579,7 @@ $__System.register('80', ['b4'], function (_export) {
   };
 });
 
-$__System.register('4f', ['80'], function (_export) {
+$__System.register('4f', ['87'], function (_export) {
   'use strict';
 
   var DefaultMap, Eventable;
@@ -59474,7 +62674,7 @@ $__System.register('4f', ['80'], function (_export) {
   };
 });
 
-$__System.register('7f', ['4f'], function (_export) {
+$__System.register('86', ['4f'], function (_export) {
   'use strict';
 
   var Eventable, VIEW, PROCESS, EXTERNAL_LINK, Action;
@@ -59530,23 +62730,23 @@ $__System.register('7f', ['4f'], function (_export) {
   };
 });
 
-$__System.register('b5', ['65', '80', '86', '4f', '7f'], function (_export) {
+$__System.register('be', ['67', '86', '87', '8f', '4f'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, Modal, Eventable, EXTERNAL_LINK, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
+  var $, $$, HTML, EXTERNAL_LINK, i18n, Modal, Eventable, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
     }, function (_3) {
-      i18n = _3.i18n;
+      EXTERNAL_LINK = _3.EXTERNAL_LINK;
     }, function (_2) {
-      Modal = _2['default'];
+      i18n = _2.i18n;
     }, function (_f) {
-      Eventable = _f['default'];
+      Modal = _f['default'];
     }, function (_f2) {
-      EXTERNAL_LINK = _f2.EXTERNAL_LINK;
+      Eventable = _f2['default'];
     }],
     execute: function () {
       paneHtml = function paneHtml() {
@@ -59969,7 +63169,7 @@ $__System.register('b5', ['65', '80', '86', '4f', '7f'], function (_export) {
   };
 });
 
-$__System.register('b6', ['48', '65', 'a7', 'a8', 'a9', 'b2', 'b5'], function (_export) {
+$__System.register('bf', ['48', '67', 'b0', 'b1', 'b2', 'bb', 'be'], function (_export) {
   'use strict';
 
   var L, $, HTML, SearchPane, WorkspacePane, sidebarHtml, Sidebar;
@@ -59979,10 +63179,10 @@ $__System.register('b6', ['48', '65', 'a7', 'a8', 'a9', 'b2', 'b5'], function (_
     }, function (_2) {
       $ = _2.$;
       HTML = _2.HTML;
-    }, function (_a7) {}, function (_a8) {}, function (_a9) {}, function (_b2) {
-      SearchPane = _b2['default'];
-    }, function (_b5) {
-      WorkspacePane = _b5['default'];
+    }, function (_b0) {}, function (_b1) {}, function (_b2) {}, function (_bb) {
+      SearchPane = _bb['default'];
+    }, function (_be) {
+      WorkspacePane = _be['default'];
     }],
     execute: function () {
       sidebarHtml = function sidebarHtml(sidebarId, searchPaneId, workspacePaneId) {
@@ -60037,7 +63237,7 @@ $__System.register('b6', ['48', '65', 'a7', 'a8', 'a9', 'b2', 'b5'], function (_
   };
 });
 
-$__System.register("b7", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("c0", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -60048,7 +63248,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("b8", [], L);
+    define("c1", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -66546,13 +69746,13 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("48", ["b8"], function(main) {
+define("48", ["c1"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register('b9', ['48'], function (_export) {
+$__System.register('c2', ['48'], function (_export) {
 
   // https://github.com/davicustodio/Leaflet.StyledLayerControl/blob/7a3268d446d755f59bcd845cf873444d01ce1774/src/styledLayerControl.js
   // + some patches to make it 'use strict' compatible
@@ -66953,7 +70153,7 @@ $__System.register('b9', ['48'], function (_export) {
   };
 });
 
-$__System.register("ba", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("c3", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
@@ -66964,7 +70164,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("bb", [], function() {
+}({}), define("c4", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -68058,15 +71258,15 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("65", ["bb"], function(main) {
+define("67", ["c4"], function(main) {
   return main;
 });
 
 _removeDefine();
 })();
-$__System.register("bc", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("c5", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('1', ['7', '18', '45', '46', '48', '49', '65', '80', 'f', 'a9', '4b', '4c', 'a6', 'b6', 'b7', 'b9', 'ba', 'bc'], function (_export) {
+$__System.register('1', ['7', '18', '45', '46', '48', '49', '67', '87', 'f', 'b2', '4b', '4c', 'af', 'bf', 'c0', 'c2', 'c3', 'c5'], function (_export) {
 
   // Xmas magic
   'use strict';
@@ -68117,11 +71317,11 @@ $__System.register('1', ['7', '18', '45', '46', '48', '49', '65', '80', 'f', 'a9
     }, function (_7) {
       i18n = _7.i18n;
       DefaultMap = _7.DefaultMap;
-    }, function (_f) {}, function (_a9) {}, function (_b) {}, function (_c) {}, function (_a6) {
-      App = _a6['default'];
-    }, function (_b6) {
-      Sidebar = _b6['default'];
-    }, function (_b7) {}, function (_b9) {}, function (_ba) {}, function (_bc) {}],
+    }, function (_f) {}, function (_b2) {}, function (_b) {}, function (_c) {}, function (_af) {
+      App = _af['default'];
+    }, function (_bf) {
+      Sidebar = _bf['default'];
+    }, function (_c0) {}, function (_c2) {}, function (_c3) {}, function (_c5) {}],
     execute: function () {
       $('body').add(HTML('\n  <div id="snow1" class="snow"></div>\n  <div id="snow2" class="snow"></div>\n  <div id="snow3" class="snow"></div>\n'));document.getElementById('map').addEventListener('keypress', function (e) {
         if (String.fromCharCode(e.charCode) == 's') letItSnow();
