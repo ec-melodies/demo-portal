@@ -247,8 +247,8 @@ export default class CoverageModelObservationCompare extends Action {
         let obsStart = new Date(modelTime - obsTimeDelta*1000)
         let obsStop = new Date(modelTime + obsTimeDelta*1000)
         promises = [
-          modelCov.subsetByValue({t: modelTime}),
-          observationsColl.query().filter({t: {start: obsStart, stop: obsStop}}).execute()
+          modelCov.subsetByValue({t: modelTime.toISOString()}),
+          observationsColl.query().filter({t: {start: obsStart.toISOString(), stop: obsStop.toISOString()}}).execute()
         ]
       } else {
         promises = [modelCov, observationsColl]
