@@ -1,5 +1,3 @@
-import L from 'leaflet'
-
 import LayerFactory from 'leaflet-coverage'
 import {getLayerClass} from 'leaflet-coverage'
 import ParameterSync from 'leaflet-coverage/layers/ParameterSync.js'
@@ -8,11 +6,8 @@ import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
 
 import {default as Action, VIEW} from './Action.js'
-import {i18n, COVJSON_PREFIX} from '../util.js'
+import {i18n} from '../util.js'
 import SelectControl from './SelectControl.js'
-
-const PROFILE_COLLECTION = COVJSON_PREFIX + 'VerticalProfileCoverageCollection'
-const POINT_COLLECTION = COVJSON_PREFIX + 'PointCoverageCollection'
 
 /**
  * Displays geospatial coverages on a map.
@@ -42,26 +37,21 @@ export default class GeoCoverageView extends Action {
   }
   
   get isSupported () {
-    if (this.cov.coverages && this.cov.coverages.length > 1) {
-      // limited collection support
-      if (this.cov.profiles.indexOf(PROFILE_COLLECTION) !== -1 || this.cov.profiles.indexOf(POINT_COLLECTION) !== -1) {
-        // only support collections with root-level parameters (where we then assume a uniform collection)
-        if (!this.cov.parameters) {
-          return false
-        }
-      } else {
-        return false
+    let cov = this.cov
+    // TODO for collections, parameters have to be defined at collection level
+    // see https://github.com/Reading-eScience-Centre/coveragejson/issues/55
+    
+    // check if leaflet-coverage can directly visualize it
+    if (getLayerClass(cov)) {
+      return true
+    }
+    // otherwise, if it's a 1-element collection, check if the single coverage can be visualized
+    if (cov.coverages && cov.coverages.length === 1) {
+      if (getLayerClass(cov.coverages[0])) {
+        return true
       }
     }
-    let cov = this.cov
-    if (cov.coverages) {
-      cov = cov.coverages[0]
-    }
-    if (!getLayerClass(cov)) {
-      return false
-    }
-
-    return true
+    return false
   }
   
   run () {    
@@ -79,13 +69,17 @@ export default class GeoCoverageView extends Action {
     this._setVisible()
     
     let cov = this.cov
-    if (cov.coverages && cov.coverages.length === 1) {
-      cov = cov.coverages[0]
+    if (!getLayerClass(cov)) {
+      if (cov.coverages && cov.coverages.length === 1) {
+        cov = cov.coverages[0]
+      }
     }
     
     let formatLabel = this.context.distribution.formatImpl.shortLabel
     let layerNamePrefix = '<span class="label label-success">' + formatLabel + '</span> '
     
+    // TODO param sync not needed anymore as we use the built-in collection layer classes of leaflet-coverage
+    //  -> will this be needed later maybe?
     this.paramSync = new ParameterSync({
       syncProperties: {
         palette: (p1, p2) => p1,
@@ -107,17 +101,8 @@ export default class GeoCoverageView extends Action {
       let opts = {keys: [key]}
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
       let fullLayerName = layerNamePrefix + layerName
-      let layer
-      if (cov.coverages) {
-        let layers = cov.coverages.map(coverage => this._createLayer(coverage, opts, true))
-        // TODO this should be more clever and be oriented towards uniform collections
-        //     then it would make sense to expose properties like palette etc.
-        layer = L.layerGroup(layers)  
-      } else {
-        layer = this._createLayer(cov, opts)
-      }
-      map.layerControl.addOverlay(
-          layer, fullLayerName, {groupName: datasetTitle, expanded: true})
+      let layer = this._createLayer(cov, opts)
+      map.layerControl.addOverlay(layer, fullLayerName, {groupName: datasetTitle, expanded: true})
       this.layers.push(layer) 
     }
     
@@ -126,7 +111,9 @@ export default class GeoCoverageView extends Action {
     map.addLayer(firstLayer)
   }
   
-  _createLayer (cov, opts, inCollection) {
+  _createLayer (cov, opts) {
+    let isCollection = cov.coverages
+    
     let map = this.context.map
     let layer = LayerFactory()(cov, opts)
       .on('add', e => {
@@ -138,7 +125,7 @@ export default class GeoCoverageView extends Action {
         // See the code above where ParameterSync gets instantiated.
         this.paramSync.addLayer(covLayer)
         
-        if (inCollection) {
+        if (isCollection) {
           // we could display a time range control for filtering the displayed collection items
           // same for vertical axis where in addition a target value could be chosen
         } else {
@@ -164,12 +151,16 @@ export default class GeoCoverageView extends Action {
       .on('dataLoading', () => this.fire('loading'))
       .on('dataLoad', () => this.fire('load'))
     
-    // TODO use full URI
-    if (cov.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
-      // we do that outside of the above 'add' handler since we want to register only once,
-      // not every time the layer is added to the map
-      layer.on('click', () => new ProfilePlot(cov, opts).addTo(map))
-    }
+
+    // we do that outside of the above 'add' handler since we want to register only once,
+    // not every time the layer is added to the map
+    layer.on('click', ({coverage}) => {
+      // TODO use full URI
+      if (coverage.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
+        new ProfilePlot(coverage, opts).addTo(map)
+      }
+    })
+
     return layer
   }
   

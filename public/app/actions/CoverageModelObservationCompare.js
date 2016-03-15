@@ -3,13 +3,14 @@ import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import SelectControl from './SelectControl.js'
+import ButtonControl from './ButtonControl.js'
 
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import {i18n, COVJSON_PREFIX} from '../util.js'
 import CoverageData from '../formats/CoverageData.js'
-import {default as Action, PROCESS} from './Action.js'
+import {default as Action, VIEW, PROCESS} from './Action.js'
 
 const PointCollection = COVJSON_PREFIX + 'PointCoverageCollection'
 const ProfileCollection = COVJSON_PREFIX + 'VerticalProfileCoverageCollection'
@@ -244,8 +245,8 @@ export default class CoverageModelObservationCompare extends Action {
       let promises
       if (modelTime) {
         // subset model + filter observations
-        let obsStart = new Date(modelTime - obsTimeDelta*1000)
-        let obsStop = new Date(modelTime + obsTimeDelta*1000)
+        let obsStart = new Date(modelTime.getTime() - obsTimeDelta*1000)
+        let obsStop = new Date(modelTime.getTime() + obsTimeDelta*1000)
         promises = [
           modelCov.subsetByValue({t: modelTime.toISOString()}),
           observationsColl.query().filter({t: {start: obsStart.toISOString(), stop: obsStop.toISOString()}}).execute()
@@ -254,9 +255,45 @@ export default class CoverageModelObservationCompare extends Action {
         promises = [modelCov, observationsColl]
       }
       Promise.all(promises).then(([modelCovSubset, obsCollFiltered]) => {
-        deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(covjson => {
-          // TODO implement
-          console.log(covjson)
+        deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(covjsonobj => {
+          let workspace = this.context.workspace 
+          
+          // discard old intercomparison dataset
+          if (this._intercomparisonResultDataset) {
+            workspace.removeDataset(this._intercomparisonResultDataset)
+          }
+          
+          // create new dataset and display          
+          let covjson = JSON.stringify(covjsonobj, null, 2)
+    
+          // NOTE: we don't call URL.revokeObjectURL() currently when removing the dataset again
+          let blobUrl = URL.createObjectURL(new Blob([covjson], {type: 'application/prs.coverage+json'}))
+          
+          let modelTimeISO = modelTime.toISOString()
+          let obsTimeDeltaStr = '± ' + Math.round(obsTimeDelta/60) + ' min'
+          let prefixTitle = 'Intercomparison [Model: ' + modelTimeISO + ', Observations: ' + obsTimeDeltaStr + ']'
+          let virtualDataset = {
+            title: { en: prefixTitle },
+            virtual: true,
+            distributions: [{
+              title: { en: prefixTitle },
+              mediaType: 'application/prs.coverage+json',
+              url: blobUrl
+            }]
+          }
+          this._intercomparisonResultDataset = virtualDataset
+          
+          // display after loading
+          var done = ({dataset}) => {
+            if (dataset === virtualDataset) {
+              dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
+              workspace.off('distributionsLoad', done)
+            }
+          }
+          workspace.on('distributionsLoad', done)
+          workspace.addDataset(virtualDataset, this.context.dataset)
+          
+          // TODO how is the input data connected to it?? 
         })
       })
     }
@@ -268,7 +305,8 @@ export default class CoverageModelObservationCompare extends Action {
         
         // Model: simple time axis control
         let modelTimeSlices = modelDomain.axes.get('t').values.map(t => new Date(t))
-        this._modelTimeControl = new TimeAxis({timeSlices: modelTimeSlices}, {title: 'Model time'})
+        let modelFakeLayer = {timeSlices: modelTimeSlices, time: modelTimeSlices[0]}
+        this._modelTimeControl = new TimeAxis(modelFakeLayer, {title: 'Model time'})
           .on('change', ({time}) => {
             let obsTimeDelta = parseInt(this._obsTimeDeltaControl.value)
             doIntercomparison(time, obsTimeDelta)
@@ -286,25 +324,32 @@ export default class CoverageModelObservationCompare extends Action {
         this._obsTimeDeltaControl = new SelectControl(null, choices, {title: 'Observation time delta'})
           .on('change', event => {
             let obsTimeDelta = parseInt(event.value)
-            let modelTime = this._modelTimeControl.time
+            let modelTime = modelFakeLayer.time
             doIntercomparison(modelTime, obsTimeDelta)
           })
           .addTo(map)
           
         // to start, apply first model time slice and first delta choice
-        doIntercomparison(modelTimeSlices[0], choices[0].value)
+        doIntercomparison(modelFakeLayer.time, choices[0].value)
+        
+        let doneButton = new ButtonControl({title: 'Exit Intercomparison'}).addTo(map)
+        doneButton.on('click', () => {
+          map.removeControl(this._modelTimeControl)
+          map.removeControl(this._obsTimeDeltaControl)
+          map.removeControl(doneButton)
+          let viewAction = this._intercomparisonResultDataset.distributions[0].actions.find(a => a.type === VIEW)
+          if (viewAction.visible) {
+            // hide it
+            viewAction.run()
+          }
+          this._intercomparisonActive = false
+        })
+        
       } else {
         doIntercomparison()
       }
     })
-    
-    // add "finish intercomparison" control
-    // -> this._intercomparisonActive = false
-    
-    // add "store as dataset" control
   }
-  
-  
 }
 
 CoverageModelObservationCompare.type = PROCESS

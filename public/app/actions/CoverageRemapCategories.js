@@ -434,7 +434,6 @@ export default class CoverageRemapCategories extends Action {
       // display after loading
       var done = ({dataset}) => {
         if (dataset === virtualDataset) {
-          window.ac = dataset.distributions[0].actions
           dataset.distributions[0].actions.find(a => a.type === VIEW).run()                  
           workspace.off('distributionsLoad', done)
         }
