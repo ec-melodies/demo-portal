@@ -1,4 +1,4 @@
-import {indexOfNearest} from 'leaflet-coverage/util/arrays.js'
+import {indexOfNearest, indicesOfNearest} from 'leaflet-coverage/util/arrays.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
@@ -249,7 +249,10 @@ export default class CoverageModelObservationCompare extends Action {
         let obsStop = new Date(modelTime.getTime() + obsTimeDelta*1000)
         promises = [
           modelCov.subsetByValue({t: modelTime.toISOString()}),
-          observationsColl.query().filter({t: {start: obsStart.toISOString(), stop: obsStop.toISOString()}}).execute()
+          observationsColl.query()
+            .filter({t: {start: obsStart.toISOString(), stop: obsStop.toISOString()}})
+            .embed({domain: true, range: true})
+            .execute()
         ]
       } else {
         promises = [modelCov, observationsColl]
@@ -269,9 +272,14 @@ export default class CoverageModelObservationCompare extends Action {
           // NOTE: we don't call URL.revokeObjectURL() currently when removing the dataset again
           let blobUrl = URL.createObjectURL(new Blob([covjson], {type: 'application/prs.coverage+json'}))
           
-          let modelTimeISO = modelTime.toISOString()
-          let obsTimeDeltaStr = '± ' + Math.round(obsTimeDelta/60) + ' min'
-          let prefixTitle = 'Intercomparison [Model: ' + modelTimeISO + ', Observations: ' + obsTimeDeltaStr + ']'
+          let prefixTitle = 'Intercomparison'
+          if (modelTime) {
+            let modelTimeISO = modelTime.toISOString()
+            let obsTimeDeltaStr = '± ' + Math.round(obsTimeDelta/60) + ' min'
+            prefixTitle += ' [Model: ' + modelTimeISO + ', Observations: ' + obsTimeDeltaStr + ']'            
+          }
+
+          // TODO embed default palette (red-green linear) in CovJSON for RMSE
           let virtualDataset = {
             title: { en: prefixTitle },
             virtual: true,
@@ -387,6 +395,8 @@ function getNonCategoricalParams (cov) {
 
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
   
+  // TODO for varying z axes, let the client provide a maximum z difference for finding matching comparison points 
+  
   // Basic requirements:
   // - the measurement units of both input parameters must be equal
   // - the model and insitu axes must have the same meaning and CRS
@@ -478,9 +488,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
       if (!insituHasZ && modelHasZ && modelZ.length > 1) {
         throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
       }
-      
-      // TODO handle nodata values
-          
+                
       // we want exactly the grid cell in which the observation is located
       let modelX = {start: insituX, stop: insituX}
       let modelY = {start: insituY, stop: insituY}
@@ -492,30 +500,59 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
             let modelVals = []
             let insituVals = []
             if (!modelHasZ || modelZ.length === 1) {
-              modelVals = [modelSubsetRange.get({})]
+              let modelVal = modelSubsetRange.get({})
               
+              let insituVal
               if (!insituHasZ || insituZ.length === 1) {
-                insituVals = [insitu.range.get({})]
+                insituVal = insitu.range.get({})
               } else {
                 // varying insitu z, get closest value to grid z
                 let zIdxClosest = indexOfNearest(insituZ, modelZ[0])
-                let val = insitu.range.get({[Z]: zIdxClosest})
-                insituVals.push(val)
+                insituVal = insitu.range.get({[Z]: zIdxClosest})
+              }
+              if (modelVal !== null && insituVal !== null) {
+                modelVals = [modelVal]
+                insituVals = [insituVal]
               }
             } else {
               // varying model z
-              for (let z of insituZ) {
-                let zIdxClosest = indexOfNearest(modelZ, z)
-                let val = modelSubsetRange.get({[Z]: zIdxClosest})
-                modelVals.push(val)
-              }
+              
+              // linear interpolation
+              let interp = (z,z0,v0,z1,v1) => v0 + (v1 - v0)*(z - z0)/(z1 - z0)
               
               for (let i=0; i < insituZ.length; i++) {
-                let val = insitu.range.get({[Z]: i})
-                insituVals.push(val)
-              } 
+                let z = insituZ[i]
+                let insituVal = insitu.range.get({[Z]: i})
+                if (insituVal === null) {
+                  continue
+                }
+                
+                // interpolate between nearest model points on z axis
+                let [zIdxClosest1,zIdxClosest2] = indicesOfNearest(modelZ, z)
+                let [zClosest1,zClosest2] = [modelZ[zIdxClosest1], modelZ[zIdxClosest2]]
+                let val1 = modelSubsetRange.get({[Z]: zIdxClosest1})
+                let val2 = modelSubsetRange.get({[Z]: zIdxClosest2})
+                if (val1 === null || val2 === null) {
+                  // We could be more clever here and search for other points.
+                  // However, model grids will likely not have partially missing values at one x/y point anyway.
+                  continue
+                }
+                
+                let val
+                if (zIdxClosest1 === zIdxClosest2) {
+                  val = val1
+                } else {
+                  val = interp(z, zClosest1, val1, zClosest2, val2)
+                }
+                modelVals.push(val)                
+                insituVals.push(insituVal)
+              }
             }
             
+            if (modelVals.length === 0) {
+              return
+            }
+                        
             // calculate RMSE = sqrt ( ( sum_{i=1}^n (x_i - y_i)^2 ) / n)
             let n = modelVals.length
             let sum = zip(modelVals, insituVals)
@@ -529,13 +566,18 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
               "profile": "PointCoverage",
               "wasGeneratedBy": {
                 "type": "ModelObservationComparisonActivity",
-                "qualifiedUsage": [{
-                  "entity": modelGridCoverage.id,
-                  "hadRole": "modelToCompareAgainst"
-                }, {
-                  "entity": insitu.cov.id,
-                  "hadRole": "observationToCompareAgainst"
-                }]
+                "qualifiedUsage": {
+                  "model": {
+                    "entity": modelGridCoverage.id,
+                    "hadRole": "modelToCompareAgainst",
+                    "parameterKey": modelParamKey
+                  },
+                  "observation": {
+                    "entity": insitu.cov.id,
+                    "hadRole": "observationToCompareAgainst",
+                    "parameterKey": insituParamKey
+                  }
+                }
               },
               "domain": {
                 "type": "Domain",
@@ -564,20 +606,39 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
     return Promise.all(promises).then(covjsons => {
       // put statistical point coverages into a CovJSON collection
       
+      covjsons = covjsons.filter(o => o) // filter empty results
+      
       let coll = {
         "@context": {
           "prov": "http://www.w3.org/ns/prov#",
           "wasGeneratedBy": "prov:wasGeneratedBy",
-          "qualifiedUsage": "prov:qualifiedUsage",
+          "qualifiedUsage": {"@id": "prov:qualifiedUsage", "@container": "@index"},
           "entity": {"@id": "prov:entity", "@type": "@id"},
           "hadRole": {"@id": "prov:hadRole", "@type": "@vocab"},
           "covstats": "http://covstats#",
           "ModelObservationComparisonActivity": "covstats:ModelObservationComparisonActivity",
           "modelToCompareAgainst": "covstats:modelToCompareAgainst",
-          "observationToCompareAgainst": "covstats:observationToCompareAgainst"
+          "observationsToCompareAgainst": "covstats:observationsToCompareAgainst",
+          "observationToCompareAgainst": "covstats:observationToCompareAgainst",
+          "parameterKey": "covstats:parameterKey"
         },
         "type": "CoverageCollection",
         "profile": "PointCoverageCollection",
+        "wasGeneratedBy": {
+          "type": "ModelObservationComparisonActivity",
+          "qualifiedUsage": {
+            "model": {
+              "entity": modelGridCoverage.id,
+              "hadRole": "modelToCompareAgainst",
+              "parameterKey": modelParamKey
+            },
+            "observations": {
+              "entity": insituCoverageCollection.id,
+              "hadRole": "observationsToCompareAgainst",
+              "parameterKey": insituParamKey
+            }
+          }
+        },
         "parameters": {
           "rmse": {
             "type": "Parameter",
@@ -588,6 +649,10 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
               },
               // TODO is stddev ok here? uncertml doesn't know RMSE
               "statisticalMeasure": "http://www.uncertml.org/statistics/standard-deviation"
+            },
+            "preferredPalette": {
+              "interpolation": "linear",
+              "colors": ["green", "orange", "red"]
             }
           }
         },

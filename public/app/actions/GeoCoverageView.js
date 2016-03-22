@@ -9,6 +9,10 @@ import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
 import SelectControl from './SelectControl.js'
 
+import CovJSON from '../formats/CovJSON.js'
+
+const ModelObservationComparisonActivity = 'ModelObservationComparisonActivity'
+
 /**
  * Displays geospatial coverages on a map.
  */
@@ -155,10 +159,40 @@ export default class GeoCoverageView extends Action {
     // we do that outside of the above 'add' handler since we want to register only once,
     // not every time the layer is added to the map
     layer.on('click', ({coverage}) => {
+      let genBy = coverage.ld.wasGeneratedBy
+      
       // TODO use full URI
       if (coverage.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
-        new ProfilePlot(coverage, opts).addTo(map)
+        new ProfilePlot(coverage).addTo(map)
+      } else if (genBy && genBy.type === ModelObservationComparisonActivity) {
+        let usage = genBy.qualifiedUsage
+        let modelParamKey = usage.model.parameterKey
+        let obsParamKey = usage.observation.parameterKey
+        
+        // display a plot of the input model (subsetting to a point) and observation
+        // TODO we are at JS Coverage Data API abstraction here, how do we know the format of the linked cov?
+        // -> should the media type be included in the prov data?
+        let modelCovUrl = usage.model.entity
+        let obsCovUrl = usage.observation.entity
+        let covJSON = new CovJSON()
+        Promise.all([covJSON.load(modelCovUrl), covJSON.load(obsCovUrl)]).then(([modelCov, obsCov]) => {
+          return obsCov.loadDomain().then(obsDomain => {
+            // TODO handle CRS, reproject 
+            let x = obsDomain.axes.get('x').values[0]
+            let y = obsDomain.axes.get('y').values[0]
+            return modelCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}).then(modelSubset => {
+              new ProfilePlot([obsCov,modelSubset], {
+                keys: [[obsParamKey, modelParamKey]],
+                labels: ['Observation', 'Model']
+              }).addTo(map)
+            })
+          })
+        }).catch(e => {
+          console.log(e)
+          // TODO display error
+        })
       }
+      
     })
 
     return layer
