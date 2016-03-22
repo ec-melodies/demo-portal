@@ -145,11 +145,9 @@ export default class CoverageModelObservationCompare extends Action {
     //           and have an observation time dimension extent selector (e.g. +- 1h)
     //         - the intercomparison data is calculated for the current model time step and observation time extent
     //           (don't subset by bounding box for now, do globally, we'll see how it goes)
-    //         - the result is a virtual dataset which is NOT added to the workspace,
-    //           it is just used for displaying the data as if it was added as a dataset
-    //         - there is a button "Store as Dataset" which adds the current virtual comparison dataset
-    //           to the workspace
+    //         - the result is a virtual dataset which is added to the workspace and displayed
     //         - when clicking on a comparison point, a popup is shown with plots etc.
+    //         - when changing times the virtual dataset is replaced by a new one
     
     this._displayDistributionSelectModal()
   }
@@ -279,7 +277,6 @@ export default class CoverageModelObservationCompare extends Action {
             prefixTitle += ' [Model: ' + modelTimeISO + ', Observations: ' + obsTimeDeltaStr + ']'            
           }
 
-          // TODO embed default palette (red-green linear) in CovJSON for RMSE
           let virtualDataset = {
             title: { en: prefixTitle },
             virtual: true,
@@ -300,8 +297,6 @@ export default class CoverageModelObservationCompare extends Action {
           }
           workspace.on('distributionsLoad', done)
           workspace.addDataset(virtualDataset, this.context.dataset)
-          
-          // TODO how is the input data connected to it?? 
         })
       })
     }
@@ -394,9 +389,7 @@ function getNonCategoricalParams (cov) {
 }
 
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
-  
-  // TODO for varying z axes, let the client provide a maximum z difference for finding matching comparison points 
-  
+
   // Basic requirements:
   // - the measurement units of both input parameters must be equal
   // - the model and insitu axes must have the same meaning and CRS
@@ -443,167 +436,176 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
   // TODO check that model and insitu coverages have the same CRSs
   
   let model = modelGridCoverage
-  let insituCovs = insituCoverageCollection.coverages
-  
   let modelParam = model.parameters.get(modelParamKey)
-  
-  let promises = [
-    model.loadDomain(),
-    Promise.all(insituCovs.map(cov => cov.loadDomain())),
-    Promise.all(insituCovs.map(cov => cov.loadRange(insituParamKey)))
-  ]
-  
-  return Promise.all(promises).then(([modelDomain, insituDomains, insituRanges]) => {
+    
+  return model.loadDomain().then(modelDomain => {
     for (let [key,axis] of modelDomain.axes) {
       if (['x','y',Z].indexOf(key) === -1 && axis.values.length > 1) {
         throw new Error('Only x,y,' + Z + ' can be varying axes in the model grid, not: ' + key)
       }
     }
-    
     let modelHasZ = modelDomain.axes.has(Z)
-    let modelZ = modelHasZ ? modelDomain.axes.get(Z).values : null 
+    let modelZ = modelHasZ ? modelDomain.axes.get(Z).values : null     
     
-    let insitus = insituCovs.map((cov, i) => ({
-      cov,
-      domain: insituDomains[i],
-      range: insituRanges[i]
-    }))
-    
-    let promises = []
-    for (let insitu of insitus) {
-      for (let [key,axis] of insitu.domain.axes) {
-        if (key !== Z && axis.values.length > 1) {
-          throw new Error('Only ' + Z + ' can be a varying axis in in-situ coverages, not: ' + key)
-        }
-      }
+    function deriveCovJSONs (insituCollection) {
+      let hasNextPage = insituCollection.paging && insituCollection.paging.next
+      let nextPage = hasNextPage ? insituCollection.paging.next.load() : undefined
       
-      let insituX = insitu.domain.axes.get('x').values[0]
-      let insituY = insitu.domain.axes.get('y').values[0]
-      let insituHasZ = insitu.domain.axes.has(Z)
-      let insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null
+      let insituCovs = insituCollection.coverages
       
-      if (insituHasZ && insituZ.length > 1 && !modelHasZ) {
-        throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis')
-      }
-      if (!insituHasZ && modelHasZ && modelZ.length > 1) {
-        throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
-      }
+      let promises = [Promise.all(insituCovs.map(cov => cov.loadDomain())),
+                      Promise.all(insituCovs.map(cov => cov.loadRange(insituParamKey)))]
+
+      return Promise.all(promises).then(([insituDomains, insituRanges]) => {
+        let insitus = insituCovs.map((cov, i) => ({
+          cov,
+          domain: insituDomains[i],
+          range: insituRanges[i]
+        }))
+        
+        let promises = []
+        for (let insitu of insitus) {
+          for (let [key,axis] of insitu.domain.axes) {
+            if (key !== Z && axis.values.length > 1) {
+              throw new Error('Only ' + Z + ' can be a varying axis in in-situ coverages, not: ' + key)
+            }
+          }
+          
+          let insituX = insitu.domain.axes.get('x').values[0]
+          let insituY = insitu.domain.axes.get('y').values[0]
+          let insituHasZ = insitu.domain.axes.has(Z)
+          let insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null
+          
+          if (insituHasZ && insituZ.length > 1 && !modelHasZ) {
+            throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis')
+          }
+          if (!insituHasZ && modelHasZ && modelZ.length > 1) {
+            throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
+          }
+                    
+          // we want exactly the grid cell in which the observation is located
+          let modelX = {start: insituX, stop: insituX}
+          let modelY = {start: insituY, stop: insituY}
+          let promise = model.subsetByValue({x: modelX, y: modelY}).then(modelSubset => {
+            return modelSubset.loadRange(modelParamKey).then(modelSubsetRange => {              
+              // collect the values to compare against each other
+              let modelVals = []
+              let insituVals = []
+              if (!modelHasZ || modelZ.length === 1) {
+                let modelVal = modelSubsetRange.get({})
                 
-      // we want exactly the grid cell in which the observation is located
-      let modelX = {start: insituX, stop: insituX}
-      let modelY = {start: insituY, stop: insituY}
-      let promise = model.subsetByValue({x: modelX, y: modelY}).then(modelSubset => {
-        return Promise.all([modelSubset.loadDomain(), modelSubset.loadRange(modelParamKey)])
-          .then(([modelSubsetDomain, modelSubsetRange]) => {
-            
-            // collect the values to compare against each other
-            let modelVals = []
-            let insituVals = []
-            if (!modelHasZ || modelZ.length === 1) {
-              let modelVal = modelSubsetRange.get({})
-              
-              let insituVal
-              if (!insituHasZ || insituZ.length === 1) {
-                insituVal = insitu.range.get({})
-              } else {
-                // varying insitu z, get closest value to grid z
-                let zIdxClosest = indexOfNearest(insituZ, modelZ[0])
-                insituVal = insitu.range.get({[Z]: zIdxClosest})
-              }
-              if (modelVal !== null && insituVal !== null) {
-                modelVals = [modelVal]
-                insituVals = [insituVal]
-              }
-            } else {
-              // varying model z
-              
-              // linear interpolation
-              let interp = (z,z0,v0,z1,v1) => v0 + (v1 - v0)*(z - z0)/(z1 - z0)
-              
-              for (let i=0; i < insituZ.length; i++) {
-                let z = insituZ[i]
-                let insituVal = insitu.range.get({[Z]: i})
-                if (insituVal === null) {
-                  continue
-                }
-                
-                // interpolate between nearest model points on z axis
-                let [zIdxClosest1,zIdxClosest2] = indicesOfNearest(modelZ, z)
-                let [zClosest1,zClosest2] = [modelZ[zIdxClosest1], modelZ[zIdxClosest2]]
-                let val1 = modelSubsetRange.get({[Z]: zIdxClosest1})
-                let val2 = modelSubsetRange.get({[Z]: zIdxClosest2})
-                if (val1 === null || val2 === null) {
-                  // We could be more clever here and search for other points.
-                  // However, model grids will likely not have partially missing values at one x/y point anyway.
-                  continue
-                }
-                
-                let val
-                if (zIdxClosest1 === zIdxClosest2) {
-                  val = val1
+                let insituVal
+                if (!insituHasZ || insituZ.length === 1) {
+                  insituVal = insitu.range.get({})
                 } else {
-                  val = interp(z, zClosest1, val1, zClosest2, val2)
+                  // varying insitu z, get closest value to grid z
+                  let zIdxClosest = indexOfNearest(insituZ, modelZ[0])
+                  insituVal = insitu.range.get({[Z]: zIdxClosest})
                 }
-                modelVals.push(val)                
-                insituVals.push(insituVal)
+                if (modelVal !== null && insituVal !== null) {
+                  modelVals = [modelVal]
+                  insituVals = [insituVal]
+                }
+              } else {
+                // varying model z
+                
+                // linear interpolation
+                let interp = (z,z0,v0,z1,v1) => v0 + (v1 - v0)*(z - z0)/(z1 - z0)
+                
+                for (let i=0; i < insituZ.length; i++) {
+                  let z = insituZ[i]
+                  let insituVal = insitu.range.get({[Z]: i})
+                  if (insituVal === null) {
+                    continue
+                  }
+                  
+                  // interpolate between nearest model points on z axis
+                  let [zIdxClosest1,zIdxClosest2] = indicesOfNearest(modelZ, z)
+                  let [zClosest1,zClosest2] = [modelZ[zIdxClosest1], modelZ[zIdxClosest2]]
+                  let val1 = modelSubsetRange.get({[Z]: zIdxClosest1})
+                  let val2 = modelSubsetRange.get({[Z]: zIdxClosest2})
+                  if (val1 === null || val2 === null) {
+                    // We could be more clever here and search for other points.
+                    // However, model grids will likely not have partially missing values at one x/y point anyway.
+                    continue
+                  }
+                  
+                  let val
+                  if (zIdxClosest1 === zIdxClosest2) {
+                    val = val1
+                  } else {
+                    val = interp(z, zClosest1, val1, zClosest2, val2)
+                  }
+                  modelVals.push(val)                
+                  insituVals.push(insituVal)
+                }
               }
-            }
-            
-            if (modelVals.length === 0) {
-              return
-            }
-                        
-            // calculate RMSE = sqrt ( ( sum_{i=1}^n (x_i - y_i)^2 ) / n)
-            let n = modelVals.length
-            let sum = zip(modelVals, insituVals)
-              .map(([v1,v2]) => Math.pow(v1-v2, 2))
-              .reduce((l,r) => l+r)
-            let rmse = Math.sqrt(sum / n)
-            
-            // assemble the result into a CovJSON Point coverage            
-            let covjson = {
-              "type": "Coverage",
-              "profile": "PointCoverage",
-              "wasGeneratedBy": {
-                "type": "ModelObservationComparisonActivity",
-                "qualifiedUsage": {
-                  "model": {
-                    "entity": modelGridCoverage.id,
-                    "hadRole": "modelToCompareAgainst",
-                    "parameterKey": modelParamKey
-                  },
-                  "observation": {
-                    "entity": insitu.cov.id,
-                    "hadRole": "observationToCompareAgainst",
-                    "parameterKey": insituParamKey
+              
+              if (modelVals.length === 0) {
+                return
+              }
+                          
+              // calculate RMSE = sqrt ( ( sum_{i=1}^n (x_i - y_i)^2 ) / n)
+              let n = modelVals.length
+              let sum = zip(modelVals, insituVals)
+                .map(([v1,v2]) => Math.pow(v1-v2, 2))
+                .reduce((l,r) => l+r)
+              let rmse = Math.sqrt(sum / n)
+              
+              // assemble the result into a CovJSON Point coverage            
+              let covjson = {
+                "type": "Coverage",
+                "profile": "PointCoverage",
+                "wasGeneratedBy": {
+                  "type": "ModelObservationComparisonActivity",
+                  "qualifiedUsage": {
+                    "model": {
+                      "entity": modelGridCoverage.id,
+                      "hadRole": "modelToCompareAgainst",
+                      "parameterKey": modelParamKey
+                    },
+                    "observation": {
+                      "entity": insitu.cov.id,
+                      "hadRole": "observationToCompareAgainst",
+                      "parameterKey": insituParamKey
+                    }
+                  }
+                },
+                "domain": {
+                  "type": "Domain",
+                  "profile": "Point",
+                  "axes": {
+                    "x": { "values": [insituX] },
+                    "y": { "values": [insituY] }
+                  }
+                },
+                "ranges": {
+                  "rmse": {
+                    "type": "Range",
+                    "values": [rmse],
+                    "dataType": "float"
                   }
                 }
-              },
-              "domain": {
-                "type": "Domain",
-                "profile": "Point",
-                "axes": {
-                  "x": { "values": [insituX] },
-                  "y": { "values": [insituY] }
-                }
-              },
-              "ranges": {
-                "rmse": {
-                  "type": "Range",
-                  "values": [rmse],
-                  "dataType": "float"
-                }
               }
-            }
-            
-            return covjson            
+              
+              return covjson            
+            })
           })
+          
+          promises.push(promise)
+        }
+        
+        return Promise.all([Promise.all(promises),nextPage]).then(([covjsons,nextPageColl]) => {
+          if (nextPageColl) {
+            return deriveCovJSONs(nextPageColl).then(nextCovjsons => covjsons.concat(nextCovjsons))
+          } else {
+            return covjsons
+          }
+        })
       })
-      
-      promises.push(promise)
     }
     
-    return Promise.all(promises).then(covjsons => {
+    return deriveCovJSONs(insituCoverageCollection).then(covjsons => {
       // put statistical point coverages into a CovJSON collection
       
       covjsons = covjsons.filter(o => o) // filter empty results
@@ -665,7 +667,9 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
       }
       return coll
     })
-  })  
+    
+  })
+  
 }
 
 function zip (a, b) {
