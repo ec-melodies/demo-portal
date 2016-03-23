@@ -240,6 +240,7 @@ export default class CoverageModelObservationCompare extends Action {
     this._intercomparisonActive = true
     
     let doIntercomparison = (modelTime, obsTimeDelta) => {
+      this.fire('loading')
       let promises
       if (modelTime) {
         // subset model + filter observations
@@ -257,6 +258,7 @@ export default class CoverageModelObservationCompare extends Action {
       }
       Promise.all(promises).then(([modelCovSubset, obsCollFiltered]) => {
         deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(covjsonobj => {
+          this.fire('load')
           let workspace = this.context.workspace 
           
           // discard old intercomparison dataset
