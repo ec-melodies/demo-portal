@@ -450,7 +450,10 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
       }
     }
     let modelHasZ = modelDomain.axes.has(Z)
-    let modelZ = modelHasZ ? modelDomain.axes.get(Z).values : null     
+    let modelZ = modelHasZ ? modelDomain.axes.get(Z).values : null
+    let modelHasVaryingZ = modelZ && modelZ.length > 1
+    let modelZMin = modelZ ? Math.min(modelZ[0], modelZ[modelZ.length-1]) : null
+    let modelZMax = modelZ ? Math.max(modelZ[0], modelZ[modelZ.length-1]) : null
     
     function deriveCovJSONs (insituCollection) {
       let hasNextPage = insituCollection.paging && insituCollection.paging.next
@@ -480,11 +483,12 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
           let insituY = insitu.domain.axes.get('y').values[0]
           let insituHasZ = insitu.domain.axes.has(Z)
           let insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null
+          let insituHasVaryingZ = insituZ && insituZ.length > 1
           
-          if (insituHasZ && insituZ.length > 1 && !modelHasZ) {
+          if (insituHasVaryingZ && !modelHasZ) {
             throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis')
           }
-          if (!insituHasZ && modelHasZ && modelZ.length > 1) {
+          if (!insituHasZ && modelHasVaryingZ) {
             throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
           }
                     
@@ -496,11 +500,11 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
               // collect the values to compare against each other
               let modelVals = []
               let insituVals = []
-              if (!modelHasZ || modelZ.length === 1) {
+              if (!modelHasVaryingZ) {
                 let modelVal = modelSubsetRange.get({})
                 
                 let insituVal
-                if (!insituHasZ || insituZ.length === 1) {
+                if (!insituHasVaryingZ) {
                   insituVal = insitu.range.get({})
                 } else {
                   // varying insitu z, get closest value to grid z
@@ -519,6 +523,10 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
                 
                 for (let i=0; i < insituZ.length; i++) {
                   let z = insituZ[i]
+                  if (z < modelZMin || z > modelZMax) {
+                    // we don't extrapolate
+                    continue
+                  }
                   let insituVal = insitu.range.get({[Z]: i})
                   if (insituVal === null) {
                     continue
