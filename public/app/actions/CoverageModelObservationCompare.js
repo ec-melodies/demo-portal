@@ -250,8 +250,7 @@ export default class CoverageModelObservationCompare extends Action {
           modelCov.subsetByValue({t: modelTime.toISOString()}),
           observationsColl.query()
             .filter({t: {start: obsStart.toISOString(), stop: obsStop.toISOString()}})
-            .embed({domain: true, range: true})
-            .execute()
+            .execute({eagerload: true})
         ]
       } else {
         promises = [modelCov, observationsColl]
@@ -439,10 +438,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
   
   let model = modelGridCoverage
   let modelParam = model.parameters.get(modelParamKey)
-  
-  // options for model subsetting
-  const opts = {embed: {domain: true, range: true}}
-    
+      
   return model.loadDomain().then(modelDomain => {
     for (let [key,axis] of modelDomain.axes) {
       if (['x','y',Z].indexOf(key) === -1 && axis.values.length > 1) {
@@ -495,7 +491,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
           // we want exactly the grid cell in which the observation is located
           let modelX = {start: insituX, stop: insituX}
           let modelY = {start: insituY, stop: insituY}
-          let promise = model.subsetByValue({x: modelX, y: modelY}, opts).then(modelSubset => {
+          let promise = model.subsetByValue({x: modelX, y: modelY}, {eagerload: true}).then(modelSubset => {
             return modelSubset.loadRange(modelParamKey).then(modelSubsetRange => {              
               // collect the values to compare against each other
               let modelVals = []
