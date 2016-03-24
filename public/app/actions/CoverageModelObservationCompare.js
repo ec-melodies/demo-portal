@@ -453,7 +453,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
     
     function deriveCovJSONs (insituCollection) {
       let hasNextPage = insituCollection.paging && insituCollection.paging.next
-      let nextPage = hasNextPage ? insituCollection.paging.next.load() : undefined
+      let nextPage = hasNextPage ? insituCollection.paging.next.load({eagerload: true}) : undefined
       
       let insituCovs = insituCollection.coverages
       
