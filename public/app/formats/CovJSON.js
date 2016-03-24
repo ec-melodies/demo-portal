@@ -17,11 +17,11 @@ export default class CovJSON extends CoverageData {
    * @param urlOrObject Either a URL, a CovJSON object, or a Coverage API object.
    * @returns {Promise} succeeds with a Coverage or Coverage Collection API object
    */
-  doLoad (urlOrObject) {
+  doLoad (urlOrObject, options) {
     if (typeof urlOrObject === 'object' && urlOrObject.loadDomain) {
       return Promise.resolve(urlOrObject)
     } else {
-      return CovJSONReader.read(urlOrObject)
+      return CovJSONReader.read(urlOrObject, options)
         .then(data => RestAPI.wrap(data, {
           loader: CovJSONReader.read
         }))

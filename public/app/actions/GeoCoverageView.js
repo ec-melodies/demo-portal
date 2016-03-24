@@ -175,12 +175,12 @@ export default class GeoCoverageView extends Action {
         let modelCovUrl = usage.model.entity
         let obsCovUrl = usage.observation.entity
         let covJSON = new CovJSON()
-        Promise.all([covJSON.load(modelCovUrl), covJSON.load(obsCovUrl)]).then(([modelCov, obsCov]) => {
+        Promise.all([covJSON.load(modelCovUrl), covJSON.load(obsCovUrl, {eagerload: true})]).then(([modelCov, obsCov]) => {
           return obsCov.loadDomain().then(obsDomain => {
             // TODO handle CRS, reproject 
             let x = obsDomain.axes.get('x').values[0]
             let y = obsDomain.axes.get('y').values[0]
-            return modelCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}).then(modelSubset => {
+            return modelCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true}).then(modelSubset => {
               new ProfilePlot([obsCov,modelSubset], {
                 keys: [[obsParamKey, modelParamKey]],
                 labels: ['Observation', 'Model']

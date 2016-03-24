@@ -26,9 +26,9 @@ export default class Format extends Eventable {
     return actions
   }
   
-  load (input) {
+  load (input, options) {
     this.fire('loading')
-    return this.doLoad(input).then(data => {
+    return this.doLoad(input, options).then(data => {
       console.log(data)
       this.fire('load')
       return data
