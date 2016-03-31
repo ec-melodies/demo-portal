@@ -389,6 +389,57 @@ function getNonCategoricalParams (cov) {
   return params.filter(param => !param.observedProperty.categories)
 }
 
+// TODO move to reusable module
+function subsetGridToPointsSimple (gridCov, points) {
+  return Promise.all(points.map(([x,y]) => {
+    // we want exactly the grid cell in which the point is located
+    return gridCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true})
+  }))
+}
+
+// TODO move to reusable module
+function subsetGridToPointsConnected (gridCov, points) {
+  // try to find rectangles in order to limit the number of grid subset queries
+  
+  let X = 'x'
+  let Y = 'y'
+    
+  let xs = points.map(([x]) => x)
+  let ys = points.map(([,y]) => y)
+  let [xMin,xMax] = [Math.min(...xs), Math.max(...xs)]
+  let [yMin,yMax] = [Math.min(...ys), Math.max(...ys)]
+  
+  return gridCov.loadDomain().then(domain => {
+    // determine resolution of grid (assumes a regular grid)
+    let gridX = domain.axes.get(X).values
+    let gridY = domain.axes.get(Y).values
+    let xStep = Math.abs(gridX[0] - gridX[gridX.length-1])
+    let yStep = Math.abs(gridY[0] - gridY[gridY.length-1])
+    
+    // TODO implement
+    
+    // all points are placed into a 2D hit box
+    let xLen = (xMax - xMin)/xStep + 1
+    let yLen = (yMax - yMin)/yStep + 1
+    let hits = new Uint8Array(xLen * yLen)
+    let xv2i = x => Math.round((x-xMin)/xStep)
+    let yv2i = y => Math.round((y-yMin)/yStep)
+    let idx = (x,y) => yLen*yv2i(y) + xv2i(x)
+    
+    for (let [x,y] of points) {
+      hits[idx(x,y)]++
+    }
+    
+    // find hit rectangles, as big as possible 
+    
+    
+    // convert to axis values
+    
+    // map to subsets
+    
+  })
+}
+
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
 
   // Basic requirements:
@@ -433,6 +484,9 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
   // This would however require that in-situ coverages have a time axis, which is typically not the case,
   // instead each new observation is a separate coverage (the reason is that the z values are often not the same).
   let Z = 'z'
+  
+  let X = 'x'
+  let Y = 'y'
     
   // TODO check that model and insitu coverages have the same CRSs
   
@@ -441,7 +495,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
       
   return model.loadDomain().then(modelDomain => {
     for (let [key,axis] of modelDomain.axes) {
-      if (['x','y',Z].indexOf(key) === -1 && axis.values.length > 1) {
+      if ([X,Y,Z].indexOf(key) === -1 && axis.values.length > 1) {
         throw new Error('Only x,y,' + Z + ' can be varying axes in the model grid, not: ' + key)
       }
     }
@@ -467,32 +521,35 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
           range: insituRanges[i]
         }))
         
-        let promises = []
-        for (let insitu of insitus) {
-          for (let [key,axis] of insitu.domain.axes) {
-            if (key !== Z && axis.values.length > 1) {
-              throw new Error('Only ' + Z + ' can be a varying axis in in-situ coverages, not: ' + key)
+        let points = insitus.map(insitu => [insitu.domain.axes.get(X).values[0], insitu.domain.axes.get(Y).values[0]])
+        let modelSubsetsPromise = subsetGridToPointsSimple(model, points)
+        
+        // TODO wrap the insitu collection/pagination and split into tiles (should happen outside this function)
+        //      then the rectangle search may find bigger rectangles (since observations are naturally clustered then)
+        
+        return modelSubsetsPromise.then(modelSubsets => {
+          let promises = []
+          for (let [insitu, modelSubset] of insitus.map((v,i) => [v, modelSubsets[i]])) {
+            for (let [key,axis] of insitu.domain.axes) {
+              if (key !== Z && axis.values.length > 1) {
+                throw new Error('Only ' + Z + ' can be a varying axis in in-situ coverages, not: ' + key)
+              }
             }
-          }
-          
-          let insituX = insitu.domain.axes.get('x').values[0]
-          let insituY = insitu.domain.axes.get('y').values[0]
-          let insituHasZ = insitu.domain.axes.has(Z)
-          let insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null
-          let insituHasVaryingZ = insituZ && insituZ.length > 1
-          
-          if (insituHasVaryingZ && !modelHasZ) {
-            throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis')
-          }
-          if (!insituHasZ && modelHasVaryingZ) {
-            throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
-          }
-                    
-          // we want exactly the grid cell in which the observation is located
-          let modelX = {start: insituX, stop: insituX}
-          let modelY = {start: insituY, stop: insituY}
-          let promise = model.subsetByValue({x: modelX, y: modelY}, {eagerload: true}).then(modelSubset => {
-            return modelSubset.loadRange(modelParamKey).then(modelSubsetRange => {              
+            
+            let insituX = insitu.domain.axes.get(X).values[0]
+            let insituY = insitu.domain.axes.get(Y).values[0]
+            let insituHasZ = insitu.domain.axes.has(Z)
+            let insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null
+            let insituHasVaryingZ = insituZ && insituZ.length > 1
+            
+            if (insituHasVaryingZ && !modelHasZ) {
+              throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis')
+            }
+            if (!insituHasZ && modelHasVaryingZ) {
+              throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis')
+            }
+            
+            let promise = modelSubset.loadRange(modelParamKey).then(modelSubsetRange => {              
               // collect the values to compare against each other
               let modelVals = []
               let insituVals = []
@@ -599,17 +656,17 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
               
               return covjson            
             })
-          })
-          
-          promises.push(promise)
-        }
-        
-        return Promise.all([Promise.all(promises),nextPage]).then(([covjsons,nextPageColl]) => {
-          if (nextPageColl) {
-            return deriveCovJSONs(nextPageColl).then(nextCovjsons => covjsons.concat(nextCovjsons))
-          } else {
-            return covjsons
+            
+            promises.push(promise)
           }
+          
+          return Promise.all([Promise.all(promises),nextPage]).then(([covjsons,nextPageColl]) => {
+            if (nextPageColl) {
+              return deriveCovJSONs(nextPageColl).then(nextCovjsons => covjsons.concat(nextCovjsons))
+            } else {
+              return covjsons
+            }
+          })
         })
       })
     }
@@ -670,7 +727,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
         "referencing": [{
           // FIXME the order could be different, or even be a x-y-z CRS
           "components": ["x","y"],
-          "system": referencingUtil.getRefSystem(modelDomain, ['x','y'])
+          "system": referencingUtil.getRefSystem(modelDomain, [X,Y])
         }],
         "coverages": covjsons
       }
