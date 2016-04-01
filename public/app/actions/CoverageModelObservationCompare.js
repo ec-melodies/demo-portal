@@ -392,52 +392,217 @@ function getNonCategoricalParams (cov) {
 // TODO move to reusable module
 function subsetGridToPointsSimple (gridCov, points) {
   return Promise.all(points.map(([x,y]) => {
-    // we want exactly the grid cell in which the point is located
+    // we want exactly the grid cell in which the point is locatedlink:
     return gridCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true})
   }))
 }
 
+/**
+ * Returns a subsetted XY grid which fits the given x and y extent.
+ */
+function subsetHorizontalGrid (xVals, yVals, xExtent, yExtent) {
+  let [xMin, xMax] = xExtent
+  let [yMin, yMax] = yExtent
+    
+  // snap xMin, xMax etc to grid
+  xMin = xVals[indexOfNearest(xVals, xMin)]
+  xMax = xVals[indexOfNearest(xVals, xMax)]
+  yMin = yVals[indexOfNearest(yVals, yMin)]
+  yMax = yVals[indexOfNearest(yVals, yMax)]
+  
+  // determine resolution of grid (assumes a regular grid)
+  // TODO support non-regular grids (rectilinear)
+  let dx = Math.abs(xVals[0] - xVals[1])
+  let dy = Math.abs(yVals[0] - yVals[1])
+  
+  let nx = Math.round((xMax - xMin)/dx + 1)
+  let ny = Math.round((yMax - yMin)/dy + 1)
+  let arr = new Uint8Array(nx * ny)
+  
+  // convenience functions
+  let idx = (ix,iy) => nx*iy + ix
+  let xv2i = x => Math.round((x-xMin)/dx)
+  let yv2i = y => Math.round((y-yMin)/dy)
+  let vidx = (x,y) => idx(xv2i(x), yv2i(y))
+
+  return {
+    nx, ny,
+    dx, dy,
+    get: (ix, iy) => arr[idx(ix,iy)],
+    set: (ix, iy, v) => arr[idx(ix,iy)] = v,
+    vset: (x, y, v) => arr[vidx(x,y)] = v,
+    ix2v: ix => xMin + ix * dx,
+    iy2v: iy => yMin + iy * dy
+  }
+}
+
+/*
+// debug function
+function print2D (matrix) {
+  for (let iy=0; iy < matrix.ny; iy++) {
+    let line = ''
+    for (let ix=0; ix < matrix.nx; ix++) {
+      line += matrix.get(ix,iy) + ' '
+    }
+    console.log(line)
+  }
+}
+
+// debug function
+function print2DCoords (matrix) {
+  console.log('x:')
+  let line = ''
+  for (let ix=0; ix < matrix.nx; ix++) {
+    line += matrix.ix2v(ix) + ' '
+  }
+  console.log(line)
+  console.log('y:')
+  for (let iy=0; iy < matrix.ny; iy++) {
+    console.log(matrix.iy2v(iy))
+  }
+}
+*/
+
 // TODO move to reusable module
 function subsetGridToPointsConnected (gridCov, points) {
   // try to find rectangles in order to limit the number of grid subset queries
-  
+    
   let X = 'x'
   let Y = 'y'
     
+  // TODO handle points outside grid domain
+    
   let xs = points.map(([x]) => x)
   let ys = points.map(([,y]) => y)
-  let [xMin,xMax] = [Math.min(...xs), Math.max(...xs)]
-  let [yMin,yMax] = [Math.min(...ys), Math.max(...ys)]
+  let xExtent = [Math.min(...xs), Math.max(...xs)]
+  let yExtent = [Math.min(...ys), Math.max(...ys)]
   
   return gridCov.loadDomain().then(domain => {
-    // determine resolution of grid (assumes a regular grid)
-    let gridX = domain.axes.get(X).values
-    let gridY = domain.axes.get(Y).values
-    let xStep = Math.abs(gridX[0] - gridX[gridX.length-1])
-    let yStep = Math.abs(gridY[0] - gridY[gridY.length-1])
-    
-    // TODO implement
-    
-    // all points are placed into a 2D hit box
-    let xLen = (xMax - xMin)/xStep + 1
-    let yLen = (yMax - yMin)/yStep + 1
-    let hits = new Uint8Array(xLen * yLen)
-    let xv2i = x => Math.round((x-xMin)/xStep)
-    let yv2i = y => Math.round((y-yMin)/yStep)
-    let idx = (x,y) => yLen*yv2i(y) + xv2i(x)
-    
+    let hits = subsetHorizontalGrid(domain.axes.get(X).values, domain.axes.get(Y).values, xExtent, yExtent)
+            
+    // all points are placed into a 2D hit matrix
     for (let [x,y] of points) {
-      hits[idx(x,y)]++
+      hits.vset(x, y, 1)
     }
+        
+    // find hit rectangles, as big as possible
+    // an approximative algorithm is used, picking the first rectangles it finds
+    let rectangles = findRectangles(hits)
     
-    // find hit rectangles, as big as possible 
-    
+    // some debug stats
+    let sizes = rectangles.map(([ix1,iy1,ix2,iy2]) => (ix2-ix1+1) * (iy2-iy1+1))
+    let connected = sizes.filter(s => s > 1).length
+    console.log('grid subset queries total: ' + rectangles.length + ', connected: ' + connected)
     
     // convert to axis values
+    let rectanglesCenter = rectangles.map(([ix1,iy1,ix2,iy2]) => 
+      [hits.ix2v(ix1), hits.iy2v(iy1), 
+       hits.ix2v(ix2), hits.iy2v(iy2)])
     
+    let {dx,dy} = hits
+    let rectanglesBounds = rectanglesCenter.map(([x1,y1,x2,y2]) => 
+      [x1-dx/2, y1-dy/2, 
+       x2+dx/2, y2+dy/2])
+
     // map to subsets
+    // the center coordinates are used to avoid fetching neighboring cells
+    let rectSubsetPromises = rectanglesCenter.map(([x1,y1,x2,y2]) => 
+      gridCov.subsetByValue({x: {start: x1, stop: x2}, y: {start: y1, stop: y2}}, {eagerload: true}))
     
+    return Promise.all(rectSubsetPromises).then(rectSubsets => {
+      let pointSubsetPromises = []
+      for (let [x,y] of points) {
+        let rectSubset
+        for (let i=0; i < rectangles.length; i++) {
+          let [x1,y1,x2,y2] = rectanglesBounds[i]
+          if (x1 <= x && x <= x2 && y1 <= y && y <= y2) {
+            rectSubset = rectSubsets[i]
+            break
+          }
+        }
+        if (!rectSubset) {
+          throw new Error('bug')
+        }
+        // TODO check if this subset is done locally by coverage-rest-client
+        //  -> currently yes because coverage-rest-client can't handle API info within "derivedFrom"
+        //     (fortunate coincidence! fix it!)
+        pointSubsetPromises.push(rectSubset.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true}))
+      }
+      return Promise.all(pointSubsetPromises)
+    })
   })
+}
+
+/**
+ * Returns as-big-as-possible rectangles of 1's in a 2D matrix.
+ * 
+ * Note: The matrix gets modified in-place during processing.
+ * 
+ * TODO move to reusable module
+ * 
+ * @param {object} matrix An object with get(ix,iy), set(ix,iy,v) functions and nx, ny properties
+ * @returns {array<[x1,y1,x2,y2]>} rectangles with top-left and bottom-right index coordinates
+ */
+function findRectangles (matrix) {
+  /* matrix:
+   * 1 1 1 0 1
+   * 1 1 0 1 1
+   * 0 0 1 1 1
+   */
+  
+  let {nx,ny} = matrix
+  
+  // find hit rectangles, as big as possible
+  // an approximative algorithm is used, picking the first rectangles it finds
+
+  // pre-compute vertical lengths of consecutive 1s
+  for (let iy=ny-2; iy >= 0; iy--) {
+    for (let ix=0; ix < nx; ix++) {
+      let val = matrix.get(ix, iy)
+      if (val > 0) {
+        matrix.set(ix, iy, val + matrix.get(ix, iy+1))
+      }
+    }
+  }
+  
+  /* matrix:
+   * 2 2 1 0 3
+   * 1 1 0 2 2
+   * 0 0 1 1 1
+   */
+  
+  // now iterate through each row and if v > 0 then expand to the right until value <  v
+  // and mark found rectangles as 0 in matrix matrix
+  let rectangles = []
+  
+  for (let iy=0; iy < ny; iy++) {
+    for (let ix=0; ix < nx; ix++) {
+      // any hit here?
+      let v = matrix.get(ix, iy)
+      if (v === 0) {
+        continue
+      }
+      // expand rectangle to the right keeping initial height
+      let ix2 = ix + 1
+      while (ix2 < nx && matrix.get(ix2, iy) >= v) {
+        ix2++
+      }
+      ix2 -= 1
+      let iy2 = iy + v - 1
+      // add the found rectangle
+      rectangles.push([ix, iy, ix2, iy2])
+      // clear rectangle area (skip over first row as we don't look at it again)
+      for (let iy3=iy+1; iy3 <= iy2; iy3++) {
+        for (let ix3=ix; ix3 <= ix2; ix3++) {
+          matrix.set(ix3, iy3, 0)
+        }
+      }
+      // skip over rectangle
+      ix = ix2
+    }
+  }
+  
+  return rectangles
 }
 
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
@@ -521,8 +686,11 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
           range: insituRanges[i]
         }))
         
-        let points = insitus.map(insitu => [insitu.domain.axes.get(X).values[0], insitu.domain.axes.get(Y).values[0]])
-        let modelSubsetsPromise = subsetGridToPointsSimple(model, points)
+        let points = insitus.map(insitu => ({x: insitu.domain.axes.get(X).values[0], y: insitu.domain.axes.get(Y).values[0]}))
+        let fromProj = referencingUtil.getProjection(insituDomains[0])
+        let toProj = referencingUtil.getProjection(modelDomain)
+        points = points.map(point => referencingUtil.reproject(point, fromProj, toProj)).map(({x,y}) => [x,y])
+        let modelSubsetsPromise = subsetGridToPointsConnected(model, points)
         
         // TODO wrap the insitu collection/pagination and split into tiles (should happen outside this function)
         //      then the rectangle search may find bigger rectangles (since observations are naturally clustered then)
