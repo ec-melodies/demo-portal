@@ -466,7 +466,11 @@ function print2DCoords (matrix) {
 // TODO move to reusable module
 function subsetGridToPointsConnected (gridCov, points) {
   // try to find rectangles in order to limit the number of grid subset queries
-    
+  
+  if (points.length === 0) {
+    return Promise.resolve([])
+  }
+  
   let X = 'x'
   let Y = 'y'
     
@@ -523,10 +527,8 @@ function subsetGridToPointsConnected (gridCov, points) {
         if (!rectSubset) {
           throw new Error('bug')
         }
-        // TODO check if this subset is done locally by coverage-rest-client
-        //  -> currently yes because coverage-rest-client can't handle API info within "derivedFrom"
-        //     (fortunate coincidence! fix it!)
-        pointSubsetPromises.push(rectSubset.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true}))
+        // the following subsetting will not do a network request since all data has been eagerly loaded already
+        pointSubsetPromises.push(rectSubset.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}))
       }
       return Promise.all(pointSubsetPromises)
     })
@@ -605,6 +607,100 @@ function findRectangles (matrix) {
   return rectangles
 }
 
+/**
+ * Load and return all coverages of all pages of the collection.
+ * 
+ * TODO move to reusable module
+ * 
+ * @param {CoverageCollection} collection The first page of the collection.
+ * @param {object} [options] Options to use when loading pages.
+ * @returns {Promise<Array>} Promise succeeding with an array of coverage objects.
+ */
+function loadAllCoverages (collection, options) {
+  let hasNext = collection.paging && collection.paging.next
+  let nextPage = hasNext ? collection.paging.next.load(options) : Promise.resolve()
+  let covs = collection.coverages
+  return nextPage.then(nextPageColl => {
+    if (nextPageColl) {
+      return loadAllCoverages(nextPageColl, options).then(nextCovs => covs.concat(nextCovs))
+    } else {
+      return covs
+    }
+  })
+}
+
+/**
+ * Returns a derived collection where coverages are organized into tile pages.
+ * Each page corresponds to a tile.
+ * A tile will contain all coverages which intersect that tile, meaning that
+ * coverages may appear in multiple tiles if they have an extent greater than
+ * a point. 
+ *  
+ * TODO move to reusable module
+ * 
+ * @param {CoverageCollection} coll A coverage collection with coverages having x/y components.
+ * @param {array<[xmin,ymin,xmax,ymax]>} tileExtents A non-empty array of tile extents in domain coordinates.
+ * @param {object} [queryOptions] Options to use when filtering or paging through the collection (e.g. ``{eagerload: true}``).
+ * @return {Promise<CoverageCollection>} A Promise succeeding with the tiled coverage collection.
+ */
+function getTiledCollection (coll, tileExtents, queryOptions) {
+  function getCollectionTile (i) {
+    let [xmin,ymin,xmax,ymax] = tileExtents[i]
+    let filter = {
+      x: {start: xmin, stop: xmax}, 
+      y: {start: ymin, stop: ymax}
+    }
+    return coll.query().filter(filter).execute(queryOptions)
+      .then(filteredColl => loadAllCoverages(filteredColl, queryOptions))
+      .then(covs => {
+        let tiledColl = {
+          id: coll.id,
+          profiles: coll.profiles, // TODO may not be valid anymore, what do we do?
+          parameters: coll.parameters,
+          coverages: covs
+          // we don't implement .query() for now since we don't need it
+        }
+        if (i < tileExtents.length - 1) {
+          tiledColl.paging = {
+            next: {
+              load: options => getCollectionTile(i+1)
+            }
+          }
+        }
+        return tiledColl
+    })
+  }  
+  return getCollectionTile(0)
+}
+
+/**
+ * Return tile extents for use in getTiledCollection().
+ * 
+ * @param {array} xExtent
+ * @param {array} yExtent
+ * @param {number} nx number of tiles along x axis
+ * @param {number} ny number of tiles along y axis
+ * @returns {Array<[xmin,ymin,xmax,ymax]>} of size nx*ny
+ */
+function getTileExtents (xExtent, yExtent, nx, ny) {
+  /** Lazy version of numpy's linspace function. */
+  function linspace (start, stop, num) {
+    let step = (stop - start) / (num - 1)
+    return i => start + i * step
+  }
+  let xs = linspace(xExtent[0], xExtent[1], nx)
+  let ys = linspace(yExtent[0], yExtent[1], ny)
+  let extents = []
+  for (let i=0; i < nx - 1; i++) {
+    for (let j=0; j < ny - 1; j++) {
+      let [xmin,xmax] = [xs(i), xs(i+1)]
+      let [ymin,ymax] = [ys(j), ys(j+1)]
+      extents.push([xmin, ymin, xmax, ymax])
+    }
+  }
+  return extents
+}
+
 function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
 
   // Basic requirements:
@@ -657,7 +753,23 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
   
   let model = modelGridCoverage
   let modelParam = model.parameters.get(modelParamKey)
-      
+  
+  function getAxisExtent (axis, withBounds=false) {
+    if (!axis) {
+      return [undefined, undefined]
+    }
+    let vals = axis.values
+    let min = Math.min(vals[0], vals[vals.length-1])
+    let max = Math.max(vals[0], vals[vals.length-1])
+    // TODO handle explicit bounds
+    if (withBounds && vals.length > 1) {
+      let halfCell = Math.abs(vals[0] - vals[1]) / 2
+      min -= halfCell
+      max += halfCell
+    }
+    return [min, max]
+  }
+        
   return model.loadDomain().then(modelDomain => {
     for (let [key,axis] of modelDomain.axes) {
       if ([X,Y,Z].indexOf(key) === -1 && axis.values.length > 1) {
@@ -667,9 +779,8 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
     let modelHasZ = modelDomain.axes.has(Z)
     let modelZ = modelHasZ ? modelDomain.axes.get(Z).values : null
     let modelHasVaryingZ = modelZ && modelZ.length > 1
-    let modelZMin = modelZ ? Math.min(modelZ[0], modelZ[modelZ.length-1]) : null
-    let modelZMax = modelZ ? Math.max(modelZ[0], modelZ[modelZ.length-1]) : null
-    
+    let [modelZMin,modelZMax] = getAxisExtent(modelDomain.axes.get(Z))
+        
     function deriveCovJSONs (insituCollection) {
       let hasNextPage = insituCollection.paging && insituCollection.paging.next
       let nextPage = hasNextPage ? insituCollection.paging.next.load({eagerload: true}) : undefined
@@ -687,13 +798,12 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
         }))
         
         let points = insitus.map(insitu => ({x: insitu.domain.axes.get(X).values[0], y: insitu.domain.axes.get(Y).values[0]}))
-        let fromProj = referencingUtil.getProjection(insituDomains[0])
-        let toProj = referencingUtil.getProjection(modelDomain)
-        points = points.map(point => referencingUtil.reproject(point, fromProj, toProj)).map(({x,y}) => [x,y])
+        if (points.length > 0) {
+          let fromProj = referencingUtil.getProjection(insituDomains[0])
+          let toProj = referencingUtil.getProjection(modelDomain)
+          points = points.map(point => referencingUtil.reproject(point, fromProj, toProj)).map(({x,y}) => [x,y])
+        }
         let modelSubsetsPromise = subsetGridToPointsConnected(model, points)
-        
-        // TODO wrap the insitu collection/pagination and split into tiles (should happen outside this function)
-        //      then the rectangle search may find bigger rectangles (since observations are naturally clustered then)
         
         return modelSubsetsPromise.then(modelSubsets => {
           let promises = []
@@ -839,7 +949,15 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
       })
     }
     
-    return deriveCovJSONs(insituCoverageCollection).then(covjsons => {
+    // get a tiled collection to help the model subsetting rectangle-based algorithm
+    let modelXExtent = getAxisExtent(modelDomain.axes.get(X), true)
+    let modelYExtent = getAxisExtent(modelDomain.axes.get(Y), true)
+    // TODO make this depend on something
+    let nx = 6
+    let ny = nx
+    let tileExtents = getTileExtents(modelXExtent, modelYExtent, nx, ny)
+    let tiledInsituCoverageCollection
+    return getTiledCollection(insituCoverageCollection, tileExtents, {eagerload: true}).then(deriveCovJSONs).then(covjsons => {
       // put statistical point coverages into a CovJSON collection
       
       covjsons = covjsons.filter(o => o) // filter empty results
