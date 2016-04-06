@@ -1,5 +1,7 @@
 # MELODIES demonstrator portal
 
+http://ec-melodies.github.io/demo-portal/
+
 A web portal which demonstrates the technologies developed and used within the MELODIES project.
 
 Have a look at the [development plan](https://github.com/ec-melodies/demo-portal/wiki/Development-Plan) to see when certain
