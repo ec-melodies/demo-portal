@@ -1,4 +1,3 @@
-"format global";
 /* */ 
 "format global";
 (function (global) {
@@ -429,845 +428,18 @@
   };
 })(typeof global === "undefined" ? self : global);
 
-(function(global) {
+!function(e){function r(e,r,o){return 4===arguments.length?t.apply(this,arguments):void n(e,{declarative:!0,deps:r,declare:o})}function t(e,r,t,o){n(e,{declarative:!1,deps:r,executingRequire:t,execute:o})}function n(e,r){r.name=e,e in p||(p[e]=r),r.normalizedDeps=r.deps}function o(e,r){if(r[e.groupIndex]=r[e.groupIndex]||[],-1==v.call(r[e.groupIndex],e)){r[e.groupIndex].push(e);for(var t=0,n=e.normalizedDeps.length;n>t;t++){var a=e.normalizedDeps[t],u=p[a];if(u&&!u.evaluated){var d=e.groupIndex+(u.declarative!=e.declarative);if(void 0===u.groupIndex||u.groupIndex<d){if(void 0!==u.groupIndex&&(r[u.groupIndex].splice(v.call(r[u.groupIndex],u),1),0==r[u.groupIndex].length))throw new TypeError("Mixed dependency cycle detected");u.groupIndex=d}o(u,r)}}}}function a(e){var r=p[e];r.groupIndex=0;var t=[];o(r,t);for(var n=!!r.declarative==t.length%2,a=t.length-1;a>=0;a--){for(var u=t[a],i=0;i<u.length;i++){var s=u[i];n?d(s):l(s)}n=!n}}function u(e){return x[e]||(x[e]={name:e,dependencies:[],exports:{},importers:[]})}function d(r){if(!r.module){var t=r.module=u(r.name),n=r.module.exports,o=r.declare.call(e,function(e,r){if(t.locked=!0,"object"==typeof e)for(var o in e)n[o]=e[o];else n[e]=r;for(var a=0,u=t.importers.length;u>a;a++){var d=t.importers[a];if(!d.locked)for(var i=0;i<d.dependencies.length;++i)d.dependencies[i]===t&&d.setters[i](n)}return t.locked=!1,r},r.name);t.setters=o.setters,t.execute=o.execute;for(var a=0,i=r.normalizedDeps.length;i>a;a++){var l,s=r.normalizedDeps[a],c=p[s],v=x[s];v?l=v.exports:c&&!c.declarative?l=c.esModule:c?(d(c),v=c.module,l=v.exports):l=f(s),v&&v.importers?(v.importers.push(t),t.dependencies.push(v)):t.dependencies.push(null),t.setters[a]&&t.setters[a](l)}}}function i(e){var r,t=p[e];if(t)t.declarative?c(e,[]):t.evaluated||l(t),r=t.module.exports;else if(r=f(e),!r)throw new Error("Unable to load dependency "+e+".");return(!t||t.declarative)&&r&&r.__useDefault?r["default"]:r}function l(r){if(!r.module){var t={},n=r.module={exports:t,id:r.name};if(!r.executingRequire)for(var o=0,a=r.normalizedDeps.length;a>o;o++){var u=r.normalizedDeps[o],d=p[u];d&&l(d)}r.evaluated=!0;var c=r.execute.call(e,function(e){for(var t=0,n=r.deps.length;n>t;t++)if(r.deps[t]==e)return i(r.normalizedDeps[t]);throw new TypeError("Module "+e+" not declared as a dependency.")},t,n);c&&(n.exports=c),t=n.exports,t&&t.__esModule?r.esModule=t:r.esModule=s(t)}}function s(r){if(r===e)return r;var t={};if("object"==typeof r||"function"==typeof r)if(g){var n;for(var o in r)(n=Object.getOwnPropertyDescriptor(r,o))&&h(t,o,n)}else{var a=r&&r.hasOwnProperty;for(var o in r)(!a||r.hasOwnProperty(o))&&(t[o]=r[o])}return t["default"]=r,h(t,"__useDefault",{value:!0}),t}function c(r,t){var n=p[r];if(n&&!n.evaluated&&n.declarative){t.push(r);for(var o=0,a=n.normalizedDeps.length;a>o;o++){var u=n.normalizedDeps[o];-1==v.call(t,u)&&(p[u]?c(u,t):f(u))}n.evaluated||(n.evaluated=!0,n.module.execute.call(e))}}function f(e){if(D[e])return D[e];if("@node/"==e.substr(0,6))return y(e.substr(6));var r=p[e];if(!r)throw"Module "+e+" not present.";return a(e),c(e,[]),p[e]=void 0,r.declarative&&h(r.module.exports,"__esModule",{value:!0}),D[e]=r.declarative?r.module.exports:r.esModule}var p={},v=Array.prototype.indexOf||function(e){for(var r=0,t=this.length;t>r;r++)if(this[r]===e)return r;return-1},g=!0;try{Object.getOwnPropertyDescriptor({a:0},"a")}catch(m){g=!1}var h;!function(){try{Object.defineProperty({},"a",{})&&(h=Object.defineProperty)}catch(e){h=function(e,r,t){try{e[r]=t.value||t.get.call(e)}catch(n){}}}}();var x={},y="undefined"!=typeof System&&System._nodeRequire||"undefined"!=typeof require&&require.resolve&&"undefined"!=typeof process&&require,D={"@empty":{}};return function(e,n,o){return function(a){a(function(a){for(var u={_nodeRequire:y,register:r,registerDynamic:t,get:f,set:function(e,r){D[e]=r},newModule:function(e){return e}},d=0;d<n.length;d++)(function(e,r){r&&r.__esModule?D[e]=r:D[e]=s(r)})(n[d],arguments[d]);o(u);var i=f(e[0]);if(e.length>1)for(var d=1;d<e.length;d++)f(e[d]);return i.__useDefault?i["default"]:i})}}}("undefined"!=typeof self?self:global)
 
-  var defined = {};
+(["1"], [], function($__System, require) {
 
-  // indexOf polyfill for IE8
-  var indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++)
-      if (this[i] === item)
-        return i;
-    return -1;
-  }
-
-  var getOwnPropertyDescriptor = true;
-  try {
-    Object.getOwnPropertyDescriptor({ a: 0 }, 'a');
-  }
-  catch(e) {
-    getOwnPropertyDescriptor = false;
-  }
-
-  var defineProperty;
-  (function () {
-    try {
-      if (!!Object.defineProperty({}, 'a', {}))
-        defineProperty = Object.defineProperty;
-    }
-    catch (e) {
-      defineProperty = function(obj, prop, opt) {
-        try {
-          obj[prop] = opt.value || opt.get.call(obj);
-        }
-        catch(e) {}
-      }
-    }
-  })();
-
-  function register(name, deps, declare) {
-    if (arguments.length === 4)
-      return registerDynamic.apply(this, arguments);
-    doRegister(name, {
-      declarative: true,
-      deps: deps,
-      declare: declare
-    });
-  }
-
-  function registerDynamic(name, deps, executingRequire, execute) {
-    doRegister(name, {
-      declarative: false,
-      deps: deps,
-      executingRequire: executingRequire,
-      execute: execute
-    });
-  }
-
-  function doRegister(name, entry) {
-    entry.name = name;
-
-    // we never overwrite an existing define
-    if (!(name in defined))
-      defined[name] = entry;
-
-    // we have to normalize dependencies
-    // (assume dependencies are normalized for now)
-    // entry.normalizedDeps = entry.deps.map(normalize);
-    entry.normalizedDeps = entry.deps;
-  }
-
-
-  function buildGroups(entry, groups) {
-    groups[entry.groupIndex] = groups[entry.groupIndex] || [];
-
-    if (indexOf.call(groups[entry.groupIndex], entry) != -1)
-      return;
-
-    groups[entry.groupIndex].push(entry);
-
-    for (var i = 0, l = entry.normalizedDeps.length; i < l; i++) {
-      var depName = entry.normalizedDeps[i];
-      var depEntry = defined[depName];
-
-      // not in the registry means already linked / ES6
-      if (!depEntry || depEntry.evaluated)
-        continue;
-
-      // now we know the entry is in our unlinked linkage group
-      var depGroupIndex = entry.groupIndex + (depEntry.declarative != entry.declarative);
-
-      // the group index of an entry is always the maximum
-      if (depEntry.groupIndex === undefined || depEntry.groupIndex < depGroupIndex) {
-
-        // if already in a group, remove from the old group
-        if (depEntry.groupIndex !== undefined) {
-          groups[depEntry.groupIndex].splice(indexOf.call(groups[depEntry.groupIndex], depEntry), 1);
-
-          // if the old group is empty, then we have a mixed depndency cycle
-          if (groups[depEntry.groupIndex].length == 0)
-            throw new TypeError("Mixed dependency cycle detected");
-        }
-
-        depEntry.groupIndex = depGroupIndex;
-      }
-
-      buildGroups(depEntry, groups);
-    }
-  }
-
-  function link(name) {
-    var startEntry = defined[name];
-
-    startEntry.groupIndex = 0;
-
-    var groups = [];
-
-    buildGroups(startEntry, groups);
-
-    var curGroupDeclarative = !!startEntry.declarative == groups.length % 2;
-    for (var i = groups.length - 1; i >= 0; i--) {
-      var group = groups[i];
-      for (var j = 0; j < group.length; j++) {
-        var entry = group[j];
-
-        // link each group
-        if (curGroupDeclarative)
-          linkDeclarativeModule(entry);
-        else
-          linkDynamicModule(entry);
-      }
-      curGroupDeclarative = !curGroupDeclarative; 
-    }
-  }
-
-  // module binding records
-  var moduleRecords = {};
-  function getOrCreateModuleRecord(name) {
-    return moduleRecords[name] || (moduleRecords[name] = {
-      name: name,
-      dependencies: [],
-      exports: {}, // start from an empty module and extend
-      importers: []
-    })
-  }
-
-  function linkDeclarativeModule(entry) {
-    // only link if already not already started linking (stops at circular)
-    if (entry.module)
-      return;
-
-    var module = entry.module = getOrCreateModuleRecord(entry.name);
-    var exports = entry.module.exports;
-
-    var declaration = entry.declare.call(global, function(name, value) {
-      module.locked = true;
-
-      if (typeof name == 'object') {
-        for (var p in name)
-          exports[p] = name[p];
-      }
-      else {
-        exports[name] = value;
-      }
-
-      for (var i = 0, l = module.importers.length; i < l; i++) {
-        var importerModule = module.importers[i];
-        if (!importerModule.locked) {
-          for (var j = 0; j < importerModule.dependencies.length; ++j) {
-            if (importerModule.dependencies[j] === module) {
-              importerModule.setters[j](exports);
-            }
-          }
-        }
-      }
-
-      module.locked = false;
-      return value;
-    }, entry.name);
-
-    module.setters = declaration.setters;
-    module.execute = declaration.execute;
-
-    // now link all the module dependencies
-    for (var i = 0, l = entry.normalizedDeps.length; i < l; i++) {
-      var depName = entry.normalizedDeps[i];
-      var depEntry = defined[depName];
-      var depModule = moduleRecords[depName];
-
-      // work out how to set depExports based on scenarios...
-      var depExports;
-
-      if (depModule) {
-        depExports = depModule.exports;
-      }
-      else if (depEntry && !depEntry.declarative) {
-        depExports = depEntry.esModule;
-      }
-      // in the module registry
-      else if (!depEntry) {
-        depExports = load(depName);
-      }
-      // we have an entry -> link
-      else {
-        linkDeclarativeModule(depEntry);
-        depModule = depEntry.module;
-        depExports = depModule.exports;
-      }
-
-      // only declarative modules have dynamic bindings
-      if (depModule && depModule.importers) {
-        depModule.importers.push(module);
-        module.dependencies.push(depModule);
-      }
-      else
-        module.dependencies.push(null);
-
-      // run the setter for this dependency
-      if (module.setters[i])
-        module.setters[i](depExports);
-    }
-  }
-
-  // An analog to loader.get covering execution of all three layers (real declarative, simulated declarative, simulated dynamic)
-  function getModule(name) {
-    var exports;
-    var entry = defined[name];
-
-    if (!entry) {
-      exports = load(name);
-      if (!exports)
-        throw new Error("Unable to load dependency " + name + ".");
-    }
-
-    else {
-      if (entry.declarative)
-        ensureEvaluated(name, []);
-
-      else if (!entry.evaluated)
-        linkDynamicModule(entry);
-
-      exports = entry.module.exports;
-    }
-
-    if ((!entry || entry.declarative) && exports && exports.__useDefault)
-      return exports['default'];
-
-    return exports;
-  }
-
-  function linkDynamicModule(entry) {
-    if (entry.module)
-      return;
-
-    var exports = {};
-
-    var module = entry.module = { exports: exports, id: entry.name };
-
-    // AMD requires execute the tree first
-    if (!entry.executingRequire) {
-      for (var i = 0, l = entry.normalizedDeps.length; i < l; i++) {
-        var depName = entry.normalizedDeps[i];
-        var depEntry = defined[depName];
-        if (depEntry)
-          linkDynamicModule(depEntry);
-      }
-    }
-
-    // now execute
-    entry.evaluated = true;
-    var output = entry.execute.call(global, function(name) {
-      for (var i = 0, l = entry.deps.length; i < l; i++) {
-        if (entry.deps[i] != name)
-          continue;
-        return getModule(entry.normalizedDeps[i]);
-      }
-      throw new TypeError('Module ' + name + ' not declared as a dependency.');
-    }, exports, module);
-
-    if (output)
-      module.exports = output;
-
-    // create the esModule object, which allows ES6 named imports of dynamics
-    exports = module.exports;
- 
-    if (exports && exports.__esModule) {
-      entry.esModule = exports;
-    }
-    else {
-      entry.esModule = {};
-      
-      // don't trigger getters/setters in environments that support them
-      if ((typeof exports == 'object' || typeof exports == 'function') && exports !== global) {
-        if (getOwnPropertyDescriptor) {
-          var d;
-          for (var p in exports)
-            if (d = Object.getOwnPropertyDescriptor(exports, p))
-              defineProperty(entry.esModule, p, d);
-        }
-        else {
-          var hasOwnProperty = exports && exports.hasOwnProperty;
-          for (var p in exports) {
-            if (!hasOwnProperty || exports.hasOwnProperty(p))
-              entry.esModule[p] = exports[p];
-          }
-         }
-       }
-      entry.esModule['default'] = exports;
-      defineProperty(entry.esModule, '__useDefault', {
-        value: true
-      });
-    }
-  }
-
-  /*
-   * Given a module, and the list of modules for this current branch,
-   *  ensure that each of the dependencies of this module is evaluated
-   *  (unless one is a circular dependency already in the list of seen
-   *  modules, in which case we execute it)
-   *
-   * Then we evaluate the module itself depth-first left to right 
-   * execution to match ES6 modules
-   */
-  function ensureEvaluated(moduleName, seen) {
-    var entry = defined[moduleName];
-
-    // if already seen, that means it's an already-evaluated non circular dependency
-    if (!entry || entry.evaluated || !entry.declarative)
-      return;
-
-    // this only applies to declarative modules which late-execute
-
-    seen.push(moduleName);
-
-    for (var i = 0, l = entry.normalizedDeps.length; i < l; i++) {
-      var depName = entry.normalizedDeps[i];
-      if (indexOf.call(seen, depName) == -1) {
-        if (!defined[depName])
-          load(depName);
-        else
-          ensureEvaluated(depName, seen);
-      }
-    }
-
-    if (entry.evaluated)
-      return;
-
-    entry.evaluated = true;
-    entry.module.execute.call(global);
-  }
-
-  // magical execution function
-  var modules = {};
-  function load(name) {
-    if (modules[name])
-      return modules[name];
-
-    // node core modules
-    if (name.substr(0, 6) == '@node/')
-      return require(name.substr(6));
-
-    var entry = defined[name];
-
-    // first we check if this module has already been defined in the registry
-    if (!entry)
-      throw "Module " + name + " not present.";
-
-    // recursively ensure that the module and all its 
-    // dependencies are linked (with dependency group handling)
-    link(name);
-
-    // now handle dependency execution in correct order
-    ensureEvaluated(name, []);
-
-    // remove from the registry
-    defined[name] = undefined;
-
-    // exported modules get __esModule defined for interop
-    if (entry.declarative)
-      defineProperty(entry.module.exports, '__esModule', { value: true });
-
-    // return the defined module object
-    return modules[name] = entry.declarative ? entry.module.exports : entry.esModule;
-  };
-
-  return function(mains, depNames, declare) {
-    return function(formatDetect) {
-      formatDetect(function(deps) {
-        var System = {
-          _nodeRequire: typeof require != 'undefined' && require.resolve && typeof process != 'undefined' && require,
-          register: register,
-          registerDynamic: registerDynamic,
-          get: load, 
-          set: function(name, module) {
-            modules[name] = module; 
-          },
-          newModule: function(module) {
-            return module;
-          }
-        };
-        System.set('@empty', {});
-
-        // register external dependencies
-        for (var i = 0; i < depNames.length; i++) (function(depName, dep) {
-          if (dep && dep.__esModule)
-            System.register(depName, [], function(_export) {
-              return {
-                setters: [],
-                execute: function() {
-                  for (var p in dep)
-                    if (p != '__esModule' && !(typeof p == 'object' && p + '' == 'Module'))
-                      _export(p, dep[p]);
-                }
-              };
-            });
-          else
-            System.registerDynamic(depName, [], false, function() {
-              return dep;
-            });
-        })(depNames[i], arguments[i]);
-
-        // register modules in this bundle
-        declare(System);
-
-        // load mains
-        var firstLoad = load(mains[0]);
-        if (mains.length > 1)
-          for (var i = 1; i < mains.length; i++)
-            load(mains[i]);
-
-        if (firstLoad.__useDefault)
-          return firstLoad['default'];
-        else
-          return firstLoad;
-      });
-    };
-  };
-
-})(typeof self != 'undefined' ? self : global)
-/* (['mainModule'], ['external-dep'], function($__System) {
-  System.register(...);
-})
-(function(factory) {
-  if (typeof define && define.amd)
-    define(['external-dep'], factory);
-  // etc UMD / module pattern
-})*/
-
-(["1"], [], function($__System) {
-
-(function(__global) {
-  var loader = $__System;
-  var hasOwnProperty = Object.prototype.hasOwnProperty;
-  var indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++)
-      if (this[i] === item)
-        return i;
-    return -1;
-  }
-
-  function readMemberExpression(p, value) {
-    var pParts = p.split('.');
-    while (pParts.length)
-      value = value[pParts.shift()];
-    return value;
-  }
-
-  // bare minimum ignores for IE8
-  var ignoredGlobalProps = ['_g', 'sessionStorage', 'localStorage', 'clipboardData', 'frames', 'frameElement', 'external', 'mozAnimationStartTime', 'webkitStorageInfo', 'webkitIndexedDB'];
-
-  var globalSnapshot;
-
-  function forEachGlobal(callback) {
-    if (Object.keys)
-      Object.keys(__global).forEach(callback);
-    else
-      for (var g in __global) {
-        if (!hasOwnProperty.call(__global, g))
-          continue;
-        callback(g);
-      }
-  }
-
-  function forEachGlobalValue(callback) {
-    forEachGlobal(function(globalName) {
-      if (indexOf.call(ignoredGlobalProps, globalName) != -1)
-        return;
-      try {
-        var value = __global[globalName];
-      }
-      catch (e) {
-        ignoredGlobalProps.push(globalName);
-      }
-      callback(globalName, value);
-    });
-  }
-
-  loader.set('@@global-helpers', loader.newModule({
-    prepareGlobal: function(moduleName, exportName, globals) {
-      // disable module detection
-      var curDefine = __global.define;
-       
-      __global.define = undefined;
-      __global.exports = undefined;
-      if (__global.module && __global.module.exports)
-        __global.module = undefined;
-
-      // set globals
-      var oldGlobals;
-      if (globals) {
-        oldGlobals = {};
-        for (var g in globals) {
-          oldGlobals[g] = __global[g];
-          __global[g] = globals[g];
-        }
-      }
-
-      // store a complete copy of the global object in order to detect changes
-      if (!exportName) {
-        globalSnapshot = {};
-
-        forEachGlobalValue(function(name, value) {
-          globalSnapshot[name] = value;
-        });
-      }
-
-      // return function to retrieve global
-      return function() {
-        var globalValue;
-
-        if (exportName) {
-          globalValue = readMemberExpression(exportName, __global);
-        }
-        else {
-          var singleGlobal;
-          var multipleExports;
-          var exports = {};
-
-          forEachGlobalValue(function(name, value) {
-            if (globalSnapshot[name] === value)
-              return;
-            if (typeof value == 'undefined')
-              return;
-            exports[name] = value;
-
-            if (typeof singleGlobal != 'undefined') {
-              if (!multipleExports && singleGlobal !== value)
-                multipleExports = true;
-            }
-            else {
-              singleGlobal = value;
-            }
-          });
-          globalValue = multipleExports ? exports : singleGlobal;
-        }
-
-        // revert globals
-        if (oldGlobals) {
-          for (var g in oldGlobals)
-            __global[g] = oldGlobals[g];
-        }
-        __global.define = curDefine;
-
-        return globalValue;
-      };
-    }
-  }));
-
-})(typeof self != 'undefined' ? self : global);
-
-(function() {
-  var loader = $__System;
-  
-  if (typeof window != 'undefined' && typeof document != 'undefined' && window.location)
-    var windowOrigin = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
-
-  loader.set('@@cjs-helpers', loader.newModule({
-    getPathVars: function(moduleId) {
-      // remove any plugin syntax
-      var pluginIndex = moduleId.lastIndexOf('!');
-      var filename;
-      if (pluginIndex != -1)
-        filename = moduleId.substr(0, pluginIndex);
-      else
-        filename = moduleId;
-
-      var dirname = filename.split('/');
-      dirname.pop();
-      dirname = dirname.join('/');
-
-      if (filename.substr(0, 8) == 'file:///') {
-        filename = filename.substr(7);
-        dirname = dirname.substr(7);
-
-        // on windows remove leading '/'
-        if (isWindows) {
-          filename = filename.substr(1);
-          dirname = dirname.substr(1);
-        }
-      }
-      else if (windowOrigin && filename.substr(0, windowOrigin.length) === windowOrigin) {
-        filename = filename.substr(windowOrigin.length);
-        dirname = dirname.substr(windowOrigin.length);
-      }
-
-      return {
-        filename: filename,
-        dirname: dirname
-      };
-    }
-  }));
-})();
-
-(function(__global) {
-  var loader = $__System;
-  var indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++)
-      if (this[i] === item)
-        return i;
-    return -1;
-  }
-
-  var commentRegEx = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg;
-  var cjsRequirePre = "(?:^|[^$_a-zA-Z\\xA0-\\uFFFF.])";
-  var cjsRequirePost = "\\s*\\(\\s*(\"([^\"]+)\"|'([^']+)')\\s*\\)";
-  var fnBracketRegEx = /\(([^\)]*)\)/;
-  var wsRegEx = /^\s+|\s+$/g;
-  
-  var requireRegExs = {};
-
-  function getCJSDeps(source, requireIndex) {
-
-    // remove comments
-    source = source.replace(commentRegEx, '');
-
-    // determine the require alias
-    var params = source.match(fnBracketRegEx);
-    var requireAlias = (params[1].split(',')[requireIndex] || 'require').replace(wsRegEx, '');
-
-    // find or generate the regex for this requireAlias
-    var requireRegEx = requireRegExs[requireAlias] || (requireRegExs[requireAlias] = new RegExp(cjsRequirePre + requireAlias + cjsRequirePost, 'g'));
-
-    requireRegEx.lastIndex = 0;
-
-    var deps = [];
-
-    var match;
-    while (match = requireRegEx.exec(source))
-      deps.push(match[2] || match[3]);
-
-    return deps;
-  }
-
-  /*
-    AMD-compatible require
-    To copy RequireJS, set window.require = window.requirejs = loader.amdRequire
-  */
-  function require(names, callback, errback, referer) {
-    // in amd, first arg can be a config object... we just ignore
-    if (typeof names == 'object' && !(names instanceof Array))
-      return require.apply(null, Array.prototype.splice.call(arguments, 1, arguments.length - 1));
-
-    // amd require
-    if (typeof names == 'string' && typeof callback == 'function')
-      names = [names];
-    if (names instanceof Array) {
-      var dynamicRequires = [];
-      for (var i = 0; i < names.length; i++)
-        dynamicRequires.push(loader['import'](names[i], referer));
-      Promise.all(dynamicRequires).then(function(modules) {
-        if (callback)
-          callback.apply(null, modules);
-      }, errback);
-    }
-
-    // commonjs require
-    else if (typeof names == 'string') {
-      var module = loader.get(names);
-      return module.__useDefault ? module['default'] : module;
-    }
-
-    else
-      throw new TypeError('Invalid require');
-  }
-
-  function define(name, deps, factory) {
-    if (typeof name != 'string') {
-      factory = deps;
-      deps = name;
-      name = null;
-    }
-    if (!(deps instanceof Array)) {
-      factory = deps;
-      deps = ['require', 'exports', 'module'].splice(0, factory.length);
-    }
-
-    if (typeof factory != 'function')
-      factory = (function(factory) {
-        return function() { return factory; }
-      })(factory);
-
-    // in IE8, a trailing comma becomes a trailing undefined entry
-    if (deps[deps.length - 1] === undefined)
-      deps.pop();
-
-    // remove system dependencies
-    var requireIndex, exportsIndex, moduleIndex;
-    
-    if ((requireIndex = indexOf.call(deps, 'require')) != -1) {
-      
-      deps.splice(requireIndex, 1);
-
-      // only trace cjs requires for non-named
-      // named defines assume the trace has already been done
-      if (!name)
-        deps = deps.concat(getCJSDeps(factory.toString(), requireIndex));
-    }
-
-    if ((exportsIndex = indexOf.call(deps, 'exports')) != -1)
-      deps.splice(exportsIndex, 1);
-    
-    if ((moduleIndex = indexOf.call(deps, 'module')) != -1)
-      deps.splice(moduleIndex, 1);
-
-    var define = {
-      name: name,
-      deps: deps,
-      execute: function(req, exports, module) {
-
-        var depValues = [];
-        for (var i = 0; i < deps.length; i++)
-          depValues.push(req(deps[i]));
-
-        module.uri = module.id;
-
-        module.config = function() {};
-
-        // add back in system dependencies
-        if (moduleIndex != -1)
-          depValues.splice(moduleIndex, 0, module);
-        
-        if (exportsIndex != -1)
-          depValues.splice(exportsIndex, 0, exports);
-        
-        if (requireIndex != -1) 
-          depValues.splice(requireIndex, 0, function(names, callback, errback) {
-            if (typeof names == 'string' && typeof callback != 'function')
-              return req(names);
-            return require.call(loader, names, callback, errback, module.id);
-          });
-
-        var output = factory.apply(exportsIndex == -1 ? __global : exports, depValues);
-
-        if (typeof output == 'undefined' && module)
-          output = module.exports;
-
-        if (typeof output != 'undefined')
-          return output;
-      }
-    };
-
-    // anonymous define
-    if (!name) {
-      // already defined anonymously -> throw
-      if (lastModule.anonDefine)
-        throw new TypeError('Multiple defines for anonymous module');
-      lastModule.anonDefine = define;
-    }
-    // named define
-    else {
-      // if we don't have any other defines,
-      // then let this be an anonymous define
-      // this is just to support single modules of the form:
-      // define('jquery')
-      // still loading anonymously
-      // because it is done widely enough to be useful
-      if (!lastModule.anonDefine && !lastModule.isBundle) {
-        lastModule.anonDefine = define;
-      }
-      // otherwise its a bundle only
-      else {
-        // if there is an anonDefine already (we thought it could have had a single named define)
-        // then we define it now
-        // this is to avoid defining named defines when they are actually anonymous
-        if (lastModule.anonDefine && lastModule.anonDefine.name)
-          loader.registerDynamic(lastModule.anonDefine.name, lastModule.anonDefine.deps, false, lastModule.anonDefine.execute);
-
-        lastModule.anonDefine = null;
-      }
-
-      // note this is now a bundle
-      lastModule.isBundle = true;
-
-      // define the module through the register registry
-      loader.registerDynamic(name, define.deps, false, define.execute);
-    }
-  }
-  define.amd = {};
-
-  // adds define as a global (potentially just temporarily)
-  function createDefine(loader) {
-    lastModule.anonDefine = null;
-    lastModule.isBundle = false;
-
-    // ensure no NodeJS environment detection
-    var oldModule = __global.module;
-    var oldExports = __global.exports;
-    var oldDefine = __global.define;
-
-    __global.module = undefined;
-    __global.exports = undefined;
-    __global.define = define;
-
-    return function() {
-      __global.define = oldDefine;
-      __global.module = oldModule;
-      __global.exports = oldExports;
-    };
-  }
-
-  var lastModule = {
-    isBundle: false,
-    anonDefine: null
-  };
-
-  loader.set('@@amd-helpers', loader.newModule({
-    createDefine: createDefine,
-    require: require,
-    define: define,
-    lastModule: lastModule
-  }));
-  loader.amdDefine = define;
-  loader.amdRequire = require;
-})(typeof self != 'undefined' ? self : global);
-
-"bundle";
+!function(e){function r(e,r){for(var n=e.split(".");n.length;)r=r[n.shift()];return r}function n(n){if("string"==typeof n)return r(n,e);if(!(n instanceof Array))throw new Error("Global exports must be a string or array.");for(var t={},o=!0,f=0;f<n.length;f++){var i=r(n[f],e);o&&(t["default"]=i,o=!1),t[n[f].split(".").pop()]=i}return t}function t(r){if(Object.keys)Object.keys(e).forEach(r);else for(var n in e)a.call(e,n)&&r(n)}function o(r){t(function(n){if(-1==l.call(s,n)){try{var t=e[n]}catch(o){s.push(n)}r(n,t)}})}var f,i=$__System,a=Object.prototype.hasOwnProperty,l=Array.prototype.indexOf||function(e){for(var r=0,n=this.length;n>r;r++)if(this[r]===e)return r;return-1},s=["_g","sessionStorage","localStorage","clipboardData","frames","frameElement","external","mozAnimationStartTime","webkitStorageInfo","webkitIndexedDB","mozInnerScreenY","mozInnerScreenX"];i.set("@@global-helpers",i.newModule({prepareGlobal:function(r,t,i){var a=e.define;e.define=void 0;var l;if(i){l={};for(var s in i)l[s]=e[s],e[s]=i[s]}return t||(f={},o(function(e,r){f[e]=r})),function(){var r;if(t)r=n(t);else{r={};var i,s;o(function(e,n){f[e]!==n&&"undefined"!=typeof n&&(r[e]=n,"undefined"!=typeof i?s||i===n||(s=!0):i=n)}),r=s?r:i}if(l)for(var u in l)e[u]=l[u];return e.define=a,r}}}))}("undefined"!=typeof self?self:global);
+!function(e){function n(e,n){e=e.replace(l,"");var r=e.match(u),t=(r[1].split(",")[n]||"require").replace(s,""),i=p[t]||(p[t]=new RegExp(a+t+f,"g"));i.lastIndex=0;for(var o,c=[];o=i.exec(e);)c.push(o[2]||o[3]);return c}function r(e,n,t,o){if("object"==typeof e&&!(e instanceof Array))return r.apply(null,Array.prototype.splice.call(arguments,1,arguments.length-1));if("string"==typeof e&&"function"==typeof n&&(e=[e]),!(e instanceof Array)){if("string"==typeof e){var l=i.get(e);return l.__useDefault?l["default"]:l}throw new TypeError("Invalid require")}for(var a=[],f=0;f<e.length;f++)a.push(i["import"](e[f],o));Promise.all(a).then(function(e){n&&n.apply(null,e)},t)}function t(t,l,a){"string"!=typeof t&&(a=l,l=t,t=null),l instanceof Array||(a=l,l=["require","exports","module"].splice(0,a.length)),"function"!=typeof a&&(a=function(e){return function(){return e}}(a)),void 0===l[l.length-1]&&l.pop();var f,u,s;-1!=(f=o.call(l,"require"))&&(l.splice(f,1),t||(l=l.concat(n(a.toString(),f)))),-1!=(u=o.call(l,"exports"))&&l.splice(u,1),-1!=(s=o.call(l,"module"))&&l.splice(s,1);var p={name:t,deps:l,execute:function(n,t,o){for(var p=[],c=0;c<l.length;c++)p.push(n(l[c]));o.uri=o.id,o.config=function(){},-1!=s&&p.splice(s,0,o),-1!=u&&p.splice(u,0,t),-1!=f&&p.splice(f,0,function(e,t,l){return"string"==typeof e&&"function"!=typeof t?n(e):r.call(i,e,t,l,o.id)});var d=a.apply(-1==u?e:t,p);return"undefined"==typeof d&&o&&(d=o.exports),"undefined"!=typeof d?d:void 0}};if(t)c.anonDefine||c.isBundle?c.anonDefine&&c.anonDefine.name&&(c.anonDefine=null):c.anonDefine=p,c.isBundle=!0,i.registerDynamic(p.name,p.deps,!1,p.execute);else{if(c.anonDefine&&!c.anonDefine.name)throw new Error("Multiple anonymous defines in module "+t);c.anonDefine=p}}var i=$__System,o=Array.prototype.indexOf||function(e){for(var n=0,r=this.length;r>n;n++)if(this[n]===e)return n;return-1},l=/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/gm,a="(?:^|[^$_a-zA-Z\\xA0-\\uFFFF.])",f="\\s*\\(\\s*(\"([^\"]+)\"|'([^']+)')\\s*\\)",u=/\(([^\)]*)\)/,s=/^\s+|\s+$/g,p={};t.amd={};var c={isBundle:!1,anonDefine:null};i.amdDefine=t,i.amdRequire=r}("undefined"!=typeof self?self:global);
 $__System.registerDynamic("2", ["3", "4", "5", "6"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $export = $__require('3'),
       toLength = $__require('4'),
       context = $__require('5'),
@@ -1280,26 +452,24 @@ $__System.registerDynamic("2", ["3", "4", "5", "6"], true, function($__require, 
           search = String(searchString);
       return $startsWith ? $startsWith.call(that, search, index) : that.slice(index, index + search.length) === search;
     }});
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("7", ["2", "8"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   $__require('2');
   module.exports = $__require('8').String.startsWith;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("9", ["a", "b", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var isObject = $__require('a'),
       cof = $__require('b'),
       MATCH = $__require('c')('match');
@@ -1307,15 +477,14 @@ $__System.registerDynamic("9", ["a", "b", "c"], true, function($__require, expor
     var isRegExp;
     return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : cof(it) == 'RegExp');
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("5", ["9", "d"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var isRegExp = $__require('9'),
       defined = $__require('d');
   module.exports = function(that, searchString, NAME) {
@@ -1323,15 +492,14 @@ $__System.registerDynamic("5", ["9", "d"], true, function($__require, exports, m
       throw TypeError('String#' + NAME + " doesn't accept regex!");
     return String(defined(that));
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("6", ["c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var MATCH = $__require('c')('match');
   module.exports = function(KEY) {
     var re = /./;
@@ -1345,16 +513,15 @@ $__System.registerDynamic("6", ["c"], true, function($__require, exports, module
     }
     return true;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("e", ["3", "4", "5", "6"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $export = $__require('3'),
       toLength = $__require('4'),
       context = $__require('5'),
@@ -1369,52 +536,48 @@ $__System.registerDynamic("e", ["3", "4", "5", "6"], true, function($__require, 
           search = String(searchString);
       return $endsWith ? $endsWith.call(that, search, end) : that.slice(end - search.length, end) === search;
     }});
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("f", ["e", "8"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   $__require('e');
   module.exports = $__require('8').String.endsWith;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("10", ["d"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var defined = $__require('d');
   module.exports = function(it) {
     return Object(defined(it));
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("11", ["b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var cof = $__require('b');
   module.exports = Array.isArray || function(arg) {
     return cof(arg) == 'Array';
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("12", ["a", "11", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var isObject = $__require('a'),
       isArray = $__require('11'),
       SPECIES = $__require('c')('species');
@@ -1432,15 +595,14 @@ $__System.registerDynamic("12", ["a", "11", "c"], true, function($__require, exp
     }
     return new (C === undefined ? Array : C)(length);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("13", ["14", "15", "10", "4", "12"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var ctx = $__require('14'),
       IObject = $__require('15'),
       toObject = $__require('10'),
@@ -1487,16 +649,15 @@ $__System.registerDynamic("13", ["14", "15", "10", "4", "12"], true, function($_
       return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
     };
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("16", ["3", "13", "17"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $export = $__require('3'),
       $find = $__require('13')(5),
       KEY = 'find',
@@ -1509,27 +670,25 @@ $__System.registerDynamic("16", ["3", "13", "17"], true, function($__require, ex
       return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
     }});
   $__require('17')(KEY);
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("18", ["16", "8"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   $__require('16');
   module.exports = $__require('8').Array.find;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("19", ["1a", "c", "1b"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var classof = $__require('1a'),
       test = {};
   test[$__require('c')('toStringTag')] = 'z';
@@ -1538,15 +697,14 @@ $__System.registerDynamic("19", ["1a", "c", "1b"], true, function($__require, ex
       return '[object ' + classof(this) + ']';
     }, true);
   }
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("1c", ["1d", "d"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var toInteger = $__require('1d'),
       defined = $__require('d');
   module.exports = function(TO_STRING) {
@@ -1562,16 +720,15 @@ $__System.registerDynamic("1c", ["1d", "d"], true, function($__require, exports,
       return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
     };
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("1e", ["1c", "1f"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $at = $__require('1c')(true);
   $__require('1f')(String, 'String', function(iterated) {
     this._t = String(iterated);
@@ -1592,15 +749,14 @@ $__System.registerDynamic("1e", ["1c", "1f"], true, function($__require, exports
       done: false
     };
   });
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("17", ["c", "20"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var UNSCOPABLES = $__require('c')('unscopables'),
       ArrayProto = Array.prototype;
   if (ArrayProto[UNSCOPABLES] == undefined)
@@ -1608,72 +764,67 @@ $__System.registerDynamic("17", ["c", "20"], true, function($__require, exports,
   module.exports = function(key) {
     ArrayProto[UNSCOPABLES][key] = true;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("21", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(done, value) {
     return {
       value: value,
       done: !!done
     };
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("15", ["b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var cof = $__require('b');
   module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
     return cof(it) == 'String' ? it.split('') : Object(it);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("d", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(it) {
     if (it == undefined)
       throw TypeError("Can't call method on  " + it);
     return it;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("22", ["15", "d"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var IObject = $__require('15'),
       defined = $__require('d');
   module.exports = function(it) {
     return IObject(defined(it));
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("23", ["24", "25", "26", "20", "c"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $ = $__require('24'),
       descriptor = $__require('25'),
       setToStringTag = $__require('26'),
@@ -1685,16 +836,15 @@ $__System.registerDynamic("23", ["24", "25", "26", "20", "c"], true, function($_
     Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
     setToStringTag(Constructor, NAME + ' Iterator');
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("1f", ["27", "3", "1b", "20", "28", "29", "23", "26", "24", "c"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var LIBRARY = $__require('27'),
       $export = $__require('3'),
       redefine = $__require('1b'),
@@ -1772,16 +922,15 @@ $__System.registerDynamic("1f", ["27", "3", "1b", "20", "28", "29", "23", "26", 
     }
     return methods;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("2a", ["17", "21", "29", "22", "1f"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var addToUnscopables = $__require('17'),
       step = $__require('21'),
       Iterators = $__require('29'),
@@ -1808,15 +957,14 @@ $__System.registerDynamic("2a", ["17", "21", "29", "22", "1f"], true, function($
   addToUnscopables('keys');
   addToUnscopables('values');
   addToUnscopables('entries');
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("2b", ["2a", "2c", "20", "29", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   $__require('2a');
   var global = $__require('2c'),
       hide = $__require('20'),
@@ -1831,25 +979,23 @@ $__System.registerDynamic("2b", ["2a", "2c", "20", "29", "c"], true, function($_
     hide(NLProto, ITERATOR, ArrayValues);
   if (HTCProto && !HTCProto[ITERATOR])
     hide(HTCProto, ITERATOR, ArrayValues);
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("27", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = false;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("3", ["2c", "8", "20", "1b", "14"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var global = $__require('2c'),
       core = $__require('8'),
       hide = $__require('20'),
@@ -1891,29 +1037,27 @@ $__System.registerDynamic("3", ["2c", "8", "20", "1b", "14"], true, function($__
   $export.B = 16;
   $export.W = 32;
   module.exports = $export;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("2d", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(it, Constructor, name) {
     if (!(it instanceof Constructor))
       throw TypeError(name + ": use the 'new' operator!");
     return it;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("2e", ["2f"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var anObject = $__require('2f');
   module.exports = function(iterator, fn, value, entries) {
     try {
@@ -1925,58 +1069,54 @@ $__System.registerDynamic("2e", ["2f"], true, function($__require, exports, modu
       throw e;
     }
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("30", ["29", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var Iterators = $__require('29'),
       ITERATOR = $__require('c')('iterator'),
       ArrayProto = Array.prototype;
   module.exports = function(it) {
     return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("1d", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var ceil = Math.ceil,
       floor = Math.floor;
   module.exports = function(it) {
     return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("4", ["1d"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var toInteger = $__require('1d'),
       min = Math.min;
   module.exports = function(it) {
     return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("1a", ["b", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var cof = $__require('b'),
       TAG = $__require('c')('toStringTag'),
       ARG = cof(function() {
@@ -1988,25 +1128,23 @@ $__System.registerDynamic("1a", ["b", "c"], true, function($__require, exports, 
         B;
     return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("29", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = {};
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("31", ["1a", "c", "29", "8"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var classof = $__require('1a'),
       ITERATOR = $__require('c')('iterator'),
       Iterators = $__require('29');
@@ -2014,15 +1152,14 @@ $__System.registerDynamic("31", ["1a", "c", "29", "8"], true, function($__requir
     if (it != undefined)
       return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("32", ["14", "2e", "30", "2f", "4", "31"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var ctx = $__require('14'),
       call = $__require('2e'),
       isArrayIter = $__require('30'),
@@ -2047,15 +1184,14 @@ $__System.registerDynamic("32", ["14", "2e", "30", "2f", "4", "31"], true, funct
         call(iterator, f, step.value, entries);
       }
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("33", ["24", "a", "2f", "14"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var getDesc = $__require('24').getDesc,
       isObject = $__require('a'),
       anObject = $__require('2f');
@@ -2084,42 +1220,39 @@ $__System.registerDynamic("33", ["24", "a", "2f", "14"], true, function($__requi
     }({}, false) : undefined),
     check: check
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("34", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = Object.is || function is(x, y) {
     return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("2f", ["a"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var isObject = $__require('a');
   module.exports = function(it) {
     if (!isObject(it))
       throw TypeError(it + ' is not an object!');
     return it;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("35", ["2f", "36", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var anObject = $__require('2f'),
       aFunction = $__require('36'),
       SPECIES = $__require('c')('species');
@@ -2128,29 +1261,27 @@ $__System.registerDynamic("35", ["2f", "36", "c"], true, function($__require, ex
         S;
     return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("36", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(it) {
     if (typeof it != 'function')
       throw TypeError(it + ' is not a function!');
     return it;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("14", ["36"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var aFunction = $__require('36');
   module.exports = function(fn, that, length) {
     aFunction(fn);
@@ -2174,15 +1305,14 @@ $__System.registerDynamic("14", ["36"], true, function($__require, exports, modu
       return fn.apply(that, arguments);
     };
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("37", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(fn, args, that) {
     var un = that === undefined;
     switch (args.length) {
@@ -2199,52 +1329,48 @@ $__System.registerDynamic("37", [], true, function($__require, exports, module) 
     }
     return fn.apply(that, args);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("38", ["2c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = $__require('2c').document && document.documentElement;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("a", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(it) {
     return typeof it === 'object' ? it !== null : typeof it === 'function';
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("39", ["a", "2c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var isObject = $__require('a'),
       document = $__require('2c').document,
       is = isObject(document) && isObject(document.createElement);
   module.exports = function(it) {
     return is ? document.createElement(it) : {};
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("3a", ["14", "37", "38", "39", "2c", "b", "3b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   (function(process) {
     var ctx = $__require('14'),
         invoke = $__require('37'),
@@ -2319,28 +1445,26 @@ $__System.registerDynamic("3a", ["14", "37", "38", "39", "2c", "b", "3b"], true,
       clear: clearTask
     };
   })($__require('3b'));
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("b", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var toString = {}.toString;
   module.exports = function(it) {
     return toString.call(it).slice(8, -1);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("3c", ["2c", "3a", "b", "3b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   (function(process) {
     var global = $__require('2c'),
         macrotask = $__require('3a').set,
@@ -2408,15 +1532,14 @@ $__System.registerDynamic("3c", ["2c", "3a", "b", "3b"], true, function($__requi
       last = task;
     };
   })($__require('3b'));
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("25", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(bitmap, value) {
     return {
       enumerable: !(bitmap & 1),
@@ -2425,15 +1548,14 @@ $__System.registerDynamic("25", [], true, function($__require, exports, module) 
       value: value
     };
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("20", ["24", "25", "3d"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $ = $__require('24'),
       createDesc = $__require('25');
   module.exports = $__require('3d') ? function(object, key, value) {
@@ -2442,15 +1564,14 @@ $__System.registerDynamic("20", ["24", "25", "3d"], true, function($__require, e
     object[key] = value;
     return object;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("1b", ["2c", "20", "3e", "8"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var global = $__require('2c'),
       hide = $__require('20'),
       SRC = $__require('3e')('src'),
@@ -2475,43 +1596,40 @@ $__System.registerDynamic("1b", ["2c", "20", "3e", "8"], true, function($__requi
   })(Function.prototype, TO_STRING, function toString() {
     return typeof this == 'function' && this[SRC] || $toString.call(this);
   });
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("3f", ["1b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var redefine = $__require('1b');
   module.exports = function(target, src) {
     for (var key in src)
       redefine(target, key, src[key]);
     return target;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("28", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var hasOwnProperty = {}.hasOwnProperty;
   module.exports = function(it, key) {
     return hasOwnProperty.call(it, key);
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("26", ["24", "28", "c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var def = $__require('24').setDesc,
       has = $__require('28'),
       TAG = $__require('c')('toStringTag');
@@ -2522,15 +1640,14 @@ $__System.registerDynamic("26", ["24", "28", "c"], true, function($__require, ex
         value: tag
       });
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("24", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var $Object = Object;
   module.exports = {
     create: $Object.create,
@@ -2544,15 +1661,14 @@ $__System.registerDynamic("24", [], true, function($__require, exports, module) 
     getSymbols: $Object.getOwnPropertySymbols,
     each: [].forEach
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("40", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(exec) {
     try {
       return !!exec();
@@ -2560,30 +1676,28 @@ $__System.registerDynamic("40", [], true, function($__require, exports, module) 
       return true;
     }
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("3d", ["40"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = !$__require('40')(function() {
     return Object.defineProperty({}, 'a', {get: function() {
         return 7;
       }}).a != 7;
   });
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("41", ["2c", "24", "3d", "c"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var global = $__require('2c'),
       $ = $__require('24'),
       DESCRIPTORS = $__require('3d'),
@@ -2598,71 +1712,66 @@ $__System.registerDynamic("41", ["2c", "24", "3d", "c"], true, function($__requi
         }
       });
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("42", ["2c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var global = $__require('2c'),
       SHARED = '__core-js_shared__',
       store = global[SHARED] || (global[SHARED] = {});
   module.exports = function(key) {
     return store[key] || (store[key] = {});
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("3e", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var id = 0,
       px = Math.random();
   module.exports = function(key) {
     return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("2c", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
   if (typeof __g == 'number')
     __g = global;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("c", ["42", "3e", "2c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var store = $__require('42')('wks'),
       uid = $__require('3e'),
       Symbol = $__require('2c').Symbol;
   module.exports = function(name) {
     return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("43", ["c"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var ITERATOR = $__require('c')('iterator'),
       SAFE_CLOSING = false;
   try {
@@ -2691,15 +1800,14 @@ $__System.registerDynamic("43", ["c"], true, function($__require, exports, modul
     } catch (e) {}
     return safe;
   };
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("44", ["24", "27", "2c", "14", "1a", "3", "a", "2f", "36", "2d", "32", "33", "34", "c", "35", "3c", "3d", "3f", "26", "41", "8", "43", "3b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   (function(process) {
     'use strict';
     var $ = $__require('24'),
@@ -3004,40 +2112,37 @@ $__System.registerDynamic("44", ["24", "27", "2c", "14", "1a", "3", "a", "2f", "
       }
     });
   })($__require('3b'));
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("8", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var core = module.exports = {version: '1.2.6'};
   if (typeof __e == 'number')
     __e = core;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.registerDynamic("45", ["19", "1e", "2b", "44", "8"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   $__require('19');
   $__require('1e');
   $__require('2b');
   $__require('44');
   module.exports = $__require('8').Promise;
-  global.define = __define;
   return module.exports;
 });
 
 $__System.register("46", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+var define = $__System.amdDefine;
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define("47", ["48"], factory);
@@ -3075,8 +2180,6 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
           url: variant.url || provider.url,
           options: L.Util.extend({}, provider.options, variantOptions)
         };
-      } else if (typeof provider.url === 'function') {
-        provider.url = provider.url(parts.splice(1, parts.length - 1).join('.'));
       }
       var forceHTTP = window.location.protocol === 'file:' || provider.options.forceHTTP;
       if (provider.url.indexOf('//') === 0 && forceHTTP) {
@@ -3142,7 +2245,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     Thunderforest: {
       url: '//{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png',
       options: {
-        attribution: '&copy; <a href="http://www.opencyclemap.org">OpenCycleMap</a>, {attribution.OpenStreetMap}',
+        attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, {attribution.OpenStreetMap}',
         variant: 'cycle'
       },
       variants: {
@@ -3155,8 +2258,13 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
             variant: 'transport-dark',
             maxZoom: 19
           }},
+        SpinalMap: {options: {
+            variant: 'spinal-map',
+            maxZoom: 11
+          }},
         Landscape: 'landscape',
-        Outdoors: 'outdoors'
+        Outdoors: 'outdoors',
+        Pioneer: 'pioneer'
       }
     },
     OpenMapSurfer: {
@@ -3532,18 +2640,16 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   return L;
 }));
 
-_removeDefine();
 })();
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+var define = $__System.amdDefine;
 define("49", ["47"], function(main) {
   return main;
 });
 
-_removeDefine();
 })();
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+var define = $__System.amdDefine;
 (function() {
   var console = window.console || {
     error: function() {},
@@ -3759,15 +2865,13 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   }
 })();
 
-_removeDefine();
 })();
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+var define = $__System.amdDefine;
 define("4b", ["4a"], function(main) {
   return main;
 });
 
-_removeDefine();
 })();
 $__System.register("4c", [], function() { return { setters: [], execute: function() {} } });
 
@@ -4181,14 +3285,14 @@ $__System.register('50', ['4f'], function (_export) {
 $__System.register('51', ['52', '53', '54'], function (_export) {
   'use strict';
 
-  var CovJSONReader, RestAPI, CoverageData, CovJSON;
+  var CoverageData, CovJSONReader, RestAPI, CovJSON;
   return {
-    setters: [function (_) {
+    setters: [function (_3) {
+      CoverageData = _3['default'];
+    }, function (_) {
       CovJSONReader = _;
     }, function (_2) {
       RestAPI = _2;
-    }, function (_3) {
-      CoverageData = _3['default'];
     }],
     execute: function () {
       CovJSON = (function (_CoverageData) {
@@ -4202,3588 +3306,8 @@ $__System.register('51', ['52', '53', '54'], function (_export) {
           babelHelpers.classCallCheck(this, CovJSON);
 
           babelHelpers.get(Object.getPrototypeOf(CovJSON.prototype), 'constructor', this).call(this, actionFactories);
-          this.label = 'CoverageJSON';
-          this.shortLabel = 'CovJSON';
-          this.mediaTypes = ['application/prs.coverage+json'];
-        }
-
-        /**
-         * @param urlOrObject Either a URL, a CovJSON object, or a Coverage API object.
-         * @returns {Promise} succeeds with a Coverage or Coverage Collection API object
-         */
-        babelHelpers.createClass(CovJSON, [{
-          key: 'doLoad',
-          value: function doLoad(urlOrObject) {
-            if (typeof urlOrObject === 'object' && urlOrObject.loadDomain) {
-              return Promise.resolve(urlOrObject);
-            } else {
-              return CovJSONReader.read(urlOrObject).then(function (data) {
-                return RestAPI.wrap(data, {
-                  loader: CovJSONReader.read
-                });
-              });
-            }
-          }
-        }]);
-        return CovJSON;
-      })(CoverageData);
-
-      _export('default', CovJSON);
-    }
-  };
-});
-
-$__System.registerDynamic("55", ["56", "57", "58"], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var _slicedToArray = function() {
-    function sliceIterator(arr, i) {
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-      var _e = undefined;
-      try {
-        for (var _i = arr[Symbol.iterator](),
-            _s; !(_n = (_s = _i.next()).done); _n = true) {
-          _arr.push(_s.value);
-          if (i && _arr.length === i)
-            break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
-        try {
-          if (!_n && _i["return"])
-            _i["return"]();
-        } finally {
-          if (_d)
-            throw _e;
-        }
-      }
-      return _arr;
-    }
-    return function(arr, i) {
-      if (Array.isArray(arr)) {
-        return arr;
-      } else if (Symbol.iterator in Object(arr)) {
-        return sliceIterator(arr, i);
-      } else {
-        throw new TypeError("Invalid attempt to destructure non-iterable instance");
-      }
-    };
-  }();
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-    return typeof obj;
-  } : function(obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-  var _createClass = function() {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor)
-          descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-    return function(Constructor, protoProps, staticProps) {
-      if (protoProps)
-        defineProperties(Constructor.prototype, protoProps);
-      if (staticProps)
-        defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-  Object.defineProperty(exports, "__esModule", {value: true});
-  exports.transformParameter = transformParameter;
-  exports.transformDomain = transformDomain;
-  var _ndarray = $__require('56');
-  var _ndarray2 = _interopRequireDefault(_ndarray);
-  var _util = $__require('57');
-  var _http = $__require('58');
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-  }
-  function _toConsumableArray(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0,
-          arr2 = Array(arr.length); i < arr.length; i++) {
-        arr2[i] = arr[i];
-      }
-      return arr2;
-    } else {
-      return Array.from(arr);
-    }
-  }
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-  var Coverage = function() {
-    function Coverage(covjson, options) {
-      _classCallCheck(this, Coverage);
-      this._covjson = covjson;
-      this.ld = {};
-      this._exposeLd(covjson);
-      this.options = options ? (0, _util.shallowcopy)(options) : {};
-      this.id = covjson.id;
-      this.parameters = new Map();
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-      try {
-        for (var _iterator = Object.keys(covjson.parameters)[Symbol.iterator](),
-            _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var key = _step.value;
-          transformParameter(covjson.parameters, key);
-          this.parameters.set(key, covjson.parameters[key]);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-      this.profiles = [];
-      var profile = this._covjson.profile;
-      if (profile) {
-        if (profile.substr(0, 4) !== 'http') {
-          profile = _util.PREFIX + profile;
-        }
-        this.profiles.push(profile);
-      }
-      this.domainProfiles = [];
-      var domainProfile = undefined;
-      if (typeof this._covjson.domain === 'string') {
-        domainProfile = this._covjson.domainProfile;
-      } else {
-        domainProfile = this._covjson.domain.profile;
-      }
-      if (domainProfile) {
-        if (domainProfile.substr(0, 4) !== 'http') {
-          domainProfile = _util.PREFIX + domainProfile;
-        }
-        this.domainProfiles.push(domainProfile);
-      }
-      this.bbox = this._covjson.bbox;
-    }
-    _createClass(Coverage, [{
-      key: '_exposeLd',
-      value: function _exposeLd(covjson) {
-        if (!covjson['@context']) {
-          return;
-        }
-        var copy = (0, _util.shallowcopy)(covjson);
-        delete copy.domain;
-        delete copy.ranges;
-        this.ld = JSON.parse(JSON.stringify(copy));
-      }
-    }, {
-      key: 'loadDomain',
-      value: function loadDomain() {
-        var _this = this;
-        var domainOrUrl = this._covjson.domain;
-        if (this._domainPromise)
-          return this._domainPromise;
-        var promise = undefined;
-        if ((typeof domainOrUrl === 'undefined' ? 'undefined' : _typeof(domainOrUrl)) === 'object') {
-          var domain = domainOrUrl;
-          transformDomain(domain, this.options.referencing);
-          promise = Promise.resolve(domain);
-        } else {
-          var url = domainOrUrl;
-          promise = (0, _http.load)(url).then(function(result) {
-            var domain = result.data;
-            transformDomain(domain, _this.options.referencing);
-            _this._covjson.domain = domain;
-            return domain;
-          });
-        }
-        this._domainPromise = promise;
-        return promise;
-      }
-    }, {
-      key: 'loadRange',
-      value: function loadRange(paramKey) {
-        var _this2 = this;
-        return this.loadDomain().then(function(domain) {
-          var rangeOrUrl = _this2._covjson.ranges[paramKey];
-          if ((typeof rangeOrUrl === 'undefined' ? 'undefined' : _typeof(rangeOrUrl)) === 'object') {
-            var range = rangeOrUrl;
-            transformRange(range, domain);
-            return Promise.resolve(range);
-          } else {
-            var url = rangeOrUrl;
-            return (0, _http.load)(url).then(function(result) {
-              var range = result.data;
-              transformRange(range, domain);
-              if (_this2.options.cacheRanges) {
-                _this2._covjson.ranges[paramKey] = range;
-              }
-              return range;
-            });
-          }
-        });
-      }
-    }, {
-      key: 'loadRanges',
-      value: function loadRanges(paramKeys) {
-        var _this3 = this;
-        if (paramKeys === undefined)
-          paramKeys = this.parameters.keys();
-        paramKeys = Array.from(paramKeys);
-        return Promise.all(paramKeys.map(function(k) {
-          return _this3.loadRange(k);
-        })).then(function(ranges) {
-          var map = new Map();
-          for (var i = 0; i < paramKeys.length; i++) {
-            map.set(paramKeys[i], ranges[i]);
-          }
-          return map;
-        });
-      }
-    }, {
-      key: 'subsetByIndex',
-      value: function subsetByIndex(constraints) {
-        return _subsetByIndex(this, constraints);
-      }
-    }, {
-      key: 'subsetByValue',
-      value: function subsetByValue(constraints) {
-        return _subsetByValue(this, constraints);
-      }
-    }]);
-    return Coverage;
-  }();
-  exports.default = Coverage;
-  function _subsetByIndex(cov, constraints) {
-    return cov.loadDomain().then(function(domain) {
-      constraints = (0, _util.shallowcopy)(constraints);
-      for (var axisName in constraints) {
-        if (!domain.axes.has(axisName)) {
-          delete constraints[axisName];
-          continue;
-        }
-        if (constraints[axisName] === undefined || constraints[axisName] === null) {
-          delete constraints[axisName];
-          continue;
-        }
-        if (typeof constraints[axisName] === 'number') {
-          var constraint = constraints[axisName];
-          constraints[axisName] = {
-            start: constraint,
-            stop: constraint + 1
-          };
-        }
-        var _constraints$axisName = constraints[axisName];
-        var _constraints$axisName2 = _constraints$axisName.start;
-        var start = _constraints$axisName2 === undefined ? 0 : _constraints$axisName2;
-        var _constraints$axisName3 = _constraints$axisName.stop;
-        var stop = _constraints$axisName3 === undefined ? domain.axes.get(axisName).values.length : _constraints$axisName3;
-        var _constraints$axisName4 = _constraints$axisName.step;
-        var step = _constraints$axisName4 === undefined ? 1 : _constraints$axisName4;
-        if (step <= 0) {
-          throw new Error('Invalid constraint for ' + axisName + ': step=' + step + ' must be > 0');
-        }
-        if (start >= stop || start < 0) {
-          throw new Error('Invalid constraint for ' + axisName + ': stop=' + stop + ' must be > start=' + start + ' and both >= 0');
-        }
-        constraints[axisName] = {
-          start: start,
-          stop: stop,
-          step: step
-        };
-      }
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-      try {
-        for (var _iterator2 = domain.axes.keys()[Symbol.iterator](),
-            _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var axisName = _step2.value;
-          if (!(axisName in constraints)) {
-            var len = domain.axes.get(axisName).values.length;
-            constraints[axisName] = {
-              start: 0,
-              stop: len,
-              step: 1
-            };
-          }
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-      var newdomain = {
-        profiles: domain.profiles,
-        axes: new Map(domain.axes),
-        referencing: domain.referencing,
-        _rangeShape: domain._rangeShape.slice(),
-        _rangeAxisOrder: domain._rangeAxisOrder
-      };
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-      try {
-        for (var _iterator3 = Object.keys(constraints)[Symbol.iterator](),
-            _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var axisName = _step3.value;
-          var axis = domain.axes.get(axisName);
-          var coords = axis.values;
-          var isTypedArray = ArrayBuffer.isView(coords);
-          var constraint = constraints[axisName];
-          var newcoords = undefined;
-          var start = constraint.start;
-          var stop = constraint.stop;
-          var step = constraint.step;
-          if (start === 0 && stop === coords.length && step === 1) {
-            newcoords = coords;
-          } else if (step === 1 && isTypedArray) {
-            newcoords = coords.subarray(start, stop);
-          } else {
-            var q = Math.trunc((stop - start) / step);
-            var r = (stop - start) % step;
-            var len = q + r;
-            newcoords = new coords.constructor(len);
-            for (var i = start,
-                j = 0; i < stop; i += step, j++) {
-              newcoords[j] = coords[i];
-            }
-          }
-          var newaxis = {
-            dataType: axis.dataType,
-            dimensions: axis.dimensions,
-            values: newcoords
-          };
-          newdomain.axes.set(axisName, newaxis);
-          newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = newcoords.length;
-        }
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-      var rangeWrapper = function rangeWrapper(range) {
-        var _ndarr$hi$lo,
-            _ndarr$hi;
-        var ndarr = range._ndarr;
-        var axisNames = domain._rangeAxisOrder;
-        var los = axisNames.map(function(name) {
-          return constraints[name].start;
-        });
-        var his = axisNames.map(function(name) {
-          return constraints[name].stop;
-        });
-        var steps = axisNames.map(function(name) {
-          return constraints[name].step;
-        });
-        var newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
-        var newrange = {
-          dataType: range.dataType,
-          get: createRangeGetFunction(newndarr, domain._rangeAxisOrder),
-          _ndarr: newndarr
-        };
-        newrange.shape = new Map();
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
-        try {
-          for (var _iterator4 = domain.axes.keys()[Symbol.iterator](),
-              _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-            var axisName = _step4.value;
-            var size = newdomain.axes.get(axisName).values.length;
-            newrange.shape.set(axisName, size);
-          }
-        } catch (err) {
-          _didIteratorError4 = true;
-          _iteratorError4 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-              _iterator4.return();
-            }
-          } finally {
-            if (_didIteratorError4) {
-              throw _iteratorError4;
-            }
-          }
-        }
-        return newrange;
-      };
-      var loadRange = function loadRange(key) {
-        return cov.loadRange(key).then(rangeWrapper);
-      };
-      var loadRanges = function loadRanges(keys) {
-        return cov.loadRanges(keys).then(function(ranges) {
-          return new Map([].concat(_toConsumableArray(ranges)).map(function(_ref) {
-            var _ref2 = _slicedToArray(_ref, 2);
-            var key = _ref2[0];
-            var range = _ref2[1];
-            return [key, rangeWrapper(range)];
-          }));
-        });
-      };
-      var newcov = {
-        profiles: cov.profiles,
-        domainProfiles: cov.domainProfiles,
-        parameters: cov.parameters,
-        loadDomain: function loadDomain() {
-          return Promise.resolve(newdomain);
-        },
-        loadRange: loadRange,
-        loadRanges: loadRanges
-      };
-      newcov.subsetByIndex = _subsetByIndex.bind(null, newcov);
-      newcov.subsetByValue = _subsetByValue.bind(null, newcov);
-      return newcov;
-    });
-  }
-  function _subsetByValue(cov, constraints) {
-    return cov.loadDomain().then(function(domain) {
-      var indexConstraints = {};
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
-      try {
-        for (var _iterator5 = Object.keys(constraints)[Symbol.iterator](),
-            _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var axisName = _step5.value;
-          var spec = constraints[axisName];
-          if (spec === undefined || spec === null || !domain.axes.has(axisName)) {
-            continue;
-          }
-          var axis = domain.axes.get(axisName);
-          var vals = axis.values;
-          if (typeof spec === 'number' || typeof spec === 'string' || spec instanceof Date) {
-            var match = spec;
-            if ((0, _util.isISODateAxis)(domain, axisName)) {
-              match = (0, _util.asTime)(match);
-              vals = vals.map(function(v) {
-                return new Date(v).getTime();
-              });
-            }
-            var i = undefined;
-            if (vals.indexOf) {
-              i = vals.indexOf(match);
-            } else {
-              i = Array.prototype.indexOf.call(vals, match);
-            }
-            if (i === -1) {
-              throw new Error('Domain value not found: ' + spec);
-            }
-            indexConstraints[axisName] = i;
-          } else if ('target' in spec) {
-            var target = spec.target;
-            if ((0, _util.isISODateAxis)(domain, axisName)) {
-              target = (0, _util.asTime)(target);
-              vals = vals.map(function(v) {
-                return new Date(v).getTime();
-              });
-            } else if (typeof vals[0] !== 'number' || typeof target !== 'number') {
-              throw new Error('Invalid axis or constraint value type');
-            }
-            var i = (0, _util.indexOfNearest)(vals, target);
-            indexConstraints[axisName] = i;
-          } else if ('start' in spec && 'stop' in spec) {
-            var start = spec.start;
-            var stop = spec.stop;
-            if ((0, _util.isISODateAxis)(domain, axisName)) {
-              var _ref3 = [(0, _util.asTime)(start), (0, _util.asTime)(stop)];
-              start = _ref3[0];
-              stop = _ref3[1];
-              vals = vals.map(function(v) {
-                return new Date(v).getTime();
-              });
-            } else if (typeof vals[0] !== 'number' || typeof start !== 'number') {
-              throw new Error('Invalid axis or constraint value type');
-            }
-            var _indicesOfNearest = (0, _util.indicesOfNearest)(vals, start);
-            var _indicesOfNearest2 = _slicedToArray(_indicesOfNearest, 2);
-            var lo1 = _indicesOfNearest2[0];
-            var hi1 = _indicesOfNearest2[1];
-            var _indicesOfNearest3 = (0, _util.indicesOfNearest)(vals, stop);
-            var _indicesOfNearest4 = _slicedToArray(_indicesOfNearest3, 2);
-            var lo2 = _indicesOfNearest4[0];
-            var hi2 = _indicesOfNearest4[1];
-            var imin = Math.min(lo1, hi1, lo2, hi2);
-            var imax = Math.max(lo1, hi1, lo2, hi2) + 1;
-            indexConstraints[axisName] = {
-              start: imin,
-              stop: imax
-            };
-          } else {
-            throw new Error('Invalid subset constraints');
-          }
-        }
-      } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return) {
-            _iterator5.return();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
-        }
-      }
-      return cov.subsetByIndex(indexConstraints);
-    });
-  }
-  function transformParameter(params, key) {
-    if ('__transformDone' in params[key])
-      return;
-    var param = params[key];
-    param.key = key;
-    if (param.categoryEncoding) {
-      var map = new Map();
-      var _iteratorNormalCompletion6 = true;
-      var _didIteratorError6 = false;
-      var _iteratorError6 = undefined;
-      try {
-        for (var _iterator6 = Object.keys(param.categoryEncoding)[Symbol.iterator](),
-            _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-          var category = _step6.value;
-          var vals = param.categoryEncoding[category];
-          if (!Array.isArray(vals)) {
-            vals = [vals];
-          }
-          map.set(category, vals);
-        }
-      } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion6 && _iterator6.return) {
-            _iterator6.return();
-          }
-        } finally {
-          if (_didIteratorError6) {
-            throw _iteratorError6;
-          }
-        }
-      }
-      param.categoryEncoding = map;
-    }
-    param.__transformDone = true;
-  }
-  function transformRange(range, domain) {
-    if ('__transformDone' in range)
-      return;
-    var values = range.values;
-    var targetDataType = range.dataType;
-    var isTyped = ArrayBuffer.isView(values);
-    var missingIsEncoded = range.missing === 'nonvalid';
-    var hasOffsetFactor = 'offset' in range;
-    if ('offset' in range) {
-      (0, _util.assert)('factor' in range);
-    }
-    var offset = range.offset;
-    var factor = range.factor;
-    if (missingIsEncoded) {
-      (0, _util.assert)('validMin' in range);
-      (0, _util.assert)('validMax' in range);
-    }
-    var validMin = range.validMin;
-    var validMax = range.validMax;
-    var vals = undefined;
-    if (!missingIsEncoded && !hasOffsetFactor) {
-      vals = values;
-    } else {
-      vals = new Array(values.length);
-      if (hasOffsetFactor) {
-        for (var i = 0; i < values.length; i++) {
-          var val = values[i];
-          if (missingIsEncoded && (val < validMin || val > validMax)) {
-            vals[i] = null;
-          } else if (!missingIsEncoded && val === null) {
-            vals[i] = null;
-          } else {
-            vals[i] = val * factor + offset;
-          }
-        }
-        if (validMin !== undefined) {
-          range.validMin = validMin * factor + offset;
-          range.validMax = validMax * factor + offset;
-        }
-      } else {
-        for (var i = 0; i < values.length; i++) {
-          var val = values[i];
-          if (val < validMin || val > validMax) {
-            vals[i] = null;
-          } else {
-            vals[i] = val;
-          }
-        }
-      }
-      delete range.offset;
-      delete range.factor;
-      delete range.missing;
-    }
-    if (validMin === undefined) {
-      var _minMax = (0, _util.minMax)(vals);
-      var _minMax2 = _slicedToArray(_minMax, 2);
-      var min = _minMax2[0];
-      var max = _minMax2[1];
-      if (min !== null) {
-        range.validMin = min;
-        range.validMax = max;
-      }
-    }
-    var shape = new Map();
-    var _iteratorNormalCompletion7 = true;
-    var _didIteratorError7 = false;
-    var _iteratorError7 = undefined;
-    try {
-      for (var _iterator7 = domain.axes.keys()[Symbol.iterator](),
-          _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-        var axisName = _step7.value;
-        shape.set(axisName, domain.axes.get(axisName).values.length);
-      }
-    } catch (err) {
-      _didIteratorError7 = true;
-      _iteratorError7 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion7 && _iterator7.return) {
-          _iterator7.return();
-        }
-      } finally {
-        if (_didIteratorError7) {
-          throw _iteratorError7;
-        }
-      }
-    }
-    range.shape = shape;
-    var ndarr = (0, _ndarray2.default)(vals, domain._rangeShape);
-    range._ndarr = ndarr;
-    range.get = createRangeGetFunction(ndarr, domain._rangeAxisOrder);
-    range.__transformDone = true;
-    return range;
-  }
-  function createRangeGetFunction(ndarr, axisOrder) {
-    var ndargs = '';
-    for (var i = 0; i < axisOrder.length; i++) {
-      if (ndargs)
-        ndargs += ',';
-      ndargs += '\'' + axisOrder[i] + '\' in obj ? obj[\'' + axisOrder[i] + '\'] : 0';
-    }
-    var fn = new Function('ndarr', 'return function ndarrget (obj) { return ndarr.get(' + ndargs + ') }')(ndarr);
-    return fn;
-  }
-  function transformDomain(domain, referencing) {
-    if ('__transformDone' in domain)
-      return;
-    domain.profiles = [];
-    var profile = domain.profile;
-    if (profile) {
-      if (profile.substr(0, 4) !== 'http') {
-        profile = _util.PREFIX + profile;
-      }
-      domain.profiles.push(profile);
-    }
-    var axes = new Map();
-    var _iteratorNormalCompletion8 = true;
-    var _didIteratorError8 = false;
-    var _iteratorError8 = undefined;
-    try {
-      for (var _iterator8 = Object.keys(domain.axes)[Symbol.iterator](),
-          _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-        var axisName = _step8.value;
-        axes.set(axisName, domain.axes[axisName]);
-      }
-    } catch (err) {
-      _didIteratorError8 = true;
-      _iteratorError8 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion8 && _iterator8.return) {
-          _iterator8.return();
-        }
-      } finally {
-        if (_didIteratorError8) {
-          throw _iteratorError8;
-        }
-      }
-    }
-    domain.axes = axes;
-    var _iteratorNormalCompletion9 = true;
-    var _didIteratorError9 = false;
-    var _iteratorError9 = undefined;
-    try {
-      for (var _iterator9 = axes[Symbol.iterator](),
-          _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-        var _step9$value = _slicedToArray(_step9.value, 2);
-        var key = _step9$value[0];
-        var axis = _step9$value[1];
-        if (axis.dataType === 'Tuple') {
-          axis.dataType = _util.PREFIX + 'Tuple';
-        } else if (axis.dataType === 'Polygon') {
-          axis.dataType = 'http://ld.geojson.org/vocab#Polygon';
-        }
-        if (!axis.dimensions) {
-          axis.dimensions = [key];
-        }
-        if ('start' in axis && 'stop' in axis && 'num' in axis) {
-          var arr = new Float64Array(axis.num);
-          var step = undefined;
-          if (axis.num === 1) {
-            if (axis.start !== axis.stop) {
-              throw new Error('regular axis of length 1 must have equal start/stop values');
-            }
-            step = 0;
-          } else {
-            step = (axis.stop - axis.start) / (axis.num - 1);
-          }
-          for (var i = 0; i < axis.num; i++) {
-            arr[i] = axis.start + i * step;
-          }
-          axis.values = arr;
-          delete axis.start;
-          delete axis.stop;
-          delete axis.num;
-        }
-        if (ArrayBuffer.isView(axis.values)) {
-          continue;
-        }
-        if (Array.isArray(axis.values) && typeof axis.values[0] === 'number') {
-          var arr = new Float64Array(axis.values.length);
-          for (var i = 0; i < axis.values.length; i++) {
-            arr[i] = axis.values[i];
-          }
-          axis.values = arr;
-        }
-      }
-    } catch (err) {
-      _didIteratorError9 = true;
-      _iteratorError9 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion9 && _iterator9.return) {
-          _iterator9.return();
-        }
-      } finally {
-        if (_didIteratorError9) {
-          throw _iteratorError9;
-        }
-      }
-    }
-    var needsRangeAxisOrder = [].concat(_toConsumableArray(axes.values())).filter(function(axis) {
-      return axis.values.length > 1;
-    }).length > 1;
-    if (needsRangeAxisOrder && !domain.rangeAxisOrder) {
-      throw new Error('Domain requires "rangeAxisOrder"');
-    }
-    domain._rangeAxisOrder = domain.rangeAxisOrder || [].concat(_toConsumableArray(axes.keys()));
-    domain._rangeShape = domain._rangeAxisOrder.map(function(k) {
-      return axes.get(k).values.length;
-    });
-    if (referencing) {
-      domain.referencing = referencing;
-    }
-    var _iteratorNormalCompletion10 = true;
-    var _didIteratorError10 = false;
-    var _iteratorError10 = undefined;
-    try {
-      for (var _iterator10 = domain.referencing[Symbol.iterator](),
-          _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-        var obj = _step10.value;
-        if (obj.system)
-          break;
-        obj.system = obj.srs || obj.trs || obj.rs;
-        delete obj.srs;
-        delete obj.trs;
-        delete obj.rs;
-      }
-    } catch (err) {
-      _didIteratorError10 = true;
-      _iteratorError10 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion10 && _iterator10.return) {
-          _iterator10.return();
-        }
-      } finally {
-        if (_didIteratorError10) {
-          throw _iteratorError10;
-        }
-      }
-    }
-    domain.__transformDone = true;
-    return domain;
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("59", ["55", "57"], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var _slicedToArray = function() {
-    function sliceIterator(arr, i) {
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-      var _e = undefined;
-      try {
-        for (var _i = arr[Symbol.iterator](),
-            _s; !(_n = (_s = _i.next()).done); _n = true) {
-          _arr.push(_s.value);
-          if (i && _arr.length === i)
-            break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
-        try {
-          if (!_n && _i["return"])
-            _i["return"]();
-        } finally {
-          if (_d)
-            throw _e;
-        }
-      }
-      return _arr;
-    }
-    return function(arr, i) {
-      if (Array.isArray(arr)) {
-        return arr;
-      } else if (Symbol.iterator in Object(arr)) {
-        return sliceIterator(arr, i);
-      } else {
-        throw new TypeError("Invalid attempt to destructure non-iterable instance");
-      }
-    };
-  }();
-  var _createClass = function() {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor)
-          descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-    return function(Constructor, protoProps, staticProps) {
-      if (protoProps)
-        defineProperties(Constructor.prototype, protoProps);
-      if (staticProps)
-        defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-  Object.defineProperty(exports, "__esModule", {value: true});
-  exports.CollectionQuery = undefined;
-  var _Coverage = $__require('55');
-  var _Coverage2 = _interopRequireDefault(_Coverage);
-  var _util = $__require('57');
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-  }
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-  var CoverageCollection = function() {
-    function CoverageCollection(covjson) {
-      _classCallCheck(this, CoverageCollection);
-      this.ld = {};
-      this._exposeLd(covjson);
-      this.id = covjson.id;
-      this.profiles = [];
-      var profile = covjson.profile;
-      if (profile) {
-        if (profile.substr(0, 4) !== 'http') {
-          profile = _util.PREFIX + profile;
-        }
-        this.profiles.push(profile);
-      }
-      var covs = [];
-      var rootParams = covjson.parameters ? covjson.parameters : {};
-      var covOptions = {};
-      if (covjson.referencing) {
-        covOptions.referencing = covjson.referencing;
-      }
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-      try {
-        for (var _iterator = covjson.coverages[Symbol.iterator](),
-            _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var coverage = _step.value;
-          if (coverage.parameters) {
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-            try {
-              for (var _iterator3 = Object.keys(rootParams)[Symbol.iterator](),
-                  _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                var key = _step3.value;
-                if (key in coverage.ranges) {
-                  coverage.parameters[key] = rootParams[key];
-                }
-              }
-            } catch (err) {
-              _didIteratorError3 = true;
-              _iteratorError3 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                  _iterator3.return();
-                }
-              } finally {
-                if (_didIteratorError3) {
-                  throw _iteratorError3;
-                }
-              }
-            }
-          } else {
-            coverage.parameters = rootParams;
-          }
-          covs.push(new _Coverage2.default(coverage, covOptions));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-      this.coverages = covs;
-      if (covjson.parameters) {
-        this.parameters = new Map();
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-        try {
-          for (var _iterator2 = Object.keys(covjson.parameters)[Symbol.iterator](),
-              _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var key = _step2.value;
-            (0, _Coverage.transformParameter)(covjson.parameters, key);
-            this.parameters.set(key, covjson.parameters[key]);
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-      }
-      if (covjson.domainTemplate) {
-        (0, _Coverage.transformDomain)(covjson.domainTemplate);
-        this.domainTemplate = covjson.domainTemplate;
-      }
-    }
-    _createClass(CoverageCollection, [{
-      key: 'query',
-      value: function query() {
-        return new CollectionQuery(this);
-      }
-    }, {
-      key: '_exposeLd',
-      value: function _exposeLd(covjson) {
-        if (!covjson['@context']) {
-          return;
-        }
-        var copy = (0, _util.shallowcopy)(covjson);
-        delete copy.coverages;
-        this.ld = JSON.parse(JSON.stringify(copy));
-      }
-    }]);
-    return CoverageCollection;
-  }();
-  exports.default = CoverageCollection;
-  var CollectionQuery = exports.CollectionQuery = function() {
-    function CollectionQuery(collection) {
-      _classCallCheck(this, CollectionQuery);
-      this._collection = collection;
-      this._filter = {};
-      this._subset = {};
-    }
-    _createClass(CollectionQuery, [{
-      key: 'filter',
-      value: function filter(spec) {
-        mergeInto(spec, this._filter);
-        return this;
-      }
-    }, {
-      key: 'subset',
-      value: function subset(spec) {
-        mergeInto(spec, this._subset);
-        return this;
-      }
-    }, {
-      key: 'embed',
-      value: function embed(spec) {
-        return this;
-      }
-    }, {
-      key: 'execute',
-      value: function execute() {
-        var _this = this;
-        var coll = this._collection;
-        var newcoll = {
-          coverages: [],
-          parameters: coll.parameters,
-          domainTemplate: coll.domainTemplate,
-          profiles: coll.profiles
-        };
-        var promises = [];
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
-        try {
-          var _loop = function _loop() {
-            var cov = _step4.value;
-            promises.push(cov.loadDomain().then(function(domain) {
-              if (!matchesFilter(domain, _this._filter)) {
-                return;
-              }
-              if (Object.keys(_this._subset).length === 0) {
-                newcoll.coverages.push(cov);
-              } else {
-                return cov.subsetByValue(_this._subset).then(function(subsetted) {
-                  newcoll.coverages.push(subsetted);
-                });
-              }
-            }));
-          };
-          for (var _iterator4 = coll.coverages[Symbol.iterator](),
-              _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-            _loop();
-          }
-        } catch (err) {
-          _didIteratorError4 = true;
-          _iteratorError4 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-              _iterator4.return();
-            }
-          } finally {
-            if (_didIteratorError4) {
-              throw _iteratorError4;
-            }
-          }
-        }
-        return Promise.all(promises).then(function() {
-          newcoll.query = function() {
-            return new CollectionQuery(newcoll);
-          };
-          return newcoll;
-        });
-      }
-    }]);
-    return CollectionQuery;
-  }();
-  function matchesFilter(domain, filter) {
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
-    try {
-      for (var _iterator5 = Object.keys(filter)[Symbol.iterator](),
-          _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-        var axisName = _step5.value;
-        var condition = filter[axisName];
-        if (!domain.axes.has(axisName)) {
-          throw new Error('Axis "' + axisName + '" does not exist');
-        }
-        var axis = domain.axes.get(axisName);
-        var vals = axis.values;
-        var min = vals[0];
-        var max = vals[vals.length - 1];
-        if (typeof min !== 'number' && typeof min !== 'string') {
-          throw new Error('Can only filter primitive axis values');
-        }
-        var start = condition.start;
-        var stop = condition.stop;
-        if ((0, _util.isISODateAxis)(domain, axisName)) {
-          var _ref = [(0, _util.asTime)(min), (0, _util.asTime)(max)][(start, stop)] = [(0, _util.asTime)(start), (0, _util.asTime)(stop)];
-          var _ref2 = _slicedToArray(_ref, 2);
-          min = _ref2[0];
-          max = _ref2[1];
-        }
-        if (min > max) {
-          var _ref3 = [max, min];
-          min = _ref3[0];
-          max = _ref3[1];
-        }
-        if (max < start || stop < min) {
-          return false;
-        }
-      }
-    } catch (err) {
-      _didIteratorError5 = true;
-      _iteratorError5 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-          _iterator5.return();
-        }
-      } finally {
-        if (_didIteratorError5) {
-          throw _iteratorError5;
-        }
-      }
-    }
-    return true;
-  }
-  function mergeInto(inputObj, targetObj) {
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
-    try {
-      for (var _iterator6 = Object.keys(inputObj)[Symbol.iterator](),
-          _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-        var k = _step6.value;
-        targetObj[k] = inputObj[k];
-      }
-    } catch (err) {
-      _didIteratorError6 = true;
-      _iteratorError6 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion6 && _iterator6.return) {
-          _iterator6.return();
-        }
-      } finally {
-        if (_didIteratorError6) {
-          throw _iteratorError6;
-        }
-      }
-    }
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5a", [], true, function($__require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "format cjs";
-  (function(global, undefined) {
-    "use strict";
-    var POW_2_24 = Math.pow(2, -24),
-        POW_2_32 = Math.pow(2, 32),
-        POW_2_53 = Math.pow(2, 53);
-    function encode(value) {
-      var data = new ArrayBuffer(256);
-      var dataView = new DataView(data);
-      var lastLength;
-      var offset = 0;
-      function ensureSpace(length) {
-        var newByteLength = data.byteLength;
-        var requiredLength = offset + length;
-        while (newByteLength < requiredLength)
-          newByteLength *= 2;
-        if (newByteLength !== data.byteLength) {
-          var oldDataView = dataView;
-          data = new ArrayBuffer(newByteLength);
-          dataView = new DataView(data);
-          var uint32count = (offset + 3) >> 2;
-          for (var i = 0; i < uint32count; ++i)
-            dataView.setUint32(i * 4, oldDataView.getUint32(i * 4));
-        }
-        lastLength = length;
-        return dataView;
-      }
-      function write() {
-        offset += lastLength;
-      }
-      function writeFloat64(value) {
-        write(ensureSpace(8).setFloat64(offset, value));
-      }
-      function writeUint8(value) {
-        write(ensureSpace(1).setUint8(offset, value));
-      }
-      function writeUint8Array(value) {
-        var dataView = ensureSpace(value.length);
-        for (var i = 0; i < value.length; ++i)
-          dataView.setUint8(offset + i, value[i]);
-        write();
-      }
-      function writeUint16(value) {
-        write(ensureSpace(2).setUint16(offset, value));
-      }
-      function writeUint32(value) {
-        write(ensureSpace(4).setUint32(offset, value));
-      }
-      function writeUint64(value) {
-        var low = value % POW_2_32;
-        var high = (value - low) / POW_2_32;
-        var dataView = ensureSpace(8);
-        dataView.setUint32(offset, high);
-        dataView.setUint32(offset + 4, low);
-        write();
-      }
-      function writeTypeAndLength(type, length) {
-        if (length < 24) {
-          writeUint8(type << 5 | length);
-        } else if (length < 0x100) {
-          writeUint8(type << 5 | 24);
-          writeUint8(length);
-        } else if (length < 0x10000) {
-          writeUint8(type << 5 | 25);
-          writeUint16(length);
-        } else if (length < 0x100000000) {
-          writeUint8(type << 5 | 26);
-          writeUint32(length);
-        } else {
-          writeUint8(type << 5 | 27);
-          writeUint64(length);
-        }
-      }
-      function encodeItem(value) {
-        var i;
-        if (value === false)
-          return writeUint8(0xf4);
-        if (value === true)
-          return writeUint8(0xf5);
-        if (value === null)
-          return writeUint8(0xf6);
-        if (value === undefined)
-          return writeUint8(0xf7);
-        switch (typeof value) {
-          case "number":
-            if (Math.floor(value) === value) {
-              if (0 <= value && value <= POW_2_53)
-                return writeTypeAndLength(0, value);
-              if (-POW_2_53 <= value && value < 0)
-                return writeTypeAndLength(1, -(value + 1));
-            }
-            writeUint8(0xfb);
-            return writeFloat64(value);
-          case "string":
-            var utf8data = [];
-            for (i = 0; i < value.length; ++i) {
-              var charCode = value.charCodeAt(i);
-              if (charCode < 0x80) {
-                utf8data.push(charCode);
-              } else if (charCode < 0x800) {
-                utf8data.push(0xc0 | charCode >> 6);
-                utf8data.push(0x80 | charCode & 0x3f);
-              } else if (charCode < 0xd800) {
-                utf8data.push(0xe0 | charCode >> 12);
-                utf8data.push(0x80 | (charCode >> 6) & 0x3f);
-                utf8data.push(0x80 | charCode & 0x3f);
-              } else {
-                charCode = (charCode & 0x3ff) << 10;
-                charCode |= value.charCodeAt(++i) & 0x3ff;
-                charCode += 0x10000;
-                utf8data.push(0xf0 | charCode >> 18);
-                utf8data.push(0x80 | (charCode >> 12) & 0x3f);
-                utf8data.push(0x80 | (charCode >> 6) & 0x3f);
-                utf8data.push(0x80 | charCode & 0x3f);
-              }
-            }
-            writeTypeAndLength(3, utf8data.length);
-            return writeUint8Array(utf8data);
-          default:
-            var length;
-            if (Array.isArray(value)) {
-              length = value.length;
-              writeTypeAndLength(4, length);
-              for (i = 0; i < length; ++i)
-                encodeItem(value[i]);
-            } else if (value instanceof Uint8Array) {
-              writeTypeAndLength(2, value.length);
-              writeUint8Array(value);
-            } else {
-              var keys = Object.keys(value);
-              length = keys.length;
-              writeTypeAndLength(5, length);
-              for (i = 0; i < length; ++i) {
-                var key = keys[i];
-                encodeItem(key);
-                encodeItem(value[key]);
-              }
-            }
-        }
-      }
-      encodeItem(value);
-      if ("slice" in data)
-        return data.slice(0, offset);
-      var ret = new ArrayBuffer(offset);
-      var retView = new DataView(ret);
-      for (var i = 0; i < offset; ++i)
-        retView.setUint8(i, dataView.getUint8(i));
-      return ret;
-    }
-    function decode(data, tagger, simpleValue) {
-      var dataView = new DataView(data);
-      var offset = 0;
-      if (typeof tagger !== "function")
-        tagger = function(value) {
-          return value;
-        };
-      if (typeof simpleValue !== "function")
-        simpleValue = function() {
-          return undefined;
-        };
-      function read(value, length) {
-        offset += length;
-        return value;
-      }
-      function readArrayBuffer(length) {
-        return read(new Uint8Array(data, offset, length), length);
-      }
-      function readFloat16() {
-        var tempArrayBuffer = new ArrayBuffer(4);
-        var tempDataView = new DataView(tempArrayBuffer);
-        var value = readUint16();
-        var sign = value & 0x8000;
-        var exponent = value & 0x7c00;
-        var fraction = value & 0x03ff;
-        if (exponent === 0x7c00)
-          exponent = 0xff << 10;
-        else if (exponent !== 0)
-          exponent += (127 - 15) << 10;
-        else if (fraction !== 0)
-          return fraction * POW_2_24;
-        tempDataView.setUint32(0, sign << 16 | exponent << 13 | fraction << 13);
-        return tempDataView.getFloat32(0);
-      }
-      function readFloat32() {
-        return read(dataView.getFloat32(offset), 4);
-      }
-      function readFloat64() {
-        return read(dataView.getFloat64(offset), 8);
-      }
-      function readUint8() {
-        return read(dataView.getUint8(offset), 1);
-      }
-      function readUint16() {
-        return read(dataView.getUint16(offset), 2);
-      }
-      function readUint32() {
-        return read(dataView.getUint32(offset), 4);
-      }
-      function readUint64() {
-        return readUint32() * POW_2_32 + readUint32();
-      }
-      function readBreak() {
-        if (dataView.getUint8(offset) !== 0xff)
-          return false;
-        offset += 1;
-        return true;
-      }
-      function readLength(additionalInformation) {
-        if (additionalInformation < 24)
-          return additionalInformation;
-        if (additionalInformation === 24)
-          return readUint8();
-        if (additionalInformation === 25)
-          return readUint16();
-        if (additionalInformation === 26)
-          return readUint32();
-        if (additionalInformation === 27)
-          return readUint64();
-        if (additionalInformation === 31)
-          return -1;
-        throw "Invalid length encoding";
-      }
-      function readIndefiniteStringLength(majorType) {
-        var initialByte = readUint8();
-        if (initialByte === 0xff)
-          return -1;
-        var length = readLength(initialByte & 0x1f);
-        if (length < 0 || (initialByte >> 5) !== majorType)
-          throw "Invalid indefinite length element";
-        return length;
-      }
-      function appendUtf16data(utf16data, length) {
-        for (var i = 0; i < length; ++i) {
-          var value = readUint8();
-          if (value & 0x80) {
-            if (value < 0xe0) {
-              value = (value & 0x1f) << 6 | (readUint8() & 0x3f);
-              length -= 1;
-            } else if (value < 0xf0) {
-              value = (value & 0x0f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
-              length -= 2;
-            } else {
-              value = (value & 0x0f) << 18 | (readUint8() & 0x3f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
-              length -= 3;
-            }
-          }
-          if (value < 0x10000) {
-            utf16data.push(value);
-          } else {
-            value -= 0x10000;
-            utf16data.push(0xd800 | (value >> 10));
-            utf16data.push(0xdc00 | (value & 0x3ff));
-          }
-        }
-      }
-      function decodeItem() {
-        var initialByte = readUint8();
-        var majorType = initialByte >> 5;
-        var additionalInformation = initialByte & 0x1f;
-        var i;
-        var length;
-        if (majorType === 7) {
-          switch (additionalInformation) {
-            case 25:
-              return readFloat16();
-            case 26:
-              return readFloat32();
-            case 27:
-              return readFloat64();
-          }
-        }
-        length = readLength(additionalInformation);
-        if (length < 0 && (majorType < 2 || 6 < majorType))
-          throw "Invalid length";
-        switch (majorType) {
-          case 0:
-            return length;
-          case 1:
-            return -1 - length;
-          case 2:
-            if (length < 0) {
-              var elements = [];
-              var fullArrayLength = 0;
-              while ((length = readIndefiniteStringLength(majorType)) >= 0) {
-                fullArrayLength += length;
-                elements.push(readArrayBuffer(length));
-              }
-              var fullArray = new Uint8Array(fullArrayLength);
-              var fullArrayOffset = 0;
-              for (i = 0; i < elements.length; ++i) {
-                fullArray.set(elements[i], fullArrayOffset);
-                fullArrayOffset += elements[i].length;
-              }
-              return fullArray;
-            }
-            return readArrayBuffer(length);
-          case 3:
-            var utf16data = [];
-            if (length < 0) {
-              while ((length = readIndefiniteStringLength(majorType)) >= 0)
-                appendUtf16data(utf16data, length);
-            } else
-              appendUtf16data(utf16data, length);
-            return String.fromCharCode.apply(null, utf16data);
-          case 4:
-            var retArray;
-            if (length < 0) {
-              retArray = [];
-              while (!readBreak())
-                retArray.push(decodeItem());
-            } else {
-              retArray = new Array(length);
-              for (i = 0; i < length; ++i)
-                retArray[i] = decodeItem();
-            }
-            return retArray;
-          case 5:
-            var retObject = {};
-            for (i = 0; i < length || length < 0 && !readBreak(); ++i) {
-              var key = decodeItem();
-              retObject[key] = decodeItem();
-            }
-            return retObject;
-          case 6:
-            return tagger(decodeItem(), length);
-          case 7:
-            switch (length) {
-              case 20:
-                return false;
-              case 21:
-                return true;
-              case 22:
-                return null;
-              case 23:
-                return undefined;
-              default:
-                return simpleValue(length);
-            }
-        }
-      }
-      var ret = decodeItem();
-      if (offset !== data.byteLength)
-        throw "Remaining bytes";
-      return ret;
-    }
-    var obj = {
-      encode: encode,
-      decode: decode
-    };
-    if (typeof define === "function" && define.amd)
-      define("cbor/cbor", obj);
-    else if (typeof module !== 'undefined' && module.exports)
-      module.exports = obj;
-    else if (!global.CBOR)
-      global.CBOR = obj;
-  })(this);
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5b", ["5a"], true, function($__require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('5a');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("57", [], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  Object.defineProperty(exports, "__esModule", {value: true});
-  exports.assert = assert;
-  exports.shallowcopy = shallowcopy;
-  exports.endsWith = endsWith;
-  exports.minMax = minMax;
-  exports.indicesOfNearest = indicesOfNearest;
-  exports.indexOfNearest = indexOfNearest;
-  exports.isISODateAxis = isISODateAxis;
-  exports.asTime = asTime;
-  var PREFIX = exports.PREFIX = 'http://coveragejson.org/def#';
-  function assert(condition, message) {
-    if (!condition) {
-      message = message || 'Assertion failed';
-      throw new Error(message);
-    }
-  }
-  function shallowcopy(obj) {
-    var copy = Object.create(Object.getPrototypeOf(obj));
-    for (var prop in obj) {
-      copy[prop] = obj[prop];
-    }
-    return copy;
-  }
-  function endsWith(subject, search) {
-    var position = subject.length - search.length;
-    var lastIndex = subject.indexOf(search, position);
-    return lastIndex !== -1 && lastIndex === position;
-  }
-  function minMax(arr) {
-    var len = arr.length;
-    var min = Infinity;
-    var max = -Infinity;
-    while (len--) {
-      var el = arr[len];
-      if (el == null) {} else if (el < min) {
-        min = el;
-      } else if (el > max) {
-        max = el;
-      }
-    }
-    if (min === Infinity) {
-      min = max;
-    } else if (max === -Infinity) {
-      max = min;
-    }
-    if (min === Infinity || min === -Infinity) {
-      min = null;
-      max = null;
-    }
-    return [min, max];
-  }
-  function indicesOfNearest(a, x) {
-    if (a.length === 0) {
-      throw new Error('Array must have at least one element');
-    }
-    var lo = -1;
-    var hi = a.length;
-    var ascending = a.length === 1 || a[0] < a[1];
-    if (ascending) {
-      while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] <= x) {
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    } else {
-      while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] >= x) {
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    }
-    if (a[lo] === x)
-      hi = lo;
-    if (lo === -1)
-      lo = hi;
-    if (hi === a.length)
-      hi = lo;
-    return [lo, hi];
-  }
-  function indexOfNearest(a, x) {
-    var i = indicesOfNearest(a, x);
-    var lo = i[0];
-    var hi = i[1];
-    if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
-      return lo;
-    } else {
-      return hi;
-    }
-  }
-  function isISODateAxis(domain, axisName) {
-    var val = domain.axes.get(axisName).values[0];
-    if (typeof val !== 'string') {
-      return false;
-    }
-    return !isNaN(new Date(val).getTime());
-  }
-  function asTime(inp) {
-    var res = undefined;
-    var err = false;
-    if (typeof inp === 'string') {
-      res = new Date(inp).getTime();
-    } else if (inp instanceof Date) {
-      res = inp.getTime();
-    } else {
-      err = true;
-    }
-    if (isNaN(res)) {
-      err = true;
-    }
-    if (err) {
-      throw new Error('Invalid date: ' + inp);
-    }
-    return res;
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5c", [], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  Object.defineProperty(exports, "__esModule", {value: true});
-  var MEDIATYPE = exports.MEDIATYPE = {
-    COVCBOR: 'application/prs.coverage+cbor',
-    COVJSON: 'application/prs.coverage+json',
-    JSONLD: 'application/ld+json',
-    JSON: 'application/json',
-    OCTETSTREAM: 'application/octet-stream',
-    TEXT: 'text/plain'
-  };
-  var ACCEPT = exports.ACCEPT = MEDIATYPE.COVCBOR + '; q=1.0, ' + MEDIATYPE.COVJSON + '; q=0.5, ' + MEDIATYPE.JSONLD + '; q=0.1, ' + MEDIATYPE.JSON + '; q=0.1';
-  var EXT = exports.EXT = {
-    COVJSON: '.covjson',
-    COVCBOR: '.covcbor'
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("58", ["5b", "57", "5c"], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  Object.defineProperty(exports, "__esModule", {value: true});
-  exports.load = load;
-  var _cborJs = $__require('5b');
-  var _cborJs2 = _interopRequireDefault(_cborJs);
-  var _util = $__require('57');
-  var _httpCommon = $__require('5c');
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-  }
-  function load(url, headers) {
-    var responseType = arguments.length <= 2 || arguments[2] === undefined ? 'arraybuffer' : arguments[2];
-    if (['arraybuffer', 'text'].indexOf(responseType) === -1) {
-      throw new Error();
-    }
-    return new Promise(function(resolve, reject) {
-      var req = new XMLHttpRequest();
-      req.open('GET', url);
-      req.responseType = responseType;
-      req.setRequestHeader('Accept', _httpCommon.ACCEPT);
-      if (headers) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-        try {
-          for (var _iterator = Object.keys(headers)[Symbol.iterator](),
-              _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var header = _step.value;
-            req.setRequestHeader(header, headers[header]);
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      }
-      req.addEventListener('load', function() {
-        try {
-          if (!(req.status >= 200 && req.status < 300 || req.status === 304)) {
-            reject(new Error('Resource "' + url + '" not found, HTTP status code: ' + req.status));
-            return;
-          }
-          var type = req.getResponseHeader('Content-Type');
-          if (type.indexOf(_httpCommon.MEDIATYPE.OCTETSTREAM) === 0 || type.indexOf(_httpCommon.MEDIATYPE.TEXT) === 0) {
-            if ((0, _util.endsWith)(url, _httpCommon.EXT.COVJSON)) {
-              type = _httpCommon.MEDIATYPE.COVJSON;
-            } else if ((0, _util.endsWith)(url, _httpCommon.EXT.COVCBOR)) {
-              type = _httpCommon.MEDIATYPE.COVCBOR;
-            }
-          }
-          var data = undefined;
-          if (type === _httpCommon.MEDIATYPE.COVCBOR) {
-            var arrayBuffer = req.response;
-            var t0 = new Date();
-            data = _cborJs2.default.decode(arrayBuffer);
-            console.log('CBOR decoding: ' + (new Date() - t0) + 'ms');
-          } else if ([_httpCommon.MEDIATYPE.COVJSON, _httpCommon.MEDIATYPE.JSONLD, _httpCommon.MEDIATYPE.JSON].indexOf(type) > -1) {
-            if (responseType === 'arraybuffer') {
-              if (window.TextDecoder) {
-                var t0 = new Date();
-                data = JSON.parse(new TextDecoder().decode(new DataView(req.response)));
-                console.log('JSON decoding: ' + (new Date() - t0) + 'ms');
-              } else {
-                reject({responseType: 'text'});
-                return;
-              }
-            } else {
-              var t0 = new Date();
-              data = JSON.parse(req.response);
-              console.log('JSON decoding (slow path): ' + (new Date() - t0) + 'ms');
-            }
-          } else {
-            reject(new Error('Unsupported media type: ' + type));
-            return;
-          }
-          var responseHeaders = parseResponseHeaders(req.getAllResponseHeaders());
-          resolve({
-            data: data,
-            headers: responseHeaders
-          });
-        } catch (e) {
-          reject(e);
-        }
-      });
-      req.addEventListener('error', function() {
-        reject(new Error('Network error loading resource at ' + url));
-      });
-      req.send();
-    }).catch(function(e) {
-      if (e.responseType) {
-        return load(url, headers, e.responseType);
-      } else {
-        throw e;
-      }
-    });
-  }
-  function parseResponseHeaders(headerStr) {
-    var headers = {};
-    if (!headerStr) {
-      return headers;
-    }
-    var headerPairs = headerStr.split('\r\n');
-    for (var i = 0; i < headerPairs.length; i++) {
-      var headerPair = headerPairs[i];
-      var index = headerPair.indexOf(': ');
-      if (index > 0) {
-        var key = headerPair.substring(0, index).toLowerCase();
-        var val = headerPair.substring(index + 2);
-        headers[key] = val;
-      }
-    }
-    return headers;
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5d", ["55", "59", "57", "58"], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-    return typeof obj;
-  } : function(obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-  Object.defineProperty(exports, "__esModule", {value: true});
-  exports.load = load;
-  exports.read = read;
-  var _Coverage = $__require('55');
-  var _Coverage2 = _interopRequireDefault(_Coverage);
-  var _CoverageCollection = $__require('59');
-  var _CoverageCollection2 = _interopRequireDefault(_CoverageCollection);
-  var _util = $__require('57');
-  var _http = $__require('58');
-  var http = _interopRequireWildcard(_http);
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key))
-            newObj[key] = obj[key];
-        }
-      }
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-  }
-  function load(url, headers) {
-    return http.load(url, headers);
-  }
-  function read(input, options) {
-    options = options || {};
-    var headers = options.headers || {};
-    if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object') {
-      return Promise.resolve().then(function() {
-        return transformCovJSON(input);
-      });
-    } else {
-      return load(input, headers).then(function(_ref) {
-        var data = _ref.data;
-        var headers = _ref.headers;
-        return transformCovJSON(data, headers);
-      });
-    }
-  }
-  function transformCovJSON(obj, headers) {
-    checkValidCovJSON(obj);
-    if (obj.type !== 'Coverage' && obj.type !== 'CoverageCollection') {
-      throw new Error('CoverageJSON document must be of Coverage or CoverageCollection type');
-    }
-    var result = undefined;
-    if (obj.type === 'Coverage') {
-      result = new _Coverage2.default(obj);
-    } else {
-      result = new _CoverageCollection2.default(obj);
-    }
-    addLinkRelations(result, headers);
-    return result;
-  }
-  function addLinkRelations(cov, headers) {
-    var IANAPrefix = 'http://www.iana.org/assignments/relation/';
-    if (!headers || !headers['link']) {
-      return;
-    }
-    var ld = cov.ld;
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-    try {
-      for (var _iterator = headers['link'].split(',')[Symbol.iterator](),
-          _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var link = _step.value;
-        link = link.trim();
-        var parts = link.split(';');
-        var url = parts[0].substr(1, parts[0].length - 2);
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-        try {
-          for (var _iterator2 = parts.slice(1)[Symbol.iterator](),
-              _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var param = _step2.value;
-            var relStart = param.indexOf('rel=');
-            if (relStart === -1) {
-              continue;
-            }
-            var rel = param.substring(relStart + 5, param.length - 2);
-            if (!rel.startsWith('http://') && !rel.startsWith('https://')) {
-              rel = IANAPrefix + rel;
-            }
-            if (ld[rel]) {
-              if (Array.isArray(ld[rel])) {
-                ld[rel].push(url);
-              } else {
-                ld[rel] = [ld[rel], url];
-              }
-            } else {
-              ld[rel] = url;
-            }
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-  }
-  function checkValidCovJSON(obj) {
-    (0, _util.assert)('type' in obj, '"type" missing');
-    if (obj.type === 'Coverage') {
-      (0, _util.assert)('parameters' in obj, '"parameters" missing');
-      (0, _util.assert)('domain' in obj, '"domain" missing');
-      (0, _util.assert)('ranges' in obj, '"ranges" missing');
-    } else if (obj.type === 'CoverageCollection') {
-      (0, _util.assert)(Array.isArray(obj.coverages), '"coverages" must be an array');
-    }
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("52", ["5d"], true, function($__require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('5d');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5e", [], true, function($__require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "format cjs";
-  (function(root, factory) {
-    if (typeof exports === 'object') {
-      module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) {
-      define([], factory);
-    } else {
-      root.urltemplate = factory();
-    }
-  }(this, function() {
-    function UrlTemplate() {}
-    UrlTemplate.prototype.encodeReserved = function(str) {
-      return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
-        if (!/%[0-9A-Fa-f]/.test(part)) {
-          part = encodeURI(part);
-        }
-        return part;
-      }).join('');
-    };
-    UrlTemplate.prototype.encodeValue = function(operator, value, key) {
-      value = (operator === '+' || operator === '#') ? this.encodeReserved(value) : encodeURIComponent(value);
-      if (key) {
-        return encodeURIComponent(key) + '=' + value;
-      } else {
-        return value;
-      }
-    };
-    UrlTemplate.prototype.isDefined = function(value) {
-      return value !== undefined && value !== null;
-    };
-    UrlTemplate.prototype.isKeyOperator = function(operator) {
-      return operator === ';' || operator === '&' || operator === '?';
-    };
-    UrlTemplate.prototype.getValues = function(context, operator, key, modifier) {
-      var value = context[key],
-          result = [];
-      if (this.isDefined(value) && value !== '') {
-        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-          value = value.toString();
-          if (modifier && modifier !== '*') {
-            value = value.substring(0, parseInt(modifier, 10));
-          }
-          result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
-        } else {
-          if (modifier === '*') {
-            if (Array.isArray(value)) {
-              value.filter(this.isDefined).forEach(function(value) {
-                result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
-              }, this);
-            } else {
-              Object.keys(value).forEach(function(k) {
-                if (this.isDefined(value[k])) {
-                  result.push(this.encodeValue(operator, value[k], k));
-                }
-              }, this);
-            }
-          } else {
-            var tmp = [];
-            if (Array.isArray(value)) {
-              value.filter(this.isDefined).forEach(function(value) {
-                tmp.push(this.encodeValue(operator, value));
-              }, this);
-            } else {
-              Object.keys(value).forEach(function(k) {
-                if (this.isDefined(value[k])) {
-                  tmp.push(encodeURIComponent(k));
-                  tmp.push(this.encodeValue(operator, value[k].toString()));
-                }
-              }, this);
-            }
-            if (this.isKeyOperator(operator)) {
-              result.push(encodeURIComponent(key) + '=' + tmp.join(','));
-            } else if (tmp.length !== 0) {
-              result.push(tmp.join(','));
-            }
-          }
-        }
-      } else {
-        if (operator === ';') {
-          result.push(encodeURIComponent(key));
-        } else if (value === '' && (operator === '&' || operator === '?')) {
-          result.push(encodeURIComponent(key) + '=');
-        } else if (value === '') {
-          result.push('');
-        }
-      }
-      return result;
-    };
-    UrlTemplate.prototype.parse = function(template) {
-      var that = this;
-      var operators = ['+', '#', '.', '/', ';', '?', '&'];
-      return {expand: function(context) {
-          return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function(_, expression, literal) {
-            if (expression) {
-              var operator = null,
-                  values = [];
-              if (operators.indexOf(expression.charAt(0)) !== -1) {
-                operator = expression.charAt(0);
-                expression = expression.substr(1);
-              }
-              expression.split(/,/g).forEach(function(variable) {
-                var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-                values.push.apply(values, that.getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
-              });
-              if (operator && operator !== '+') {
-                var separator = ',';
-                if (operator === '?') {
-                  separator = '&';
-                } else if (operator !== '#') {
-                  separator = operator;
-                }
-                return (values.length !== 0 ? operator : '') + values.join(separator);
-              } else {
-                return values.join(',');
-              }
-            } else {
-              return that.encodeReserved(literal);
-            }
-          });
-        }};
-    };
-    return new UrlTemplate();
-  }));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("5f", ["5e"], true, function($__require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('5e');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register('60', ['61', '5f'], function (_export) {
-  'use strict';
-
-  var jsonld, urltemplate, PartialCollectionView, IriTemplate, COVAPI_NS, COVAPI_API, CanInclude, COVJSON_NS, Domain, Range, OSGEO_NS, OSTIME_NS, URL_PROPS, FRAME_CONTEXT, API;
-
-  _export('discover', discover);
-
-  /**
-   * Extracts API information from the given Coverage/CoverageCollection object
-   * and returns an API object.
-   */
-
-  function discover(cov) {
-    // Our main source of API information comes from data within the .ld property.
-    // To query that we need the id of the coverage or coveragecollection.
-    if (!cov.id) {
-      return Promise.resolve(new API());
-    }
-    return jsonld.frame(cov.ld, {
-      '@context': FRAME_CONTEXT,
-      id: cov.id
-    }).then(function (framed) {
-      return jsonld.compact(framed, framed['@context']);
-    }).then(function (compacted) {
-      return new API(compacted);
-    });
-  }
-
-  function checkEmpty(obj, err) {
-    if (Object.keys(obj).length > 0) {
-      throw new Error(err);
-    }
-  }
-
-  function getBboxString(bbox) {
-    return bbox.map(getNumberString).join(',');
-  }
-
-  /**
-   * Converts a number to a decimal string in non-scientific notation.
-   */
-  function getNumberString(num) {
-    // try toString() to avoid trailing zeros from toFixed()
-    var str = num.toString();
-    // if this resulted in scientific notation, use toFixed() instead
-    if (str.indexOf('e') !== -1) {
-      str = num.toFixed(20);
-    }
-    return str;
-  }
-
-  function getIndexSubsetString(axis, spec) {
-    var slice = undefined;
-    if (typeof spec === 'number') {
-      slice = getNumberString(spec);
-    } else if (spec.start === spec.stop && (!spec.step || spec.step === 1)) {
-      slice = getNumberString(spec.start);
-    } else {
-      slice = getNumberString(spec.start) + ':' + getNumberString(stop);
-      if (spec.step) {
-        slice += ':' + getNumberString(spec.step);
-      }
-    }
-    return axis + '[' + slice + ']';
-  }
-  return {
-    setters: [function (_) {
-      jsonld = _.promises;
-    }, function (_f) {
-      urltemplate = _f['default'];
-    }],
-    execute: function () {
-      PartialCollectionView = 'PartialCollectionView';
-      IriTemplate = 'IriTemplate';
-      COVAPI_NS = 'http://coverageapi.org/ns#';
-      COVAPI_API = COVAPI_NS + 'api';
-      CanInclude = COVAPI_NS + 'canInclude';
-      COVJSON_NS = 'http://coveragejson.org/def#';
-      Domain = COVJSON_NS + 'Domain';
-      Range = COVJSON_NS + 'Range';
-      OSGEO_NS = 'http://a9.com/-/opensearch/extensions/geo/1.0/';
-      OSTIME_NS = 'http://a9.com/-/opensearch/extensions/time/1.0/';
-      URL_PROPS = {
-        filterBbox: OSGEO_NS + 'box',
-        filterTimeStart: OSTIME_NS + 'start',
-        filterTimeEnd: OSTIME_NS + 'end',
-        filterVerticalStart: COVAPI_NS + 'verticalStart',
-        filterVerticalEnd: COVAPI_NS + 'verticalEnd',
-        subsetBbox: COVAPI_NS + 'subsetBbox',
-        subsetTimeStart: COVAPI_NS + 'subsetTimeStart',
-        subsetTimeEnd: COVAPI_NS + 'subsetTimeEnd',
-        subsetVerticalStart: COVAPI_NS + 'subsetVerticalStart',
-        subsetVerticalEnd: COVAPI_NS + 'subsetVerticalEnd',
-        subsetVerticalTarget: COVAPI_NS + 'subsetVerticalTarget',
-        subsetIndex: COVAPI_NS + 'subsetIndex'
-      };
-      FRAME_CONTEXT = [
-      // partial copy of http://www.hydra-cg.com/spec/latest/core/core.jsonld
-      {
-        "hydra": "http://www.w3.org/ns/hydra/core#",
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "xsd": "http://www.w3.org/2001/XMLSchema#",
-        "owl": "http://www.w3.org/2002/07/owl#",
-        "vs": "http://www.w3.org/2003/06/sw-vocab-status/ns#",
-        "dc": "http://purl.org/dc/terms/",
-        "cc": "http://creativecommons.org/ns#",
-        "property": { "@id": "hydra:property", "@type": "@vocab" },
-        "required": "hydra:required",
-        "view": { "@id": "hydra:view", "@type": "@id" },
-        "PartialCollectionView": "hydra:PartialCollectionView",
-        "totalItems": "hydra:totalItems",
-        "first": { "@id": "hydra:first", "@type": "@id" },
-        "last": { "@id": "hydra:last", "@type": "@id" },
-        "next": { "@id": "hydra:next", "@type": "@id" },
-        "previous": { "@id": "hydra:previous", "@type": "@id" },
-        "IriTemplate": "hydra:IriTemplate",
-        "template": "hydra:template",
-        "mapping": "hydra:mapping",
-        "IriTemplateMapping": "hydra:IriTemplateMapping",
-        "variable": "hydra:variable"
-      }, {
-        'id': '@id',
-        'type': '@type',
-        // Hydra has "@type": "@vocab" which confuses the compaction -> we override it as workaround
-        // see https://github.com/json-ld/json-ld.org/issues/400
-        // we also want the full object form anyway, which we can force by omitting "@type"
-        "property": { "@id": "hydra:property" },
-        'api': COVAPI_API
-      }];
-
-      API = (function () {
-        /**
-         * @param ld A framed and compacted JSON-LD document from which Hydra data can be read.
-         */
-
-        function API(ld) {
-          babelHelpers.classCallCheck(this, API);
-
-          this.supportedUrlProps = new Map();
-
-          if (!ld) return;
-          console.log(ld);
-
-          if (ld.view && ld.view.type === PartialCollectionView) {
-            this.isPaged = true;
-            this.paging = ld.view;
-            this.paging.total = ld.totalItems;
-
-            console.log(ld.view);
-          }
-
-          if (ld.api && ld.api.type === IriTemplate) {
-            this.hasUrlTemplate = true;
-            this.urlTemplate = ld.api;
-            console.log('URL template: ' + ld.api.template);
-
-            var mappings = ld.api.mapping;
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-              for (var _iterator = mappings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var mapping = _step.value;
-
-                var propId = mapping.property.id;
-                for (var prop in URL_PROPS) {
-                  if (URL_PROPS[prop] === propId) {
-                    console.log('property recognized: ' + propId + ' (variable: ' + mapping.variable + ')');
-                    this.supportedUrlProps.set(propId, mapping.variable);
-                  }
-                }
-              }
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
-            }
-
-            console.log(ld.api);
-          }
-
-          if (ld[CanInclude]) {
-            // server supports optional inclusion via Prefer header
-            this.supportsPreferHeaders = true;
-          }
-
-          this._createCapabilities();
-        }
-
-        babelHelpers.createClass(API, [{
-          key: '_createCapabilities',
-          value: function _createCapabilities() {
-            var caps = {
-              filter: {},
-              subset: {}
-            };
-            var startstop = function startstop() {
-              return {
-                start: true,
-                stop: true
-              };
-            };
-            if (this.supportsBboxFiltering) {
-              // 'x' is not the axis name, it just represents the x-axis in a horizontal CRS
-              caps.filter.x = {
-                start: true,
-                stop: true,
-                dependency: ['y']
-              };
-              caps.filter.y = {
-                start: true,
-                stop: true,
-                dependency: ['x']
-              };
-            }
-            if (this.supportsTimeFiltering) {
-              caps.filter.time = startstop();
-            }
-            if (this.supportsVerticalFiltering) {
-              caps.filter.vertical = startstop();
-            }
-            if (this.supportsBboxSubsetting) {
-              caps.subset.x = {
-                start: true,
-                stop: true,
-                dependency: ['y']
-              };
-              caps.subset.y = {
-                start: true,
-                stop: true,
-                dependency: ['x']
-              };
-            }
-            if (this.supportsTimeSubsetting) {
-              caps.subset.time = startstop();
-            }
-            if (this.supportsVerticalSubsetting) {
-              caps.subset.vertical = startstop();
-            }
-            if (this.supportsVerticalTargetSubsetting) {
-              if (!caps.subset.vertical) {
-                caps.subset.vertical = {};
-              }
-              caps.subset.vertical.target = true;
-            }
-            if (this.supportsIndexSubsetting) {
-              caps.subset.index = {
-                start: true,
-                stop: true,
-                step: true
-              };
-            }
-            if (this.supportsPreferHeaders) {
-              caps.embed = {
-                domain: true,
-                range: true
-              };
-            }
-            this.capabilities = caps;
-          }
-
-          /**
-           * Option keys: time, x, y, vertical, embed
-           * 
-           * Each value except for 'embed' is one of (check this.capabilities to see which ones are supported!):
-           * 
-           * {start, stop} // intersect match
-           * 
-           * 'embed' is an object {domain: true, range: true} where both members are optional.
-           */
-        }, {
-          key: '_getFilterTemplateVars',
-          value: function _getFilterTemplateVars() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-            var templateVars = {};
-            if (options.time) {
-              if (!this.supportsTimeFiltering) {
-                throw new Error('Time filtering not supported!');
-              }
-              var isoStart = options.time.start;
-              var isoEnd = options.time.stop;
-              templateVars[this.supportedUrlProps.get(URL_PROPS.filterTimeStart)] = isoStart;
-              templateVars[this.supportedUrlProps.get(URL_PROPS.filterTimeEnd)] = isoEnd;
-              delete options.time;
-            }
-            if (options.vertical) {
-              if (!this.supportsVerticalFiltering) {
-                throw new Error('Vertical filtering not supported!');
-              }
-              var start = getNumberString(options.vertical.start);
-              var end = getNumberString(options.vertical.stop);
-              templateVars[this.supportedUrlProps.get(URL_PROPS.filterVerticalStart)] = start;
-              templateVars[this.supportedUrlProps.get(URL_PROPS.filterVerticalEnd)] = end;
-              delete options.vertical;
-            }
-            if (options.x) {
-              if (!this.supportsBboxFiltering) {
-                throw new Error('BBOX filtering not supported!');
-              }
-              var bboxStr = getBboxString([options.x.start, options.y.start, options.x.stop, options.y.stop]);
-              templateVars[this.supportedUrlProps.get(URL_PROPS.filterBbox)] = bboxStr;
-              delete options.x;
-              delete options.y;
-            }
-            checkEmpty(options, 'Unrecognized filter options');
-
-            return templateVars;
-          }
-
-          /**
-           * Option keys: time, x, y, vertical, index
-           * 
-           * Each value is one of (check this.capabilities to see which ones are supported!):
-           * 
-           * For time, x, y, vertical:
-           * ISO string // exact match (time)
-           * number // exact match (x, y, vertical) <- typically not supported by API
-           * {start, stop} // intersect match
-           * {target} // nearest neighbor match
-           * 
-           * For index:
-           * {<axisName>: integer, ...}
-           * {<axisName>: {start,stop[,step]}, ...}
-           */
-        }, {
-          key: '_getSubsetTemplateVars',
-          value: function _getSubsetTemplateVars() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-            var templateVars = {};
-            if (options.time) {
-              if (!this.supportsTimeSubsetting) {
-                throw new Error('Time subsetting not supported!');
-              }
-              var isoStart = options.time.start;
-              var isoEnd = options.time.stop;
-              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetTimeStart)] = isoStart;
-              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetTimeEnd)] = isoEnd;
-              delete options.time;
-            }
-            if (options.x) {
-              if (!this.supportsBboxSubsetting) {
-                throw new Error('BBOX subsetting not supported!');
-              }
-              var bboxStr = getBboxString([options.x.start, options.y.start, options.x.stop, options.y.stop]);
-              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetBbox)] = bboxStr;
-              delete options.x;
-              delete options.y;
-            }
-            if (options.vertical) {
-              if (options.vertical.target) {
-                if (!this.supportsVerticalTargetSubsetting) {
-                  throw new Error('vertical target subsetting not supported!');
-                }
-                var target = getNumberString(options.vertical.target);
-                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalTarget)] = target;
-              }
-              if (options.vertical.start) {
-                if (!this.supportsVerticalSubsetting) {
-                  throw new Error('vertical subsetting not supported!');
-                }
-                var start = getNumberString(options.vertical.start);
-                var end = getNumberString(options.vertical.stop);
-                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalStart)] = start;
-                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalEnd)] = end;
-              }
-              delete options.vertical;
-            }
-            if (options.index) {
-              if (!this.supportsIndexSubsetting) {
-                throw new Error('index subsetting not supported!');
-              }
-              var strings = [];
-              var _iteratorNormalCompletion2 = true;
-              var _didIteratorError2 = false;
-              var _iteratorError2 = undefined;
-
-              try {
-                for (var _iterator2 = Object.keys(options.index)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                  var axis = _step2.value;
-
-                  strings.push(getIndexSubsetString(axis, options.index[axis]));
-                }
-              } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                    _iterator2['return']();
-                  }
-                } finally {
-                  if (_didIteratorError2) {
-                    throw _iteratorError2;
-                  }
-                }
-              }
-
-              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetIndex)] = strings;
-            }
-            checkEmpty(options, 'Unrecognized subset options');
-
-            return templateVars;
-          }
-        }, {
-          key: '_getIncludeDomainAndRangeHeaders',
-          value: function _getIncludeDomainAndRangeHeaders() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-            if (!this.supportsPreferHeaders) {
-              return {};
-            }
-            var uris = [];
-            if (options.domain) {
-              uris.push(Domain);
-            }
-            if (options.range) {
-              uris.push(Range);
-            }
-            return {
-              Prefer: 'return=representation; ' + 'include="' + uris.join(' ') + '"'
-            };
-          }
-        }, {
-          key: 'getUrlAndHeaders',
-          value: function getUrlAndHeaders(options) {
-            var subsetTemplateVars = this._getSubsetTemplateVars(options.subset);
-            var filterTemplateVars = this._getFilterTemplateVars(options.filter);
-
-            var templateVars = subsetTemplateVars;
-            for (var key in filterTemplateVars) {
-              templateVars[key] = filterTemplateVars[key];
-            }
-
-            var url = urltemplate.parse(this.urlTemplate.template).expand(templateVars);
-            var headers = this._getIncludeDomainAndRangeHeaders(options.embed);
-            return { url: url, headers: headers };
-          }
-        }, {
-          key: 'supportsBboxFiltering',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.filterBbox);
-          }
-        }, {
-          key: 'supportsBboxSubsetting',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.subsetBbox);
-          }
-        }, {
-          key: 'supportsTimeFiltering',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.filterTimeStart) && this.supportedUrlProps.has(URL_PROPS.filterTimeEnd);
-          }
-        }, {
-          key: 'supportsTimeSubsetting',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.subsetTimeStart) && this.supportedUrlProps.has(URL_PROPS.subsetTimeEnd);
-          }
-        }, {
-          key: 'supportsVerticalFiltering',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.filterVerticalStart) && this.supportedUrlProps.has(URL_PROPS.filterVerticalEnd);
-          }
-        }, {
-          key: 'supportsVerticalSubsetting',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.subsetVerticalStart) && this.supportedUrlProps.has(URL_PROPS.subsetVerticalEnd);
-          }
-        }, {
-          key: 'supportsVerticalTargetSubsetting',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.subsetVerticalTarget);
-          }
-        }, {
-          key: 'supportsIndexSubsetting',
-          get: function get() {
-            return this.supportedUrlProps.has(URL_PROPS.subsetIndex);
-          }
-        }]);
-        return API;
-      })();
-
-      _export('API', API);
-    }
-  };
-});
-
-$__System.register('62', [], function (_export) {
-  // TODO this is copied from leaflet-coverage, DRY!
-
-  /***
-   * Return the indices of the two neighbors in the a array closest to x.
-   * The array must be sorted (strictly monotone), either ascending or descending.
-   * 
-   * If x exists in the array, both neighbors point to x.
-   * If x is lower (greated if descending) than the first value, both neighbors point to 0.
-   * If x is greater (lower if descending) than the last value, both neighbors point to the last index.
-   * 
-   * Adapted from https://stackoverflow.com/a/4431347
-   */
-  'use strict';
-
-  /**
-   * Return the index in a of the value closest to x.
-   * The array a must be sorted, either ascending or descending.
-   * If x happens to be exactly between two values, the one that
-   * appears first is returned.
-   */
-
-  _export('indicesOfNearest', indicesOfNearest);
-
-  _export('indexOfNearest', indexOfNearest);
-
-  function indicesOfNearest(a, x) {
-    if (a.length === 0) {
-      throw new Error('Array must have at least one element');
-    }
-    var lo = -1;
-    var hi = a.length;
-    var ascending = a.length === 1 || a[0] < a[1];
-    // we have two separate code paths to help the runtime optimize the loop
-    if (ascending) {
-      while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] <= x) {
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    } else {
-      while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] >= x) {
-          // here's the difference
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    }
-    if (a[lo] === x) hi = lo;
-    if (lo === -1) lo = hi;
-    if (hi === a.length) hi = lo;
-    return [lo, hi];
-  }
-
-  function indexOfNearest(a, x) {
-    var i = indicesOfNearest(a, x);
-    var lo = i[0];
-    var hi = i[1];
-    if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
-      return lo;
-    } else {
-      return hi;
-    }
-  }
-
-  return {
-    setters: [],
-    execute: function () {}
-  };
-});
-
-$__System.register("63", [], function (_export) {
-  "use strict";
-
-  _export("shallowcopy", shallowcopy);
-
-  _export("mergeInto", mergeInto);
-
-  function shallowcopy(obj) {
-    var copy = Object.create(Object.getPrototypeOf(obj));
-    for (var prop in obj) {
-      copy[prop] = obj[prop];
-    }
-    return copy;
-  }
-
-  function mergeInto(inputObj, targetObj) {
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-      for (var _iterator = Object.keys(inputObj)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var k = _step.value;
-
-        targetObj[k] = inputObj[k];
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator["return"]) {
-          _iterator["return"]();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-  }
-
-  return {
-    setters: [],
-    execute: function () {}
-  };
-});
-
-$__System.register('64', ['60', '62', '63'], function (_export) {
-
-  // Note: We currently can't handle Hydra data in non-default graphs due to lack of support in JSON-LD framing.
-
-  /**
-   * Wraps a Coverage or Coverage Collection object and executes certain functions
-   * via a remote API, in particular subsetting.
-   * 
-   * @param {object} data The Coverage API object to wrap.
-   * @param {object} options Options which control the behaviour of the wrapper.
-   * @param {function} options.loader 
-   *   The function to use for loading coverage data from a URL.
-   *   It is called as loader(url, headers) where headers is an optional object
-   *   of HTTP headers to send.
-   *   It must return a Promise succeeding with a Coverage Data API object.
-   *   
-   * @returns {object} The wrapped Coverage Data API object.
-   */
-  'use strict';
-
-  var API, arrays, shallowcopy, mergeInto, QueryProxy;
-
-  _export('wrap', wrap);
-
-  function wrap(data, options) {
-    if (typeof options.loader !== 'function') {
-      throw new Error('options.loader must be a function');
-    }
-    if (data.coverages) {
-      return wrapCollection(data, options);
-    } else {
-      return wrapCoverage(data, options);
-    }
-  }
-
-  function wrapCollection(collection, options) {
-    // TODO wrap each individual coverage as well!
-    return API.discover(collection).then(function (api) {
-      var newcoll = shallowcopy(collection);
-      newcoll.query = function () {
-        var query = collection.query();
-        return new QueryProxy(query, newcoll, api, options);
-      };
-      if (api.isPaged) {
-        (function () {
-          var _load = options.loader;
-          var wrapPageLink = function wrapPageLink(url) {
-            if (!url) return;
-            return {
-              load: function load() {
-                return _load(url, options.headers).then(function (coll) {
-                  return wrap(coll, options);
-                });
-              }
-            };
-          };
-          newcoll.paging = {
-            total: api.paging.total,
-            previous: wrapPageLink(api.paging.previous),
-            next: wrapPageLink(api.paging.next),
-            first: wrapPageLink(api.paging.first),
-            last: wrapPageLink(api.paging.last)
-          };
-        })();
-      }
-      return newcoll;
-    });
-  }
-
-  /**
-   * Collects the query parts and executes the query remotely
-   * if possible.
-   */
-
-  function wrapCoverage(coverage, options) {
-    return API.discover(coverage).then(function (api) {
-      var wrappedCoverage = shallowcopy(coverage);
-      wrappedCoverage.subsetByIndex = wrappedSubsetByIndex(coverage, wrappedCoverage, api, options);
-      wrappedCoverage.subsetByValue = wrappedSubsetByValue(coverage, wrappedCoverage, api, options);
-      return wrappedCoverage;
-    });
-  }
-
-  function wrappedSubsetByIndex(coverage, wrappedCoverage, api, wrapOptions) {
-    return function (constraints) {
-      return coverage.loadDomain().then(function (domain) {
-        constraints = cleanedConstraints(constraints);
-
-        if (!requiresSubsetting(domain, constraints)) {
-          return wrappedCoverage;
-        }
-
-        var caps = api.capabilities.subset;
-        var axisMap = getAxisConcepts(domain);
-
-        /*
-         * If the API supports generic index-based subsetting, then this is used.
-         * If not, several emulation strategies are used instead (if possible).
-         */
-
-        // we split the subsetting constraints into API-compatible and local ones
-        var apiConstraints = {}; // API concept -> spec
-        var localConstraints = {}; // axis name -> spec
-
-        if (caps.index) {
-          apiConstraints.index = constraints;
-        } else {
-          // try to emulate some constraints
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
-
-          try {
-            for (var _iterator3 = Object.keys(constraints)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var axis = _step3.value;
-
-              var useApi = false;
-              var constraint = constraints[axis];
-              var cap = caps[axisMap[axis]];
-
-              if (!cap) {
-                // leave useApi = false
-              } else if (typeof constraint !== 'object') {
-                  if (cap.start && cap.stop) {
-                    // emulate identity match via start/stop
-                    var val = domain.axes.get(axis).values[constraint];
-                    constraint = { start: val, stop: val };
-                    useApi = true;
-                  }
-                } else if (!constraint.step) {
-                  // start / stop
-                  if (cap.start && cap.stop) {
-                    var start = domain.axes.get(axis).values[constraint.start];
-                    var _stop = domain.axes.get(axis).values[constraint.stop];
-                    constraint = { start: start, stop: _stop };
-                    useApi = true;
-                  }
-                }
-
-              if (useApi) {
-                apiConstraints[axisMap[axis]] = constraint;
-              } else {
-                localConstraints[axis] = constraint;
-              }
-            }
-          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-                _iterator3['return']();
-              }
-            } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
-              }
-            }
-          }
-        }
-
-        toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, caps, axisMap);
-
-        if (Object.keys(apiConstraints).length === 0) {
-          // Note that we DON'T wrap the locally subsetted coverage again.
-          // This would be incorrect as a partially applied local subset would not be
-          // known by the API metadata and therefore a subsequent API subset operation would
-          // return wrong data (too much).
-          // A way out would be to attach the original API info to the original coverage identity,
-          // which can be established with "subsetOf".
-          // Somewhere the constraints used for subsetting would have to be stored as well,
-          // so that we can reproduce them.
-          // E.g.:
-          // 1. Coverage A with API info
-          // 2. Subset Coverage A by bounding box without API -> Coverage B with subset relationship to Coverage A
-          // 3. Subset Coverage B by time
-          //  3.1. Subset Coverage A by time with API -> Coverage C with API info
-          //  3.2. Subset Coverage C by bounding box without API -> Coverage D with subset relationship to Coverage C
-          // TODO implement that or think of something simpler
-          return coverage.subsetByIndex(constraints);
-        }
-
-        var _api$getUrlAndHeaders2 = api.getUrlAndHeaders({ subset: apiConstraints });
-
-        var url = _api$getUrlAndHeaders2.url;
-        var headers = _api$getUrlAndHeaders2.headers;
-
-        return wrapOptions.loader(url, headers).then(function (subset) {
-          // apply remaining subset constraints
-          if (Object.keys(localConstraints).length > 0) {
-            // again, we DON'T wrap the locally subsetted coverage again, see above
-            return subset.subsetByIndex(localConstraints);
-          } else {
-            return wrap(subset, wrapOptions);
-          }
-        });
-      });
-    };
-  }
-
-  function wrappedSubsetByValue(coverage, wrappedCoverage, api, wrapOptions) {
-    return function (constraints) {
-      return coverage.loadDomain().then(function (domain) {
-        constraints = cleanedConstraints(constraints);
-
-        if (!requiresSubsetting(domain, constraints)) {
-          return wrappedCoverage;
-        }
-
-        var caps = api.capabilities.subset;
-        var axisMap = getAxisConcepts(domain);
-
-        /* If the API does not support target-based subsetting, then this can be emulated
-         * via intersection-based subsetting by inspecting the domain locally first
-         * and then subsetting with equal start/stop with the identified domain value.
-         * The same is done for exact match subsetting.
-         * 
-         * FIXME this approach will return invalid results (two instead of one axis step)
-         * if the axis has bounds and they are aligned such that a bound start or end
-         * is identical to the axis value and the neighboring bounds share their start/end.
-         * This is common in WaterML. To account for that, this scenario could be explicitly checked for.
-         * A safe start/stop would then be a newly calculated axis value which is in the middle
-         * of the bounds.
-         */
-
-        // we split the subsetting constraints into API-compatible and local ones
-        var apiConstraints = {}; // API concept -> spec
-        var localConstraints = {}; // axis name -> spec
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
-
-        try {
-          for (var _iterator4 = Object.keys(constraints)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-            var axis = _step4.value;
-
-            var useApi = false;
-            var constraint = constraints[axis];
-            var cap = caps[axisMap[axis]];
-            var isTimeString = axisMap[axis] === 'time';
-
-            if (!cap) {
-              // leave useApi = false
-            } else if (typeof constraint !== 'object') {
-                if (cap.identity) {
-                  useApi = true;
-                } else if (cap.start && cap.stop) {
-                  // emulate identity match via start/stop if we find a matching axis value
-                  var idx = getClosestIndex(domain, axis, constraint.target, isTimeString);
-                  var val = domain.axes.get(axis).values[idx];
-                  if (isTimeString) {
-                    if (new Date(val).getTime() === new Date(constraint).getTime()) {
-                      constraint = { start: constraint, stop: constraint };
-                      useApi = true;
-                    }
-                  } else if (val === constraint) {
-                    constraint = { start: constraint, stop: constraint };
-                    useApi = true;
-                  }
-                }
-              } else if ('target' in constraint) {
-                if (cap.target) {
-                  useApi = true;
-                } else if (cap.start && cap.stop) {
-                  // emulate target via start/stop
-                  var idx = getClosestIndex(domain, axis, constraint.target, isTimeString);
-                  var val = domain.axes.get(axis).values[idx];
-                  constraint = { start: val, stop: val };
-                  useApi = true;
-                }
-              } else {
-                // start / stop
-                useApi = cap.start && cap.stop;
-              }
-
-            if (useApi) {
-              apiConstraints[axisMap[axis]] = constraint;
-            } else {
-              localConstraints[axis] = constraint;
-            }
-          }
-        } catch (err) {
-          _didIteratorError4 = true;
-          _iteratorError4 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-              _iterator4['return']();
-            }
-          } finally {
-            if (_didIteratorError4) {
-              throw _iteratorError4;
-            }
-          }
-        }
-
-        toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, caps, axisMap);
-
-        if (Object.keys(apiConstraints).length === 0) {
-          // again, we DON'T wrap the locally subsetted coverage again, see above
-          return coverage.subsetByValue(constraints);
-        }
-
-        var _api$getUrlAndHeaders3 = api.getUrlAndHeaders({ subset: apiConstraints });
-
-        var url = _api$getUrlAndHeaders3.url;
-        var headers = _api$getUrlAndHeaders3.headers;
-
-        return wrapOptions.loader(url, headers).then(function (subset) {
-          // apply remaining subset constraints
-          if (Object.keys(localConstraints).length > 0) {
-            // again, we DON'T wrap the locally subsetted coverage again, see above
-            return subset.subsetByValue(localConstraints);
-          } else {
-            return wrap(subset, wrapOptions);
-          }
-        });
-      });
-    };
-  }
-
-  /**
-   * Returns an object that maps axis keys to API concept names by
-   * interpreting domain referencing info.
-   * An axis with unknown concept is mapped to undefined.
-   */
-  function getAxisConcepts(domain) {
-    var axisConcepts = {};
-    var referencing = domain.referencing;
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
-
-    try {
-      var _loop = function () {
-        var axis = _step5.value;
-
-        var concept = undefined;
-
-        var ref = referencing.filter(function (ref) {
-          return ref.dimensions.indexOf(axis) !== -1;
-        });
-        if (ref.length === 1) {
-          var _ref$0 = ref[0];
-          var dimensions = _ref$0.dimensions;
-          var system = _ref$0.system;
-
-          if (system.type === 'TemporalRS') {
-            // The assumption is that if the API offers filtering/subsetting by time,
-            // then this happens in the same concrete temporal system (calendar etc.).
-            // Also, it is assumed that there is only one time axis.
-            // TODO how to locate the "main" time axis if there are multiple?
-            //      see https://github.com/Reading-eScience-Centre/coveragejson/issues/45
-            concept = 'time';
-          } else if (system.type === 'VerticalCRS') {
-            concept = 'vertical';
-          } else if (system.type === 'GeodeticCRS' || system.type === 'ProjectedCRS') {
-            // a geodetic crs can be x,y or x,y,z
-            // a projected crs is x,y
-            var idx = dimensions.indexOf(axis);
-            if (idx === 0) {
-              concept = 'x';
-            } else if (idx === 1) {
-              concept = 'y';
-            } else if (idx === 2) {
-              concept = 'vertical';
-            }
-          }
-        }
-
-        axisConcepts[axis] = concept;
-      };
-
-      for (var _iterator5 = domain.axes.keys()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-        _loop();
-      }
-    } catch (err) {
-      _didIteratorError5 = true;
-      _iteratorError5 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-          _iterator5['return']();
-        }
-      } finally {
-        if (_didIteratorError5) {
-          throw _iteratorError5;
-        }
-      }
-    }
-
-    return axisConcepts;
-  }
-
-  /**
-   *  Check if all API dependencies between concepts are met.
-   *  This is mainly for the bounding box case which needs both x and y.
-   *  If a dependency is missing, then the constraint is moved to the
-   *  locally applied ones.
-   */
-  function toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, capabilities, axisConcepts) {
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
-
-    try {
-      var _loop2 = function () {
-        var concept = _step6.value;
-
-        var depends = capabilities[concept].dependency;
-        if (depends && depends.some(function (concept_) {
-          return !apiConstraints[concept_];
-        })) {
-          var axis = Object.keys(axisConcepts).filter(function (axis) {
-            return axisConcepts[axis] === concept;
-          })[0];
-          localConstraints[axis] = apiConstraints[concept];
-          delete apiConstraints[concept];
-        }
-      };
-
-      for (var _iterator6 = Object.keys(apiConstraints)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-        _loop2();
-      }
-    } catch (err) {
-      _didIteratorError6 = true;
-      _iteratorError6 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-          _iterator6['return']();
-        }
-      } finally {
-        if (_didIteratorError6) {
-          throw _iteratorError6;
-        }
-      }
-    }
-  }
-
-  function getClosestIndex(domain, axis, val, isTimeString) {
-    var vals = domain.axes.get(axis).values;
-    if (isTimeString) {
-      // convert to unix timestamps as we need numbers
-      val = new Date(val).getTime();
-      vals = vals.map(function (t) {
-        return new Date(t).getTime();
-      });
-    }
-    var idx = arrays.indexOfNearest(vals, val);
-    return idx;
-  }
-
-  /**
-   * Checks whether the constraints may result in an actual
-   * subsetting of the coverage (=true), or whether they are guaranteed
-   * to have no effect (=false). 
-   */
-  function requiresSubsetting(domain, constraints) {
-    var _iteratorNormalCompletion7 = true;
-    var _didIteratorError7 = false;
-    var _iteratorError7 = undefined;
-
-    try {
-      for (var _iterator7 = Object.keys(constraints)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-        var axisKey = _step7.value;
-
-        var len = domain.axes.get(axisKey).values.length;
-        if (len > 1) {
-          return true;
-        }
-      }
-    } catch (err) {
-      _didIteratorError7 = true;
-      _iteratorError7 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
-          _iterator7['return']();
-        }
-      } finally {
-        if (_didIteratorError7) {
-          throw _iteratorError7;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  function cleanedConstraints(constraints) {
-    var cleanConstraints = shallowcopy(constraints);
-    var _iteratorNormalCompletion8 = true;
-    var _didIteratorError8 = false;
-    var _iteratorError8 = undefined;
-
-    try {
-      for (var _iterator8 = Object.keys(constraints)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-        var key = _step8.value;
-
-        if (constraints[key] === undefined || constraints[key] === null) {
-          delete cleanConstraints[key];
-        }
-      }
-    } catch (err) {
-      _didIteratorError8 = true;
-      _iteratorError8 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion8 && _iterator8['return']) {
-          _iterator8['return']();
-        }
-      } finally {
-        if (_didIteratorError8) {
-          throw _iteratorError8;
-        }
-      }
-    }
-
-    return cleanConstraints;
-  }
-
-  function getOptionsWithHeaders(options, headers) {
-    options = shallowcopy(options);
-    if (!options.headers) {
-      options.headers = {};
-    }
-    mergeInto(headers, options.headers);
-    return options;
-  }
-  return {
-    setters: [function (_) {
-      API = _;
-    }, function (_2) {
-      arrays = _2;
-    }, function (_3) {
-      shallowcopy = _3.shallowcopy;
-      mergeInto = _3.mergeInto;
-    }],
-    execute: function () {
-      QueryProxy = (function () {
-        function QueryProxy(query, collection, api, options) {
-          babelHelpers.classCallCheck(this, QueryProxy);
-
-          this._query = query;
-          this._collection = collection;
-          this._api = api;
-          this._options = options;
-
-          this._filter = {};
-          this._subset = {};
-          this._embed = {};
-        }
-
-        babelHelpers.createClass(QueryProxy, [{
-          key: 'filter',
-          value: function filter(spec) {
-            this._query.filter(spec);
-            mergeInto(spec, this._filter);
-            return this;
-          }
-        }, {
-          key: 'subset',
-          value: function subset(spec) {
-            this._query.subset(spec);
-            mergeInto(spec, this._subset);
-            return this;
-          }
-        }, {
-          key: 'embed',
-          value: function embed(spec) {
-            this._query.embed(spec);
-            mergeInto(spec, this._embed);
-            return this;
-          }
-        }, {
-          key: 'execute',
-          value: function execute() {
-            var _this = this;
-
-            var domainTemplate = this._collection.domainTemplate;
-            if (domainTemplate) {
-              return this._doExecute(domainTemplate);
-            } else {
-              // inspect domain of first coverage and assume uniform collection
-              if (this._collection.coverages.length > 0) {
-                return this._collection.coverages[0].loadDomain().then(function (domain) {
-                  return _this._doExecute(domain);
-                });
-              } else {
-                return this._query.execute();
-              }
-            }
-          }
-        }, {
-          key: '_doExecute',
-          value: function _doExecute(domainTemplate) {
-            var _this2 = this;
-
-            var load = this._options.loader;
-
-            var filterCaps = this._api.capabilities.filter;
-            var subsetCaps = this._api.capabilities.subset;
-            var embedCaps = this._api.capabilities.embed;
-            var axisMap = getAxisConcepts(domainTemplate);
-
-            // split constraints into API and locally applied ones
-            var apiConstraints = {
-              filter: {},
-              subset: {},
-              embed: {}
-            };
-
-            var localFilterConstraints = {}; // axis name -> spec
-            var localSubsetConstraints = {}; // axis name -> spec
-
-            // embedding
-            // makes only sense when using the API, hence there is no local fall-back
-            if (embedCaps.domain && embedCaps.range) {
-              apiConstraints.embed = this._embed;
-            }
-
-            // filtering
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-              for (var _iterator = Object.keys(this._filter)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var axis = _step.value;
-
-                var constraint = this._filter[axis];
-                var cap = filterCaps[axisMap[axis]];
-                if (cap && cap.start && cap.stop) {
-                  apiConstraints.filter[axisMap[axis]] = constraint;
-                } else {
-                  localFilterConstraints[axis] = constraint;
-                }
-              }
-
-              // subsetting
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
-            }
-
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = Object.keys(this._subset)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var axis = _step2.value;
-
-                var constraint = this._subset[axis];
-                var cap = subsetCaps[axisMap[axis]];
-                var useApi = false;
-
-                if (!cap) {
-                  // leave useApi = false
-                } else if (typeof constraint !== 'object' && cap.identity) {
-                    useApi = true;
-                  } else if ('target' in constraint && cap.target) {
-                    useApi = true;
-                  } else if ('start' in constraint && 'stop' in constraint && cap.start && cap.stop) {
-                    useApi = true;
-                  }
-
-                if (useApi) {
-                  apiConstraints.subset[axisMap[axis]] = constraint;
-                } else {
-                  localSubsetConstraints[axis] = constraint;
-                }
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-                  _iterator2['return']();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
-            }
-
-            toLocalConstraintsIfDependencyMissing(apiConstraints.filter, localFilterConstraints, filterCaps, axisMap);
-            toLocalConstraintsIfDependencyMissing(apiConstraints.subset, localSubsetConstraints, subsetCaps, axisMap);
-
-            // TODO if only embed is requested, check if this is already applied and return the original collection in that case
-            if (Object.keys(apiConstraints.filter).length === 0 && Object.keys(apiConstraints.subset).length === 0 && Object.keys(apiConstraints.embed).length === 0) {
-              return this._query.execute();
-            }
-
-            var _api$getUrlAndHeaders = this._api.getUrlAndHeaders(apiConstraints);
-
-            var url = _api$getUrlAndHeaders.url;
-            var headers = _api$getUrlAndHeaders.headers;
-
-            return load(url, headers).then(function (resultCollection) {
-              // apply remaining query parts
-              if (Object.keys(localSubsetConstraints).length > 0 || Object.keys(localFilterConstraints).length > 0) {
-                // the locally queried collection is NOT wrapped! see comment for coverage subsetting below
-                return resultCollection.query().filter(localFilterConstraints).subset(localSubsetConstraints).execute();
-              } else {
-                // carry-over headers for paging
-                var options = getOptionsWithHeaders(_this2._options, headers);
-                return wrap(resultCollection, options);
-              }
-            });
-          }
-        }]);
-        return QueryProxy;
-      })();
-    }
-  };
-});
-
-$__System.register("53", ["64"], function (_export) {
-  "use strict";
-
-  return {
-    setters: [function (_) {
-      var _exportObj = {};
-
-      for (var _key in _) {
-        if (_key !== "default") _exportObj[_key] = _[_key];
-      }
-
-      _exportObj["default"] = _["default"];
-
-      _export(_exportObj);
-    }],
-    execute: function () {}
-  };
-});
-
-$__System.register('65', ['52', '53', '54'], function (_export) {
-  'use strict';
-
-  var CovJSONReader, RestAPI, CoverageData, CovJSON;
-  return {
-    setters: [function (_) {
-      CovJSONReader = _;
-    }, function (_2) {
-      RestAPI = _2;
-    }, function (_3) {
-      CoverageData = _3['default'];
-    }],
-    execute: function () {
-      CovJSON = (function (_CoverageData) {
-        babelHelpers.inherits(CovJSON, _CoverageData);
-
-        /**
-         * @param {Array} actionFactories Array of action class factories
-         */
-
-        function CovJSON(actionFactories) {
-          babelHelpers.classCallCheck(this, CovJSON);
-
-          babelHelpers.get(Object.getPrototypeOf(CovJSON.prototype), 'constructor', this).call(this, actionFactories);
-          this.label = 'CoverageJSON Binary';
-          this.shortLabel = 'CovJSONB';
+          this.label = 'CoverageCBOR';
+          this.shortLabel = 'CovCBOR';
           this.mediaTypes = ['application/prs.coverage+cbor'];
         }
 
@@ -7813,7 +3337,7 @@ $__System.register('65', ['52', '53', '54'], function (_export) {
   };
 });
 
-$__System.register('66', ['67', '68'], function (_export) {
+$__System.register('55', ['56', '57'], function (_export) {
   'use strict';
 
   var $, Format, WMS;
@@ -7926,11 +3450,11 @@ $__System.register('66', ['67', '68'], function (_export) {
   };
 });
 
-$__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export) {
+$__System.register('58', ['48', '59', '5f', '5a', '5b', '5c', '5d', '5e'], function (_export) {
   /* */
   'use strict';
 
-  var L, ndarray, linearPalette, directPalette, scale, arrays, rangeutil, referencingutil, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
+  var L, linearPalette, directPalette, scale, ndarray, arrays, rangeutil, referencingutil, isDomain, toCoverage, DEFAULT_CONTINUOUS_PALETTE, DEFAULT_CATEGORICAL_PALETTE, Grid;
 
   function wrapLongitude(lon, range) {
     return wrapNum(lon, range, true);
@@ -7948,17 +3472,21 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      ndarray = _2['default'];
+      linearPalette = _2.linearPalette;
+      directPalette = _2.directPalette;
+      scale = _2.scale;
+    }, function (_f) {
+      ndarray = _f['default'];
     }, function (_a) {
-      linearPalette = _a.linearPalette;
-      directPalette = _a.directPalette;
-      scale = _a.scale;
+      arrays = _a;
     }, function (_b) {
-      arrays = _b;
+      rangeutil = _b;
     }, function (_c) {
-      rangeutil = _c;
+      referencingutil = _c;
     }, function (_d) {
-      referencingutil = _d;
+      isDomain = _d.isDomain;
+    }, function (_e) {
+      toCoverage = _e.toCoverage;
     }],
     execute: function () {
       DEFAULT_CONTINUOUS_PALETTE = function DEFAULT_CONTINUOUS_PALETTE() {
@@ -7972,7 +3500,8 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
       };
 
       /**
-       * Renderer for Coverages with domain type Grid.
+       * Renderer for Coverages and Domains with (domain) profile Grid.
+       * For Domain objects, a dummy parameter and range data is created.
        * 
        * Events:
        * "add" - Layer is initialized and is about to be added to the map
@@ -7991,7 +3520,8 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
         babelHelpers.inherits(Grid, _L$TileLayer$Canvas);
 
         /**
-         * The parameter to display must be given as the 'parameter' options property.
+         * The key of the parameter to display must be given in the 'keys' options property,
+         * except when the coverage data object is a Domain object.
          * 
          * Optional time and vertical axis target values can be defined with the 'time' and
          * 'vertical' options properties. The closest values on the respective axes are chosen.
@@ -8013,6 +3543,11 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
           babelHelpers.classCallCheck(this, Grid);
 
           babelHelpers.get(Object.getPrototypeOf(Grid.prototype), 'constructor', this).call(this);
+
+          if (isDomain(cov)) {
+            cov = toCoverage(cov);
+            options.keys = [cov.parameters.keys().next.value];
+          }
 
           this.cov = cov;
           this.param = cov.parameters.get(options.keys[0]);
@@ -8258,7 +3793,7 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
                 }
                 if (ax.coordPref == undefined) {
                   // == also handles null
-                  spec[axis] = this.domain.axes.get(axis).values[0];
+                  spec[axis] = { target: this.domain.axes.get(axis).values[0] };
                 } else {
                   spec[axis] = { target: ax.coordPref };
                 }
@@ -8325,9 +3860,17 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
             if (extent === 'subset') {
               // scan the current subset for min/max values
 
+              var xlen = this.subsetRange.shape.get('x');
+              var ylen = this.subsetRange.shape.get('y');
+
               // check if subsetted size is manageable
-              if (this.subsetRange.shape.x * this.subsetRange.shape.y < 10000) {
+              if (xlen * ylen < 10000) {
                 extent = rangeutil.minMax(this.subsetRange);
+                // enlarge extent if there is just a single value
+                if (extent[0] === extent[1]) {
+                  var buffer = extent[0] * 0.1;
+                  extent = [extent[0] - buffer, extent[1] + buffer];
+                }
                 var changed = hasChanged(extent);
                 this._paletteExtent = extent;
                 return Promise.resolve(changed);
@@ -8335,8 +3878,6 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
                 // subset x and y to get a fast estimate of the palette extent
                 // since it is an estimate, the lower and upper bound needs a small buffer
                 // (to prevent out-of-bounds colours)
-                var xlen = this.subsetRange.shape.get('x');
-                var ylen = this.subsetRange.shape.get('y');
                 var xconstraint = { start: 0, stop: xlen, step: Math.max(Math.round(xlen / 100), 1) };
                 var yconstraint = { start: 0, stop: ylen, step: Math.max(Math.round(ylen / 100), 1) };
 
@@ -8501,25 +4042,32 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
         }, {
           key: '_getDomainBbox',
           value: function _getDomainBbox() {
-            var x = this.domain.axes.get('x').values;
-            var y = this.domain.axes.get('y').values;
+            var xAxis = this.domain.axes.get('x');
+            var yAxis = this.domain.axes.get('y');
+            var x = xAxis.values;
+            var y = yAxis.values;
+            var xBounds = xAxis.bounds;
+            var yBounds = yAxis.bounds;
 
-            // TODO use bounds if they are supplied
             var xend = x.length - 1;
             var yend = y.length - 1;
-            var xmin = x[0];
-            var xmax = x[xend];
-            var ymin = y[0];
-            var ymax = y[yend];
-
-            // TODO only enlarge when bounds haven't been used above
-            if (x.length > 1) {
-              xmin -= Math.abs(x[0] - x[1]) / 2;
-              xmax += Math.abs(x[xend] - x[xend - 1]) / 2;
+            var xmin = undefined,
+                xmax = undefined;
+            if (xBounds) {
+              xmin = xBounds.get(0)[0];
+              xmax = xBounds.get(xend)[1];
+            } else {
+              xmin = x[0];
+              xmax = x[xend];
             }
-            if (y.length > 1) {
-              ymin -= Math.abs(y[0] - y[1]) / 2;
-              ymax += Math.abs(y[yend] - y[yend - 1]) / 2;
+            var ymin = undefined,
+                ymax = undefined;
+            if (yBounds) {
+              ymin = yBounds.get(0)[0];
+              ymax = yBounds.get(yend)[1];
+            } else {
+              ymin = y[0];
+              ymax = y[yend];
             }
             if (xmin > xmax) {
               var _ref3 = [xmax, xmin];
@@ -8531,6 +4079,15 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
               ymin = _ref4[0];
               ymax = _ref4[1];
             }
+            if (!xBounds && x.length > 1) {
+              xmin -= Math.abs(x[0] - x[1]) / 2;
+              xmax += Math.abs(x[xend] - x[xend - 1]) / 2;
+            }
+            if (!yBounds && y.length > 1) {
+              ymin -= Math.abs(y[0] - y[1]) / 2;
+              ymax += Math.abs(y[yend] - y[yend - 1]) / 2;
+            }
+
             return [xmin, ymin, xmax, ymax];
           }
 
@@ -8683,6 +4240,11 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
             }
           }
         }, {
+          key: 'coverage',
+          get: function get() {
+            return this.cov;
+          }
+        }, {
           key: 'parameter',
           get: function get() {
             return this.param;
@@ -8807,28 +4369,32 @@ $__System.register('69', ['48', '56', '6a', '6b', '6c', '6d'], function (_export
   };
 });
 
-$__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
+$__System.register('60', ['48', '59', '5b', '5c', '5d', '5e'], function (_export) {
   /* */
   'use strict';
 
-  var L, linearPalette, scale, rangeutil, referencingutil, DEFAULT_PALETTE, Trajectory;
+  var L, linearPalette, scale, rangeutil, referencingutil, isDomain, toCoverage, DEFAULT_PALETTE, Trajectory;
   return {
     setters: [function (_) {
       L = _['default'];
-    }, function (_a) {
-      linearPalette = _a.linearPalette;
-      scale = _a.scale;
+    }, function (_2) {
+      linearPalette = _2.linearPalette;
+      scale = _2.scale;
+    }, function (_b) {
+      rangeutil = _b;
     }, function (_c) {
-      rangeutil = _c;
+      referencingutil = _c;
     }, function (_d) {
-      referencingutil = _d;
+      isDomain = _d.isDomain;
+    }, function (_e) {
+      toCoverage = _e.toCoverage;
     }],
     execute: function () {
       DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
       // blues
 
       /**
-       * Renderer for Coverages with domain type Trajectory.
+       * Renderer for Coverages and Domains with (domain) profile Trajectory.
        * 
        * Displays the trajectory as a path with coloured points using
        * a given palette for a given parameter.
@@ -8855,6 +4421,11 @@ $__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
 
           babelHelpers.get(Object.getPrototypeOf(Trajectory.prototype), 'constructor', this).call(this);
 
+          if (isDomain(cov)) {
+            cov = toCoverage(cov);
+            options.keys = [cov.parameters.keys().next.value];
+          }
+
           this.cov = cov;
           this.param = cov.parameters.get(options.keys[0]);
 
@@ -8877,7 +4448,6 @@ $__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
           value: function onAdd(map) {
             var _this = this;
 
-            console.log('adding trajectory to map');
             this._map = map;
             this.fire('dataLoading'); // for supporting loading spinners
             Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(function (_ref) {
@@ -8886,7 +4456,6 @@ $__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
               var domain = _ref2[0];
               var range = _ref2[1];
 
-              console.log('domain and range loaded');
               _this.domain = domain;
               var srs = referencingutil.getRefSystem(domain, ['x', 'y']);
               if (!referencingutil.isGeodeticWGS84CRS(srs)) {
@@ -8910,7 +4479,6 @@ $__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
           key: 'onRemove',
           value: function onRemove(map) {
             this.fire('remove');
-            console.log('removing trajectory from map');
             babelHelpers.get(Object.getPrototypeOf(Trajectory.prototype), 'onRemove', this).call(this, map);
           }
         }, {
@@ -8999,6 +4567,11 @@ $__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
             this._addTrajectoryLayers();
           }
         }, {
+          key: 'coverage',
+          get: function get() {
+            return this.cov;
+          }
+        }, {
           key: 'parameter',
           get: function get() {
             return this.param;
@@ -9032,11 +4605,7 @@ $__System.register('6e', ['48', '6a', '6c', '6d'], function (_export) {
   };
 });
 
-$__System.register('6f', [], function (_export) {
-  /* */
-  'use strict';
-
-  "format esm";
+$__System.register("61", [], function (_export) {
   // 2016-02-23 Maik Riechert - adjust boilerplate to make it node compatible
 
   /**
@@ -9050,518 +4619,509 @@ $__System.register('6f', [], function (_export) {
    * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
    */
 
-  return {
-    setters: [],
-    execute: function () {
-      (function (root, factory) {
-        if (typeof define === 'function' && define.amd) {
-          // AMD. Register as an anonymous module.
-          define([], factory);
-        } else if (typeof module === 'object' && module.exports) {
-          // Node. Does not work with strict CommonJS, but
-          // only CommonJS-like environments that support module.exports,
-          // like Node.
-          module.exports = factory();
+  "use strict";
+
+  function Node(obj, dimension, parent) {
+    this.obj = obj;
+    this.left = null;
+    this.right = null;
+    this.parent = parent;
+    this.dimension = dimension;
+  }
+
+  function kdTree(points, metric, dimensions) {
+
+    var self = this;
+
+    function buildTree(points, depth, parent) {
+      var dim = depth % dimensions.length,
+          median,
+          node;
+
+      if (points.length === 0) {
+        return null;
+      }
+      if (points.length === 1) {
+        return new Node(points[0], dim, parent);
+      }
+
+      points.sort(function (a, b) {
+        return a[dimensions[dim]] - b[dimensions[dim]];
+      });
+
+      median = Math.floor(points.length / 2);
+      node = new Node(points[median], dim, parent);
+      node.left = buildTree(points.slice(0, median), depth + 1, node);
+      node.right = buildTree(points.slice(median + 1), depth + 1, node);
+
+      return node;
+    }
+
+    // Reloads a serialied tree
+    function loadTree(data) {
+      // Just need to restore the `parent` parameter
+      self.root = data;
+
+      function restoreParent(root) {
+        if (root.left) {
+          root.left.parent = root;
+          restoreParent(root.left);
         }
-      })(undefined, function () {
-        function Node(obj, dimension, parent) {
-          this.obj = obj;
-          this.left = null;
-          this.right = null;
-          this.parent = parent;
-          this.dimension = dimension;
+
+        if (root.right) {
+          root.right.parent = root;
+          restoreParent(root.right);
         }
+      }
 
-        function kdTree(points, metric, dimensions) {
+      restoreParent(self.root);
+    }
 
-          var self = this;
+    // If points is not an array, assume we're loading a pre-built tree
+    if (!Array.isArray(points)) loadTree(points, metric, dimensions);else this.root = buildTree(points, 0, null);
 
-          function buildTree(points, depth, parent) {
-            var dim = depth % dimensions.length,
-                median,
-                node;
+    // Convert to a JSON serializable structure; this just requires removing
+    // the `parent` property
+    this.toJSON = function (src) {
+      if (!src) src = this.root;
+      var dest = new Node(src.obj, src.dimension, null);
+      if (src.left) dest.left = self.toJSON(src.left);
+      if (src.right) dest.right = self.toJSON(src.right);
+      return dest;
+    };
 
-            if (points.length === 0) {
-              return null;
-            }
-            if (points.length === 1) {
-              return new Node(points[0], dim, parent);
-            }
+    this.insert = function (point) {
+      function innerSearch(_x, _x2) {
+        var _again = true;
 
-            points.sort(function (a, b) {
-              return a[dimensions[dim]] - b[dimensions[dim]];
-            });
+        _function: while (_again) {
+          var node = _x,
+              parent = _x2;
+          _again = false;
 
-            median = Math.floor(points.length / 2);
-            node = new Node(points[median], dim, parent);
-            node.left = buildTree(points.slice(0, median), depth + 1, node);
-            node.right = buildTree(points.slice(median + 1), depth + 1, node);
+          if (node === null) {
+            return parent;
+          }
 
+          var dimension = dimensions[node.dimension];
+          if (point[dimension] < node.obj[dimension]) {
+            _x = node.left;
+            _x2 = node;
+            _again = true;
+            dimension = undefined;
+            continue _function;
+          } else {
+            _x = node.right;
+            _x2 = node;
+            _again = true;
+            dimension = undefined;
+            continue _function;
+          }
+        }
+      }
+
+      var insertPosition = innerSearch(this.root, null),
+          newNode,
+          dimension;
+
+      if (insertPosition === null) {
+        this.root = new Node(point, 0, null);
+        return;
+      }
+
+      newNode = new Node(point, (insertPosition.dimension + 1) % dimensions.length, insertPosition);
+      dimension = dimensions[insertPosition.dimension];
+
+      if (point[dimension] < insertPosition.obj[dimension]) {
+        insertPosition.left = newNode;
+      } else {
+        insertPosition.right = newNode;
+      }
+    };
+
+    this.remove = function (point) {
+      var node;
+
+      function nodeSearch(_x3) {
+        var _again2 = true;
+
+        _function2: while (_again2) {
+          var node = _x3;
+          _again2 = false;
+
+          if (node === null) {
+            return null;
+          }
+
+          if (node.obj === point) {
             return node;
           }
 
-          // Reloads a serialied tree
-          function loadTree(data) {
-            // Just need to restore the `parent` parameter
-            self.root = data;
+          var dimension = dimensions[node.dimension];
 
-            function restoreParent(root) {
-              if (root.left) {
-                root.left.parent = root;
-                restoreParent(root.left);
-              }
-
-              if (root.right) {
-                root.right.parent = root;
-                restoreParent(root.right);
-              }
-            }
-
-            restoreParent(self.root);
+          if (point[dimension] < node.obj[dimension]) {
+            _x3 = node.left;
+            _again2 = true;
+            dimension = undefined;
+            continue _function2;
+          } else {
+            _x3 = node.right;
+            _again2 = true;
+            dimension = undefined;
+            continue _function2;
           }
+        }
+      }
 
-          // If points is not an array, assume we're loading a pre-built tree
-          if (!Array.isArray(points)) loadTree(points, metric, dimensions);else this.root = buildTree(points, 0, null);
+      function removeNode(node) {
+        var nextNode, nextObj, pDimension;
 
-          // Convert to a JSON serializable structure; this just requires removing
-          // the `parent` property
-          this.toJSON = function (src) {
-            if (!src) src = this.root;
-            var dest = new Node(src.obj, src.dimension, null);
-            if (src.left) dest.left = self.toJSON(src.left);
-            if (src.right) dest.right = self.toJSON(src.right);
-            return dest;
-          };
+        function findMin(_x4, _x5) {
+          var _again3 = true;
 
-          this.insert = function (point) {
-            function innerSearch(_x, _x2) {
-              var _again = true;
+          _function3: while (_again3) {
+            var node = _x4,
+                dim = _x5;
+            _again3 = false;
 
-              _function: while (_again) {
-                var node = _x,
-                    parent = _x2;
-                _again = false;
-
-                if (node === null) {
-                  return parent;
-                }
-
-                var dimension = dimensions[node.dimension];
-                if (point[dimension] < node.obj[dimension]) {
-                  _x = node.left;
-                  _x2 = node;
-                  _again = true;
-                  dimension = undefined;
-                  continue _function;
-                } else {
-                  _x = node.right;
-                  _x2 = node;
-                  _again = true;
-                  dimension = undefined;
-                  continue _function;
-                }
-              }
-            }
-
-            var insertPosition = innerSearch(this.root, null),
-                newNode,
-                dimension;
-
-            if (insertPosition === null) {
-              this.root = new Node(point, 0, null);
-              return;
-            }
-
-            newNode = new Node(point, (insertPosition.dimension + 1) % dimensions.length, insertPosition);
-            dimension = dimensions[insertPosition.dimension];
-
-            if (point[dimension] < insertPosition.obj[dimension]) {
-              insertPosition.left = newNode;
-            } else {
-              insertPosition.right = newNode;
-            }
-          };
-
-          this.remove = function (point) {
-            var node;
-
-            function nodeSearch(_x3) {
-              var _again2 = true;
-
-              _function2: while (_again2) {
-                var node = _x3;
-                _again2 = false;
-
-                if (node === null) {
-                  return null;
-                }
-
-                if (node.obj === point) {
-                  return node;
-                }
-
-                var dimension = dimensions[node.dimension];
-
-                if (point[dimension] < node.obj[dimension]) {
-                  _x3 = node.left;
-                  _again2 = true;
-                  dimension = undefined;
-                  continue _function2;
-                } else {
-                  _x3 = node.right;
-                  _again2 = true;
-                  dimension = undefined;
-                  continue _function2;
-                }
-              }
-            }
-
-            function removeNode(node) {
-              var nextNode, nextObj, pDimension;
-
-              function findMin(_x4, _x5) {
-                var _again3 = true;
-
-                _function3: while (_again3) {
-                  var node = _x4,
-                      dim = _x5;
-                  _again3 = false;
-
-                  var dimension, own, left, right, min;
-
-                  if (node === null) {
-                    return null;
-                  }
-
-                  dimension = dimensions[dim];
-
-                  if (node.dimension === dim) {
-                    if (node.left !== null) {
-                      _x4 = node.left;
-                      _x5 = dim;
-                      _again3 = true;
-                      dimension = own = left = right = min = undefined;
-                      continue _function3;
-                    }
-                    return node;
-                  }
-
-                  own = node.obj[dimension];
-                  left = findMin(node.left, dim);
-                  right = findMin(node.right, dim);
-                  min = node;
-
-                  if (left !== null && left.obj[dimension] < own) {
-                    min = left;
-                  }
-                  if (right !== null && right.obj[dimension] < min.obj[dimension]) {
-                    min = right;
-                  }
-                  return min;
-                }
-              }
-
-              if (node.left === null && node.right === null) {
-                if (node.parent === null) {
-                  self.root = null;
-                  return;
-                }
-
-                pDimension = dimensions[node.parent.dimension];
-
-                if (node.obj[pDimension] < node.parent.obj[pDimension]) {
-                  node.parent.left = null;
-                } else {
-                  node.parent.right = null;
-                }
-                return;
-              }
-
-              // If the right subtree is not empty, swap with the minimum element on the
-              // node's dimension. If it is empty, we swap the left and right subtrees and
-              // do the same.
-              if (node.right !== null) {
-                nextNode = findMin(node.right, node.dimension);
-                nextObj = nextNode.obj;
-                removeNode(nextNode);
-                node.obj = nextObj;
-              } else {
-                nextNode = findMin(node.left, node.dimension);
-                nextObj = nextNode.obj;
-                removeNode(nextNode);
-                node.right = node.left;
-                node.left = null;
-                node.obj = nextObj;
-              }
-            }
-
-            node = nodeSearch(self.root);
+            var dimension, own, left, right, min;
 
             if (node === null) {
+              return null;
+            }
+
+            dimension = dimensions[dim];
+
+            if (node.dimension === dim) {
+              if (node.left !== null) {
+                _x4 = node.left;
+                _x5 = dim;
+                _again3 = true;
+                dimension = own = left = right = min = undefined;
+                continue _function3;
+              }
+              return node;
+            }
+
+            own = node.obj[dimension];
+            left = findMin(node.left, dim);
+            right = findMin(node.right, dim);
+            min = node;
+
+            if (left !== null && left.obj[dimension] < own) {
+              min = left;
+            }
+            if (right !== null && right.obj[dimension] < min.obj[dimension]) {
+              min = right;
+            }
+            return min;
+          }
+        }
+
+        if (node.left === null && node.right === null) {
+          if (node.parent === null) {
+            self.root = null;
+            return;
+          }
+
+          pDimension = dimensions[node.parent.dimension];
+
+          if (node.obj[pDimension] < node.parent.obj[pDimension]) {
+            node.parent.left = null;
+          } else {
+            node.parent.right = null;
+          }
+          return;
+        }
+
+        // If the right subtree is not empty, swap with the minimum element on the
+        // node's dimension. If it is empty, we swap the left and right subtrees and
+        // do the same.
+        if (node.right !== null) {
+          nextNode = findMin(node.right, node.dimension);
+          nextObj = nextNode.obj;
+          removeNode(nextNode);
+          node.obj = nextObj;
+        } else {
+          nextNode = findMin(node.left, node.dimension);
+          nextObj = nextNode.obj;
+          removeNode(nextNode);
+          node.right = node.left;
+          node.left = null;
+          node.obj = nextObj;
+        }
+      }
+
+      node = nodeSearch(self.root);
+
+      if (node === null) {
+        return;
+      }
+
+      removeNode(node);
+    };
+
+    this.nearest = function (point, maxNodes, maxDistance) {
+      var i, result, bestNodes;
+
+      bestNodes = new BinaryHeap(function (e) {
+        return -e[1];
+      });
+
+      function nearestSearch(node) {
+        var bestChild,
+            dimension = dimensions[node.dimension],
+            ownDistance = metric(point, node.obj),
+            linearPoint = {},
+            linearDistance,
+            otherChild,
+            i;
+
+        function saveNode(node, distance) {
+          bestNodes.push([node, distance]);
+          if (bestNodes.size() > maxNodes) {
+            bestNodes.pop();
+          }
+        }
+
+        for (i = 0; i < dimensions.length; i += 1) {
+          if (i === node.dimension) {
+            linearPoint[dimensions[i]] = point[dimensions[i]];
+          } else {
+            linearPoint[dimensions[i]] = node.obj[dimensions[i]];
+          }
+        }
+
+        linearDistance = metric(linearPoint, node.obj);
+
+        if (node.right === null && node.left === null) {
+          if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
+            saveNode(node, ownDistance);
+          }
+          return;
+        }
+
+        if (node.right === null) {
+          bestChild = node.left;
+        } else if (node.left === null) {
+          bestChild = node.right;
+        } else {
+          if (point[dimension] < node.obj[dimension]) {
+            bestChild = node.left;
+          } else {
+            bestChild = node.right;
+          }
+        }
+
+        nearestSearch(bestChild);
+
+        if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
+          saveNode(node, ownDistance);
+        }
+
+        if (bestNodes.size() < maxNodes || Math.abs(linearDistance) < bestNodes.peek()[1]) {
+          if (bestChild === node.left) {
+            otherChild = node.right;
+          } else {
+            otherChild = node.left;
+          }
+          if (otherChild !== null) {
+            nearestSearch(otherChild);
+          }
+        }
+      }
+
+      if (maxDistance) {
+        for (i = 0; i < maxNodes; i += 1) {
+          bestNodes.push([null, maxDistance]);
+        }
+      }
+
+      if (self.root) nearestSearch(self.root);
+
+      result = [];
+
+      for (i = 0; i < Math.min(maxNodes, bestNodes.content.length); i += 1) {
+        if (bestNodes.content[i][0]) {
+          result.push([bestNodes.content[i][0].obj, bestNodes.content[i][1]]);
+        }
+      }
+      return result;
+    };
+
+    this.balanceFactor = function () {
+      function height(node) {
+        if (node === null) {
+          return 0;
+        }
+        return Math.max(height(node.left), height(node.right)) + 1;
+      }
+
+      function count(node) {
+        if (node === null) {
+          return 0;
+        }
+        return count(node.left) + count(node.right) + 1;
+      }
+
+      return height(self.root) / (Math.log(count(self.root)) / Math.log(2));
+    };
+  }
+
+  // Binary heap implementation from:
+  // http://eloquentjavascript.net/appendix2.html
+
+  function BinaryHeap(scoreFunction) {
+    this.content = [];
+    this.scoreFunction = scoreFunction;
+  }
+
+  return {
+    setters: [],
+    execute: function () {
+      BinaryHeap.prototype = {
+        push: function push(element) {
+          // Add the new element to the end of the array.
+          this.content.push(element);
+          // Allow it to bubble up.
+          this.bubbleUp(this.content.length - 1);
+        },
+
+        pop: function pop() {
+          // Store the first element so we can return it later.
+          var result = this.content[0];
+          // Get the element at the end of the array.
+          var end = this.content.pop();
+          // If there are any elements left, put the end element at the
+          // start, and let it sink down.
+          if (this.content.length > 0) {
+            this.content[0] = end;
+            this.sinkDown(0);
+          }
+          return result;
+        },
+
+        peek: function peek() {
+          return this.content[0];
+        },
+
+        remove: function remove(node) {
+          var len = this.content.length;
+          // To remove a value, we must search through the array to find
+          // it.
+          for (var i = 0; i < len; i++) {
+            if (this.content[i] == node) {
+              // When it is found, the process seen in 'pop' is repeated
+              // to fill up the hole.
+              var end = this.content.pop();
+              if (i != len - 1) {
+                this.content[i] = end;
+                if (this.scoreFunction(end) < this.scoreFunction(node)) this.bubbleUp(i);else this.sinkDown(i);
+              }
               return;
             }
-
-            removeNode(node);
-          };
-
-          this.nearest = function (point, maxNodes, maxDistance) {
-            var i, result, bestNodes;
-
-            bestNodes = new BinaryHeap(function (e) {
-              return -e[1];
-            });
-
-            function nearestSearch(node) {
-              var bestChild,
-                  dimension = dimensions[node.dimension],
-                  ownDistance = metric(point, node.obj),
-                  linearPoint = {},
-                  linearDistance,
-                  otherChild,
-                  i;
-
-              function saveNode(node, distance) {
-                bestNodes.push([node, distance]);
-                if (bestNodes.size() > maxNodes) {
-                  bestNodes.pop();
-                }
-              }
-
-              for (i = 0; i < dimensions.length; i += 1) {
-                if (i === node.dimension) {
-                  linearPoint[dimensions[i]] = point[dimensions[i]];
-                } else {
-                  linearPoint[dimensions[i]] = node.obj[dimensions[i]];
-                }
-              }
-
-              linearDistance = metric(linearPoint, node.obj);
-
-              if (node.right === null && node.left === null) {
-                if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
-                  saveNode(node, ownDistance);
-                }
-                return;
-              }
-
-              if (node.right === null) {
-                bestChild = node.left;
-              } else if (node.left === null) {
-                bestChild = node.right;
-              } else {
-                if (point[dimension] < node.obj[dimension]) {
-                  bestChild = node.left;
-                } else {
-                  bestChild = node.right;
-                }
-              }
-
-              nearestSearch(bestChild);
-
-              if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
-                saveNode(node, ownDistance);
-              }
-
-              if (bestNodes.size() < maxNodes || Math.abs(linearDistance) < bestNodes.peek()[1]) {
-                if (bestChild === node.left) {
-                  otherChild = node.right;
-                } else {
-                  otherChild = node.left;
-                }
-                if (otherChild !== null) {
-                  nearestSearch(otherChild);
-                }
-              }
-            }
-
-            if (maxDistance) {
-              for (i = 0; i < maxNodes; i += 1) {
-                bestNodes.push([null, maxDistance]);
-              }
-            }
-
-            if (self.root) nearestSearch(self.root);
-
-            result = [];
-
-            for (i = 0; i < Math.min(maxNodes, bestNodes.content.length); i += 1) {
-              if (bestNodes.content[i][0]) {
-                result.push([bestNodes.content[i][0].obj, bestNodes.content[i][1]]);
-              }
-            }
-            return result;
-          };
-
-          this.balanceFactor = function () {
-            function height(node) {
-              if (node === null) {
-                return 0;
-              }
-              return Math.max(height(node.left), height(node.right)) + 1;
-            }
-
-            function count(node) {
-              if (node === null) {
-                return 0;
-              }
-              return count(node.left) + count(node.right) + 1;
-            }
-
-            return height(self.root) / (Math.log(count(self.root)) / Math.log(2));
-          };
-        }
-
-        // Binary heap implementation from:
-        // http://eloquentjavascript.net/appendix2.html
-
-        function BinaryHeap(scoreFunction) {
-          this.content = [];
-          this.scoreFunction = scoreFunction;
-        }
-
-        BinaryHeap.prototype = {
-          push: function push(element) {
-            // Add the new element to the end of the array.
-            this.content.push(element);
-            // Allow it to bubble up.
-            this.bubbleUp(this.content.length - 1);
-          },
-
-          pop: function pop() {
-            // Store the first element so we can return it later.
-            var result = this.content[0];
-            // Get the element at the end of the array.
-            var end = this.content.pop();
-            // If there are any elements left, put the end element at the
-            // start, and let it sink down.
-            if (this.content.length > 0) {
-              this.content[0] = end;
-              this.sinkDown(0);
-            }
-            return result;
-          },
-
-          peek: function peek() {
-            return this.content[0];
-          },
-
-          remove: function remove(node) {
-            var len = this.content.length;
-            // To remove a value, we must search through the array to find
-            // it.
-            for (var i = 0; i < len; i++) {
-              if (this.content[i] == node) {
-                // When it is found, the process seen in 'pop' is repeated
-                // to fill up the hole.
-                var end = this.content.pop();
-                if (i != len - 1) {
-                  this.content[i] = end;
-                  if (this.scoreFunction(end) < this.scoreFunction(node)) this.bubbleUp(i);else this.sinkDown(i);
-                }
-                return;
-              }
-            }
-            throw new Error("Node not found.");
-          },
-
-          size: function size() {
-            return this.content.length;
-          },
-
-          bubbleUp: function bubbleUp(n) {
-            // Fetch the element that has to be moved.
-            var element = this.content[n];
-            // When at 0, an element can not go up any further.
-            while (n > 0) {
-              // Compute the parent element's index, and fetch it.
-              var parentN = Math.floor((n + 1) / 2) - 1,
-                  parent = this.content[parentN];
-              // Swap the elements if the parent is greater.
-              if (this.scoreFunction(element) < this.scoreFunction(parent)) {
-                this.content[parentN] = element;
-                this.content[n] = parent;
-                // Update 'n' to continue at the new position.
-                n = parentN;
-              }
-              // Found a parent that is less, no need to move it further.
-              else {
-                  break;
-                }
-            }
-          },
-
-          sinkDown: function sinkDown(n) {
-            // Look up the target element and its score.
-            var length = this.content.length,
-                element = this.content[n],
-                elemScore = this.scoreFunction(element);
-
-            while (true) {
-              // Compute the indices of the child elements.
-              var child2N = (n + 1) * 2,
-                  child1N = child2N - 1;
-              // This is used to store the new position of the element,
-              // if any.
-              var swap = null;
-              // If the first child exists (is inside the array)...
-              if (child1N < length) {
-                // Look it up and compute its score.
-                var child1 = this.content[child1N],
-                    child1Score = this.scoreFunction(child1);
-                // If the score is less than our element's, we need to swap.
-                if (child1Score < elemScore) swap = child1N;
-              }
-              // Do the same checks for the other child.
-              if (child2N < length) {
-                var child2 = this.content[child2N],
-                    child2Score = this.scoreFunction(child2);
-                if (child2Score < (swap == null ? elemScore : child1Score)) {
-                  swap = child2N;
-                }
-              }
-
-              // If the element needs to be moved, swap it, and continue.
-              if (swap != null) {
-                this.content[n] = this.content[swap];
-                this.content[swap] = element;
-                n = swap;
-              }
-              // Otherwise, we are done.
-              else {
-                  break;
-                }
-            }
           }
-        };
+          throw new Error("Node not found.");
+        },
 
-        return { kdTree: kdTree, BinaryHeap: BinaryHeap };
-      });
+        size: function size() {
+          return this.content.length;
+        },
+
+        bubbleUp: function bubbleUp(n) {
+          // Fetch the element that has to be moved.
+          var element = this.content[n];
+          // When at 0, an element can not go up any further.
+          while (n > 0) {
+            // Compute the parent element's index, and fetch it.
+            var parentN = Math.floor((n + 1) / 2) - 1,
+                parent = this.content[parentN];
+            // Swap the elements if the parent is greater.
+            if (this.scoreFunction(element) < this.scoreFunction(parent)) {
+              this.content[parentN] = element;
+              this.content[n] = parent;
+              // Update 'n' to continue at the new position.
+              n = parentN;
+            }
+            // Found a parent that is less, no need to move it further.
+            else {
+                break;
+              }
+          }
+        },
+
+        sinkDown: function sinkDown(n) {
+          // Look up the target element and its score.
+          var length = this.content.length,
+              element = this.content[n],
+              elemScore = this.scoreFunction(element);
+
+          while (true) {
+            // Compute the indices of the child elements.
+            var child2N = (n + 1) * 2,
+                child1N = child2N - 1;
+            // This is used to store the new position of the element,
+            // if any.
+            var swap = null;
+            // If the first child exists (is inside the array)...
+            if (child1N < length) {
+              // Look it up and compute its score.
+              var child1 = this.content[child1N],
+                  child1Score = this.scoreFunction(child1);
+              // If the score is less than our element's, we need to swap.
+              if (child1Score < elemScore) swap = child1N;
+            }
+            // Do the same checks for the other child.
+            if (child2N < length) {
+              var child2 = this.content[child2N],
+                  child2Score = this.scoreFunction(child2);
+              if (child2Score < (swap == null ? elemScore : child1Score)) {
+                swap = child2N;
+              }
+            }
+
+            // If the element needs to be moved, swap it, and continue.
+            if (swap != null) {
+              this.content[n] = this.content[swap];
+              this.content[swap] = element;
+              n = swap;
+            }
+            // Otherwise, we are done.
+            else {
+                break;
+              }
+          }
+        }
+      };
+
+      _export("kdTree", kdTree);
+
+      _export("BinaryHeap", BinaryHeap);
     }
   };
 });
 
-$__System.register('70', ['48', '71', '6f'], function (_export) {
+$__System.register('62', ['48', '59', '61', '63'], function (_export) {
   /* */
 
-  // We implement this specifically for vertical profiles for now and see what we can move into
-  // a common class later.
-
   /**
-   * A collection of vertical profiles sharing the same parameters / referencing.
+   * A collection of points sharing the same parameters / referencing.
    * 
    */
   'use strict';
 
-  var L, Point, DEFAULT_COLOR, DEFAULT_PALETTE, kdTree, PointCollection;
+  var L, palettes, kdTree, Point, DEFAULT_COLOR, DEFAULT_PALETTE, PointCollection;
   return {
     setters: [function (_) {
       L = _['default'];
+    }, function (_3) {
+      palettes = _3;
+    }, function (_4) {
+      kdTree = _4.kdTree;
     }, function (_2) {
       Point = _2['default'];
       DEFAULT_COLOR = _2.DEFAULT_COLOR;
       DEFAULT_PALETTE = _2.DEFAULT_PALETTE;
-    }, function (_f) {
-      kdTree = _f['default'];
     }],
     execute: function () {
       PointCollection = (function (_L$Class) {
@@ -9584,7 +5144,13 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
             throw new Error('category parameters are currently not supported for VerticalProfileCollection');
           }
 
-          this._palette = options.palette || DEFAULT_PALETTE;
+          if (options.palette) {
+            this._palette = options.palette;
+          } else if (this.param && this.param.preferredPalette) {
+            this._palette = palettes.create(this.param.preferredPalette);
+          } else {
+            this._palette = DEFAULT_PALETTE;
+          }
 
           if (!options.paletteExtent) {
             this._paletteExtent = 'full';
@@ -9603,7 +5169,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
           key: 'onAdd',
           value: function onAdd(map) {
             this._map = map;
-            this._layerAddCount = 0;
+            this._layerLoadCount = 0;
             this._layerErrors = [];
 
             var options = {
@@ -9623,10 +5189,11 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
             var _iteratorError = undefined;
 
             try {
-              for (var _iterator = this.covcoll[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              for (var _iterator = this.covcoll.coverages[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                 var cov = _step.value;
 
                 var layer = new this.pointClass(cov, options);
+                layer.load();
                 this._attachListeners(layer, cov);
                 this._layerGroup.addLayer(layer);
                 this._layers.push(layer);
@@ -9647,16 +5214,21 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
             }
           }
         }, {
+          key: 'onRemove',
+          value: function onRemove(map) {
+            this._map.removeLayer(this._layerGroup);
+            this._layerGroup = L.layerGroup();
+          }
+        }, {
           key: '_attachListeners',
           value: function _attachListeners(layer, cov) {
             var _this = this;
 
-            layer.once('add', function () {
-              ++_this._layerAddCount;
+            layer.once('dataLoad', function () {
+              ++_this._layerLoadCount;
               _this._fireIfOnAddDone();
             }).once('error', function (e) {
               _this._layerErrors.push(e);
-              _this._fireIfOnAddDone();
             }).on('click', function (e) {
               e.coverage = cov;
               _this.fire('click', e);
@@ -9665,13 +5237,13 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
         }, {
           key: '_fireIfOnAddDone',
           value: function _fireIfOnAddDone() {
-            if (this._layerAddCount + this._layerErrors.length === this._layers.length) {
+            if (this._layerLoadCount === this._layers.length) {
               if (this._layerErrors.length > 0) {
                 this.fire('error', { errors: this._layerErrors });
               } else {
                 this._initKdtree();
-                if (this.param && this._vertical) {
-                  this._updatePaletteExtent();
+                if (this.param) {
+                  this._updatePaletteExtent(this._paletteExtent);
                 }
                 this._layerGroup.addTo(this._map);
                 this.fire('add');
@@ -9684,6 +5256,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
             var points = this._layers.map(function (layer) {
               var point = layer.getLatLng();
               point.layer = layer;
+              return point;
             });
             var distance = function distance(point1, point2) {
               return point1.distanceTo(point2);
@@ -9704,13 +5277,13 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
           }
 
           /**
-           * Return the displayed value of the vertical profile closest to
+           * Return the displayed value of the point coverage closest to
            * the given position and within the given maximum distance.
-           * If no profile is found, undefined is returned, otherwise
+           * If no coverage is found, undefined is returned, otherwise
            * a number or null (no-data).
            * 
            * @param {number} maxDistance
-           *   Maximum distance in meters that the vertical profile may be
+           *   Maximum distance in meters that the point coverage may be
            *   apart from the given position.
            */
         }, {
@@ -9762,8 +5335,10 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
                 var layer = _step2.value;
 
                 var val = layer.getValue();
-                min = Math.min(min, val);
-                max = Math.max(max, val);
+                if (val != null) {
+                  min = Math.min(min, val);
+                  max = Math.max(max, val);
+                }
               }
             } catch (err) {
               _didIteratorError2 = true;
@@ -9781,10 +5356,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
             }
 
             this._paletteExtent = [min, max];
-          }
-        }, {
-          key: 'redraw',
-          value: function redraw() {
+
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
@@ -9793,7 +5365,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
               for (var _iterator3 = this._layers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                 var layer = _step3.value;
 
-                layer.redraw();
+                layer.paletteExtent = this._paletteExtent;
               }
             } catch (err) {
               _didIteratorError3 = true;
@@ -9811,17 +5383,8 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
             }
           }
         }, {
-          key: 'parameter',
-          get: function get() {
-            return this.param;
-          }
-        }, {
-          key: 'palette',
-          get: function get() {
-            return this.param ? this._palette : undefined;
-          },
-          set: function set(val) {
-            this._palette = val;
+          key: 'redraw',
+          value: function redraw() {
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
@@ -9830,7 +5393,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
               for (var _iterator4 = this._layers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                 var layer = _step4.value;
 
-                layer.palette = val;
+                layer.redraw();
               }
             } catch (err) {
               _didIteratorError4 = true;
@@ -9846,13 +5409,19 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
                 }
               }
             }
-
-            this.fire('paletteChange');
           }
         }, {
-          key: 'paletteExtent',
-          set: function set(extent) {
-            this._updatePaletteExtent(extent);
+          key: 'parameter',
+          get: function get() {
+            return this.param;
+          }
+        }, {
+          key: 'palette',
+          get: function get() {
+            return this.param ? this._palette : undefined;
+          },
+          set: function set(val) {
+            this._palette = val;
             var _iteratorNormalCompletion5 = true;
             var _didIteratorError5 = false;
             var _iteratorError5 = undefined;
@@ -9861,7 +5430,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
               for (var _iterator5 = this._layers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                 var layer = _step5.value;
 
-                layer.paletteExtent = this._paletteExtent;
+                layer.palette = val;
               }
             } catch (err) {
               _didIteratorError5 = true;
@@ -9878,6 +5447,12 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
               }
             }
 
+            this.fire('paletteChange');
+          }
+        }, {
+          key: 'paletteExtent',
+          set: function set(extent) {
+            this._updatePaletteExtent(extent);
             this.fire('paletteExtentChange');
           },
           get: function get() {
@@ -9896,7 +5471,7 @@ $__System.register('70', ['48', '71', '6f'], function (_export) {
   };
 });
 
-$__System.register('72', ['48'], function (_export) {
+$__System.register('64', ['48'], function (_export) {
   /* */
 
   /**
@@ -9927,11 +5502,12 @@ $__System.register('72', ['48'], function (_export) {
         key: '_addMarker',
 
         /*
-         * The base class must supply the following:
+         * The base class must supply the following functions/properties:
          * 
          * getValue()
          * _getColor(val)
          * getLatLng()
+         * coverage
          */
 
         value: function _addMarker() {
@@ -9943,12 +5519,30 @@ $__System.register('72', ['48'], function (_export) {
           if (val === null && !this.showNoData) {
             return;
           }
-          var color = this._getColor(val);
+
+          var _getColor = this._getColor(val);
+
+          var r = _getColor.r;
+          var g = _getColor.g;
+          var b = _getColor.b;
+
           var latlng = this.getLatLng();
 
-          this._marker = L.circleMarker(latlng, { color: color }).on('click', function (e) {
-            return _this.fire('click', e);
+          var strokeBrightness = 0.7;
+
+          this._marker = L.circleMarker(latlng, {
+            fillColor: 'rgb(' + r + ',' + g + ',' + b + ')',
+            fillOpacity: 1,
+            radius: 5,
+            stroke: true,
+            opacity: 1,
+            weight: 1,
+            color: 'rgb(' + Math.round(r * strokeBrightness) + ',' + Math.round(g * strokeBrightness) + ',' + Math.round(b * strokeBrightness) + ')'
+          }).on('click', function (e) {
+            e.coverage = _this.coverage;
+            _this.fire('click', e);
           }).addTo(this._map);
+
           if (this._deferBindPopup) {
             var _marker;
 
@@ -10004,25 +5598,30 @@ $__System.register('72', ['48'], function (_export) {
   };
 });
 
-$__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
+$__System.register('63', ['48', '59', '64', '65', '5c', '5d', '5e'], function (_export) {
   /* */
 
   /** @ignore */
   'use strict';
 
-  var L, CircleMarkerMixin, EventMixin, linearPalette, scale, referencingutil, DEFAULT_COLOR, DEFAULT_PALETTE, Point;
+  var L, linearPalette, scale, palettes, CircleMarkerMixin, EventMixin, referencingutil, isDomain, toCoverage, DEFAULT_COLOR, DEFAULT_PALETTE, Point;
   return {
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      CircleMarkerMixin = _2['default'];
+      linearPalette = _2.linearPalette;
+      scale = _2.scale;
+      palettes = _2;
     }, function (_3) {
-      EventMixin = _3['default'];
-    }, function (_a) {
-      linearPalette = _a.linearPalette;
-      scale = _a.scale;
+      CircleMarkerMixin = _3['default'];
+    }, function (_4) {
+      EventMixin = _4['default'];
+    }, function (_c) {
+      referencingutil = _c;
     }, function (_d) {
-      referencingutil = _d;
+      isDomain = _d.isDomain;
+    }, function (_e) {
+      toCoverage = _e.toCoverage;
     }],
     execute: function () {
       DEFAULT_COLOR = 'black';
@@ -10037,7 +5636,7 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
       // blues
 
       /**
-       * Renderer for Coverages with domain type Point.
+       * Renderer for Coverages and Domains with (domain) profile Point.
        * 
        * This will simply display a dot on the map and fire a click
        * event when a user clicks on it.
@@ -10053,6 +5652,11 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
 
           babelHelpers.get(Object.getPrototypeOf(Point.prototype), 'constructor', this).call(this);
 
+          if (isDomain(cov)) {
+            cov = toCoverage(cov);
+            delete options.keys;
+          }
+
           this.cov = cov;
           this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
           this.defaultColor = options.color || DEFAULT_COLOR;
@@ -10062,7 +5666,14 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
             throw new Error('category parameters are currently not supported for Point');
           }
 
-          this._palette = options.palette || DEFAULT_PALETTE;
+          if (options.palette) {
+            this._palette = options.palette;
+          } else if (this.param && this.param.preferredPalette) {
+            this._palette = palettes.create(this.param.preferredPalette);
+          } else {
+            this._palette = DEFAULT_PALETTE;
+          }
+
           if (Array.isArray(options.paletteExtent)) {
             this._paletteExtent = options.paletteExtent;
           } else {
@@ -10076,6 +5687,21 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
             var _this = this;
 
             this._map = map;
+
+            this.load().then(function () {
+              _this._addMarker();
+              _this.fire('add');
+            });
+          }
+
+          /**
+           * Load all data without adding anything to the map.
+           * After loading is done, all functions and properties can be accessed (like getLatLng()).
+           */
+        }, {
+          key: 'load',
+          value: function load() {
+            var _this2 = this;
 
             this.fire('dataLoading'); // for supporting loading spinners
 
@@ -10094,29 +5720,26 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
                 var domain = _ref2[0];
                 var range = _ref2[1];
 
-                _this.domain = domain;
+                _this2.domain = domain;
                 checkWGS84(domain);
-                _this.range = range;
-                _this._updatePaletteExtent(_this._paletteExtent);
-                _this._addMarker();
-                _this.fire('add');
-                _this.fire('dataLoad');
+                _this2.range = range;
+                _this2._updatePaletteExtent(_this2._paletteExtent);
+                _this2.fire('dataLoad');
               });
             } else {
               promise = this.cov.loadDomain().then(function (domain) {
-                _this.domain = domain;
+                _this2.domain = domain;
                 checkWGS84(domain);
-                _this._addMarker();
-                _this.fire('add');
-                _this.fire('dataLoad');
+                _this2.fire('dataLoad');
               });
             }
 
             promise['catch'](function (e) {
               console.error(e);
-              _this.fire('error', e);
-              _this.fire('dataLoad');
+              _this2.fire('error', e);
+              _this2.fire('dataLoad');
             });
+            return promise;
           }
         }, {
           key: 'onRemove',
@@ -10181,8 +5804,13 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
               var green = _palette.green;
               var blue = _palette.blue;
 
-              return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
+              return { r: red[valScaled], g: green[valScaled], b: blue[valScaled] };
             }
+          }
+        }, {
+          key: 'coverage',
+          get: function get() {
+            return this.cov;
           }
         }, {
           key: 'parameter',
@@ -10218,7 +5846,7 @@ $__System.register('71', ['48', '72', '73', '6a', '6d'], function (_export) {
   };
 });
 
-$__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], function (_export) {
+$__System.register('66', ['48', '59', '63', '64', '65', '5a', '5b', '5c', '5d', '5e'], function (_export) {
   /* */
 
   /**
@@ -10231,25 +5859,30 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
    */
   'use strict';
 
-  var L, DEFAULT_COLOR, DEFAULT_PALETTE, CircleMarkerMixin, EventMixin, scale, arrays, rangeutil, referencingutil, VerticalProfile;
+  var L, scale, palettes, DEFAULT_COLOR, DEFAULT_PALETTE, CircleMarkerMixin, EventMixin, arrays, rangeutil, referencingutil, isDomain, toCoverage, VerticalProfile;
   return {
     setters: [function (_) {
       L = _['default'];
-    }, function (_4) {
-      DEFAULT_COLOR = _4.DEFAULT_COLOR;
-      DEFAULT_PALETTE = _4.DEFAULT_PALETTE;
     }, function (_2) {
-      CircleMarkerMixin = _2['default'];
+      scale = _2.scale;
+      palettes = _2;
+    }, function (_5) {
+      DEFAULT_COLOR = _5.DEFAULT_COLOR;
+      DEFAULT_PALETTE = _5.DEFAULT_PALETTE;
     }, function (_3) {
-      EventMixin = _3['default'];
+      CircleMarkerMixin = _3['default'];
+    }, function (_4) {
+      EventMixin = _4['default'];
     }, function (_a) {
-      scale = _a.scale;
+      arrays = _a;
     }, function (_b) {
-      arrays = _b;
+      rangeutil = _b;
     }, function (_c) {
-      rangeutil = _c;
+      referencingutil = _c;
     }, function (_d) {
-      referencingutil = _d;
+      isDomain = _d.isDomain;
+    }, function (_e) {
+      toCoverage = _e.toCoverage;
     }],
     execute: function () {
       VerticalProfile = (function (_CircleMarkerMixin) {
@@ -10259,6 +5892,11 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
           babelHelpers.classCallCheck(this, VerticalProfile);
 
           babelHelpers.get(Object.getPrototypeOf(VerticalProfile.prototype), 'constructor', this).call(this);
+
+          if (isDomain(cov)) {
+            cov = toCoverage(cov);
+            delete options.keys;
+          }
 
           this.cov = cov;
           this.param = options.keys ? cov.parameters.get(options.keys[0]) : null;
@@ -10272,7 +5910,14 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
             throw new Error('category parameters are currently not support for VerticalProfile');
           }
 
-          this._palette = options.palette || DEFAULT_PALETTE;
+          if (options.palette) {
+            this._palette = options.palette;
+          } else if (this.param && this.param.preferredPalette) {
+            this._palette = palettes.create(this.param.preferredPalette);
+          } else {
+            this._palette = DEFAULT_PALETTE;
+          }
+
           if (Array.isArray(options.paletteExtent)) {
             this._paletteExtent = options.paletteExtent;
           } else {
@@ -10286,6 +5931,21 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
             var _this = this;
 
             this._map = map;
+
+            this.load().then(function () {
+              _this._addMarker();
+              _this.fire('add');
+            });
+          }
+
+          /**
+           * Load all data without adding anything to the map.
+           * After loading is done, all functions and properties can be accessed (like getLatLng()).
+           */
+        }, {
+          key: 'load',
+          value: function load() {
+            var _this2 = this;
 
             this.fire('dataLoading'); // for supporting loading spinners
 
@@ -10305,30 +5965,27 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
                 var range = _ref2[1];
 
                 checkWGS84(domain);
-                _this.domain = domain;
-                _this._subsetByCoordinatePreference();
-                _this.range = range;
-                _this._updatePaletteExtent(_this._paletteExtent);
-                _this._addMarker();
-                _this.fire('add');
-                _this.fire('dataLoad');
+                _this2.domain = domain;
+                _this2._subsetByCoordinatePreference();
+                _this2.range = range;
+                _this2._updatePaletteExtent(_this2._paletteExtent);
+                _this2.fire('dataLoad');
               });
             } else {
               promise = this.cov.loadDomain().then(function (domain) {
                 checkWGS84(domain);
-                _this.domain = domain;
-                _this._subsetByCoordinatePreference();
-                _this._addMarker();
-                _this.fire('add');
-                _this.fire('dataLoad');
+                _this2.domain = domain;
+                _this2._subsetByCoordinatePreference();
+                _this2.fire('dataLoad');
               });
             }
 
             promise['catch'](function (e) {
               console.error(e);
-              _this.fire('error', e);
-              _this.fire('dataLoad');
+              _this2.fire('error', e);
+              _this2.fire('dataLoad');
             });
+            return promise;
           }
         }, {
           key: '_subsetByCoordinatePreference',
@@ -10409,8 +6066,13 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
               var green = _palette.green;
               var blue = _palette.blue;
 
-              return 'rgb(' + red[valScaled] + ', ' + green[valScaled] + ', ' + blue[valScaled] + ')';
+              return { r: red[valScaled], g: green[valScaled], b: blue[valScaled] };
             }
+          }
+        }, {
+          key: 'coverage',
+          get: function get() {
+            return this.cov;
           }
         }, {
           key: 'parameter',
@@ -10467,11 +6129,8 @@ $__System.register('74', ['48', '71', '72', '73', '6a', '6b', '6c', '6d'], funct
   };
 });
 
-$__System.register('75', ['70', '74'], function (_export) {
+$__System.register('67', ['62', '66'], function (_export) {
   /* */
-
-  // We implement this specifically for vertical profiles for now and see what we can move into
-  // a common class later.
 
   /**
    * A collection of vertical profiles sharing the same parameters / referencing.
@@ -10553,7 +6212,7 @@ $__System.register('75', ['70', '74'], function (_export) {
   };
 });
 
-$__System.register('6a', [], function (_export) {
+$__System.register('59', [], function (_export) {
   /**
    * Returns a linearly interpolated palette out of CSS colors.
    * 
@@ -10587,6 +6246,23 @@ $__System.register('6a', [], function (_export) {
   _export('linearPalette', linearPalette);
 
   /**
+   * Create a palette from a description object.
+   * 
+   * Currently, two forms are supported:
+   * 
+   * {
+   *   "colors": ["red", "blue", ..]
+   *   "interpolation": "linear"
+   * }
+   * 
+   * {
+   *   "colors": ["red", "blue", ..]
+   * }
+   */
+
+  _export('directPalette', directPalette);
+
+  /**
    * Linearly scales a value to a given palette and value extent.
    * 
    * @example
@@ -10602,7 +6278,7 @@ $__System.register('6a', [], function (_export) {
    * @return {number} The scaled value.
    */
 
-  _export('directPalette', directPalette);
+  _export('create', create);
 
   /**
    * Manages palettes under common names.
@@ -10684,6 +6360,20 @@ $__System.register('6a', [], function (_export) {
       green: green,
       blue: blue
     };
+  }
+
+  function create(paletteSpec) {
+    if (!paletteSpec) {
+      return;
+    }
+    var colors = paletteSpec.colors;
+    var palette = undefined;
+    if (paletteSpec.interpolation === 'linear') {
+      palette = linearPalette(colors, paletteSpec.steps);
+    } else {
+      palette = directPalette(colors);
+    }
+    return palette;
   }
 
   function scale(val, palette, extent) {
@@ -10806,30 +6496,197 @@ $__System.register('6a', [], function (_export) {
   };
 });
 
-$__System.register('76', ['48', '73', '6a', '6c', '6d'], function (_export) {
+$__System.registerDynamic("5e", ["68", "5d", "69"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  var _slicedToArray = function() {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+      try {
+        for (var _i = arr[Symbol.iterator](),
+            _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+          if (i && _arr.length === i)
+            break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"])
+            _i["return"]();
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+    return function(arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+  exports.toCoverage = toCoverage;
+  var _constants = $__require('68');
+  var _validate = $__require('5d');
+  var _subset = $__require('69');
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0,
+          arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+  function toCoverage(domain) {
+    (0, _validate.checkDomain)(domain);
+    var dummyKey = 'domain';
+    var dummyLabel = 'Domain';
+    var assumeGrid = domain.axes.has('x') && domain.axes.has('y') && (domain.axes.get('x').values.length > 1 || domain.axes.get('y').values.length > 1);
+    var categories = void 0;
+    var categoryEncoding = void 0;
+    var a = 'a';
+    var av = 0;
+    var b = 'b';
+    var bv = 1;
+    if (assumeGrid) {
+      categories = [{
+        id: a,
+        label: {en: 'A'}
+      }, {
+        id: b,
+        label: {en: 'B'}
+      }];
+      categoryEncoding = new Map([[a, [av]], [b, [bv]]]);
+    } else {
+      categories = [{
+        id: a,
+        label: {en: 'X'}
+      }];
+      categoryEncoding = new Map([[a, [av]]]);
+    }
+    var parameters = new Map();
+    parameters.set(dummyKey, {
+      key: dummyKey,
+      observedProperty: {
+        label: {en: dummyLabel},
+        categories: categories
+      },
+      categoryEncoding: categoryEncoding
+    });
+    var shape = new Map([].concat(_toConsumableArray(domain.axes)).map(function(_ref) {
+      var _ref2 = _slicedToArray(_ref, 2);
+      var name = _ref2[0];
+      var axis = _ref2[1];
+      return [name, axis.values.length];
+    }));
+    var get = void 0;
+    if (assumeGrid) {
+      (function() {
+        var isOdd = function isOdd(n) {
+          return n % 2;
+        };
+        get = function get(_ref3) {
+          var _ref3$x = _ref3.x;
+          var x = _ref3$x === undefined ? 0 : _ref3$x;
+          var _ref3$y = _ref3.y;
+          var y = _ref3$y === undefined ? 0 : _ref3$y;
+          return isOdd(x + y) ? av : bv;
+        };
+      })();
+    } else {
+      get = function get() {
+        return av;
+      };
+    }
+    var loadRange = function loadRange() {
+      return Promise.resolve({
+        shape: shape,
+        dataType: 'integer',
+        get: get
+      });
+    };
+    var cov = {
+      type: _constants.COVERAGE,
+      profiles: [],
+      domainProfiles: domain.profiles,
+      parameters: parameters,
+      loadDomain: function loadDomain() {
+        return Promise.resolve(domain);
+      },
+      loadRange: loadRange
+    };
+    addLoadRangesFunction(cov);
+    addSubsetFunctions(cov);
+    return cov;
+  }
+  function addSubsetFunctions(cov) {
+    (0, _validate.checkCoverage)(cov);
+    cov.subsetByIndex = _subset.subsetCoverageByIndex.bind(null, cov);
+    cov.subsetByValue = _subset.subsetCoverageByValue.bind(null, cov);
+  }
+  function addLoadRangesFunction(cov) {
+    (0, _validate.checkCoverage)(cov);
+    function loadRanges(keys) {
+      if (!keys) {
+        keys = cov.parameters.keys();
+      }
+      return Promise.all([].concat(_toConsumableArray(keys)).map(cov.loadRange)).then(function(ranges) {
+        return new Map(keys.map(function(key, i) {
+          return [key, ranges[i]];
+        }));
+      });
+    }
+    cov.loadRanges = loadRanges;
+  }
+  return module.exports;
+});
+
+$__System.register('6a', ['48', '59', '65', '5b', '5c', '5d', '5e'], function (_export) {
   /* */
   'use strict';
 
-  var L, EventMixin, linearPalette, scale, rangeutil, referencingutil, DEFAULT_PALETTE, MultiPolygon;
+  var L, linearPalette, scale, EventMixin, rangeutil, referencingutil, isDomain, toCoverage, DEFAULT_PALETTE, MultiPolygon;
   return {
     setters: [function (_) {
       L = _['default'];
     }, function (_2) {
-      EventMixin = _2['default'];
-    }, function (_a) {
-      linearPalette = _a.linearPalette;
-      scale = _a.scale;
+      linearPalette = _2.linearPalette;
+      scale = _2.scale;
+    }, function (_3) {
+      EventMixin = _3['default'];
+    }, function (_b) {
+      rangeutil = _b;
     }, function (_c) {
-      rangeutil = _c;
+      referencingutil = _c;
     }, function (_d) {
-      referencingutil = _d;
+      isDomain = _d.isDomain;
+    }, function (_e) {
+      toCoverage = _e.toCoverage;
     }],
     execute: function () {
       DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']);
       // blues
 
       /**
-       * Renderer for coverages with domain profile MultiPolygon.
+       * Renderer for Coverages and Domains with (domain) profile MultiPolygon.
        */
 
       MultiPolygon = (function (_EventMixin) {
@@ -10839,6 +6696,11 @@ $__System.register('76', ['48', '73', '6a', '6c', '6d'], function (_export) {
           babelHelpers.classCallCheck(this, MultiPolygon);
 
           babelHelpers.get(Object.getPrototypeOf(MultiPolygon.prototype), 'constructor', this).call(this);
+
+          if (isDomain(cov)) {
+            cov = toCoverage(cov);
+            options.keys = [cov.parameters.keys().next.value];
+          }
 
           this.cov = cov;
           this.param = cov.parameters.get(options.keys[0]);
@@ -10984,6 +6846,11 @@ $__System.register('76', ['48', '73', '6a', '6c', '6d'], function (_export) {
             this._geojson.redraw();
           }
         }, {
+          key: 'coverage',
+          get: function get() {
+            return this.cov;
+          }
+        }, {
           key: 'parameter',
           get: function get() {
             return this.param;
@@ -11017,11 +6884,11 @@ $__System.register('76', ['48', '73', '6a', '6c', '6d'], function (_export) {
   };
 });
 
-$__System.register('77', ['69', '70', '71', '74', '75', '76', '78', '6e'], function (_export) {
+$__System.register('6b', ['58', '60', '62', '63', '66', '67', '6a', '6c'], function (_export) {
   /* */
   'use strict';
 
-  var Grid, PointCollection, Point, VerticalProfile, VerticalProfileCollection, MultiPolygon, COVJSON_POINT, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, COVJSON_VERTICALPROFILECOLLECTION, COVJSON_POINTCOLLECTION, Trajectory, DEFAULT_DOMAIN_LAYER_CLASSES, DEFAULT_COLLECTION_LAYER_CLASSES;
+  var Grid, Trajectory, PointCollection, Point, VerticalProfile, VerticalProfileCollection, MultiPolygon, COVJSON_POINT, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, COVJSON_VERTICALPROFILECOLLECTION, COVJSON_POINTCOLLECTION, DEFAULT_DOMAIN_LAYER_CLASSES, DEFAULT_COLLECTION_LAYER_CLASSES;
 
   var _DEFAULT_DOMAIN_LAYER_CLASSES, _DEFAULT_COLLECTION_LAYER_CLASSES;
 
@@ -11094,7 +6961,8 @@ $__System.register('77', ['69', '70', '71', '74', '75', '76', '78', '6e'], funct
           return options.classes[p];
         })];
       }
-      if (cov.domainProfiles.some(function (p) {
+      // domainProfiles is not defined for collections, hence the check
+      if (cov.domainProfiles && cov.domainProfiles.some(function (p) {
         return options.classes[p];
       })) {
         return options.classes[cov.domainProfiles.find(function (p) {
@@ -11102,14 +6970,21 @@ $__System.register('77', ['69', '70', '71', '74', '75', '76', '78', '6e'], funct
         })];
       }
     }
-    if (cov.domainProfiles.some(function (p) {
+    if (cov.type === 'Coverage' && cov.domainProfiles && cov.domainProfiles.some(function (p) {
       return DEFAULT_DOMAIN_LAYER_CLASSES[p];
     })) {
       return DEFAULT_DOMAIN_LAYER_CLASSES[cov.domainProfiles.find(function (p) {
         return DEFAULT_DOMAIN_LAYER_CLASSES[p];
       })];
     }
-    if (cov.profiles.some(function (p) {
+    if (cov.type === 'Domain' && cov.profiles && cov.profiles.some(function (p) {
+      return DEFAULT_DOMAIN_LAYER_CLASSES[p];
+    })) {
+      return DEFAULT_DOMAIN_LAYER_CLASSES[cov.profiles.find(function (p) {
+        return DEFAULT_DOMAIN_LAYER_CLASSES[p];
+      })];
+    }
+    if (cov.type === 'CoverageCollection' && cov.profiles.some(function (p) {
       return DEFAULT_COLLECTION_LAYER_CLASSES[p];
     })) {
       return DEFAULT_COLLECTION_LAYER_CLASSES[cov.profiles.find(function (p) {
@@ -11121,26 +6996,26 @@ $__System.register('77', ['69', '70', '71', '74', '75', '76', '78', '6e'], funct
   return {
     setters: [function (_) {
       Grid = _['default'];
-    }, function (_3) {
-      PointCollection = _3['default'];
     }, function (_2) {
-      Point = _2['default'];
+      Trajectory = _2['default'];
     }, function (_4) {
-      VerticalProfile = _4['default'];
+      PointCollection = _4['default'];
+    }, function (_3) {
+      Point = _3['default'];
     }, function (_5) {
-      VerticalProfileCollection = _5['default'];
+      VerticalProfile = _5['default'];
     }, function (_6) {
-      MultiPolygon = _6['default'];
-    }, function (_7) {
-      COVJSON_POINT = _7.COVJSON_POINT;
-      COVJSON_VERTICALPROFILE = _7.COVJSON_VERTICALPROFILE;
-      COVJSON_GRID = _7.COVJSON_GRID;
-      COVJSON_TRAJECTORY = _7.COVJSON_TRAJECTORY;
-      COVJSON_MULTIPOLYGON = _7.COVJSON_MULTIPOLYGON;
-      COVJSON_VERTICALPROFILECOLLECTION = _7.COVJSON_VERTICALPROFILECOLLECTION;
-      COVJSON_POINTCOLLECTION = _7.COVJSON_POINTCOLLECTION;
-    }, function (_e) {
-      Trajectory = _e['default'];
+      VerticalProfileCollection = _6['default'];
+    }, function (_a) {
+      MultiPolygon = _a['default'];
+    }, function (_c) {
+      COVJSON_POINT = _c.COVJSON_POINT;
+      COVJSON_VERTICALPROFILE = _c.COVJSON_VERTICALPROFILE;
+      COVJSON_GRID = _c.COVJSON_GRID;
+      COVJSON_TRAJECTORY = _c.COVJSON_TRAJECTORY;
+      COVJSON_MULTIPOLYGON = _c.COVJSON_MULTIPOLYGON;
+      COVJSON_VERTICALPROFILECOLLECTION = _c.COVJSON_VERTICALPROFILECOLLECTION;
+      COVJSON_POINTCOLLECTION = _c.COVJSON_POINTCOLLECTION;
     }],
     execute: function () {
       DEFAULT_DOMAIN_LAYER_CLASSES = (_DEFAULT_DOMAIN_LAYER_CLASSES = {}, babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_GRID, Grid), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_POINT, Point), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_VERTICALPROFILE, VerticalProfile), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_TRAJECTORY, Trajectory), babelHelpers.defineProperty(_DEFAULT_DOMAIN_LAYER_CLASSES, COVJSON_MULTIPOLYGON, MultiPolygon), _DEFAULT_DOMAIN_LAYER_CLASSES);
@@ -11149,18 +7024,18 @@ $__System.register('77', ['69', '70', '71', '74', '75', '76', '78', '6e'], funct
   };
 });
 
-$__System.register("79", ["77"], function (_export) {
+$__System.register("6d", ["6b"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_) {
+    setters: [function (_b) {
       var _exportObj = {};
 
-      for (var _key in _) {
-        if (_key !== "default") _exportObj[_key] = _[_key];
+      for (var _key in _b) {
+        if (_key !== "default") _exportObj[_key] = _b[_key];
       }
 
-      _exportObj["default"] = _["default"];
+      _exportObj["default"] = _b["default"];
 
       _export(_exportObj);
     }],
@@ -11168,7 +7043,7 @@ $__System.register("79", ["77"], function (_export) {
   };
 });
 
-$__System.register('7a', ['48'], function (_export) {
+$__System.register('6e', ['48'], function (_export) {
   /* */
 
   /**
@@ -11705,7 +7580,7 @@ $__System.register('7a', ['48'], function (_export) {
   };
 });
 
-$__System.register('7b', ['48', '67', '7c', '7d'], function (_export) {
+$__System.register('6f', ['48', '56', '70', '71'], function (_export) {
   /* */
 
   // TODO the default template should be moved outside this module so that it can be easily skipped
@@ -11718,11 +7593,11 @@ $__System.register('7b', ['48', '67', '7c', '7d'], function (_export) {
     }, function (_2) {
       $ = _2.$;
       HTML = _2.HTML;
-    }, function (_c) {
-      inject = _c.inject;
-      fromTemplate = _c.fromTemplate;
-    }, function (_d) {
-      i18n = _d;
+    }, function (_3) {
+      inject = _3.inject;
+      fromTemplate = _3.fromTemplate;
+    }, function (_4) {
+      i18n = _4;
     }],
     execute: function () {
       DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend';
@@ -11881,7 +7756,7 @@ $__System.register('7b', ['48', '67', '7c', '7d'], function (_export) {
   };
 });
 
-$__System.register('7c', ['67'], function (_export) {
+$__System.register('70', ['56'], function (_export) {
   /* */
 
   /**
@@ -11940,7 +7815,7 @@ $__System.register('7c', ['67'], function (_export) {
   };
 });
 
-$__System.register('7e', ['48', '67', '7c', '7d'], function (_export) {
+$__System.register('72', ['48', '56', '70', '71'], function (_export) {
   /* */
 
   // TODO the default template should be moved outside this module so that it can be easily skipped
@@ -11952,11 +7827,11 @@ $__System.register('7e', ['48', '67', '7c', '7d'], function (_export) {
       L = _['default'];
     }, function (_2) {
       $ = _2.$;
-    }, function (_c) {
-      inject = _c.inject;
-      fromTemplate = _c.fromTemplate;
-    }, function (_d) {
-      i18n = _d;
+    }, function (_3) {
+      inject = _3.inject;
+      fromTemplate = _3.fromTemplate;
+    }, function (_4) {
+      i18n = _4;
     }],
     execute: function () {
       DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend';
@@ -12132,7 +8007,7 @@ $__System.register('7e', ['48', '67', '7c', '7d'], function (_export) {
   };
 });
 
-$__System.register('7f', ['7b', '7e'], function (_export) {
+$__System.register('73', ['72', '6f'], function (_export) {
   /* */
 
   /**
@@ -12162,12 +8037,12 @@ $__System.register('7f', ['7b', '7e'], function (_export) {
    */
   'use strict';
 
-  var DiscreteLegend, ContinuousLegend;
+  var ContinuousLegend, DiscreteLegend;
   return {
-    setters: [function (_b) {
-      DiscreteLegend = _b['default'];
-    }, function (_e) {
-      ContinuousLegend = _e['default'];
+    setters: [function (_) {
+      ContinuousLegend = _['default'];
+    }, function (_f) {
+      DiscreteLegend = _f['default'];
     }],
     execute: function () {
       _export('default', function (layer) {
@@ -12184,11 +8059,11 @@ $__System.register('7f', ['7b', '7e'], function (_export) {
   };
 });
 
-$__System.registerDynamic("80", ["81"], true, function($__require, exports, module) {
+$__System.registerDynamic("74", ["75"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   "format cjs";
   (function(window) {
     'use strict';
@@ -12225,7 +8100,7 @@ $__System.registerDynamic("80", ["81"], true, function($__require, exports, modu
     }
     function ChartInternal(api) {
       var $$ = this;
-      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('81') : undefined;
+      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('75') : undefined;
       $$.api = api;
       $$.config = $$.getDefaultConfig();
       $$.data = {};
@@ -18945,23 +14820,23 @@ $__System.registerDynamic("80", ["81"], true, function($__require, exports, modu
       window.c3 = c3;
     }
   })(window);
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("82", ["80"], true, function($__require, exports, module) {
+$__System.registerDynamic("76", ["74"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('80');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('74');
   return module.exports;
 });
 
-$__System.register("83", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("77", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('7d', [], function (_export) {
+$__System.register('71', [], function (_export) {
+  // TODO move to covutils
+
   /** @ignore */
   'use strict';
 
@@ -19032,7 +14907,7 @@ $__System.register('7d', [], function (_export) {
   };
 });
 
-$__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
+$__System.register('78', ['48', '71', '76', '77', '5c'], function (_export) {
   /* */
 
   /**
@@ -19047,44 +14922,130 @@ $__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
    */
   'use strict';
 
-  var L, c3, i18n, referencingUtil, VerticalProfilePlot;
+  var L, i18n, c3, referencingUtil, VerticalProfilePlot;
+
+  function zip(a, b) {
+    return a.map(function (e, i) {
+      return [a[i], b[i]];
+    });
+  }
   return {
     setters: [function (_) {
       L = _['default'];
+    }, function (_4) {
+      i18n = _4;
     }, function (_2) {
       c3 = _2['default'];
-    }, function (_3) {}, function (_d) {
-      i18n = _d;
-    }, function (_d2) {
-      referencingUtil = _d2;
+    }, function (_3) {}, function (_c) {
+      referencingUtil = _c;
     }],
     execute: function () {
       VerticalProfilePlot = (function (_L$Popup) {
         babelHelpers.inherits(VerticalProfilePlot, _L$Popup);
 
-        // TODO rethink options.keys, feels weird
-
         /**
          * Creates a vertical profile plot popup.
          * 
-         * @param {object} coverage The vertical profile coverage to visualize.
+         * @param {Coverage|Array<Coverage>} coverage The vertical profile coverage to visualize.
+         *   If an array of vertical profile coverages is given, then the vertical reference systems
+         *   are assumed to be identical.
          * @param {object} [options] Popup options. See also http://leafletjs.com/reference.html#popup-options.
-         * @param {Array} [options.keys] A single-element array of a parameter key
+         * @param {Array|Array<Array>} [options.keys] The parameters to display.
+         *   For a single coverage, an array of parameter keys, each parameter is accessible in a drop down.
+         *   The default for a single coverage is to display all parameters.
+         *   For multiple coverages, an array of parameter key groups, each group is accessible in a drop down.
+         *   Each group array is ordered as the coverage array and determines which parameter of each coverage
+         *   is displayed in a single plot. In each group, at least one item must be defined.
+         *   The default for multiple coverages is to display all parameters and treat each one as a separate group.
          * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+         * @param {string} [options.precision=4] The number of significant digits to display.
          */
 
         function VerticalProfilePlot(coverage) {
+          var _this = this;
+
           var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
           babelHelpers.classCallCheck(this, VerticalProfilePlot);
 
           options.maxWidth = options.maxWidth || 350;
           babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'constructor', this).call(this, options);
-          this._cov = coverage;
-          this._param = options.keys ? coverage.parameters.get(options.keys[0]) : null;
+          this._covs = Array.isArray(coverage) ? coverage : [coverage];
           this._language = options.language || i18n.DEFAULT_LANGUAGE;
+          this._precision = options.precision || 4;
 
-          if (this._param === null) {
-            throw new Error('multiple params not supported yet');
+          this._labels = options.labels ? options.labels : new Array(this._covs.length);
+
+          var keyGroups = [];
+          if (!options.keys) {
+            // treat all parameters of all coverages as separate
+            for (var i = 0; i < this._covs.length; i++) {
+              var _iteratorNormalCompletion = true;
+              var _didIteratorError = false;
+              var _iteratorError = undefined;
+
+              try {
+                for (var _iterator = this._covs[i].parameters.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  var key = _step.value;
+
+                  var group = new Array(this._covs.length);
+                  group[i] = key;
+                  keyGroups.push(group);
+                }
+              } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion && _iterator['return']) {
+                    _iterator['return']();
+                  }
+                } finally {
+                  if (_didIteratorError) {
+                    throw _iteratorError;
+                  }
+                }
+              }
+            }
+          } else if (!Array.isArray(options.keys[0])) {
+            // short-cut for a single coverage, acts as parameter selector
+            keyGroups = options.keys.map(function (key) {
+              return [key];
+            });
+          } else {
+            // user defines which parameters to display and how to group them
+            keyGroups = options.keys;
+          }
+
+          // filter out groups which only contain null/undefined keys
+          keyGroups = keyGroups.filter(function (group) {
+            return !group.every(function (key) {
+              return !key;
+            });
+          });
+
+          if (keyGroups.some(function (group) {
+            return group.length !== _this._covs.length;
+          })) {
+            throw new Error('Length of each parameter group must match number of coverages');
+          }
+
+          // 2D array of parameter key groups, where each inner array is ordered like the coverages array
+          this._paramKeyGroups = keyGroups;
+
+          // Map from coverage to param keys
+          this._paramKeys = new Map();
+
+          var _loop = function (i) {
+            var keys = _this._paramKeyGroups.map(function (group) {
+              return group[i];
+            }).filter(function (key) {
+              return key;
+            });
+            _this._paramKeys.set(_this._covs[i], keys);
+          };
+
+          for (var i = 0; i < this._covs.length; i++) {
+            _loop(i);
           }
         }
 
@@ -19094,56 +15055,153 @@ $__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
         babelHelpers.createClass(VerticalProfilePlot, [{
           key: 'onAdd',
           value: function onAdd(map) {
-            var _this = this;
+            var _this2 = this;
 
             map.fire('dataloading');
-            Promise.all([this._cov.loadDomain(), this._cov.loadRanges()]).then(function (_ref) {
+            var domainPromise = Promise.all(this._covs.map(function (cov) {
+              return cov.loadDomain();
+            }));
+            var rangePromise = Promise.all(this._covs.map(function (cov) {
+              return cov.loadRanges(_this2._paramKeys.get(cov));
+            }));
+            Promise.all([domainPromise, rangePromise]).then(function (_ref) {
               var _ref2 = babelHelpers.slicedToArray(_ref, 2);
 
-              var domain = _ref2[0];
+              var domains = _ref2[0];
               var ranges = _ref2[1];
 
-              _this._domain = domain;
-              _this._ranges = ranges;
-              _this._addPlotToPopup();
-              babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'onAdd', _this).call(_this, map);
-              _this.fire('add');
+              _this2._domains = domains;
+              _this2._ranges = ranges;
+              _this2._addPlotToPopup();
+              babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'onAdd', _this2).call(_this2, map);
+              _this2.fire('add');
               map.fire('dataload');
             })['catch'](function (e) {
               console.error(e);
-              _this.fire('error', e);
+              _this2.fire('error', e);
               map.fire('dataload');
             });
           }
         }, {
           key: '_addPlotToPopup',
           value: function _addPlotToPopup() {
+            var _this3 = this;
+
             // TODO transform if necessary
             if (!this.getLatLng()) {
               // in case bindPopup is not used and the caller did not set a position
-              var x = this._domain.axes.get('x');
-              var y = this._domain.axes.get('y');
+              var x = this._domains[0].axes.get('x');
+              var y = this._domains[0].axes.get('y');
               this.setLatLng(L.latLng(y.values[0], x.values[0]));
             }
-            var el = this._getPlotElement();
+
+            // display first parameter group
+            var paramKeyGroup = this._paramKeyGroups[0];
+            var plot = this._getPlotElement(paramKeyGroup);
+
+            var el = document.createElement('span');
+
+            // display dropdown if multiple parameter groups
+            if (this._paramKeyGroups.length > 1) {
+              var _iteratorNormalCompletion2;
+
+              var _didIteratorError2;
+
+              var _iteratorError2;
+
+              var _iterator2, _step2;
+
+              (function () {
+                var select = document.createElement('select');
+
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
+
+                try {
+                  for (_iterator2 = _this3._paramKeyGroups.map(function (v, i) {
+                    return [v, i];
+                  })[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _step2$value = babelHelpers.slicedToArray(_step2.value, 2);
+
+                    var _paramKeyGroup = _step2$value[0];
+                    var i = _step2$value[1];
+
+                    var refParam = _this3._getRefParam(_paramKeyGroup);
+                    var option = document.createElement('option');
+                    option.value = i;
+                    option.text = i18n.getLanguageString(refParam.observedProperty.label, _this3._language);
+                    select.appendChild(option);
+                  }
+                } catch (err) {
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                      _iterator2['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
+                    }
+                  }
+                }
+
+                select.addEventListener('change', function () {
+                  el.removeChild(plot);
+                  var group = _this3._paramKeyGroups[parseInt(select.value)];
+                  plot = _this3._getPlotElement(group);
+                  el.appendChild(plot);
+                });
+
+                el.appendChild(select);
+              })();
+            }
+
+            el.appendChild(plot);
             this.setContent(el);
           }
         }, {
-          key: '_getPlotElement',
-          value: function _getPlotElement() {
-            var param = this._param;
+          key: '_getRefParam',
+          value: function _getRefParam(paramKeyGroup) {
+            // use first defined parameter as representative for the group
+            var covsWithParamKey = zip(this._covs, paramKeyGroup);
 
+            var _covsWithParamKey$filter$0 = babelHelpers.slicedToArray(covsWithParamKey.filter(function (_ref3) {
+              var _ref32 = babelHelpers.slicedToArray(_ref3, 2);
+
+              var key = _ref32[1];
+              return key;
+            })[0], 2);
+
+            var refCov = _covsWithParamKey$filter$0[0];
+            var refParamKey = _covsWithParamKey$filter$0[1];
+
+            var refParam = refCov.parameters.get(refParamKey);
+            return refParam;
+          }
+        }, {
+          key: '_getPlotElement',
+          value: function _getPlotElement(paramKeyGroup) {
+            var _this4 = this;
+
+            var refDomain = this._domains[0];
+            var covsWithParamKey = zip(this._covs, paramKeyGroup);
+
+            var refParam = this._getRefParam(paramKeyGroup);
+
+            // axis labels
             var zName = 'Vertical';
             var zUnit = '';
 
-            var vertSrs = referencingUtil.getRefSystem(this._domain, ['z']);
+            var vertSrs = referencingUtil.getRefSystem(refDomain, ['z']);
             if (vertSrs) {
               if (vertSrs.cs && vertSrs.cs.axes) {
                 var ax = vertSrs.cs.axes[0];
                 zUnit = ax.unit.symbol;
-                // TODO i18n
-                if (ax.name && ax.name.en) {
-                  zName = ax.name.en;
+                if (ax.name) {
+                  zName = i18n.getLanguageString(ax.name, this._language);
                 }
               }
             }
@@ -19153,56 +15211,76 @@ $__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
               xLabel += ' (' + zUnit + ')';
             }
 
-            var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this._language) : '';
-            var obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this._language);
-            var x = ['x'];
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var unit = refParam.unit ? refParam.unit.symbol ? refParam.unit.symbol : i18n.getLanguageString(refParam.unit.label, this._language) : '';
+            var obsPropLabel = i18n.getLanguageString(refParam.observedProperty.label, this._language);
 
-            try {
-              for (var _iterator = this._domain.axes.get('z').values[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var z = _step.value;
+            // http://c3js.org/samples/simple_xy_multiple.html
 
+            // axis values
+            var xs = {};
+            var columns = [];
+            var names = {};
+
+            for (var i = 0; i < this._covs.length; i++) {
+              var paramKey = covsWithParamKey[i][1];
+              if (!paramKey) {
+                continue;
+              }
+
+              var xname = 'x' + i;
+              var yname = refParam.key + i;
+
+              names[yname] = this._labels[i] ? this._labels[i] : obsPropLabel;
+
+              xs[yname] = xname;
+
+              var zVals = this._domains[i].axes.get('z').values;
+              var vals = this._ranges[i].get(paramKey);
+              var x = [xname];
+              var y = [yname];
+              for (var j = 0; j < zVals.length; j++) {
+                var val = vals.get({ z: j });
+                if (val === null) {
+                  continue;
+                }
+                var z = zVals[j];
                 x.push(z);
+                y.push(val);
               }
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator['return']) {
-                  _iterator['return']();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
-            }
 
-            var y = [param.key];
-            for (var i = 0; i < this._domain.axes.get('z').values.length; i++) {
-              y.push(this._ranges.get(param.key).get({ z: i }));
+              columns.push(x);
+              columns.push(y);
             }
 
             var el = document.createElement('div');
             c3.generate({
               bindto: el,
               data: {
-                x: 'x',
-                columns: [x, y],
-                names: babelHelpers.defineProperty({}, param.key, obsPropLabel)
+                xs: xs,
+                columns: columns,
+                names: names
               },
               axis: {
                 rotated: true,
                 x: {
+                  tick: {
+                    count: 10,
+                    format: function format(x) {
+                      return x.toPrecision(_this4._precision);
+                    }
+                  },
                   label: {
                     text: xLabel,
                     position: 'outer-center'
                   }
                 },
                 y: {
+                  tick: {
+                    count: 7,
+                    format: function format(x) {
+                      return x.toPrecision(_this4._precision);
+                    }
+                  },
                   label: {
                     text: obsPropLabel + (unit ? ' (' + unit + ')' : ''),
                     position: 'outer-middle'
@@ -19217,17 +15295,16 @@ $__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
                   show: true
                 }
               },
-              // no need for a legend since there is only one source currently
               legend: {
-                show: false
+                show: this._covs.length > 1 ? true : false
               },
               tooltip: {
                 format: {
                   title: function title(d) {
-                    return zName + ': ' + d + ' ' + zUnit;
+                    return zName + ': ' + d.toPrecision(_this4._precision) + ' ' + zUnit;
                   },
                   value: function value(_value, ratio, id) {
-                    return _value + ' ' + unit;
+                    return _value.toPrecision(_this4._precision) + ' ' + unit;
                   }
                 }
               },
@@ -19252,36 +15329,4178 @@ $__System.register('84', ['48', '82', '83', '7d', '6d'], function (_export) {
   };
 });
 
-$__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'], function (_export) {
+$__System.registerDynamic("69", ["79", "7a", "68"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  var _slicedToArray = function() {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+      try {
+        for (var _i = arr[Symbol.iterator](),
+            _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+          if (i && _arr.length === i)
+            break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"])
+            _i["return"]();
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+    return function(arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+  exports.normalizeIndexSubsetConstraints = normalizeIndexSubsetConstraints;
+  exports.subsetDomainByIndex = subsetDomainByIndex;
+  exports.subsetCoverageByIndex = subsetCoverageByIndex;
+  exports.subsetCoverageByValue = subsetCoverageByValue;
+  var _referencing = $__require('79');
+  var _array = $__require('7a');
+  var _constants = $__require('68');
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0,
+          arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+  function normalizeIndexSubsetConstraints(domain, constraints) {
+    var normalizedConstraints = {};
+    for (var axisName in constraints) {
+      if (!domain.axes.has(axisName)) {
+        continue;
+      }
+      if (constraints[axisName] === undefined || constraints[axisName] === null) {
+        continue;
+      }
+      if (typeof constraints[axisName] === 'number') {
+        var constraint = constraints[axisName];
+        normalizedConstraints[axisName] = {
+          start: constraint,
+          stop: constraint + 1
+        };
+      } else {
+        normalizedConstraints[axisName] = constraints[axisName];
+      }
+      var _normalizedConstraint = normalizedConstraints[axisName];
+      var _normalizedConstraint2 = _normalizedConstraint.start;
+      var start = _normalizedConstraint2 === undefined ? 0 : _normalizedConstraint2;
+      var _normalizedConstraint3 = _normalizedConstraint.stop;
+      var stop = _normalizedConstraint3 === undefined ? domain.axes.get(axisName).values.length : _normalizedConstraint3;
+      var _normalizedConstraint4 = _normalizedConstraint.step;
+      var step = _normalizedConstraint4 === undefined ? 1 : _normalizedConstraint4;
+      if (step <= 0) {
+        throw new Error('Invalid constraint for ' + axisName + ': step=' + step + ' must be > 0');
+      }
+      if (start >= stop || start < 0) {
+        throw new Error('Invalid constraint for ' + axisName + ': stop=' + stop + ' must be > start=' + start + ' and both >= 0');
+      }
+      normalizedConstraints[axisName] = {
+        start: start,
+        stop: stop,
+        step: step
+      };
+    }
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+    try {
+      for (var _iterator = domain.axes.keys()[Symbol.iterator](),
+          _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var _axisName = _step.value;
+        if (!(_axisName in normalizedConstraints)) {
+          var len = domain.axes.get(_axisName).values.length;
+          normalizedConstraints[_axisName] = {
+            start: 0,
+            stop: len,
+            step: 1
+          };
+        }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+    return normalizedConstraints;
+  }
+  function subsetDomainByIndex(domain, constraints) {
+    constraints = normalizeIndexSubsetConstraints(domain, constraints);
+    var newdomain = {
+      type: _constants.DOMAIN,
+      profiles: domain.profiles,
+      axes: new Map(domain.axes),
+      referencing: domain.referencing
+    };
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+    try {
+      var _loop = function _loop() {
+        var axisName = _step2.value;
+        var axis = domain.axes.get(axisName);
+        var coords = axis.values;
+        var bounds = axis.bounds;
+        var constraint = constraints[axisName];
+        var newcoords = void 0;
+        var newbounds = void 0;
+        var start = constraint.start;
+        var stop = constraint.stop;
+        var step = constraint.step;
+        if (start === 0 && stop === coords.length && step === 1) {
+          newcoords = coords;
+          newbounds = bounds;
+        } else if (step === 1) {
+          if (coords.subarray) {
+            newcoords = coords.subarray(start, stop);
+          } else {
+            newcoords = coords.slice(start, stop);
+          }
+          if (bounds) {
+            newbounds = {get: function get(i) {
+                return bounds.get(start + i);
+              }};
+          }
+        } else {
+          var q = Math.trunc((stop - start) / step);
+          var r = (stop - start) % step;
+          var len = q + r;
+          newcoords = new coords.constructor(len);
+          for (var i = start,
+              j = 0; i < stop; i += step, j++) {
+            newcoords[j] = coords[i];
+          }
+          if (bounds) {
+            newbounds = {get: function get(i) {
+                return bounds.get(start + i * step);
+              }};
+          }
+        }
+        var newaxis = {
+          dataType: axis.dataType,
+          components: axis.components,
+          values: newcoords,
+          bounds: newbounds
+        };
+        newdomain.axes.set(axisName, newaxis);
+      };
+      for (var _iterator2 = Object.keys(constraints)[Symbol.iterator](),
+          _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        _loop();
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
+    }
+    return newdomain;
+  }
+  function subsetCoverageByIndex(cov, constraints) {
+    return cov.loadDomain().then(function(domain) {
+      constraints = normalizeIndexSubsetConstraints(domain, constraints);
+      var newdomain = subsetDomainByIndex(domain, constraints);
+      var rangeWrapper = function rangeWrapper(range) {
+        var newrange = {
+          dataType: range.dataType,
+          get: function get(obj) {
+            var newobj = {};
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+            try {
+              for (var _iterator3 = Object.keys(obj)[Symbol.iterator](),
+                  _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                var axisName = _step3.value;
+                var _constraints$axisName = constraints[axisName];
+                var _start = _constraints$axisName.start;
+                var _step4 = _constraints$axisName.step;
+                newobj[axisName] = _start + obj[axisName] * _step4;
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                  _iterator3.return();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+            return range.get(newobj);
+          }
+        };
+        newrange.shape = new Map();
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+        try {
+          for (var _iterator4 = domain.axes.keys()[Symbol.iterator](),
+              _step5; !(_iteratorNormalCompletion4 = (_step5 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var axisName = _step5.value;
+            var size = newdomain.axes.get(axisName).values.length;
+            newrange.shape.set(axisName, size);
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+              _iterator4.return();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+        return newrange;
+      };
+      var loadRange = function loadRange(key) {
+        return cov.loadRange(key).then(rangeWrapper);
+      };
+      var loadRanges = function loadRanges(keys) {
+        return cov.loadRanges(keys).then(function(ranges) {
+          return new Map([].concat(_toConsumableArray(ranges)).map(function(_ref) {
+            var _ref2 = _slicedToArray(_ref, 2);
+            var key = _ref2[0];
+            var range = _ref2[1];
+            return [key, rangeWrapper(range)];
+          }));
+        });
+      };
+      var newcov = {
+        type: _constants.COVERAGE,
+        profiles: cov.profiles,
+        domainProfiles: cov.domainProfiles,
+        parameters: cov.parameters,
+        loadDomain: function loadDomain() {
+          return Promise.resolve(newdomain);
+        },
+        loadRange: loadRange,
+        loadRanges: loadRanges
+      };
+      newcov.subsetByIndex = subsetCoverageByIndex.bind(null, newcov);
+      newcov.subsetByValue = subsetCoverageByValue.bind(null, newcov);
+      return newcov;
+    });
+  }
+  function subsetCoverageByValue(cov, constraints) {
+    return cov.loadDomain().then(function(domain) {
+      var indexConstraints = {};
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+      try {
+        for (var _iterator5 = Object.keys(constraints)[Symbol.iterator](),
+            _step6; !(_iteratorNormalCompletion5 = (_step6 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var axisName = _step6.value;
+          var spec = constraints[axisName];
+          if (spec === undefined || spec === null || !domain.axes.has(axisName)) {
+            continue;
+          }
+          var axis = domain.axes.get(axisName);
+          var vals = axis.values;
+          var isISODate = (0, _referencing.isISODateAxis)(domain, axisName);
+          var isLongitude = (0, _referencing.isLongitudeAxis)(domain, axisName);
+          var lonWrapper = isLongitude ? (0, _referencing.getLongitudeWrapper)(domain, axisName) : undefined;
+          if (typeof spec === 'number' || typeof spec === 'string' || spec instanceof Date) {
+            var match = spec;
+            if (isISODate) {
+              match = (0, _referencing.asTime)(match);
+              vals = vals.map(function(v) {
+                return new Date(v).getTime();
+              });
+            } else if (isLongitude) {
+              match = lonWrapper(match);
+            }
+            var i = void 0;
+            if (vals.indexOf) {
+              i = vals.indexOf(match);
+            } else {
+              i = Array.prototype.indexOf.call(vals, match);
+            }
+            if (i === -1) {
+              throw new Error('Domain value not found: ' + spec);
+            }
+            indexConstraints[axisName] = i;
+          } else if ('target' in spec) {
+            var target = spec.target;
+            if (isISODate) {
+              target = (0, _referencing.asTime)(target);
+              vals = vals.map(function(v) {
+                return new Date(v).getTime();
+              });
+            } else if (isLongitude) {
+              target = lonWrapper(target);
+            } else if (typeof vals[0] !== 'number' || typeof target !== 'number') {
+              throw new Error('Invalid axis or constraint value type');
+            }
+            var _i = (0, _array.indexOfNearest)(vals, target);
+            indexConstraints[axisName] = _i;
+          } else if ('start' in spec && 'stop' in spec) {
+            var _start2 = spec.start;
+            var _stop = spec.stop;
+            if (isISODate) {
+              var _ref3 = [(0, _referencing.asTime)(_start2), (0, _referencing.asTime)(_stop)];
+              _start2 = _ref3[0];
+              _stop = _ref3[1];
+              vals = vals.map(function(v) {
+                return new Date(v).getTime();
+              });
+            } else if (isLongitude) {
+              var _ref4 = [lonWrapper(_start2), lonWrapper(_stop)];
+              _start2 = _ref4[0];
+              _stop = _ref4[1];
+            } else if (typeof vals[0] !== 'number' || typeof _start2 !== 'number') {
+              throw new Error('Invalid axis or constraint value type');
+            }
+            var _indicesOfNearest = (0, _array.indicesOfNearest)(vals, _start2);
+            var _indicesOfNearest2 = _slicedToArray(_indicesOfNearest, 2);
+            var lo1 = _indicesOfNearest2[0];
+            var hi1 = _indicesOfNearest2[1];
+            var _indicesOfNearest3 = (0, _array.indicesOfNearest)(vals, _stop);
+            var _indicesOfNearest4 = _slicedToArray(_indicesOfNearest3, 2);
+            var lo2 = _indicesOfNearest4[0];
+            var hi2 = _indicesOfNearest4[1];
+            var imin = Math.min(lo1, hi1, lo2, hi2);
+            var imax = Math.max(lo1, hi1, lo2, hi2) + 1;
+            indexConstraints[axisName] = {
+              start: imin,
+              stop: imax
+            };
+          } else {
+            throw new Error('Invalid subset constraints');
+          }
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+      return cov.subsetByIndex(indexConstraints);
+    });
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var _slicedToArray = function() {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+      try {
+        for (var _i = arr[Symbol.iterator](),
+            _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+          if (i && _arr.length === i)
+            break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"])
+            _i["return"]();
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+    return function(arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
+    return typeof obj;
+  } : function(obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+  var _createClass = function() {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor)
+          descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function(Constructor, protoProps, staticProps) {
+      if (protoProps)
+        defineProperties(Constructor.prototype, protoProps);
+      if (staticProps)
+        defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.transformParameter = transformParameter;
+  exports.transformDomain = transformDomain;
+  var _ndarray = $__require('5f');
+  var _ndarray2 = _interopRequireDefault(_ndarray);
+  var _subset = $__require('69');
+  var _array = $__require('7a');
+  var _constants = $__require('7c');
+  var _util = $__require('7d');
+  var _http = $__require('7e');
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {default: obj};
+  }
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0,
+          arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+  var Coverage = function() {
+    function Coverage(covjson, options) {
+      _classCallCheck(this, Coverage);
+      this._covjson = covjson;
+      this.type = _constants.COVERAGE;
+      this.ld = {};
+      this._exposeLd(covjson);
+      this.options = options ? (0, _util.shallowcopy)(options) : {};
+      this.id = covjson.id;
+      this.parameters = new Map();
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+      try {
+        for (var _iterator = Object.keys(covjson.parameters)[Symbol.iterator](),
+            _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var key = _step.value;
+          transformParameter(covjson.parameters, key);
+          this.parameters.set(key, covjson.parameters[key]);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+      this.profiles = [];
+      var profile = this._covjson.profile;
+      if (profile) {
+        if (profile.substr(0, 4) !== 'http') {
+          profile = _util.PREFIX + profile;
+        }
+        this.profiles.push(profile);
+      }
+      this.domainProfiles = [];
+      var domainProfile = undefined;
+      if (typeof this._covjson.domain === 'string') {
+        domainProfile = this._covjson.domainProfile;
+      } else {
+        domainProfile = this._covjson.domain.profile;
+      }
+      if (domainProfile) {
+        if (domainProfile.substr(0, 4) !== 'http') {
+          domainProfile = _util.PREFIX + domainProfile;
+        }
+        this.domainProfiles.push(domainProfile);
+      }
+      this._updateLoadStatus();
+    }
+    _createClass(Coverage, [{
+      key: '_updateLoadStatus',
+      value: function _updateLoadStatus() {
+        var _this = this;
+        var isLoaded = function isLoaded(prop) {
+          return (typeof prop === 'undefined' ? 'undefined' : _typeof(prop)) === 'object';
+        };
+        var domainLoaded = isLoaded(this._covjson.domain);
+        var rangesLoaded = Object.keys(this._covjson.ranges).every(function(key) {
+          return isLoaded(_this._covjson.ranges[key]);
+        });
+        this.loaded = domainLoaded && rangesLoaded;
+      }
+    }, {
+      key: '_exposeLd',
+      value: function _exposeLd(covjson) {
+        if (!covjson['@context']) {
+          return;
+        }
+        var copy = (0, _util.shallowcopy)(covjson);
+        delete copy.domain;
+        delete copy.ranges;
+        this.ld = JSON.parse(JSON.stringify(copy));
+      }
+    }, {
+      key: 'loadDomain',
+      value: function loadDomain() {
+        var _this2 = this;
+        var domainOrUrl = this._covjson.domain;
+        if (this._domainPromise)
+          return this._domainPromise;
+        var promise = undefined;
+        if ((typeof domainOrUrl === 'undefined' ? 'undefined' : _typeof(domainOrUrl)) === 'object') {
+          var domain = domainOrUrl;
+          transformDomain(domain, this.options.referencing);
+          promise = Promise.resolve(domain);
+        } else {
+          var url = domainOrUrl;
+          promise = (0, _http.load)(url).then(function(result) {
+            var domain = result.data;
+            transformDomain(domain, _this2.options.referencing);
+            _this2._covjson.domain = domain;
+            _this2._updateLoadStatus();
+            return domain;
+          });
+        }
+        this._domainPromise = promise;
+        return promise;
+      }
+    }, {
+      key: 'loadRange',
+      value: function loadRange(paramKey) {
+        var _this3 = this;
+        return this.loadDomain().then(function(domain) {
+          var rangeOrUrl = _this3._covjson.ranges[paramKey];
+          if ((typeof rangeOrUrl === 'undefined' ? 'undefined' : _typeof(rangeOrUrl)) === 'object') {
+            var range = rangeOrUrl;
+            transformRange(range, domain);
+            return Promise.resolve(range);
+          } else {
+            var url = rangeOrUrl;
+            return (0, _http.load)(url).then(function(result) {
+              var range = result.data;
+              transformRange(range, domain);
+              if (_this3.options.cacheRanges) {
+                _this3._covjson.ranges[paramKey] = range;
+                _this3._updateLoadStatus();
+              }
+              return range;
+            });
+          }
+        });
+      }
+    }, {
+      key: 'loadRanges',
+      value: function loadRanges(paramKeys) {
+        var _this4 = this;
+        if (paramKeys === undefined)
+          paramKeys = this.parameters.keys();
+        paramKeys = Array.from(paramKeys);
+        return Promise.all(paramKeys.map(function(k) {
+          return _this4.loadRange(k);
+        })).then(function(ranges) {
+          var map = new Map();
+          for (var i = 0; i < paramKeys.length; i++) {
+            map.set(paramKeys[i], ranges[i]);
+          }
+          return map;
+        });
+      }
+    }, {
+      key: 'subsetByIndex',
+      value: function subsetByIndex(constraints) {
+        return _subsetByIndex(this, constraints);
+      }
+    }, {
+      key: 'subsetByValue',
+      value: function subsetByValue(constraints) {
+        return (0, _subset.subsetCoverageByValue)(this, constraints);
+      }
+    }]);
+    return Coverage;
+  }();
+  exports.default = Coverage;
+  function _subsetByIndex(cov, constraints) {
+    return cov.loadDomain().then(function(domain) {
+      constraints = (0, _subset.normalizeIndexSubsetConstraints)(domain, constraints);
+      var newdomain = (0, _subset.subsetDomainByIndex)(domain, constraints);
+      newdomain._rangeAxisOrder = domain._rangeAxisOrder;
+      newdomain._rangeShape = {};
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+      try {
+        for (var _iterator2 = newdomain.axes[Symbol.iterator](),
+            _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var _step2$value = _slicedToArray(_step2.value, 2);
+          var axisName = _step2$value[0];
+          var axis = _step2$value[1];
+          newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = axis.values.length;
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+      var rangeWrapper = function rangeWrapper(range) {
+        var _ndarr$hi$lo,
+            _ndarr$hi;
+        var ndarr = range._ndarr;
+        var axisNames = domain._rangeAxisOrder;
+        var los = axisNames.map(function(name) {
+          return constraints[name].start;
+        });
+        var his = axisNames.map(function(name) {
+          return constraints[name].stop;
+        });
+        var steps = axisNames.map(function(name) {
+          return constraints[name].step;
+        });
+        var newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
+        var newrange = {
+          dataType: range.dataType,
+          get: createRangeGetFunction(newndarr, domain._rangeAxisOrder),
+          _ndarr: newndarr
+        };
+        newrange.shape = new Map();
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
+        try {
+          for (var _iterator3 = domain.axes.keys()[Symbol.iterator](),
+              _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var axisName = _step3.value;
+            var size = newdomain.axes.get(axisName).values.length;
+            newrange.shape.set(axisName, size);
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
+        }
+        return newrange;
+      };
+      var loadRange = function loadRange(key) {
+        return cov.loadRange(key).then(rangeWrapper);
+      };
+      var loadRanges = function loadRanges(keys) {
+        return cov.loadRanges(keys).then(function(ranges) {
+          return new Map([].concat(_toConsumableArray(ranges)).map(function(_ref) {
+            var _ref2 = _slicedToArray(_ref, 2);
+            var key = _ref2[0];
+            var range = _ref2[1];
+            return [key, rangeWrapper(range)];
+          }));
+        });
+      };
+      var newcov = {
+        type: _constants.COVERAGE,
+        profiles: cov.profiles,
+        domainProfiles: cov.domainProfiles,
+        parameters: cov.parameters,
+        loadDomain: function loadDomain() {
+          return Promise.resolve(newdomain);
+        },
+        loadRange: loadRange,
+        loadRanges: loadRanges
+      };
+      newcov.subsetByIndex = _subsetByIndex.bind(null, newcov);
+      newcov.subsetByValue = _subset.subsetCoverageByValue.bind(null, newcov);
+      return newcov;
+    });
+  }
+  function transformParameter(params, key) {
+    if ('__transformDone' in params[key])
+      return;
+    var param = params[key];
+    param.key = key;
+    if (param.categoryEncoding) {
+      var map = new Map();
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+      try {
+        for (var _iterator4 = Object.keys(param.categoryEncoding)[Symbol.iterator](),
+            _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var category = _step4.value;
+          var vals = param.categoryEncoding[category];
+          if (!Array.isArray(vals)) {
+            vals = [vals];
+          }
+          map.set(category, vals);
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+      param.categoryEncoding = map;
+    }
+    param.__transformDone = true;
+  }
+  function transformRange(range, domain) {
+    if ('__transformDone' in range)
+      return;
+    var values = range.values;
+    var targetDataType = range.dataType;
+    var isTyped = ArrayBuffer.isView(values);
+    var missingIsEncoded = typeof range.validMin === 'number';
+    var hasOffsetFactor = 'offset' in range;
+    if ('offset' in range) {
+      (0, _util.assert)('factor' in range);
+    }
+    var offset = range.offset;
+    var factor = range.factor;
+    if (missingIsEncoded) {
+      (0, _util.assert)('validMin' in range);
+      (0, _util.assert)('validMax' in range);
+    }
+    var validMin = range.validMin;
+    var validMax = range.validMax;
+    var vals = undefined;
+    if (!missingIsEncoded && !hasOffsetFactor) {
+      vals = values;
+    } else {
+      vals = new Array(values.length);
+      if (hasOffsetFactor) {
+        for (var i = 0; i < values.length; i++) {
+          var val = values[i];
+          if (missingIsEncoded && (val < validMin || val > validMax)) {
+            vals[i] = null;
+          } else if (!missingIsEncoded && val === null) {
+            vals[i] = null;
+          } else {
+            vals[i] = val * factor + offset;
+          }
+        }
+        if (validMin !== undefined) {
+          range.validMin = validMin * factor + offset;
+          range.validMax = validMax * factor + offset;
+        }
+      } else {
+        for (var i = 0; i < values.length; i++) {
+          var val = values[i];
+          if (val < validMin || val > validMax) {
+            vals[i] = null;
+          } else {
+            vals[i] = val;
+          }
+        }
+      }
+      delete range.offset;
+      delete range.factor;
+      delete range.validMin;
+      delete range.validMax;
+    }
+    if (range.actualMin === undefined) {
+      var _minMax = (0, _array.minMax)(vals);
+      var _minMax2 = _slicedToArray(_minMax, 2);
+      var min = _minMax2[0];
+      var max = _minMax2[1];
+      if (min !== null) {
+        range.actualMin = min;
+        range.actualMax = max;
+      }
+    }
+    var shape = new Map();
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
+    try {
+      for (var _iterator5 = domain.axes.keys()[Symbol.iterator](),
+          _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var axisName = _step5.value;
+        shape.set(axisName, domain.axes.get(axisName).values.length);
+      }
+    } catch (err) {
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion5 && _iterator5.return) {
+          _iterator5.return();
+        }
+      } finally {
+        if (_didIteratorError5) {
+          throw _iteratorError5;
+        }
+      }
+    }
+    range.shape = shape;
+    var ndarr = (0, _ndarray2.default)(vals, domain._rangeShape);
+    range._ndarr = ndarr;
+    range.get = createRangeGetFunction(ndarr, domain._rangeAxisOrder);
+    range.__transformDone = true;
+    return range;
+  }
+  function createRangeGetFunction(ndarr, axisOrder) {
+    var ndargs = '';
+    for (var i = 0; i < axisOrder.length; i++) {
+      if (ndargs)
+        ndargs += ',';
+      ndargs += '\'' + axisOrder[i] + '\' in obj ? obj[\'' + axisOrder[i] + '\'] : 0';
+    }
+    var fn = new Function('ndarr', 'return function ndarrget (obj) { return ndarr.get(' + ndargs + ') }')(ndarr);
+    return fn;
+  }
+  function transformDomain(domain, referencing) {
+    if ('__transformDone' in domain)
+      return;
+    domain.profiles = [];
+    var profile = domain.profile;
+    if (profile) {
+      if (profile.substr(0, 4) !== 'http') {
+        profile = _util.PREFIX + profile;
+      }
+      domain.profiles.push(profile);
+    }
+    var axes = new Map();
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
+    try {
+      for (var _iterator6 = Object.keys(domain.axes)[Symbol.iterator](),
+          _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var axisName = _step6.value;
+        axes.set(axisName, domain.axes[axisName]);
+      }
+    } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+          _iterator6.return();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+    domain.axes = axes;
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+    try {
+      for (var _iterator7 = axes[Symbol.iterator](),
+          _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var _step7$value = _slicedToArray(_step7.value, 2);
+        var key = _step7$value[0];
+        var axis = _step7$value[1];
+        axis.key = key;
+        if (axis.dataType === 'Tuple' || axis.dataType === 'Polygon') {
+          axis.dataType = _util.PREFIX + axis.dataType;
+        }
+        if (axis.dimensions) {
+          axis.components = axis.dimensions;
+        }
+        if (!axis.components) {
+          axis.components = [key];
+        }
+        axis.dimensions = axis.components;
+        if ('start' in axis && 'stop' in axis && 'num' in axis) {
+          var arr = new Float64Array(axis.num);
+          var step = undefined;
+          if (axis.num === 1) {
+            if (axis.start !== axis.stop) {
+              throw new Error('regular axis of length 1 must have equal start/stop values');
+            }
+            step = 0;
+          } else {
+            step = (axis.stop - axis.start) / (axis.num - 1);
+          }
+          for (var i = 0; i < axis.num; i++) {
+            arr[i] = axis.start + i * step;
+          }
+          axis.values = arr;
+          delete axis.start;
+          delete axis.stop;
+          delete axis.num;
+        }
+        if (ArrayBuffer.isView(axis.values)) {
+          continue;
+        }
+        if (Array.isArray(axis.values) && typeof axis.values[0] === 'number') {
+          var arr = new Float64Array(axis.values.length);
+          for (var i = 0; i < axis.values.length; i++) {
+            arr[i] = axis.values[i];
+          }
+          axis.values = arr;
+        }
+        axis.bounds = wrapBounds(axis);
+      }
+    } catch (err) {
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion7 && _iterator7.return) {
+          _iterator7.return();
+        }
+      } finally {
+        if (_didIteratorError7) {
+          throw _iteratorError7;
+        }
+      }
+    }
+    var needsRangeAxisOrder = [].concat(_toConsumableArray(axes.values())).filter(function(axis) {
+      return axis.values.length > 1;
+    }).length > 1;
+    if (needsRangeAxisOrder && !domain.rangeAxisOrder) {
+      throw new Error('Domain requires "rangeAxisOrder"');
+    }
+    domain._rangeAxisOrder = domain.rangeAxisOrder || [].concat(_toConsumableArray(axes.keys()));
+    domain._rangeShape = domain._rangeAxisOrder.map(function(k) {
+      return axes.get(k).values.length;
+    });
+    if (referencing) {
+      domain.referencing = referencing;
+    }
+    var _iteratorNormalCompletion8 = true;
+    var _didIteratorError8 = false;
+    var _iteratorError8 = undefined;
+    try {
+      for (var _iterator8 = domain.referencing[Symbol.iterator](),
+          _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+        var obj = _step8.value;
+        if (obj.system)
+          break;
+        obj.system = obj.srs || obj.trs || obj.rs;
+        if (obj.dimensions) {
+          obj.components = obj.dimensions;
+        }
+        delete obj.srs;
+        delete obj.trs;
+        delete obj.rs;
+      }
+    } catch (err) {
+      _didIteratorError8 = true;
+      _iteratorError8 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion8 && _iterator8.return) {
+          _iterator8.return();
+        }
+      } finally {
+        if (_didIteratorError8) {
+          throw _iteratorError8;
+        }
+      }
+    }
+    domain.__transformDone = true;
+    return domain;
+  }
+  function wrapBounds(axis) {
+    if (axis.bounds) {
+      var _ret = function() {
+        var bounds = axis.bounds;
+        return {v: {get: function get(i) {
+              return [bounds[2 * i], bounds[2 * i + 1]];
+            }}};
+      }();
+      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object")
+        return _ret.v;
+    }
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("79", [], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  var _LongitudeAxisIndex;
+  exports.getLongitudeWrapper = getLongitudeWrapper;
+  exports.isLongitudeAxis = isLongitudeAxis;
+  exports.isISODateAxis = isISODateAxis;
+  exports.asTime = asTime;
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+    return obj;
+  }
+  var OPENGIS_CRS_PREFIX = 'http://www.opengis.net/def/crs/';
+  var EPSG4979 = OPENGIS_CRS_PREFIX + 'EPSG/0/4979';
+  var EPSG4326 = OPENGIS_CRS_PREFIX + 'EPSG/0/4326';
+  var CRS84 = OPENGIS_CRS_PREFIX + 'OGC/1.3/CRS84';
+  var EllipsoidalCRSs = [EPSG4979, EPSG4326, CRS84];
+  var LongitudeAxisIndex = (_LongitudeAxisIndex = {}, _defineProperty(_LongitudeAxisIndex, EPSG4979, 1), _defineProperty(_LongitudeAxisIndex, EPSG4326, 1), _defineProperty(_LongitudeAxisIndex, CRS84, 0), _LongitudeAxisIndex);
+  function getLongitudeWrapper(domain, axisName) {
+    if (!isLongitudeAxis(domain, axisName)) {
+      throw new Error('\'' + axisName + '\' is not a longitude axis');
+    }
+    var vals = domain.axes.get(axisName).values;
+    var lon_min = vals[0];
+    var lon_max = vals[vals.length - 1];
+    if (lon_min > lon_max) {
+      var _ref = [lon_max, lon_min];
+      lon_min = _ref[0];
+      lon_max = _ref[1];
+    }
+    var x_mid = (lon_max + lon_min) / 2;
+    var x_min = x_mid - 180;
+    var x_max = x_mid + 180;
+    return function(lon) {
+      if (x_min <= lon && lon <= x_max) {
+        return lon;
+      } else {
+        return ((lon - x_min) % 360 + 360) % 360 + x_min;
+      }
+    };
+  }
+  function isLongitudeAxis(domain, axisName) {
+    var ref = getReferenceObject(domain, axisName);
+    if (!ref) {
+      return false;
+    }
+    var crsId = ref.system.id;
+    if (EllipsoidalCRSs.indexOf(crsId) === -1) {
+      return false;
+    }
+    var compIdx = ref.components.indexOf(axisName);
+    var isLongitude = LongitudeAxisIndex[crsId] === compIdx;
+    return isLongitude;
+  }
+  function isISODateAxis(domain, axisName) {
+    var val = domain.axes.get(axisName).values[0];
+    if (typeof val !== 'string') {
+      return false;
+    }
+    return !isNaN(new Date(val).getTime());
+  }
+  function getReferenceObject(domain, component) {
+    var ref = domain.referencing.find(function(ref) {
+      return ref.components.indexOf(component) !== -1;
+    });
+    return ref;
+  }
+  function asTime(inp) {
+    var res = void 0;
+    var err = false;
+    if (typeof inp === 'string') {
+      res = new Date(inp).getTime();
+    } else if (inp instanceof Date) {
+      res = inp.getTime();
+    } else {
+      err = true;
+    }
+    if (isNaN(res)) {
+      err = true;
+    }
+    if (err) {
+      throw new Error('Invalid date: ' + inp);
+    }
+    return res;
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("7f", ["7c", "7b", "7d", "79"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var _slicedToArray = function() {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+      try {
+        for (var _i = arr[Symbol.iterator](),
+            _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+          if (i && _arr.length === i)
+            break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"])
+            _i["return"]();
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+    return function(arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+  var _createClass = function() {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor)
+          descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function(Constructor, protoProps, staticProps) {
+      if (protoProps)
+        defineProperties(Constructor.prototype, protoProps);
+      if (staticProps)
+        defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.CollectionQuery = undefined;
+  var _constants = $__require('7c');
+  var _Coverage = $__require('7b');
+  var _Coverage2 = _interopRequireDefault(_Coverage);
+  var _util = $__require('7d');
+  var _referencing = $__require('79');
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {default: obj};
+  }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+  var CoverageCollection = function() {
+    function CoverageCollection(covjson) {
+      _classCallCheck(this, CoverageCollection);
+      this.type = _constants.COVERAGECOLLECTION;
+      this.ld = {};
+      this._exposeLd(covjson);
+      this.id = covjson.id;
+      this.profiles = [];
+      var profile = covjson.profile;
+      if (profile) {
+        if (profile.substr(0, 4) !== 'http') {
+          profile = _util.PREFIX + profile;
+        }
+        this.profiles.push(profile);
+      }
+      var covs = [];
+      var rootParams = covjson.parameters ? covjson.parameters : {};
+      var covOptions = {};
+      if (covjson.referencing) {
+        covOptions.referencing = covjson.referencing;
+      }
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+      try {
+        for (var _iterator = covjson.coverages[Symbol.iterator](),
+            _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var coverage = _step.value;
+          if (!coverage.parameters) {
+            coverage.parameters = {};
+          }
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+          try {
+            for (var _iterator3 = Object.keys(rootParams)[Symbol.iterator](),
+                _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var key = _step3.value;
+              if (key in coverage.ranges) {
+                coverage.parameters[key] = rootParams[key];
+              }
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+          if (covjson['@context']) {
+            coverage['@context'] = covjson['@context'];
+          }
+          covs.push(new _Coverage2.default(coverage, covOptions));
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+      this.coverages = covs;
+      if (covjson.parameters) {
+        this.parameters = new Map();
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+        try {
+          for (var _iterator2 = Object.keys(covjson.parameters)[Symbol.iterator](),
+              _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var key = _step2.value;
+            (0, _Coverage.transformParameter)(covjson.parameters, key);
+            this.parameters.set(key, covjson.parameters[key]);
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+      }
+      if (covjson.domainTemplate) {
+        (0, _Coverage.transformDomain)(covjson.domainTemplate);
+        this.domainTemplate = covjson.domainTemplate;
+      }
+    }
+    _createClass(CoverageCollection, [{
+      key: 'query',
+      value: function query() {
+        return new CollectionQuery(this);
+      }
+    }, {
+      key: '_exposeLd',
+      value: function _exposeLd(covjson) {
+        if (!covjson['@context']) {
+          return;
+        }
+        var copy = (0, _util.shallowcopy)(covjson);
+        delete copy.coverages;
+        this.ld = JSON.parse(JSON.stringify(copy));
+      }
+    }]);
+    return CoverageCollection;
+  }();
+  exports.default = CoverageCollection;
+  var CollectionQuery = exports.CollectionQuery = function() {
+    function CollectionQuery(collection) {
+      _classCallCheck(this, CollectionQuery);
+      this._collection = collection;
+      this._filter = {};
+      this._subset = {};
+    }
+    _createClass(CollectionQuery, [{
+      key: 'filter',
+      value: function filter(spec) {
+        mergeInto(spec, this._filter);
+        return this;
+      }
+    }, {
+      key: 'subset',
+      value: function subset(spec) {
+        mergeInto(spec, this._subset);
+        return this;
+      }
+    }, {
+      key: 'embed',
+      value: function embed(spec) {
+        return this;
+      }
+    }, {
+      key: 'execute',
+      value: function execute() {
+        var _this = this;
+        var coll = this._collection;
+        var newcoll = {
+          type: _constants.COVERAGECOLLECTION,
+          coverages: [],
+          parameters: coll.parameters,
+          domainTemplate: coll.domainTemplate,
+          profiles: coll.profiles
+        };
+        var promises = [];
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+        try {
+          var _loop = function _loop() {
+            var cov = _step4.value;
+            promises.push(cov.loadDomain().then(function(domain) {
+              if (!matchesFilter(domain, _this._filter)) {
+                return;
+              }
+              if (Object.keys(_this._subset).length === 0) {
+                newcoll.coverages.push(cov);
+              } else {
+                return cov.subsetByValue(_this._subset).then(function(subsetted) {
+                  newcoll.coverages.push(subsetted);
+                });
+              }
+            }));
+          };
+          for (var _iterator4 = coll.coverages[Symbol.iterator](),
+              _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            _loop();
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+              _iterator4.return();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+        return Promise.all(promises).then(function() {
+          newcoll.query = function() {
+            return new CollectionQuery(newcoll);
+          };
+          return newcoll;
+        });
+      }
+    }]);
+    return CollectionQuery;
+  }();
+  function matchesFilter(domain, filter) {
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
+    try {
+      for (var _iterator5 = Object.keys(filter)[Symbol.iterator](),
+          _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var axisName = _step5.value;
+        var condition = filter[axisName];
+        if (!domain.axes.has(axisName)) {
+          throw new Error('Axis "' + axisName + '" does not exist');
+        }
+        var axis = domain.axes.get(axisName);
+        var vals = axis.values;
+        var min = vals[0];
+        var max = vals[vals.length - 1];
+        if (typeof min !== 'number' && typeof min !== 'string') {
+          throw new Error('Can only filter primitive axis values');
+        }
+        var start = condition.start;
+        var stop = condition.stop;
+        if ((0, _referencing.isISODateAxis)(domain, axisName)) {
+          var _ref = [(0, _util.asTime)(min), (0, _util.asTime)(max)][(start, stop)] = [(0, _util.asTime)(start), (0, _util.asTime)(stop)];
+          var _ref2 = _slicedToArray(_ref, 2);
+          min = _ref2[0];
+          max = _ref2[1];
+        } else if ((0, _referencing.isLongitudeAxis)(domain, axisName)) {
+          var lonWrapper = (0, _referencing.getLongitudeWrapper)(domain, axisName)[(start, stop)] = [lonWrapper(start), lonWrapper(stop)];
+        }
+        if (min > max) {
+          var _ref3 = [max, min];
+          min = _ref3[0];
+          max = _ref3[1];
+        }
+        if (max < start || stop < min) {
+          return false;
+        }
+      }
+    } catch (err) {
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion5 && _iterator5.return) {
+          _iterator5.return();
+        }
+      } finally {
+        if (_didIteratorError5) {
+          throw _iteratorError5;
+        }
+      }
+    }
+    return true;
+  }
+  function mergeInto(inputObj, targetObj) {
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
+    try {
+      for (var _iterator6 = Object.keys(inputObj)[Symbol.iterator](),
+          _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var k = _step6.value;
+        targetObj[k] = inputObj[k];
+      }
+    } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+          _iterator6.return();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("7c", ["68"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  var _constants = $__require('68');
+  Object.defineProperty(exports, 'DOMAIN', {
+    enumerable: true,
+    get: function get() {
+      return _constants.DOMAIN;
+    }
+  });
+  Object.defineProperty(exports, 'COVERAGE', {
+    enumerable: true,
+    get: function get() {
+      return _constants.COVERAGE;
+    }
+  });
+  Object.defineProperty(exports, 'COVERAGECOLLECTION', {
+    enumerable: true,
+    get: function get() {
+      return _constants.COVERAGECOLLECTION;
+    }
+  });
+  var LINKRELPREFIX = exports.LINKRELPREFIX = 'http://www.iana.org/assignments/relation/';
+  return module.exports;
+});
+
+$__System.registerDynamic("80", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  "format cjs";
+  (function(global, undefined) {
+    "use strict";
+    var POW_2_24 = Math.pow(2, -24),
+        POW_2_32 = Math.pow(2, 32),
+        POW_2_53 = Math.pow(2, 53);
+    function encode(value) {
+      var data = new ArrayBuffer(256);
+      var dataView = new DataView(data);
+      var lastLength;
+      var offset = 0;
+      function ensureSpace(length) {
+        var newByteLength = data.byteLength;
+        var requiredLength = offset + length;
+        while (newByteLength < requiredLength)
+          newByteLength *= 2;
+        if (newByteLength !== data.byteLength) {
+          var oldDataView = dataView;
+          data = new ArrayBuffer(newByteLength);
+          dataView = new DataView(data);
+          var uint32count = (offset + 3) >> 2;
+          for (var i = 0; i < uint32count; ++i)
+            dataView.setUint32(i * 4, oldDataView.getUint32(i * 4));
+        }
+        lastLength = length;
+        return dataView;
+      }
+      function write() {
+        offset += lastLength;
+      }
+      function writeFloat64(value) {
+        write(ensureSpace(8).setFloat64(offset, value));
+      }
+      function writeUint8(value) {
+        write(ensureSpace(1).setUint8(offset, value));
+      }
+      function writeUint8Array(value) {
+        var dataView = ensureSpace(value.length);
+        for (var i = 0; i < value.length; ++i)
+          dataView.setUint8(offset + i, value[i]);
+        write();
+      }
+      function writeUint16(value) {
+        write(ensureSpace(2).setUint16(offset, value));
+      }
+      function writeUint32(value) {
+        write(ensureSpace(4).setUint32(offset, value));
+      }
+      function writeUint64(value) {
+        var low = value % POW_2_32;
+        var high = (value - low) / POW_2_32;
+        var dataView = ensureSpace(8);
+        dataView.setUint32(offset, high);
+        dataView.setUint32(offset + 4, low);
+        write();
+      }
+      function writeTypeAndLength(type, length) {
+        if (length < 24) {
+          writeUint8(type << 5 | length);
+        } else if (length < 0x100) {
+          writeUint8(type << 5 | 24);
+          writeUint8(length);
+        } else if (length < 0x10000) {
+          writeUint8(type << 5 | 25);
+          writeUint16(length);
+        } else if (length < 0x100000000) {
+          writeUint8(type << 5 | 26);
+          writeUint32(length);
+        } else {
+          writeUint8(type << 5 | 27);
+          writeUint64(length);
+        }
+      }
+      function encodeItem(value) {
+        var i;
+        if (value === false)
+          return writeUint8(0xf4);
+        if (value === true)
+          return writeUint8(0xf5);
+        if (value === null)
+          return writeUint8(0xf6);
+        if (value === undefined)
+          return writeUint8(0xf7);
+        switch (typeof value) {
+          case "number":
+            if (Math.floor(value) === value) {
+              if (0 <= value && value <= POW_2_53)
+                return writeTypeAndLength(0, value);
+              if (-POW_2_53 <= value && value < 0)
+                return writeTypeAndLength(1, -(value + 1));
+            }
+            writeUint8(0xfb);
+            return writeFloat64(value);
+          case "string":
+            var utf8data = [];
+            for (i = 0; i < value.length; ++i) {
+              var charCode = value.charCodeAt(i);
+              if (charCode < 0x80) {
+                utf8data.push(charCode);
+              } else if (charCode < 0x800) {
+                utf8data.push(0xc0 | charCode >> 6);
+                utf8data.push(0x80 | charCode & 0x3f);
+              } else if (charCode < 0xd800) {
+                utf8data.push(0xe0 | charCode >> 12);
+                utf8data.push(0x80 | (charCode >> 6) & 0x3f);
+                utf8data.push(0x80 | charCode & 0x3f);
+              } else {
+                charCode = (charCode & 0x3ff) << 10;
+                charCode |= value.charCodeAt(++i) & 0x3ff;
+                charCode += 0x10000;
+                utf8data.push(0xf0 | charCode >> 18);
+                utf8data.push(0x80 | (charCode >> 12) & 0x3f);
+                utf8data.push(0x80 | (charCode >> 6) & 0x3f);
+                utf8data.push(0x80 | charCode & 0x3f);
+              }
+            }
+            writeTypeAndLength(3, utf8data.length);
+            return writeUint8Array(utf8data);
+          default:
+            var length;
+            if (Array.isArray(value)) {
+              length = value.length;
+              writeTypeAndLength(4, length);
+              for (i = 0; i < length; ++i)
+                encodeItem(value[i]);
+            } else if (value instanceof Uint8Array) {
+              writeTypeAndLength(2, value.length);
+              writeUint8Array(value);
+            } else {
+              var keys = Object.keys(value);
+              length = keys.length;
+              writeTypeAndLength(5, length);
+              for (i = 0; i < length; ++i) {
+                var key = keys[i];
+                encodeItem(key);
+                encodeItem(value[key]);
+              }
+            }
+        }
+      }
+      encodeItem(value);
+      if ("slice" in data)
+        return data.slice(0, offset);
+      var ret = new ArrayBuffer(offset);
+      var retView = new DataView(ret);
+      for (var i = 0; i < offset; ++i)
+        retView.setUint8(i, dataView.getUint8(i));
+      return ret;
+    }
+    function decode(data, tagger, simpleValue) {
+      var dataView = new DataView(data);
+      var offset = 0;
+      if (typeof tagger !== "function")
+        tagger = function(value) {
+          return value;
+        };
+      if (typeof simpleValue !== "function")
+        simpleValue = function() {
+          return undefined;
+        };
+      function read(value, length) {
+        offset += length;
+        return value;
+      }
+      function readArrayBuffer(length) {
+        return read(new Uint8Array(data, offset, length), length);
+      }
+      function readFloat16() {
+        var tempArrayBuffer = new ArrayBuffer(4);
+        var tempDataView = new DataView(tempArrayBuffer);
+        var value = readUint16();
+        var sign = value & 0x8000;
+        var exponent = value & 0x7c00;
+        var fraction = value & 0x03ff;
+        if (exponent === 0x7c00)
+          exponent = 0xff << 10;
+        else if (exponent !== 0)
+          exponent += (127 - 15) << 10;
+        else if (fraction !== 0)
+          return fraction * POW_2_24;
+        tempDataView.setUint32(0, sign << 16 | exponent << 13 | fraction << 13);
+        return tempDataView.getFloat32(0);
+      }
+      function readFloat32() {
+        return read(dataView.getFloat32(offset), 4);
+      }
+      function readFloat64() {
+        return read(dataView.getFloat64(offset), 8);
+      }
+      function readUint8() {
+        return read(dataView.getUint8(offset), 1);
+      }
+      function readUint16() {
+        return read(dataView.getUint16(offset), 2);
+      }
+      function readUint32() {
+        return read(dataView.getUint32(offset), 4);
+      }
+      function readUint64() {
+        return readUint32() * POW_2_32 + readUint32();
+      }
+      function readBreak() {
+        if (dataView.getUint8(offset) !== 0xff)
+          return false;
+        offset += 1;
+        return true;
+      }
+      function readLength(additionalInformation) {
+        if (additionalInformation < 24)
+          return additionalInformation;
+        if (additionalInformation === 24)
+          return readUint8();
+        if (additionalInformation === 25)
+          return readUint16();
+        if (additionalInformation === 26)
+          return readUint32();
+        if (additionalInformation === 27)
+          return readUint64();
+        if (additionalInformation === 31)
+          return -1;
+        throw "Invalid length encoding";
+      }
+      function readIndefiniteStringLength(majorType) {
+        var initialByte = readUint8();
+        if (initialByte === 0xff)
+          return -1;
+        var length = readLength(initialByte & 0x1f);
+        if (length < 0 || (initialByte >> 5) !== majorType)
+          throw "Invalid indefinite length element";
+        return length;
+      }
+      function appendUtf16data(utf16data, length) {
+        for (var i = 0; i < length; ++i) {
+          var value = readUint8();
+          if (value & 0x80) {
+            if (value < 0xe0) {
+              value = (value & 0x1f) << 6 | (readUint8() & 0x3f);
+              length -= 1;
+            } else if (value < 0xf0) {
+              value = (value & 0x0f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
+              length -= 2;
+            } else {
+              value = (value & 0x0f) << 18 | (readUint8() & 0x3f) << 12 | (readUint8() & 0x3f) << 6 | (readUint8() & 0x3f);
+              length -= 3;
+            }
+          }
+          if (value < 0x10000) {
+            utf16data.push(value);
+          } else {
+            value -= 0x10000;
+            utf16data.push(0xd800 | (value >> 10));
+            utf16data.push(0xdc00 | (value & 0x3ff));
+          }
+        }
+      }
+      function decodeItem() {
+        var initialByte = readUint8();
+        var majorType = initialByte >> 5;
+        var additionalInformation = initialByte & 0x1f;
+        var i;
+        var length;
+        if (majorType === 7) {
+          switch (additionalInformation) {
+            case 25:
+              return readFloat16();
+            case 26:
+              return readFloat32();
+            case 27:
+              return readFloat64();
+          }
+        }
+        length = readLength(additionalInformation);
+        if (length < 0 && (majorType < 2 || 6 < majorType))
+          throw "Invalid length";
+        switch (majorType) {
+          case 0:
+            return length;
+          case 1:
+            return -1 - length;
+          case 2:
+            if (length < 0) {
+              var elements = [];
+              var fullArrayLength = 0;
+              while ((length = readIndefiniteStringLength(majorType)) >= 0) {
+                fullArrayLength += length;
+                elements.push(readArrayBuffer(length));
+              }
+              var fullArray = new Uint8Array(fullArrayLength);
+              var fullArrayOffset = 0;
+              for (i = 0; i < elements.length; ++i) {
+                fullArray.set(elements[i], fullArrayOffset);
+                fullArrayOffset += elements[i].length;
+              }
+              return fullArray;
+            }
+            return readArrayBuffer(length);
+          case 3:
+            var utf16data = [];
+            if (length < 0) {
+              while ((length = readIndefiniteStringLength(majorType)) >= 0)
+                appendUtf16data(utf16data, length);
+            } else
+              appendUtf16data(utf16data, length);
+            return String.fromCharCode.apply(null, utf16data);
+          case 4:
+            var retArray;
+            if (length < 0) {
+              retArray = [];
+              while (!readBreak())
+                retArray.push(decodeItem());
+            } else {
+              retArray = new Array(length);
+              for (i = 0; i < length; ++i)
+                retArray[i] = decodeItem();
+            }
+            return retArray;
+          case 5:
+            var retObject = {};
+            for (i = 0; i < length || length < 0 && !readBreak(); ++i) {
+              var key = decodeItem();
+              retObject[key] = decodeItem();
+            }
+            return retObject;
+          case 6:
+            return tagger(decodeItem(), length);
+          case 7:
+            switch (length) {
+              case 20:
+                return false;
+              case 21:
+                return true;
+              case 22:
+                return null;
+              case 23:
+                return undefined;
+              default:
+                return simpleValue(length);
+            }
+        }
+      }
+      var ret = decodeItem();
+      if (offset !== data.byteLength)
+        throw "Remaining bytes";
+      return ret;
+    }
+    var obj = {
+      encode: encode,
+      decode: decode
+    };
+    if (typeof define === "function" && define.amd)
+      define("cbor/cbor", obj);
+    else if (typeof module !== 'undefined' && module.exports)
+      module.exports = obj;
+    else if (!global.CBOR)
+      global.CBOR = obj;
+  })(this);
+  return module.exports;
+});
+
+$__System.registerDynamic("81", ["80"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('80');
+  return module.exports;
+});
+
+$__System.registerDynamic("7d", ["7a"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  var _array = $__require('7a');
+  Object.defineProperty(exports, 'minMax', {
+    enumerable: true,
+    get: function get() {
+      return _array.minMax;
+    }
+  });
+  Object.defineProperty(exports, 'indicesOfNearest', {
+    enumerable: true,
+    get: function get() {
+      return _array.indicesOfNearest;
+    }
+  });
+  Object.defineProperty(exports, 'indexOfNearest', {
+    enumerable: true,
+    get: function get() {
+      return _array.indexOfNearest;
+    }
+  });
+  exports.assert = assert;
+  exports.shallowcopy = shallowcopy;
+  exports.endsWith = endsWith;
+  var PREFIX = exports.PREFIX = 'http://coveragejson.org/def#';
+  function assert(condition, message) {
+    if (!condition) {
+      message = message || 'Assertion failed';
+      throw new Error(message);
+    }
+  }
+  function shallowcopy(obj) {
+    var copy = Object.create(Object.getPrototypeOf(obj));
+    for (var prop in obj) {
+      copy[prop] = obj[prop];
+    }
+    return copy;
+  }
+  function endsWith(subject, search) {
+    var position = subject.length - search.length;
+    var lastIndex = subject.indexOf(search, position);
+    return lastIndex !== -1 && lastIndex === position;
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("82", [], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.getAcceptHeader = getAcceptHeader;
+  var MEDIATYPE = exports.MEDIATYPE = {
+    COVCBOR: 'application/prs.coverage+cbor',
+    COVJSON: 'application/prs.coverage+json',
+    JSONLD: 'application/ld+json',
+    JSON: 'application/json',
+    OCTETSTREAM: 'application/octet-stream',
+    TEXT: 'text/plain'
+  };
+  var COVJSON_PROFILE_STANDALONE = exports.COVJSON_PROFILE_STANDALONE = 'http://coveragejson.org/profiles/standalone';
+  function getAcceptHeader(standalone) {
+    var covjsonProfile = standalone ? '; profile="' + COVJSON_PROFILE_STANDALONE + '"' : '';
+    var accept = MEDIATYPE.COVCBOR + '; q=1.0, ' + MEDIATYPE.COVJSON + covjsonProfile + '; q=0.5, ' + MEDIATYPE.JSONLD + '; q=0.1, ' + MEDIATYPE.JSON + '; q=0.1';
+    return accept;
+  }
+  var EXT = exports.EXT = {
+    COVJSON: '.covjson',
+    COVCBOR: '.covcbor'
+  };
+  return module.exports;
+});
+
+$__System.registerDynamic("7e", ["81", "7d", "82"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.load = load;
+  var _cborJs = $__require('81');
+  var _cborJs2 = _interopRequireDefault(_cborJs);
+  var _util = $__require('7d');
+  var _httpCommon = $__require('82');
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {default: obj};
+  }
+  function load(url) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var responseType = arguments.length <= 2 || arguments[2] === undefined ? 'arraybuffer' : arguments[2];
+    if (['arraybuffer', 'text'].indexOf(responseType) === -1) {
+      throw new Error();
+    }
+    var headers = options.headers || {};
+    return new Promise(function(resolve, reject) {
+      var req = new XMLHttpRequest();
+      req.open('GET', url);
+      req.responseType = responseType;
+      var accept = (0, _httpCommon.getAcceptHeader)(options.eagerload);
+      req.setRequestHeader('Accept', accept);
+      if (headers) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+        try {
+          for (var _iterator = Object.keys(headers)[Symbol.iterator](),
+              _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var header = _step.value;
+            req.setRequestHeader(header, headers[header]);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+      req.addEventListener('load', function() {
+        try {
+          if (!(req.status >= 200 && req.status < 300 || req.status === 304)) {
+            reject(new Error('Resource "' + url + '" not found, HTTP status code: ' + req.status));
+            return;
+          }
+          var type = req.getResponseHeader('Content-Type');
+          if (type.indexOf(_httpCommon.MEDIATYPE.OCTETSTREAM) === 0 || type.indexOf(_httpCommon.MEDIATYPE.TEXT) === 0) {
+            if ((0, _util.endsWith)(url, _httpCommon.EXT.COVJSON)) {
+              type = _httpCommon.MEDIATYPE.COVJSON;
+            } else if ((0, _util.endsWith)(url, _httpCommon.EXT.COVCBOR)) {
+              type = _httpCommon.MEDIATYPE.COVCBOR;
+            }
+          }
+          var data = undefined;
+          if (type === _httpCommon.MEDIATYPE.COVCBOR) {
+            var arrayBuffer = req.response;
+            var t0 = new Date();
+            data = _cborJs2.default.decode(arrayBuffer);
+            console.log('CBOR decoding: ' + (new Date() - t0) + 'ms');
+          } else if ([_httpCommon.MEDIATYPE.COVJSON, _httpCommon.MEDIATYPE.JSONLD, _httpCommon.MEDIATYPE.JSON].indexOf(type) > -1) {
+            if (responseType === 'arraybuffer') {
+              if (window.TextDecoder) {
+                var t0 = new Date();
+                data = JSON.parse(new TextDecoder().decode(new DataView(req.response)));
+                console.log('JSON decoding: ' + (new Date() - t0) + 'ms');
+              } else {
+                reject({responseType: 'text'});
+                return;
+              }
+            } else {
+              var t0 = new Date();
+              data = JSON.parse(req.response);
+              console.log('JSON decoding (slow path): ' + (new Date() - t0) + 'ms');
+            }
+          } else {
+            reject(new Error('Unsupported media type: ' + type));
+            return;
+          }
+          var responseHeaders = parseResponseHeaders(req.getAllResponseHeaders());
+          resolve({
+            data: data,
+            headers: responseHeaders
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
+      req.addEventListener('error', function() {
+        reject(new Error('Network error loading resource at ' + url));
+      });
+      req.send();
+    }).catch(function(e) {
+      if (e.responseType) {
+        return load(url, headers, e.responseType);
+      } else {
+        throw e;
+      }
+    });
+  }
+  function parseResponseHeaders(headerStr) {
+    var headers = {};
+    if (!headerStr) {
+      return headers;
+    }
+    var headerPairs = headerStr.split('\r\n');
+    for (var i = 0; i < headerPairs.length; i++) {
+      var headerPair = headerPairs[i];
+      var index = headerPair.indexOf(': ');
+      if (index > 0) {
+        var key = headerPair.substring(0, index).toLowerCase();
+        var val = headerPair.substring(index + 2);
+        headers[key] = val;
+      }
+    }
+    return headers;
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("83", ["7b", "7f", "7d", "7c", "7e"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
+    return typeof obj;
+  } : function(obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.load = load;
+  exports.read = read;
+  var _Coverage = $__require('7b');
+  var _Coverage2 = _interopRequireDefault(_Coverage);
+  var _CoverageCollection = $__require('7f');
+  var _CoverageCollection2 = _interopRequireDefault(_CoverageCollection);
+  var _util = $__require('7d');
+  var _constants = $__require('7c');
+  var _http = $__require('7e');
+  var http = _interopRequireWildcard(_http);
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key))
+            newObj[key] = obj[key];
+        }
+      }
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {default: obj};
+  }
+  function load(url, options) {
+    return http.load(url, options);
+  }
+  function read(input) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object') {
+      return Promise.resolve().then(function() {
+        return transformCovJSON(input);
+      });
+    } else {
+      return load(input, options).then(function(_ref) {
+        var data = _ref.data;
+        var headers = _ref.headers;
+        return transformCovJSON(data, headers);
+      });
+    }
+  }
+  function transformCovJSON(obj, headers) {
+    checkValidCovJSON(obj);
+    if ([_constants.COVERAGE, _constants.COVERAGECOLLECTION, _constants.DOMAIN].indexOf(obj.type) === -1) {
+      throw new Error('CoverageJSON document must be of Coverage, CoverageCollection, or Domain type');
+    }
+    var result = undefined;
+    if (obj.type === _constants.DOMAIN) {
+      (0, _Coverage.transformDomain)(obj);
+      result = obj;
+    } else if (obj.type === _constants.COVERAGE) {
+      result = new _Coverage2.default(obj);
+    } else {
+      result = new _CoverageCollection2.default(obj);
+    }
+    if (obj.type === _constants.COVERAGE || obj.type === _constants.COVERAGECOLLECTION) {
+      addLinkRelations(result, headers);
+    }
+    return result;
+  }
+  function addLinkRelations(cov, headers) {
+    if (!headers || !headers['link']) {
+      return;
+    }
+    var ld = cov.ld;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+    try {
+      for (var _iterator = headers['link'].split(',')[Symbol.iterator](),
+          _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var link = _step.value;
+        link = link.trim();
+        var parts = link.split(';');
+        var url = parts[0].substr(1, parts[0].length - 2);
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+        try {
+          for (var _iterator2 = parts.slice(1)[Symbol.iterator](),
+              _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var param = _step2.value;
+            var relStart = param.indexOf('rel=');
+            if (relStart === -1) {
+              continue;
+            }
+            var rel = param.substring(relStart + 5, param.length - 1);
+            if (!rel.startsWith('http://') && !rel.startsWith('https://')) {
+              rel = _constants.LINKRELPREFIX + rel;
+            }
+            if (ld[rel]) {
+              if (Array.isArray(ld[rel])) {
+                ld[rel].push(url);
+              } else {
+                ld[rel] = [ld[rel], url];
+              }
+            } else {
+              ld[rel] = url;
+            }
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+  }
+  function checkValidCovJSON(obj) {
+    (0, _util.assert)('type' in obj, '"type" missing');
+    if (obj.type === _constants.COVERAGE) {
+      (0, _util.assert)('parameters' in obj, '"parameters" missing');
+      (0, _util.assert)('domain' in obj, '"domain" missing');
+      (0, _util.assert)('ranges' in obj, '"ranges" missing');
+    } else if (obj.type === _constants.COVERAGECOLLECTION) {
+      (0, _util.assert)(Array.isArray(obj.coverages), '"coverages" must be an array');
+    }
+  }
+  return module.exports;
+});
+
+$__System.registerDynamic("53", ["83"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('83');
+  return module.exports;
+});
+
+$__System.registerDynamic("84", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  "format cjs";
+  (function(root, factory) {
+    if (typeof exports === 'object') {
+      module.exports = factory();
+    } else if (typeof define === 'function' && define.amd) {
+      define([], factory);
+    } else {
+      root.urltemplate = factory();
+    }
+  }(this, function() {
+    function UrlTemplate() {}
+    UrlTemplate.prototype.encodeReserved = function(str) {
+      return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
+        if (!/%[0-9A-Fa-f]/.test(part)) {
+          part = encodeURI(part);
+        }
+        return part;
+      }).join('');
+    };
+    UrlTemplate.prototype.encodeValue = function(operator, value, key) {
+      value = (operator === '+' || operator === '#') ? this.encodeReserved(value) : encodeURIComponent(value);
+      if (key) {
+        return encodeURIComponent(key) + '=' + value;
+      } else {
+        return value;
+      }
+    };
+    UrlTemplate.prototype.isDefined = function(value) {
+      return value !== undefined && value !== null;
+    };
+    UrlTemplate.prototype.isKeyOperator = function(operator) {
+      return operator === ';' || operator === '&' || operator === '?';
+    };
+    UrlTemplate.prototype.getValues = function(context, operator, key, modifier) {
+      var value = context[key],
+          result = [];
+      if (this.isDefined(value) && value !== '') {
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+          value = value.toString();
+          if (modifier && modifier !== '*') {
+            value = value.substring(0, parseInt(modifier, 10));
+          }
+          result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
+        } else {
+          if (modifier === '*') {
+            if (Array.isArray(value)) {
+              value.filter(this.isDefined).forEach(function(value) {
+                result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
+              }, this);
+            } else {
+              Object.keys(value).forEach(function(k) {
+                if (this.isDefined(value[k])) {
+                  result.push(this.encodeValue(operator, value[k], k));
+                }
+              }, this);
+            }
+          } else {
+            var tmp = [];
+            if (Array.isArray(value)) {
+              value.filter(this.isDefined).forEach(function(value) {
+                tmp.push(this.encodeValue(operator, value));
+              }, this);
+            } else {
+              Object.keys(value).forEach(function(k) {
+                if (this.isDefined(value[k])) {
+                  tmp.push(encodeURIComponent(k));
+                  tmp.push(this.encodeValue(operator, value[k].toString()));
+                }
+              }, this);
+            }
+            if (this.isKeyOperator(operator)) {
+              result.push(encodeURIComponent(key) + '=' + tmp.join(','));
+            } else if (tmp.length !== 0) {
+              result.push(tmp.join(','));
+            }
+          }
+        }
+      } else {
+        if (operator === ';') {
+          result.push(encodeURIComponent(key));
+        } else if (value === '' && (operator === '&' || operator === '?')) {
+          result.push(encodeURIComponent(key) + '=');
+        } else if (value === '') {
+          result.push('');
+        }
+      }
+      return result;
+    };
+    UrlTemplate.prototype.parse = function(template) {
+      var that = this;
+      var operators = ['+', '#', '.', '/', ';', '?', '&'];
+      return {expand: function(context) {
+          return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function(_, expression, literal) {
+            if (expression) {
+              var operator = null,
+                  values = [];
+              if (operators.indexOf(expression.charAt(0)) !== -1) {
+                operator = expression.charAt(0);
+                expression = expression.substr(1);
+              }
+              expression.split(/,/g).forEach(function(variable) {
+                var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
+                values.push.apply(values, that.getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+              });
+              if (operator && operator !== '+') {
+                var separator = ',';
+                if (operator === '?') {
+                  separator = '&';
+                } else if (operator !== '#') {
+                  separator = operator;
+                }
+                return (values.length !== 0 ? operator : '') + values.join(separator);
+              } else {
+                return values.join(',');
+              }
+            } else {
+              return that.encodeReserved(literal);
+            }
+          });
+        }};
+    };
+    return new UrlTemplate();
+  }));
+  return module.exports;
+});
+
+$__System.registerDynamic("85", ["84"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('84');
+  return module.exports;
+});
+
+$__System.register('86', ['85', '87'], function (_export) {
+  /* */
   'use strict';
 
-  var L, LayerFactory, getLayerClass, ProfilePlot, Action, VIEW, i18n, COVJSON_PREFIX, SelectControl, TimeAxis, ParameterSync, CoverageLegend, PROFILE_COLLECTION, POINT_COLLECTION, GeoCoverageView;
+  var urltemplate, jsonld, jsonldOriginal, PartialCollectionView, IriTemplate, COVAPI_NS, COVAPI_API, OSGEO_NS, OSTIME_NS, URL_PROPS, FRAME_CONTEXT, CONTEXTS, customLoader, jsonldOpts, API;
+
+  _export('discover', discover);
+
+  /**
+   * Extracts API information from the given Coverage/CoverageCollection object
+   * and returns an API object.
+   */
+
+  function discover(cov) {
+    // Our main source of API information comes from data within the .ld property.
+    // To query that we need the id of the coverage or coveragecollection.
+    if (!cov.id) {
+      return Promise.resolve(new API());
+    }
+    return jsonld.frame(cov.ld, {
+      '@context': FRAME_CONTEXT,
+      id: cov.id
+    }, jsonldOpts).then(function (framed) {
+      return jsonld.compact(framed, framed['@context'], jsonldOpts);
+    }).then(function (compacted) {
+      return new API(compacted);
+    });
+  }
+
+  function checkEmpty(obj, err) {
+    if (Object.keys(obj).length > 0) {
+      throw new Error(err);
+    }
+  }
+
+  function getBboxString(bbox) {
+    return bbox.map(getNumberString).join(',');
+  }
+
+  /**
+   * Converts a number to a decimal string in non-scientific notation.
+   */
+  function getNumberString(num) {
+    // try toString() to avoid trailing zeros from toFixed()
+    var str = num.toString();
+    // if this resulted in scientific notation, use toFixed() instead
+    if (str.indexOf('e') !== -1) {
+      str = num.toFixed(20);
+    }
+    return str;
+  }
+
+  function getIndexSubsetString(axis, spec) {
+    var slice = undefined;
+    if (typeof spec === 'number') {
+      slice = getNumberString(spec);
+    } else if (spec.start === spec.stop && (!spec.step || spec.step === 1)) {
+      slice = getNumberString(spec.start);
+    } else {
+      slice = getNumberString(spec.start) + ':' + getNumberString(stop);
+      if (spec.step) {
+        slice += ':' + getNumberString(spec.step);
+      }
+    }
+    return axis + '[' + slice + ']';
+  }
   return {
-    setters: [function (_) {
-      L = _['default'];
-    }, function (_2) {
-      LayerFactory = _2['default'];
-      getLayerClass = _2.getLayerClass;
-    }, function (_4) {
-      ProfilePlot = _4['default'];
-    }, function (_5) {
-      Action = _5['default'];
-      VIEW = _5.VIEW;
-    }, function (_6) {
-      i18n = _6.i18n;
-      COVJSON_PREFIX = _6.COVJSON_PREFIX;
-    }, function (_7) {
-      SelectControl = _7['default'];
-    }, function (_3) {
-      TimeAxis = _3['default'];
-    }, function (_a) {
-      ParameterSync = _a['default'];
-    }, function (_f) {
-      CoverageLegend = _f['default'];
+    setters: [function (_2) {
+      urltemplate = _2['default'];
+    }, function (_) {
+      jsonld = _.promises;
+      jsonldOriginal = _['default'];
     }],
     execute: function () {
-      PROFILE_COLLECTION = COVJSON_PREFIX + 'VerticalProfileCoverageCollection';
-      POINT_COLLECTION = COVJSON_PREFIX + 'PointCoverageCollection';
+      PartialCollectionView = 'PartialCollectionView';
+      IriTemplate = 'IriTemplate';
+      COVAPI_NS = 'http://coverageapi.org/ns#';
+      COVAPI_API = COVAPI_NS + 'api';
+      OSGEO_NS = 'http://a9.com/-/opensearch/extensions/geo/1.0/';
+      OSTIME_NS = 'http://a9.com/-/opensearch/extensions/time/1.0/';
+      URL_PROPS = {
+        filterBbox: OSGEO_NS + 'box',
+        filterTimeStart: OSTIME_NS + 'start',
+        filterTimeEnd: OSTIME_NS + 'end',
+        filterVerticalStart: COVAPI_NS + 'verticalStart',
+        filterVerticalEnd: COVAPI_NS + 'verticalEnd',
+        subsetBbox: COVAPI_NS + 'subsetBbox',
+        subsetTimeStart: COVAPI_NS + 'subsetTimeStart',
+        subsetTimeEnd: COVAPI_NS + 'subsetTimeEnd',
+        subsetVerticalStart: COVAPI_NS + 'subsetVerticalStart',
+        subsetVerticalEnd: COVAPI_NS + 'subsetVerticalEnd',
+        subsetVerticalTarget: COVAPI_NS + 'subsetVerticalTarget',
+        subsetIndex: COVAPI_NS + 'subsetIndex'
+      };
+      FRAME_CONTEXT = [
+      // partial copy of http://www.hydra-cg.com/spec/latest/core/core.jsonld
+      {
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "vs": "http://www.w3.org/2003/06/sw-vocab-status/ns#",
+        "dc": "http://purl.org/dc/terms/",
+        "cc": "http://creativecommons.org/ns#",
+        "property": { "@id": "hydra:property", "@type": "@vocab" },
+        "required": "hydra:required",
+        "view": { "@id": "hydra:view", "@type": "@id" },
+        "PartialCollectionView": "hydra:PartialCollectionView",
+        "totalItems": "hydra:totalItems",
+        "first": { "@id": "hydra:first", "@type": "@id" },
+        "last": { "@id": "hydra:last", "@type": "@id" },
+        "next": { "@id": "hydra:next", "@type": "@id" },
+        "previous": { "@id": "hydra:previous", "@type": "@id" },
+        "IriTemplate": "hydra:IriTemplate",
+        "template": "hydra:template",
+        "mapping": "hydra:mapping",
+        "IriTemplateMapping": "hydra:IriTemplateMapping",
+        "variable": "hydra:variable"
+      }, {
+        'id': '@id',
+        'type': '@type',
+        // Hydra has "@type": "@vocab" which confuses the compaction -> we override it as workaround
+        // see https://github.com/json-ld/json-ld.org/issues/400
+        // we also want the full object form anyway, which we can force by omitting "@type"
+        "property": { "@id": "hydra:property" },
+        'api': COVAPI_API
+      }];
+
+      /*
+       * We are using a custom jsonld document loader to skip loading the CovJSON context URL
+       * which may be included in the document. Instead we load a local partial copy of it.
+       */
+      CONTEXTS = {
+        "https://rawgit.com/reading-escience-centre/coveragejson/master/contexts/coveragejson-base.jsonld": {
+          "@context": {
+            "id": "@id",
+            "type": "@type"
+          }
+        }
+      };
+
+      customLoader = function customLoader(url) {
+        if (url in CONTEXTS) {
+          return Promise.resolve({
+            contextUrl: null, // this is for a context via a link header
+            document: CONTEXTS[url], // this is the actual document that was loaded
+            documentUrl: url // this is the actual context URL after redirects
+          });
+        }
+        // fall-back to default loader
+        return jsonldOriginal.documentLoader(url);
+      };
+
+      jsonldOpts = {
+        documentLoader: customLoader
+      };
+
+      API = (function () {
+        /**
+         * @param ld A framed and compacted JSON-LD document from which Hydra data can be read.
+         */
+
+        function API() {
+          var ld = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+          babelHelpers.classCallCheck(this, API);
+
+          this.supportedUrlProps = new Map();
+
+          if (ld.view && ld.view.type === PartialCollectionView) {
+            this.isPaged = true;
+            this.paging = ld.view;
+            this.paging.total = ld.totalItems;
+          }
+
+          if (ld.api && ld.api.type === IriTemplate) {
+            this.hasUrlTemplate = true;
+            this.urlTemplate = ld.api;
+
+            var mappings = ld.api.mapping;
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = mappings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var mapping = _step.value;
+
+                var propId = mapping.property.id;
+                for (var prop in URL_PROPS) {
+                  if (URL_PROPS[prop] === propId) {
+                    this.supportedUrlProps.set(propId, mapping.variable);
+                  }
+                }
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          }
+
+          this._createCapabilities();
+        }
+
+        babelHelpers.createClass(API, [{
+          key: '_createCapabilities',
+          value: function _createCapabilities() {
+            var caps = {
+              filter: {},
+              subset: {}
+            };
+            var startstop = function startstop() {
+              return {
+                start: true,
+                stop: true
+              };
+            };
+            if (this.supportsBboxFiltering) {
+              // 'x' is not the axis name, it just represents the x-axis in a horizontal CRS
+              caps.filter.x = {
+                start: true,
+                stop: true,
+                dependency: ['y']
+              };
+              caps.filter.y = {
+                start: true,
+                stop: true,
+                dependency: ['x']
+              };
+            }
+            if (this.supportsTimeFiltering) {
+              caps.filter.time = startstop();
+            }
+            if (this.supportsVerticalFiltering) {
+              caps.filter.vertical = startstop();
+            }
+            if (this.supportsBboxSubsetting) {
+              caps.subset.x = {
+                start: true,
+                stop: true,
+                dependency: ['y']
+              };
+              caps.subset.y = {
+                start: true,
+                stop: true,
+                dependency: ['x']
+              };
+            }
+            if (this.supportsTimeSubsetting) {
+              caps.subset.time = startstop();
+            }
+            if (this.supportsVerticalSubsetting) {
+              caps.subset.vertical = startstop();
+            }
+            if (this.supportsVerticalTargetSubsetting) {
+              if (!caps.subset.vertical) {
+                caps.subset.vertical = {};
+              }
+              caps.subset.vertical.target = true;
+            }
+            if (this.supportsIndexSubsetting) {
+              caps.subset.index = {
+                start: true,
+                stop: true,
+                step: true
+              };
+            }
+            this.capabilities = caps;
+          }
+
+          /**
+           * Option keys: time, x, y, vertical
+           * 
+           * Each value except for 'embed' is one of (check this.capabilities to see which ones are supported!):
+           * 
+           * {start, stop} // intersect match
+           */
+        }, {
+          key: '_getFilterTemplateVars',
+          value: function _getFilterTemplateVars() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+            var templateVars = {};
+            if (options.time) {
+              if (!this.supportsTimeFiltering) {
+                throw new Error('Time filtering not supported!');
+              }
+              var isoStart = options.time.start;
+              var isoEnd = options.time.stop;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterTimeStart)] = isoStart;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterTimeEnd)] = isoEnd;
+              delete options.time;
+            }
+            if (options.vertical) {
+              if (!this.supportsVerticalFiltering) {
+                throw new Error('Vertical filtering not supported!');
+              }
+              var start = getNumberString(options.vertical.start);
+              var end = getNumberString(options.vertical.stop);
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterVerticalStart)] = start;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterVerticalEnd)] = end;
+              delete options.vertical;
+            }
+            if (options.x) {
+              if (!this.supportsBboxFiltering) {
+                throw new Error('BBOX filtering not supported!');
+              }
+              var bboxStr = getBboxString([options.x.start, options.y.start, options.x.stop, options.y.stop]);
+              templateVars[this.supportedUrlProps.get(URL_PROPS.filterBbox)] = bboxStr;
+              delete options.x;
+              delete options.y;
+            }
+            checkEmpty(options, 'Unrecognized filter options');
+
+            return templateVars;
+          }
+
+          /**
+           * Option keys: time, x, y, vertical, index
+           * 
+           * Each value is one of (check this.capabilities to see which ones are supported!):
+           * 
+           * For time, x, y, vertical:
+           * ISO string // exact match (time)
+           * number // exact match (x, y, vertical) <- typically not supported by API
+           * {start, stop} // intersect match
+           * {target} // nearest neighbor match
+           * 
+           * For index:
+           * {<axisName>: integer, ...}
+           * {<axisName>: {start,stop[,step]}, ...}
+           */
+        }, {
+          key: '_getSubsetTemplateVars',
+          value: function _getSubsetTemplateVars() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+            var templateVars = {};
+            if (options.time) {
+              if (!this.supportsTimeSubsetting) {
+                throw new Error('Time subsetting not supported!');
+              }
+              var isoStart = options.time.start;
+              var isoEnd = options.time.stop;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetTimeStart)] = isoStart;
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetTimeEnd)] = isoEnd;
+              delete options.time;
+            }
+            if (options.x) {
+              if (!this.supportsBboxSubsetting) {
+                throw new Error('BBOX subsetting not supported!');
+              }
+              var bboxStr = getBboxString([options.x.start, options.y.start, options.x.stop, options.y.stop]);
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetBbox)] = bboxStr;
+              delete options.x;
+              delete options.y;
+            }
+            if (options.vertical) {
+              if (options.vertical.target) {
+                if (!this.supportsVerticalTargetSubsetting) {
+                  throw new Error('vertical target subsetting not supported!');
+                }
+                var target = getNumberString(options.vertical.target);
+                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalTarget)] = target;
+              }
+              if (options.vertical.start) {
+                if (!this.supportsVerticalSubsetting) {
+                  throw new Error('vertical subsetting not supported!');
+                }
+                var start = getNumberString(options.vertical.start);
+                var end = getNumberString(options.vertical.stop);
+                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalStart)] = start;
+                templateVars[this.supportedUrlProps.get(URL_PROPS.subsetVerticalEnd)] = end;
+              }
+              delete options.vertical;
+            }
+            if (options.index) {
+              if (!this.supportsIndexSubsetting) {
+                throw new Error('index subsetting not supported!');
+              }
+              var strings = [];
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = Object.keys(options.index)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var axis = _step2.value;
+
+                  strings.push(getIndexSubsetString(axis, options.index[axis]));
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                    _iterator2['return']();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+
+              templateVars[this.supportedUrlProps.get(URL_PROPS.subsetIndex)] = strings;
+            }
+            checkEmpty(options, 'Unrecognized subset options');
+
+            return templateVars;
+          }
+        }, {
+          key: 'getUrl',
+          value: function getUrl(options) {
+            // deep-copy as we delete properties after they are applied
+            options = JSON.parse(JSON.stringify(options));
+            var subsetTemplateVars = this._getSubsetTemplateVars(options.subset);
+            var filterTemplateVars = this._getFilterTemplateVars(options.filter);
+
+            var templateVars = subsetTemplateVars;
+            for (var key in filterTemplateVars) {
+              templateVars[key] = filterTemplateVars[key];
+            }
+
+            var url = urltemplate.parse(this.urlTemplate.template).expand(templateVars);
+            return url;
+          }
+        }, {
+          key: 'supportsBboxFiltering',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.filterBbox);
+          }
+        }, {
+          key: 'supportsBboxSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetBbox);
+          }
+        }, {
+          key: 'supportsTimeFiltering',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.filterTimeStart) && this.supportedUrlProps.has(URL_PROPS.filterTimeEnd);
+          }
+        }, {
+          key: 'supportsTimeSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetTimeStart) && this.supportedUrlProps.has(URL_PROPS.subsetTimeEnd);
+          }
+        }, {
+          key: 'supportsVerticalFiltering',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.filterVerticalStart) && this.supportedUrlProps.has(URL_PROPS.filterVerticalEnd);
+          }
+        }, {
+          key: 'supportsVerticalSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetVerticalStart) && this.supportedUrlProps.has(URL_PROPS.subsetVerticalEnd);
+          }
+        }, {
+          key: 'supportsVerticalTargetSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetVerticalTarget);
+          }
+        }, {
+          key: 'supportsIndexSubsetting',
+          get: function get() {
+            return this.supportedUrlProps.has(URL_PROPS.subsetIndex);
+          }
+        }]);
+        return API;
+      })();
+
+      _export('API', API);
+    }
+  };
+});
+
+$__System.register('88', [], function (_export) {
+  // TODO this is copied from leaflet-coverage, DRY!
+
+  /***
+   * Return the indices of the two neighbors in the a array closest to x.
+   * The array must be sorted (strictly monotone), either ascending or descending.
+   * 
+   * If x exists in the array, both neighbors point to x.
+   * If x is lower (greated if descending) than the first value, both neighbors point to 0.
+   * If x is greater (lower if descending) than the last value, both neighbors point to the last index.
+   * 
+   * Adapted from https://stackoverflow.com/a/4431347
+   */
+  'use strict';
+
+  /**
+   * Return the index in a of the value closest to x.
+   * The array a must be sorted, either ascending or descending.
+   * If x happens to be exactly between two values, the one that
+   * appears first is returned.
+   */
+
+  _export('indicesOfNearest', indicesOfNearest);
+
+  _export('indexOfNearest', indexOfNearest);
+
+  function indicesOfNearest(a, x) {
+    if (a.length === 0) {
+      throw new Error('Array must have at least one element');
+    }
+    var lo = -1;
+    var hi = a.length;
+    var ascending = a.length === 1 || a[0] < a[1];
+    // we have two separate code paths to help the runtime optimize the loop
+    if (ascending) {
+      while (hi - lo > 1) {
+        var mid = Math.round((lo + hi) / 2);
+        if (a[mid] <= x) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    } else {
+      while (hi - lo > 1) {
+        var mid = Math.round((lo + hi) / 2);
+        if (a[mid] >= x) {
+          // here's the difference
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    }
+    if (a[lo] === x) hi = lo;
+    if (lo === -1) lo = hi;
+    if (hi === a.length) hi = lo;
+    return [lo, hi];
+  }
+
+  function indexOfNearest(a, x) {
+    var i = indicesOfNearest(a, x);
+    var lo = i[0];
+    var hi = i[1];
+    if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
+      return lo;
+    } else {
+      return hi;
+    }
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+
+$__System.register("89", [], function (_export) {
+  /* */
+  "use strict";
+
+  _export("shallowcopy", shallowcopy);
+
+  _export("mergeInto", mergeInto);
+
+  function shallowcopy(obj) {
+    var copy = Object.create(Object.getPrototypeOf(obj));
+    for (var prop in obj) {
+      copy[prop] = obj[prop];
+    }
+    return copy;
+  }
+
+  function mergeInto(inputObj, targetObj) {
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = Object.keys(inputObj)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var k = _step.value;
+
+        targetObj[k] = inputObj[k];
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator["return"]) {
+          _iterator["return"]();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+  }
+
+  return {
+    setters: [],
+    execute: function () {}
+  };
+});
+
+$__System.register('8a', [], function (_export) {
+  // COPIED FROM covjson-reader -> DRY!!!!!
+
+  'use strict';
+
+  var OPENGIS_CRS_PREFIX, EPSG4979, EPSG4326, CRS84, EllipsoidalCRSs, LongitudeAxisIndex;
+
+  var _LongitudeAxisIndex;
+
+  /**
+   * Return whether the given domain axis represents longitudes.
+   * 
+   * @ignore
+   */
+
+  _export('getLongitudeWrapper', getLongitudeWrapper);
+
+  /**
+   * Returns true if the given axis has ISO8601 date strings
+   * as axis values.
+   */
+
+  _export('isLongitudeAxis', isLongitudeAxis);
+
+  /**
+   * Return the reference system connection object for the given domain component,
+   * or undefined if none exists.
+   */
+
+  _export('isISODateAxis', isISODateAxis);
+
+  /**
+   * Returns a function which converts an arbitrary longitude to the
+   * longitude extent used in the coverage domain.
+   * This only supports primitive axes since this is what subsetByValue supports.
+   * The longitude extent is extended to 360 degrees if the actual extent is smaller.
+   * The extension is done equally on both sides of the extent. 
+   * 
+   * For example, the domain may have longitudes within [0,360].
+   * An input longitude of -70 is converted to 290.
+   * All longitudes within [0,360] are returned unchanged.
+   * 
+   * If the domain has longitudes within [10,50] then the
+   * extended longitude range is [-150,210] (-+180 from the middle point).
+   * An input longitude of -170 is converted to 190.
+   * All longitudes within [-150,210] are returned unchanged.
+   * 
+   * @ignore
+   */
+
+  function getLongitudeWrapper(domain, axisName) {
+    // for primitive axes, the axis identifier = component identifier
+    if (!isLongitudeAxis(domain, axisName)) {
+      throw new Error('\'' + axisName + '\' is not a longitude axis');
+    }
+
+    var vals = domain.axes.get(axisName).values;
+    var lon_min = vals[0];
+    var lon_max = vals[vals.length - 1];
+    if (lon_min > lon_max) {
+      var _ref = [lon_max, lon_min];
+      lon_min = _ref[0];
+      lon_max = _ref[1];
+    }
+
+    var x_mid = (lon_max + lon_min) / 2;
+    var x_min = x_mid - 180;
+    var x_max = x_mid + 180;
+
+    return function (lon) {
+      if (x_min <= lon && lon <= x_max) {
+        // directly return to avoid introducing rounding errors
+        return lon;
+      } else {
+        return ((lon - x_min) % 360 + 360) % 360 + x_min;
+      }
+    };
+  }
+
+  function isLongitudeAxis(domain, axisName) {
+    var ref = getReferenceObject(domain, axisName);
+    if (!ref) {
+      return false;
+    }
+
+    var crsId = ref.system.id;
+    // TODO should support unknown CRSs with embedded axis information
+    if (EllipsoidalCRSs.indexOf(crsId) === -1) {
+      // this also covers the case when there is no ID property
+      return false;
+    }
+
+    var compIdx = ref.components.indexOf(axisName);
+    var isLongitude = LongitudeAxisIndex[crsId] === compIdx;
+    return isLongitude;
+  }
+
+  function isISODateAxis(domain, axisName) {
+    var val = domain.axes.get(axisName).values[0];
+    if (typeof val !== 'string') {
+      return false;
+    }
+    return !isNaN(new Date(val).getTime());
+  }
+
+  function getReferenceObject(domain, component) {
+    var ref = domain.referencing.find(function (ref) {
+      return ref.components.indexOf(component) !== -1;
+    });
+    return ref;
+  }
+  return {
+    setters: [],
+    execute: function () {
+      OPENGIS_CRS_PREFIX = 'http://www.opengis.net/def/crs/';
+
+      /** 3D WGS84 in lat-lon-height order */
+      EPSG4979 = OPENGIS_CRS_PREFIX + 'EPSG/0/4979';
+
+      /** 2D WGS84 in lat-lon order */
+      EPSG4326 = OPENGIS_CRS_PREFIX + 'EPSG/0/4326';
+
+      /** 2D WGS84 in lon-lat order */
+      CRS84 = OPENGIS_CRS_PREFIX + 'OGC/1.3/CRS84';
+
+      /** CRSs in which position is specified by geodetic latitude and longitude */
+      EllipsoidalCRSs = [EPSG4979, EPSG4326, CRS84];
+
+      /** Position of longitude axis */
+      LongitudeAxisIndex = (_LongitudeAxisIndex = {}, babelHelpers.defineProperty(_LongitudeAxisIndex, EPSG4979, 1), babelHelpers.defineProperty(_LongitudeAxisIndex, EPSG4326, 1), babelHelpers.defineProperty(_LongitudeAxisIndex, CRS84, 0), _LongitudeAxisIndex);
+    }
+  };
+});
+
+$__System.register('8b', ['86', '88', '89', '8a'], function (_export) {
+  /* */
+  'use strict';
+
+  var API, arrays, shallowcopy, mergeInto, isISODateAxis, isLongitudeAxis, getLongitudeWrapper, COVERAGE, COVERAGECOLLECTION, QueryProxy;
+
+  _export('wrap', wrap);
+
+  // Note: We currently can't handle Hydra data in non-default graphs due to lack of support in JSON-LD framing.
+
+  /**
+   * Wraps a Coverage or Coverage Collection object and executes certain functions
+   * via a remote API, in particular subsetting.
+   * 
+   * @param {object} data The Coverage API object to wrap.
+   * @param {object} options Options which control the behaviour of the wrapper.
+   * @param {function} options.loader 
+   *   The function to use for loading coverage data from a URL.
+   *   It is called as loader(url, options) where options corresponds to the
+   *   options parameter of Coverage.subsetBy* and CoverageCollectionQuery.execute.
+   *   It must return a Promise succeeding with a Coverage Data API object.
+   *   
+   * @returns {object} The wrapped Coverage Data API object.
+   */
+
+  function wrap(data, options) {
+    if (typeof options.loader !== 'function') {
+      throw new Error('options.loader must be a function');
+    }
+    if (data.type === COVERAGECOLLECTION) {
+      return wrapCollection(data, options);
+    } else if (data.type === COVERAGE) {
+      return wrapCoverage(data, options);
+    } else {
+      // Domain or other unknown type
+      return data;
+    }
+  }
+
+  function wrapCollection(collection, wrapOptions) {
+    // TODO wrap each individual coverage as well!
+    return API.discover(collection).then(function (api) {
+      var newcoll = shallowcopy(collection);
+      newcoll.query = function () {
+        var query = collection.query();
+        return new QueryProxy(query, newcoll, api, wrapOptions);
+      };
+      if (api.isPaged) {
+        (function () {
+          var _load = wrapOptions.loader;
+          var wrapPageLink = function wrapPageLink(url) {
+            if (!url) return;
+            return {
+              load: function load(options) {
+                return _load(url, options).then(function (coll) {
+                  return wrap(coll, wrapOptions);
+                });
+              }
+            };
+          };
+          newcoll.paging = {
+            total: api.paging.total,
+            previous: wrapPageLink(api.paging.previous),
+            next: wrapPageLink(api.paging.next),
+            first: wrapPageLink(api.paging.first),
+            last: wrapPageLink(api.paging.last)
+          };
+        })();
+      }
+      return newcoll;
+    });
+  }
+
+  /**
+   * Collects the query parts and executes the query remotely
+   * if possible.
+   */
+
+  function wrapCoverage(coverage, wrapOptions) {
+    return API.discover(coverage).then(function (api) {
+      var wrappedCoverage = shallowcopy(coverage);
+      wrappedCoverage.subsetByIndex = wrappedSubsetByIndex(coverage, wrappedCoverage, api, wrapOptions);
+      wrappedCoverage.subsetByValue = wrappedSubsetByValue(coverage, wrappedCoverage, api, wrapOptions);
+      return wrappedCoverage;
+    });
+  }
+
+  function wrappedSubsetByIndex(coverage, wrappedCoverage, api, wrapOptions) {
+    return function (constraints) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      return coverage.loadDomain().then(function (domain) {
+        constraints = cleanedConstraints(constraints);
+
+        if (!requiresSubsetting(domain, constraints)) {
+          return wrappedCoverage;
+        }
+
+        // if the coverage is fully loaded, then there is no need to use a server API
+        if (coverage.loaded) {
+          return coverage.subsetByIndex(constraints, options);
+        }
+
+        var caps = api.capabilities.subset;
+        var axisMap = getAxisConcepts(domain);
+
+        /*
+         * If the API supports generic index-based subsetting, then this is used.
+         * If not, several emulation strategies are used instead (if possible).
+         */
+
+        // we split the subsetting constraints into API-compatible and local ones
+        var apiConstraints = {
+          subset: {} // API concept -> spec
+        };
+        var localSubsetConstraints = {}; // axis name -> spec
+
+        if (caps.index) {
+          apiConstraints.subset.index = constraints;
+        } else {
+          // try to emulate some constraints
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = Object.keys(constraints)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var axis = _step3.value;
+
+              var useApi = false;
+              var constraint = constraints[axis];
+              var cap = caps[axisMap[axis]];
+
+              if (!cap) {
+                // leave useApi = false
+              } else if (typeof constraint !== 'object') {
+                  if (cap.start && cap.stop) {
+                    // emulate identity match via start/stop
+                    var val = domain.axes.get(axis).values[constraint];
+                    constraint = { start: val, stop: val };
+                    useApi = true;
+                  }
+                } else if (!constraint.step) {
+                  // start / stop
+                  if (cap.start && cap.stop) {
+                    var start = domain.axes.get(axis).values[constraint.start];
+                    var _stop = domain.axes.get(axis).values[constraint.stop];
+                    constraint = { start: start, stop: _stop };
+                    useApi = true;
+                  }
+                }
+
+              if (useApi) {
+                apiConstraints.subset[axisMap[axis]] = constraint;
+              } else {
+                localSubsetConstraints[axis] = constraint;
+              }
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                _iterator3['return']();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+        }
+
+        toLocalConstraintsIfDependencyMissing(apiConstraints.subset, localSubsetConstraints, caps, axisMap);
+
+        if (Object.keys(apiConstraints.subset).length === 0) {
+          // Note that we DON'T wrap the locally subsetted coverage again.
+          // This would be incorrect as a partially applied local subset would not be
+          // known by the API metadata and therefore a subsequent API subset operation would
+          // return wrong data (too much).
+          // A way out would be to attach the original API info to the original coverage identity,
+          // which can be established with "subsetOf".
+          // Somewhere the constraints used for subsetting would have to be stored as well,
+          // so that we can reproduce them.
+          // E.g.:
+          // 1. Coverage A with API info
+          // 2. Subset Coverage A by bounding box without API -> Coverage B with subset relationship to Coverage A
+          // 3. Subset Coverage B by time
+          //  3.1. Subset Coverage A by time with API -> Coverage C with API info
+          //  3.2. Subset Coverage C by bounding box without API -> Coverage D with subset relationship to Coverage C
+          // TODO implement that or think of something simpler
+          return coverage.subsetByIndex(constraints, options);
+        }
+
+        var url = api.getUrl(apiConstraints);
+        return wrapOptions.loader(url, options).then(function (subset) {
+          // apply remaining subset constraints
+          if (Object.keys(localSubsetConstraints).length > 0) {
+            // again, we DON'T wrap the locally subsetted coverage again, see above
+            return subset.subsetByIndex(localSubsetConstraints, options);
+          } else {
+            return wrap(subset, wrapOptions);
+          }
+        });
+      });
+    };
+  }
+
+  function wrappedSubsetByValue(coverage, wrappedCoverage, api, wrapOptions) {
+    return function (constraints) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      return coverage.loadDomain().then(function (domain) {
+        constraints = cleanedConstraints(constraints);
+
+        if (!requiresSubsetting(domain, constraints)) {
+          return wrappedCoverage;
+        }
+
+        // if the coverage is fully loaded, then there is no need to use a server API
+        if (coverage.loaded) {
+          return coverage.subsetByValue(constraints, options);
+        }
+
+        var caps = api.capabilities.subset;
+        var axisMap = getAxisConcepts(domain);
+
+        /* If the API does not support target-based subsetting, then this can be emulated
+         * via intersection-based subsetting by inspecting the domain locally first
+         * and then subsetting with equal start/stop with the identified domain value.
+         * The same is done for exact match subsetting.
+         * 
+         * FIXME this approach will return invalid results (two instead of one axis step)
+         * if the axis has bounds and they are aligned such that a bound start or end
+         * is identical to the axis value and the neighboring bounds share their start/end.
+         * This is common in WaterML. To account for that, this scenario could be explicitly checked for.
+         * A safe start/stop would then be a newly calculated axis value which is in the middle
+         * of the bounds.
+         */
+
+        // TODO if API axis-value-subsetting is not supported, try to emulate with API axis-index-subsetting
+
+        // we split the subsetting constraints into API-compatible and local ones
+        var apiConstraints = {
+          subset: {} // API concept -> spec
+        };
+        var localSubsetConstraints = {}; // axis name -> spec
+
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+
+        try {
+          for (var _iterator4 = Object.keys(constraints)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var axis = _step4.value;
+
+            var useApi = false;
+            var constraint = constraints[axis];
+            var cap = caps[axisMap[axis]];
+            var isTimeString = isISODateAxis(domain, axis);
+
+            if (!cap) {
+              // leave useApi = false
+            } else if (typeof constraint !== 'object') {
+                if (cap.identity) {
+                  useApi = true;
+                } else if (cap.start && cap.stop) {
+                  // emulate identity match via start/stop if we find a matching axis value
+                  var idx = getClosestIndex(domain, axis, constraint.target);
+                  var val = domain.axes.get(axis).values[idx];
+                  if (isTimeString) {
+                    if (new Date(val).getTime() === new Date(constraint).getTime()) {
+                      constraint = { start: constraint, stop: constraint };
+                      useApi = true;
+                    }
+                  } else if (val === constraint) {
+                    constraint = { start: constraint, stop: constraint };
+                    useApi = true;
+                  }
+                }
+              } else if ('target' in constraint) {
+                if (cap.target) {
+                  useApi = true;
+                } else if (cap.start && cap.stop) {
+                  // emulate target via start/stop
+
+                  var _prepareForAxisArraySearch = prepareForAxisArraySearch(domain, axis, constraint.target);
+
+                  var _prepareForAxisArraySearch2 = babelHelpers.slicedToArray(_prepareForAxisArraySearch, 3);
+
+                  var vals = _prepareForAxisArraySearch2[0];
+                  var bounds = _prepareForAxisArraySearch2[1];
+                  var target = _prepareForAxisArraySearch2[2];
+
+                  var _getAxisExtent = getAxisExtent(vals, bounds);
+
+                  var _getAxisExtent2 = babelHelpers.slicedToArray(_getAxisExtent, 2);
+
+                  var minBound = _getAxisExtent2[0];
+                  var maxBound = _getAxisExtent2[1];
+
+                  // if the target is outside the axis extent then the API can't be used (as there is no intersection then)
+                  if (minBound <= target && target <= maxBound) {
+                    // FIXME handle explicit bounds
+                    var idx = getClosestIndex(domain, axis, constraint.target);
+                    var val = domain.axes.get(axis).values[idx];
+                    constraint = { start: val, stop: val };
+                    useApi = true;
+                  }
+                }
+              } else {
+                // start / stop
+                useApi = cap.start && cap.stop;
+
+                if (useApi) {
+                  // snap start/stop to axis values to increase the chance of using a cached request
+
+                  var _prepareForAxisArraySearch3 = prepareForAxisArraySearch(domain, axis, constraint.start, constraint.stop);
+
+                  var _prepareForAxisArraySearch32 = babelHelpers.slicedToArray(_prepareForAxisArraySearch3, 4);
+
+                  var vals = _prepareForAxisArraySearch32[0];
+                  var bounds = _prepareForAxisArraySearch32[1];
+                  var start = _prepareForAxisArraySearch32[2];
+                  var _stop2 = _prepareForAxisArraySearch32[3];
+
+                  var _getAxisExtent3 = getAxisExtent(vals, bounds);
+
+                  var _getAxisExtent32 = babelHelpers.slicedToArray(_getAxisExtent3, 2);
+
+                  var minBound = _getAxisExtent32[0];
+                  var maxBound = _getAxisExtent32[1];
+
+                  if (_stop2 < minBound || start > maxBound) {
+                    // if both start and stop are outside the axis extent, then snapping would be wrong (has to be an error)
+                    throw new Error('start or stop must be inside the axis extent');
+                  } else {
+                    // FIXME handle explicit bounds
+                    var idxStart = getClosestIndexArr(vals, start);
+                    var idxStop = getClosestIndexArr(vals, _stop2);
+                    var axisVals = domain.axes.get(axis).values;
+                    constraint = { start: axisVals[idxStart], stop: axisVals[idxStop] };
+                  }
+                }
+              }
+
+            if (useApi) {
+              apiConstraints.subset[axisMap[axis]] = constraint;
+            } else {
+              localSubsetConstraints[axis] = constraint;
+            }
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+              _iterator4['return']();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+
+        toLocalConstraintsIfDependencyMissing(apiConstraints.subset, localSubsetConstraints, caps, axisMap);
+
+        if (Object.keys(apiConstraints.subset).length === 0) {
+          // again, we DON'T wrap the locally subsetted coverage again, see above
+          return coverage.subsetByValue(constraints, options);
+        }
+
+        var url = api.getUrl(apiConstraints);
+        return wrapOptions.loader(url, options).then(function (subset) {
+          // apply remaining subset constraints
+          if (Object.keys(localSubsetConstraints).length > 0) {
+            // again, we DON'T wrap the locally subsetted coverage again, see above
+            return subset.subsetByValue(localSubsetConstraints, options);
+          } else {
+            return wrap(subset, wrapOptions);
+          }
+        });
+      });
+    };
+  }
+
+  /**
+   * Returns an object that maps axis keys to API concept names by
+   * interpreting domain referencing info.
+   * An axis with unknown concept is mapped to undefined.
+   */
+  function getAxisConcepts(domain) {
+    var axisConcepts = {};
+    var referencing = domain.referencing;
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
+
+    try {
+      var _loop = function () {
+        var axis = _step5.value;
+
+        var concept = undefined;
+
+        var ref = referencing.filter(function (ref) {
+          return ref.components.indexOf(axis) !== -1;
+        });
+        if (ref.length === 1) {
+          var _ref$0 = ref[0];
+          var components = _ref$0.components;
+          var system = _ref$0.system;
+
+          if (system.type === 'TemporalRS') {
+            // The assumption is that if the API offers filtering/subsetting by time,
+            // then this happens in the same concrete temporal system (calendar etc.).
+            // Also, it is assumed that there is only one time axis.
+            // TODO how to locate the "main" time axis if there are multiple?
+            //      see https://github.com/Reading-eScience-Centre/coveragejson/issues/45
+            concept = 'time';
+          } else if (system.type === 'VerticalCRS') {
+            concept = 'vertical';
+          } else if (system.type === 'GeodeticCRS' || system.type === 'ProjectedCRS') {
+            // a geodetic crs can be x,y or x,y,z
+            // a projected crs is x,y
+            var idx = components.indexOf(axis);
+            if (idx === 0) {
+              concept = 'x';
+            } else if (idx === 1) {
+              concept = 'y';
+            } else if (idx === 2) {
+              concept = 'vertical';
+            }
+          }
+        }
+
+        axisConcepts[axis] = concept;
+      };
+
+      for (var _iterator5 = domain.axes.keys()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        _loop();
+      }
+    } catch (err) {
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+          _iterator5['return']();
+        }
+      } finally {
+        if (_didIteratorError5) {
+          throw _iteratorError5;
+        }
+      }
+    }
+
+    return axisConcepts;
+  }
+
+  /**
+   *  Check if all API dependencies between concepts are met.
+   *  This is mainly for the bounding box case which needs both x and y.
+   *  If a dependency is missing, then the constraint is moved to the
+   *  locally applied ones.
+   */
+  function toLocalConstraintsIfDependencyMissing(apiConstraints, localConstraints, capabilities, axisConcepts) {
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
+
+    try {
+      var _loop2 = function () {
+        var concept = _step6.value;
+
+        var depends = capabilities[concept].dependency;
+        if (depends && depends.some(function (concept_) {
+          return !apiConstraints[concept_];
+        })) {
+          var axis = Object.keys(axisConcepts).filter(function (axis) {
+            return axisConcepts[axis] === concept;
+          })[0];
+          localConstraints[axis] = apiConstraints[concept];
+          delete apiConstraints[concept];
+        }
+      };
+
+      for (var _iterator6 = Object.keys(apiConstraints)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        _loop2();
+      }
+    } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+          _iterator6['return']();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+  }
+
+  function getAxisExtent(vals, bounds) {
+    var min = undefined,
+        max = undefined;
+    if (bounds) {
+      min = bounds.get(0)[0];
+      max = bounds.get(vals.length - 1)[1];
+    } else {
+      min = vals[0];
+      max = vals[vals.length - 1];
+    }
+    if (min > max) {
+      var _ref = [max, min];
+      min = _ref[0];
+      max = _ref[1];
+    }
+    // if no explicit bounds are given then we assume a regular axis and derive bounds
+    // TODO this is not desirable in all cases (time steps etc.), should be recorded in the domain data (point vs cell)
+    if (!bounds && vals.length > 1) {
+      // calculate cell size and extend by half a cell size on each end
+      var halfSize = Math.abs(vals[0] - vals[1]) / 2;
+      var _ref2 = [min - halfSize, max + halfSize];
+      min = _ref2[0];
+      max = _ref2[1];
+    }
+    return [min, max];
+  }
+
+  function getClosestIndex(domain, axis, val) {
+    var _prepareForAxisArraySearch4 = prepareForAxisArraySearch(domain, axis, val);
+
+    var _prepareForAxisArraySearch42 = babelHelpers.slicedToArray(_prepareForAxisArraySearch4, 3);
+
+    var axisVals = _prepareForAxisArraySearch42[0];
+    var searchVal = _prepareForAxisArraySearch42[2];
+
+    return getClosestIndexArr(axisVals, searchVal);
+  }
+
+  function getClosestIndexArr(vals, val) {
+    var _arrays$indicesOfNearest = arrays.indicesOfNearest(vals, val);
+
+    var _arrays$indicesOfNearest2 = babelHelpers.slicedToArray(_arrays$indicesOfNearest, 2);
+
+    var lo = _arrays$indicesOfNearest2[0];
+    var hi = _arrays$indicesOfNearest2[1];
+
+    var idx = Math.abs(val - vals[lo]) <= Math.abs(val - vals[hi]) ? lo : hi;
+    return idx;
+  }
+
+  function prepareForAxisArraySearch(domain, axis) {
+    for (var _len = arguments.length, searchVal = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      searchVal[_key - 2] = arguments[_key];
+    }
+
+    var axisVals = domain.axes.get(axis).values;
+    var axisBounds = domain.axes.get(axis).bounds;
+    searchVal = [].concat(babelHelpers.toConsumableArray(searchVal)); // to array
+    if (isISODateAxis(domain, axis)) {
+      (function () {
+        // convert to unix timestamps as we need numbers
+        var toUnix = function toUnix(v) {
+          return new Date(v).getTime();
+        };
+        searchVal = searchVal.map(toUnix);
+        axisVals = axisVals.map(toUnix);
+        if (axisBounds) {
+          (function () {
+            var originalBounds = axisBounds;
+            axisBounds = {
+              get: function get(i) {
+                return [toUnix(originalBounds.get(i)[0]), toUnix(originalBounds.get(i)[1])];
+              }
+            };
+          })();
+        }
+      })();
+    } else if (isLongitudeAxis(domain, axis)) {
+      var lonWrapper = getLongitudeWrapper(domain, axis);
+      searchVal = searchVal.map(lonWrapper);
+    }
+    return [axisVals, axisBounds].concat(babelHelpers.toConsumableArray(searchVal));
+  }
+
+  /**
+   * Checks whether the constraints may result in an actual
+   * subsetting of the coverage (=true), or whether they are guaranteed
+   * to have no effect (=false). 
+   */
+  function requiresSubsetting(domain, constraints) {
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+
+    try {
+      for (var _iterator7 = Object.keys(constraints)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var axisKey = _step7.value;
+
+        var len = domain.axes.get(axisKey).values.length;
+        if (len > 1) {
+          return true;
+        }
+      }
+    } catch (err) {
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+          _iterator7['return']();
+        }
+      } finally {
+        if (_didIteratorError7) {
+          throw _iteratorError7;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  function cleanedConstraints(constraints) {
+    var cleanConstraints = shallowcopy(constraints);
+    var _iteratorNormalCompletion8 = true;
+    var _didIteratorError8 = false;
+    var _iteratorError8 = undefined;
+
+    try {
+      for (var _iterator8 = Object.keys(constraints)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+        var key = _step8.value;
+
+        if (constraints[key] === undefined || constraints[key] === null) {
+          delete cleanConstraints[key];
+        }
+      }
+    } catch (err) {
+      _didIteratorError8 = true;
+      _iteratorError8 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+          _iterator8['return']();
+        }
+      } finally {
+        if (_didIteratorError8) {
+          throw _iteratorError8;
+        }
+      }
+    }
+
+    return cleanConstraints;
+  }
+  return {
+    setters: [function (_) {
+      API = _;
+    }, function (_2) {
+      arrays = _2;
+    }, function (_3) {
+      shallowcopy = _3.shallowcopy;
+      mergeInto = _3.mergeInto;
+    }, function (_a) {
+      isISODateAxis = _a.isISODateAxis;
+      isLongitudeAxis = _a.isLongitudeAxis;
+      getLongitudeWrapper = _a.getLongitudeWrapper;
+    }],
+    execute: function () {
+      COVERAGE = 'Coverage';
+      COVERAGECOLLECTION = COVERAGE + 'Collection';
+
+      QueryProxy = (function () {
+        function QueryProxy(query, collection, api, wrapOptions) {
+          babelHelpers.classCallCheck(this, QueryProxy);
+
+          this._query = query;
+          this._collection = collection;
+          this._api = api;
+          this._wrapOptions = wrapOptions;
+
+          this._filter = {};
+          this._subset = {};
+        }
+
+        babelHelpers.createClass(QueryProxy, [{
+          key: 'filter',
+          value: function filter(spec) {
+            this._query.filter(spec);
+            mergeInto(spec, this._filter);
+            return this;
+          }
+        }, {
+          key: 'subset',
+          value: function subset(spec) {
+            this._query.subset(spec);
+            mergeInto(spec, this._subset);
+            return this;
+          }
+        }, {
+          key: 'execute',
+          value: function execute(options) {
+            var _this = this;
+
+            var domainTemplate = this._collection.domainTemplate;
+            if (domainTemplate) {
+              return this._doExecute(domainTemplate);
+            } else {
+              // inspect domain of first coverage and assume uniform collection
+              if (this._collection.coverages.length > 0) {
+                return this._collection.coverages[0].loadDomain().then(function (domain) {
+                  return _this._doExecute(options, domain);
+                });
+              } else {
+                return this._query.execute(options);
+              }
+            }
+          }
+        }, {
+          key: '_doExecute',
+          value: function _doExecute(options, domainTemplate) {
+            var _this2 = this;
+
+            var load = this._wrapOptions.loader;
+
+            var filterCaps = this._api.capabilities.filter;
+            var subsetCaps = this._api.capabilities.subset;
+            var axisMap = getAxisConcepts(domainTemplate);
+
+            // split constraints into API and locally applied ones
+            var apiConstraints = {
+              filter: {},
+              subset: {}
+            };
+
+            var localFilterConstraints = {}; // axis name -> spec
+            var localSubsetConstraints = {}; // axis name -> spec
+
+            // filtering
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = Object.keys(this._filter)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var axis = _step.value;
+
+                var constraint = this._filter[axis];
+                var cap = filterCaps[axisMap[axis]];
+                if (cap && cap.start && cap.stop) {
+                  apiConstraints.filter[axisMap[axis]] = constraint;
+                } else {
+                  localFilterConstraints[axis] = constraint;
+                }
+              }
+
+              // subsetting
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator['return']) {
+                  _iterator['return']();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = Object.keys(this._subset)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var axis = _step2.value;
+
+                var constraint = this._subset[axis];
+                var cap = subsetCaps[axisMap[axis]];
+                var useApi = false;
+
+                if (!cap) {
+                  // leave useApi = false
+                } else if (typeof constraint !== 'object' && cap.identity) {
+                    useApi = true;
+                  } else if ('target' in constraint && cap.target) {
+                    useApi = true;
+                  } else if ('start' in constraint && 'stop' in constraint && cap.start && cap.stop) {
+                    useApi = true;
+                  }
+
+                if (useApi) {
+                  apiConstraints.subset[axisMap[axis]] = constraint;
+                } else {
+                  localSubsetConstraints[axis] = constraint;
+                }
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                  _iterator2['return']();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+
+            toLocalConstraintsIfDependencyMissing(apiConstraints.filter, localFilterConstraints, filterCaps, axisMap);
+            toLocalConstraintsIfDependencyMissing(apiConstraints.subset, localSubsetConstraints, subsetCaps, axisMap);
+
+            if (Object.keys(apiConstraints.filter).length === 0 && Object.keys(apiConstraints.subset).length === 0) {
+              return this._query.execute(options);
+            }
+
+            var url = this._api.getUrl(apiConstraints);
+            return load(url, options).then(function (resultCollection) {
+              // apply remaining query parts
+              if (Object.keys(localSubsetConstraints).length > 0 || Object.keys(localFilterConstraints).length > 0) {
+                // the locally queried collection is NOT wrapped! see comment for coverage subsetting below
+                return resultCollection.query().filter(localFilterConstraints).subset(localSubsetConstraints).execute();
+              } else {
+                return wrap(resultCollection, _this2._wrapOptions);
+              }
+            });
+          }
+        }]);
+        return QueryProxy;
+      })();
+    }
+  };
+});
+
+$__System.register("54", ["8b"], function (_export) {
+  "use strict";
+
+  return {
+    setters: [function (_b) {
+      var _exportObj = {};
+
+      for (var _key in _b) {
+        if (_key !== "default") _exportObj[_key] = _b[_key];
+      }
+
+      _exportObj["default"] = _b["default"];
+
+      _export(_exportObj);
+    }],
+    execute: function () {}
+  };
+});
+
+$__System.register('8c', ['52', '53', '54'], function (_export) {
+  'use strict';
+
+  var CoverageData, CovJSONReader, RestAPI, CovJSON;
+  return {
+    setters: [function (_3) {
+      CoverageData = _3['default'];
+    }, function (_) {
+      CovJSONReader = _;
+    }, function (_2) {
+      RestAPI = _2;
+    }],
+    execute: function () {
+      CovJSON = (function (_CoverageData) {
+        babelHelpers.inherits(CovJSON, _CoverageData);
+
+        /**
+         * @param {Array} actionFactories Array of action class factories
+         */
+
+        function CovJSON(actionFactories) {
+          babelHelpers.classCallCheck(this, CovJSON);
+
+          babelHelpers.get(Object.getPrototypeOf(CovJSON.prototype), 'constructor', this).call(this, actionFactories);
+          this.label = 'CoverageJSON';
+          this.shortLabel = 'CovJSON';
+          this.mediaTypes = ['application/prs.coverage+json'];
+        }
+
+        /**
+         * @param urlOrObject Either a URL, a CovJSON object, or a Coverage API object.
+         * @returns {Promise} succeeds with a Coverage or Coverage Collection API object
+         */
+        babelHelpers.createClass(CovJSON, [{
+          key: 'doLoad',
+          value: function doLoad(urlOrObject, options) {
+            if (typeof urlOrObject === 'object' && urlOrObject.loadDomain) {
+              return Promise.resolve(urlOrObject);
+            } else {
+              return CovJSONReader.read(urlOrObject, options).then(function (data) {
+                return RestAPI.wrap(data, {
+                  loader: CovJSONReader.read
+                });
+              });
+            }
+          }
+        }]);
+        return CovJSON;
+      })(CoverageData);
+
+      _export('default', CovJSON);
+    }
+  };
+});
+
+$__System.register('8d', ['73', '78', '90', '91', '6d', '6e', '8e', '8f', '8c'], function (_export) {
+  'use strict';
+
+  var CoverageLegend, ProfilePlot, SelectControl, TimeAxis, LayerFactory, getLayerClass, ParameterSync, Action, VIEW, i18n, CovJSON, ModelObservationComparisonActivity, GeoCoverageView;
+  return {
+    setters: [function (_) {
+      CoverageLegend = _['default'];
+    }, function (_3) {
+      ProfilePlot = _3['default'];
+    }, function (_4) {
+      SelectControl = _4['default'];
+    }, function (_2) {
+      TimeAxis = _2['default'];
+    }, function (_d) {
+      LayerFactory = _d['default'];
+      getLayerClass = _d.getLayerClass;
+    }, function (_e) {
+      ParameterSync = _e['default'];
+    }, function (_e2) {
+      Action = _e2['default'];
+      VIEW = _e2.VIEW;
+    }, function (_f) {
+      i18n = _f.i18n;
+    }, function (_c) {
+      CovJSON = _c['default'];
+    }],
+    execute: function () {
+      ModelObservationComparisonActivity = 'ModelObservationComparisonActivity';
 
       /**
        * Displays geospatial coverages on a map.
@@ -19320,8 +19539,6 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
         }, {
           key: 'run',
           value: function run() {
-            var _this = this;
-
             var map = this.context.map;
 
             var dataset = this.context.dataset;
@@ -19336,13 +19553,17 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
             this._setVisible();
 
             var cov = this.cov;
-            if (cov.coverages && cov.coverages.length === 1) {
-              cov = cov.coverages[0];
+            if (!getLayerClass(cov)) {
+              if (cov.coverages && cov.coverages.length === 1) {
+                cov = cov.coverages[0];
+              }
             }
 
             var formatLabel = this.context.distribution.formatImpl.shortLabel;
             var layerNamePrefix = '<span class="label label-success">' + formatLabel + '</span> ';
 
+            // TODO param sync not needed anymore as we use the built-in collection layer classes of leaflet-coverage
+            //  -> will this be needed later maybe?
             this.paramSync = new ParameterSync({
               syncProperties: {
                 palette: function palette(p1, p2) {
@@ -19369,29 +19590,15 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
             var _iteratorError = undefined;
 
             try {
-              var _loop = function () {
+              for (var _iterator = cov.parameters.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                 var key = _step.value;
 
                 var opts = { keys: [key] };
                 var layerName = i18n(cov.parameters.get(key).observedProperty.label);
                 var fullLayerName = layerNamePrefix + layerName;
-                var layer = undefined;
-                if (cov.coverages) {
-                  var layers = cov.coverages.map(function (coverage) {
-                    return _this._createLayer(coverage, opts, true);
-                  });
-                  // TODO this should be more clever and be oriented towards uniform collections
-                  //     then it would make sense to expose properties like palette etc.
-                  layer = L.layerGroup(layers);
-                } else {
-                  layer = _this._createLayer(cov, opts);
-                }
+                var layer = this._createLayer(cov, opts);
                 map.layerControl.addOverlay(layer, fullLayerName, { groupName: datasetTitle, expanded: true });
-                _this.layers.push(layer);
-              };
-
-              for (var _iterator = cov.parameters.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                _loop();
+                this.layers.push(layer);
               }
 
               // display the first layer
@@ -19415,8 +19622,10 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
           }
         }, {
           key: '_createLayer',
-          value: function _createLayer(cov, opts, inCollection) {
-            var _this2 = this;
+          value: function _createLayer(cov, opts) {
+            var _this = this;
+
+            var isCollection = cov.coverages;
 
             var map = this.context.map;
             var layer = LayerFactory()(cov, opts).on('add', function (e) {
@@ -19426,9 +19635,9 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
               // By doing that, the palette and extent get unified (if existing)
               // and an event gets fired if a new parameter was added.
               // See the code above where ParameterSync gets instantiated.
-              _this2.paramSync.addLayer(covLayer);
+              _this.paramSync.addLayer(covLayer);
 
-              if (inCollection) {
+              if (isCollection) {
                 // we could display a time range control for filtering the displayed collection items
                 // same for vertical axis where in addition a target value could be chosen
               } else {
@@ -19451,21 +19660,60 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
                   }
                 }
             }).on('dataLoading', function () {
-              return _this2.fire('loading');
+              return _this.fire('loading');
             }).on('dataLoad', function () {
-              return _this2.fire('load');
+              return _this.fire('load');
             });
 
-            // TODO use full URI
-            if (cov.domainProfiles.some(function (p) {
-              return p.endsWith('VerticalProfile');
-            })) {
-              // we do that outside of the above 'add' handler since we want to register only once,
-              // not every time the layer is added to the map
-              layer.on('click', function () {
-                return new ProfilePlot(cov, opts).addTo(map);
-              });
-            }
+            // we do that outside of the above 'add' handler since we want to register only once,
+            // not every time the layer is added to the map
+            layer.on('click', function (_ref) {
+              var coverage = _ref.coverage;
+
+              var genBy = coverage.ld.wasGeneratedBy;
+
+              // TODO use full URI
+              if (coverage.domainProfiles.some(function (p) {
+                return p.endsWith('VerticalProfile');
+              })) {
+                new ProfilePlot(coverage).addTo(map);
+              } else if (genBy && genBy.type === ModelObservationComparisonActivity) {
+                (function () {
+                  var usage = genBy.qualifiedUsage;
+                  var modelParamKey = usage.model.parameterKey;
+                  var obsParamKey = usage.observation.parameterKey;
+
+                  // display a plot of the input model (subsetting to a point) and observation
+                  // TODO we are at JS Coverage Data API abstraction here, how do we know the format of the linked cov?
+                  // -> should the media type be included in the prov data?
+                  var modelCovUrl = usage.model.entity;
+                  var obsCovUrl = usage.observation.entity;
+                  var covJSON = new CovJSON();
+                  Promise.all([covJSON.load(modelCovUrl), covJSON.load(obsCovUrl, { eagerload: true })]).then(function (_ref2) {
+                    var _ref22 = babelHelpers.slicedToArray(_ref2, 2);
+
+                    var modelCov = _ref22[0];
+                    var obsCov = _ref22[1];
+
+                    return obsCov.loadDomain().then(function (obsDomain) {
+                      // TODO handle CRS, reproject
+                      var x = obsDomain.axes.get('x').values[0];
+                      var y = obsDomain.axes.get('y').values[0];
+                      return modelCov.subsetByValue({ x: { start: x, stop: x }, y: { start: y, stop: y } }, { eagerload: true }).then(function (modelSubset) {
+                        new ProfilePlot([obsCov, modelSubset], {
+                          keys: [[obsParamKey, modelParamKey]],
+                          labels: ['Observation', 'Model']
+                        }).addTo(map);
+                      });
+                    });
+                  })['catch'](function (e) {
+                    console.log(e);
+                    // TODO display error
+                  });
+                })();
+              }
+            });
+
             return layer;
           }
         }, {
@@ -19506,26 +19754,21 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
         }, {
           key: 'isSupported',
           get: function get() {
-            if (this.cov.coverages && this.cov.coverages.length > 1) {
-              // limited collection support
-              if (this.cov.profiles.indexOf(PROFILE_COLLECTION) !== -1 || this.cov.profiles.indexOf(POINT_COLLECTION) !== -1) {
-                // only support collections with root-level parameters (where we then assume a uniform collection)
-                if (!this.cov.parameters) {
-                  return false;
-                }
-              } else {
-                return false;
+            var cov = this.cov;
+            // TODO for collections, parameters have to be defined at collection level
+            // see https://github.com/Reading-eScience-Centre/coveragejson/issues/55
+
+            // check if leaflet-coverage can directly visualize it
+            if (getLayerClass(cov)) {
+              return true;
+            }
+            // otherwise, if it's a 1-element collection, check if the single coverage can be visualized
+            if (cov.coverages && cov.coverages.length === 1) {
+              if (getLayerClass(cov.coverages[0])) {
+                return true;
               }
             }
-            var cov = this.cov;
-            if (cov.coverages) {
-              cov = cov.coverages[0];
-            }
-            if (!getLayerClass(cov)) {
-              return false;
-            }
-
-            return true;
+            return false;
           }
         }]);
         return GeoCoverageView;
@@ -19538,8 +19781,8 @@ $__System.register('85', ['48', '79', '84', '86', '87', '88', '89', '7a', '7f'],
   };
 });
 
-$__System.registerDynamic("8a", [], false, function(__require, __exports, __module) {
-  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, "d3", null);
+$__System.registerDynamic("92", [], false, function($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, "d3", null);
   (function() {
     "format global";
     "exports d3";
@@ -31362,21 +31605,20 @@ $__System.registerDynamic("8a", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("81", ["8a"], true, function($__require, exports, module) {
+$__System.registerDynamic("75", ["92"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('8a');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('92');
   return module.exports;
 });
 
-$__System.registerDynamic("8b", ["81"], true, function($__require, exports, module) {
+$__System.registerDynamic("93", ["75"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   "format cjs";
   (function(window) {
     'use strict';
@@ -31415,7 +31657,7 @@ $__System.registerDynamic("8b", ["81"], true, function($__require, exports, modu
     }
     function ChartInternal(api) {
       var $$ = this;
-      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('81') : undefined;
+      $$.d3 = window.d3 ? window.d3 : typeof $__require !== 'undefined' ? $__require('75') : undefined;
       $$.api = api;
       $$.config = $$.getDefaultConfig();
       $$.data = {};
@@ -38378,41 +38620,39 @@ $__System.registerDynamic("8b", ["81"], true, function($__require, exports, modu
       window.c3 = c3;
     }
   })(window);
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("8c", ["8b"], true, function($__require, exports, module) {
+$__System.registerDynamic("94", ["93"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('8b');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('93');
   return module.exports;
 });
 
-$__System.register("8d", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("95", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('8e', ['67', '86', '87', '8f', '8c', '8d'], function (_export) {
+$__System.register('96', ['56', '94', '95', '97', '8e', '8f'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, Action, VIEW, i18n, Modal, c3, DISCRETE_PROB, html, TEMPLATES, StatisticalCoverageView;
+  var $, $$, HTML, c3, Modal, Action, VIEW, i18n, DISCRETE_PROB, html, TEMPLATES, StatisticalCoverageView;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_2) {
-      Action = _2['default'];
-      VIEW = _2.VIEW;
     }, function (_3) {
-      i18n = _3.i18n;
+      c3 = _3['default'];
+    }, function (_4) {}, function (_2) {
+      Modal = _2['default'];
+    }, function (_e) {
+      Action = _e['default'];
+      VIEW = _e.VIEW;
     }, function (_f) {
-      Modal = _f['default'];
-    }, function (_c) {
-      c3 = _c['default'];
-    }, function (_d) {}],
+      i18n = _f.i18n;
+    }],
     execute: function () {
       DISCRETE_PROB = 'http://www.uncertml.org/statistics/discrete-probability';
       html = '\n<div class="modal fade" id="statisticsViewModal" tabindex="-1" role="dialog" aria-labelledby="statisticsViewModalLabel">\n  <div class="modal-dialog modal-lg" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="statisticsViewModalLabel">Statistics View</h4>\n      </div>\n      <div class="modal-body">\n        <div class="param-selector"></div>\n      \n        <div class="chart-container"></div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
@@ -38749,11 +38989,11 @@ $__System.register('8e', ['67', '86', '87', '8f', '8c', '8d'], function (_export
   };
 });
 
-$__System.registerDynamic("90", ["3b"], true, function($__require, exports, module) {
+$__System.registerDynamic("98", ["3b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   "format cjs";
   (function(process) {
     (function() {
@@ -39255,19 +39495,20 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
     ;
     (function() {
       "use strict";
-      var Sniff = {android: navigator.userAgent.toLowerCase().indexOf("android") > -1};
-      var matchesSelector = function(el, selector, ctx) {
-        ctx = ctx || el.parentNode;
-        var possibles = ctx.querySelectorAll(selector);
-        for (var i = 0; i < possibles.length; i++) {
-          if (possibles[i] === el) {
-            return true;
-          }
-        }
-        return false;
-      },
+      var root = this,
+          Sniff = {android: navigator.userAgent.toLowerCase().indexOf("android") > -1},
+          matchesSelector = function(el, selector, ctx) {
+            ctx = ctx || el.parentNode;
+            var possibles = ctx.querySelectorAll(selector);
+            for (var i = 0; i < possibles.length; i++) {
+              if (possibles[i] === el) {
+                return true;
+              }
+            }
+            return false;
+          },
           _gel = function(el) {
-            return typeof el == "string" ? document.getElementById(el) : el;
+            return (typeof el == "string" || el.constructor === String) ? document.getElementById(el) : el;
           },
           _t = function(e) {
             return e.srcElement || e.target;
@@ -39564,7 +39805,6 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               }
             });
           },
-          _devNull = function() {},
           _each = function(obj, fn) {
             if (obj == null)
               return;
@@ -39572,7 +39812,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             for (var i = 0; i < obj.length; i++)
               fn.apply(obj[i]);
           };
-      this.Mottle = function(params) {
+      root.Mottle = function(params) {
         params = params || {};
         var clickThreshold = params.clickThreshold || 150,
             dblClickThreshold = params.dblClickThreshold || 350,
@@ -39680,7 +39920,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return this;
         };
       };
-      Mottle.consume = function(e, doNotPreventDefault) {
+      root.Mottle.consume = function(e, doNotPreventDefault) {
         if (e.stopPropagation)
           e.stopPropagation();
         else
@@ -39688,26 +39928,36 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         if (!doNotPreventDefault && e.preventDefault)
           e.preventDefault();
       };
-      Mottle.pageLocation = _pageLocation;
-      Mottle.setForceTouchEvents = function(value) {
+      root.Mottle.pageLocation = _pageLocation;
+      root.Mottle.setForceTouchEvents = function(value) {
         isTouchDevice = value;
       };
-      Mottle.setForceMouseEvents = function(value) {
+      root.Mottle.setForceMouseEvents = function(value) {
         isMouseDevice = value;
       };
     }).call(this);
     ;
     (function() {
       "use strict";
-      Array.prototype.suggest = function(item, head) {
-        if (this.indexOf(item) === -1) {
-          head ? this.unshift(item) : this.push(item);
+      var _suggest = function(list, item, head) {
+        if (list.indexOf(item) === -1) {
+          head ? list.unshift(item) : list.push(item);
+          return true;
         }
+        return false;
       };
-      Array.prototype.vanquish = function(item) {
-        var idx = this.indexOf(item);
+      var _vanquish = function(list, item) {
+        var idx = list.indexOf(item);
         if (idx != -1)
-          this.splice(idx, 1);
+          list.splice(idx, 1);
+      };
+      var _difference = function(l1, l2) {
+        var d = [];
+        for (var i = 0; i < l1.length; i++) {
+          if (l2.indexOf(l1[i]) == -1)
+            d.push(l1[i]);
+        }
+        return d;
       };
       var _isString = function(f) {
         return f == null ? false : (typeof f === "string" || f.constructor == String);
@@ -39749,13 +39999,14 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           DEFAULT_GRID_X = 50,
           DEFAULT_GRID_Y = 50,
           isIELT9 = iev > -1 && iev < 9,
+          isIE9 = iev == 9,
           _pl = function(e) {
             if (isIELT9) {
               return [e.clientX + document.documentElement.scrollLeft, e.clientY + document.documentElement.scrollTop];
             } else {
               var ts = _touches(e),
                   t = _getTouch(ts, 0);
-              return [t.pageX, t.pageY];
+              return isIE9 ? [t.pageX || t.clientX, t.pageY || t.clientY] : [t.pageX, t.pageY];
             }
           },
           _getTouch = function(touches, idx) {
@@ -40045,6 +40296,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             k.unmarkPosses(this, e);
             this.stop(e);
             k.notifySelectionDragStop(this, e);
+            k.notifyPosseDragStop(this, e);
             moving = false;
             if (clone) {
               dragEl && dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
@@ -40144,14 +40396,16 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             k.notifySelectionDragStart(this);
           }
         };
-        this.unmark = function(e) {
+        this.unmark = function(e, doNotCheckDroppables) {
           _setDroppablesActive(matchingDroppables, false, true, this);
           this.params.removeClass(dragEl, this.params.dragClass || css.drag);
           matchingDroppables.length = 0;
-          for (var i = 0; i < intersectingDroppables.length; i++) {
-            var retVal = intersectingDroppables[i].drop(this, e);
-            if (retVal === true)
-              break;
+          if (!doNotCheckDroppables) {
+            for (var i = 0; i < intersectingDroppables.length; i++) {
+              var retVal = intersectingDroppables[i].drop(this, e);
+              if (retVal === true)
+                break;
+            }
           }
         };
         this.moveBy = function(dx, dy, e) {
@@ -40205,10 +40459,11 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
       var Drop = function(el, params, css, scope) {
         this._class = css.droppable;
         this.params = params || {};
-        this._activeClass = params.activeClass || css.active;
-        this._hoverClass = params.hoverClass || css.hover;
+        this._activeClass = this.params.activeClass || css.active;
+        this._hoverClass = this.params.hoverClass || css.hover;
         Super.apply(this, arguments);
         var hover = false;
+        this.allowLoopback = this.params.allowLoopback !== false;
         this.setActive = function(val) {
           this.params[val ? "addClass" : "removeClass"](this.el, this._activeClass);
         };
@@ -40302,7 +40557,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 var _dd = this._dropsByScope[drag.scopes[i]];
                 if (_dd) {
                   for (var j = 0; j < _dd.length; j++) {
-                    if (_dd[j].canDrop(drag) && !_m[_dd[j].uuid]) {
+                    if (_dd[j].canDrop(drag) && !_m[_dd[j].uuid] && (_dd[j].allowLoopback || _dd[j].el !== drag.el)) {
                       _m[_dd[j].uuid] = true;
                       dd.push(_dd[j]);
                     }
@@ -40445,7 +40700,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             _each(drag.posses, function(p) {
               if (drag.posseRoles[p] && _posses[p]) {
                 _foreach(_posses[p].members, function(d) {
-                  d.unmark(event);
+                  d.unmark(event, true);
                 }, drag);
               }
             });
@@ -40459,16 +40714,26 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             e.moveBy(dx, dy);
           }, drag);
         };
-        this.updatePosses = function(dx, dy, drag) {
+        var _posseAction = function(fn, drag) {
           if (drag.posses) {
             _each(drag.posses, function(p) {
               if (drag.posseRoles[p] && _posses[p]) {
                 _foreach(_posses[p].members, function(e) {
-                  e.moveBy(dx, dy);
+                  fn(e);
                 }, drag);
               }
             });
           }
+        };
+        this.updatePosses = function(dx, dy, drag) {
+          _posseAction(function(e) {
+            e.moveBy(dx, dy);
+          }, drag);
+        };
+        this.notifyPosseDragStop = function(drag, evt) {
+          _posseAction(function(e) {
+            e.stop(evt, true);
+          }, drag);
         };
         this.notifySelectionDragStop = function(drag, evt) {
           _foreach(_selection, function(e) {
@@ -40499,10 +40764,10 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             _scopeManip(el._katavorioDrop, scopes, this._dropsByScope, v + "Scope");
           }.bind(this);
           this[v + "DragScope"] = function(el, scopes) {
-            _scopeManip(el._katavorioDrag, scopes, this._dragsByScope, v + "Scope");
+            _scopeManip(el.constructor === Drag ? el : el._katavorioDrag, scopes, this._dragsByScope, v + "Scope");
           }.bind(this);
           this[v + "DropScope"] = function(el, scopes) {
-            _scopeManip(el._katavorioDrop, scopes, this._dropsByScope, v + "Scope");
+            _scopeManip(el.constructor === Drop ? el : el._katavorioDrop, scopes, this._dropsByScope, v + "Scope");
           }.bind(this);
         }.bind(this));
         this.snapToGrid = function(x, y) {
@@ -40547,33 +40812,50 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           _posses = {};
         };
         var _posses = {};
+        var _processOneSpec = function(el, _spec, dontAddExisting) {
+          var posseId = _isString(_spec) ? _spec : _spec.id;
+          var active = _isString(_spec) ? true : _spec.active !== false;
+          var posse = _posses[posseId] || (function() {
+            var g = {
+              name: posseId,
+              members: []
+            };
+            _posses[posseId] = g;
+            return g;
+          })();
+          _each(el, function(_el) {
+            if (_el._katavorioDrag) {
+              if (dontAddExisting && _el._katavorioDrag.posseRoles[posse.name] != null)
+                return;
+              _suggest(posse.members, _el._katavorioDrag);
+              _suggest(_el._katavorioDrag.posses, posse.name);
+              _el._katavorioDrag.posseRoles[posse.name] = active;
+            }
+          });
+          return posse;
+        };
         this.addToPosse = function(el, spec) {
-          var posses = [],
-              posseId,
-              active;
-          var _one = function(_spec) {
-            posseId = _isString(_spec) ? _spec : _spec.id;
-            active = _isString(_spec) ? true : _spec.active !== false;
-            var posse = _posses[posseId] || (function() {
-              var g = {
-                name: posseId,
-                members: []
-              };
-              _posses[posseId] = g;
-              return g;
-            })();
-            _each(el, function(_el) {
-              if (_el._katavorioDrag) {
-                posse.members.suggest(_el._katavorioDrag);
-                _el._katavorioDrag.posses.suggest(posse.name);
-                _el._katavorioDrag.posseRoles[posse.name] = active;
-              }
-            });
-            posses.push(posse);
-          };
+          var posses = [];
           for (var i = 1; i < arguments.length; i++) {
-            _one(arguments[i]);
+            posses.push(_processOneSpec(el, arguments[i]));
           }
+          return posses.length == 1 ? posses[0] : posses;
+        };
+        this.setPosse = function(el, spec) {
+          var posses = [];
+          for (var i = 1; i < arguments.length; i++) {
+            posses.push(_processOneSpec(el, arguments[i], true).name);
+          }
+          _each(el, function(_el) {
+            if (_el._katavorioDrag) {
+              var diff = _difference(_el._katavorioDrag.posses, posses);
+              var p = [];
+              Array.prototype.push.apply(p, _el._katavorioDrag.posses);
+              for (var i = 0; i < diff.length; i++) {
+                this.removeFromPosse(_el, diff[i]);
+              }
+            }
+          }.bind(this));
           return posses.length == 1 ? posses[0] : posses;
         };
         this.removeFromPosse = function(el, posseId) {
@@ -40585,8 +40867,8 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               if (_el._katavorioDrag && _el._katavorioDrag.posses) {
                 var d = _el._katavorioDrag;
                 _each(posseId, function(p) {
-                  _posses[p].members.vanquish(d);
-                  d.posses.vanquish(p);
+                  _vanquish(_posses[p].members, d);
+                  _vanquish(d.posses, p);
                   delete d.posseRoles[p];
                 });
               }
@@ -40598,12 +40880,22 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             if (_el._katavorioDrag && _el._katavorioDrag.posses) {
               var d = _el._katavorioDrag;
               _each(d.posses, function(p) {
-                _posses[p].members.vanquish(d);
+                _vanquish(_posses[p].members, d);
               });
               d.posses.length = 0;
               d.posseRoles = {};
             }
           });
+        };
+        this.setPosseState = function(el, posseId, state) {
+          var posse = _posses[posseId];
+          if (posse) {
+            _each(el, function(_el) {
+              if (_el._katavorioDrag && _el._katavorioDrag.posses) {
+                _el._katavorioDrag.posseRoles[posse.name] = state;
+              }
+            });
+          }
         };
       };
     }).call(this);
@@ -40632,6 +40924,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           },
           _isf = function(o) {
             return Object.prototype.toString.call(o) === "[object Function]";
+          },
+          _isNamedFunction = function(o) {
+            return _isf(o) && o.name != null && o.name.length > 0;
           },
           _ise = function(o) {
             for (var i in o) {
@@ -40755,7 +41050,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           }
           return successValue;
         },
-        populate: function(model, values) {
+        populate: function(model, values, functionPrefix) {
           var getValue = function(fromString) {
             var matches = fromString.match(/(\${.*?})/g);
             if (matches != null) {
@@ -40772,6 +41067,8 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 if (d != null) {
                   if (_iss(d)) {
                     return getValue(d);
+                  } else if (_isf(d) && (functionPrefix == null || (d.name || "").indexOf(functionPrefix) === 0)) {
+                    return d(values);
                   } else if (_isa(d)) {
                     var r = [];
                     for (var i = 0; i < d.length; i++)
@@ -41057,6 +41354,16 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             for (var i in obj)
               map[i] = typeId;
           },
+          _each = function(fn, obj) {
+            obj = _ju.isArray(obj) || (obj.length != null && !_ju.isString(obj)) ? obj : [obj];
+            for (var i = 0; i < obj.length; i++) {
+              try {
+                fn.apply(obj[i], [obj[i]]);
+              } catch (e) {
+                _ju.log(".each iteration failed : " + e);
+              }
+            }
+          },
           _applyTypes = function(component, params, doNotRepaint) {
             if (component.getDefaultType) {
               var td = component.getTypeDescriptor(),
@@ -41076,15 +41383,15 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 }
               }
               if (params) {
-                o = _ju.populate(o, params);
+                o = _ju.populate(o, params, "_");
               }
               component.applyType(o, doNotRepaint, map);
               if (!doNotRepaint)
                 component.repaint();
             }
           },
-          jsPlumbUIComponent = window.jsPlumbUIComponent = function(params) {
-            jsPlumbUtil.EventGenerator.apply(this, arguments);
+          jsPlumbUIComponent = root.jsPlumbUIComponent = function(params) {
+            _ju.EventGenerator.apply(this, arguments);
             var self = this,
                 a = arguments,
                 idPrefix = self.idPrefix,
@@ -41201,7 +41508,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             component._jsPlumb.instance.removeClass(component.canvas, type.cssClass);
         }
       };
-      jsPlumbUtil.extend(jsPlumbUIComponent, jsPlumbUtil.EventGenerator, {
+      _ju.extend(root.jsPlumbUIComponent, _ju.EventGenerator, {
         getParameter: function(name) {
           return this._jsPlumb.parameters[name];
         },
@@ -41258,7 +41565,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               _applyTypes(this, params, doNotRepaint);
           }
         },
-        removeType: function(typeId, doNotRepaint) {
+        removeType: function(typeId, params, doNotRepaint) {
           var t = _splitType(typeId),
               _cont = false,
               _one = function(tt) {
@@ -41276,16 +41583,16 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               _cont = _one(t[i]) || _cont;
             }
             if (_cont)
-              _applyTypes(this, null, doNotRepaint);
+              _applyTypes(this, params, doNotRepaint);
           }
         },
-        clearTypes: function(doNotRepaint) {
+        clearTypes: function(params, doNotRepaint) {
           var i = this._jsPlumb.types.length;
           for (var j = 0; j < i; j++) {
             _removeTypeCssHelper(this, 0);
             this._jsPlumb.types.splice(0, 1);
           }
-          _applyTypes(this, {}, doNotRepaint);
+          _applyTypes(this, params, doNotRepaint);
         },
         toggleType: function(typeId, params, doNotRepaint) {
           var t = _splitType(typeId);
@@ -41409,7 +41716,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         this.logEnabled = this.Defaults.LogEnabled;
         this._connectionTypes = {};
         this._endpointTypes = {};
-        jsPlumbUtil.EventGenerator.apply(this);
+        _ju.EventGenerator.apply(this);
         var _currentInstance = this,
             _instanceIndex = getInstanceIndex(),
             _bb = _currentInstance.bind,
@@ -41427,7 +41734,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 var _el = _currentInstance.getElement(el);
                 return {
                   el: _el,
-                  id: (jsPlumbUtil.isString(el) && _el == null) ? el : _getId(_el)
+                  id: (_ju.isString(el) && _el == null) ? el : _getId(_el)
                 };
               }
             };
@@ -41619,19 +41926,15 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                         ui.top += _ancestorOffset.top;
                         _draw(element, ui, null, true);
                         if (_started)
-                          _currentInstance.addClass(element, "jsPlumb_dragged");
+                          _currentInstance.addClass(element, "jsplumb-dragged");
                         _started = true;
                       });
                       options[stopEvent] = _ju.wrap(options[stopEvent], function() {
-                        var elements = [];
-                        if (arguments.length == 1 && arguments[0].selection && arguments[0].selection.length > 0) {
-                          elements = arguments[0].selection;
-                        } else {
-                          elements = [[element, _currentInstance.getUIPosition(arguments, _currentInstance.getZoom(), true)]];
-                        }
+                        var elements = arguments[0].selection;
+                        var uip = _currentInstance.getUIPosition(arguments);
                         var _one = function(_e) {
-                          _draw(_e[0], _e[1]);
-                          _currentInstance.removeClass(_e[0], "jsPlumb_dragged");
+                          _draw(_e[0], uip);
+                          _currentInstance.removeClass(_e[0], "jsplumb-dragged");
                           _currentInstance.select({source: _e[0]}).removeClass(_currentInstance.elementDraggingClass + " " + _currentInstance.sourceElementDraggingClass, true);
                           _currentInstance.select({target: _e[0]}).removeClass(_currentInstance.elementDraggingClass + " " + _currentInstance.targetElementDraggingClass, true);
                           _currentInstance.getDragManager().dragEnded(_e[0]);
@@ -41702,6 +42005,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                     j = _p.sourceEndpoint.connectorOverlays.length; i < j; i++) {
                   _p.overlays.push(_p.sourceEndpoint.connectorOverlays[i]);
                 }
+              }
+              if (_p.sourceEndpoint && _p.sourceEndpoint.scope) {
+                _p.scope = _p.sourceEndpoint.scope;
               }
               if (!_p["pointer-events"] && _p.sourceEndpoint && _p.sourceEndpoint.connectorPointerEvents)
                 _p["pointer-events"] = _p.sourceEndpoint.connectorPointerEvents;
@@ -41891,7 +42197,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 };
             },
             _getId = function(element, uuid, doNotCreateIfNotFound) {
-              if (jsPlumbUtil.isString(element))
+              if (_ju.isString(element))
                 return element;
               if (element == null)
                 return null;
@@ -41920,6 +42226,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         };
         this.connectorClass = "jsplumb-connector";
         this.connectorOutlineClass = "jsplumb-connector-outline";
+        this.editableConnectorClass = "jsplumb-connector-editable";
         this.connectedClass = "jsplumb-connected";
         this.hoverClass = "jsplumb-hover";
         this.endpointClass = "jsplumb-endpoint";
@@ -42023,11 +42330,11 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               jpc;
           if (_p) {
             if (_p.source == null && _p.sourceEndpoint == null) {
-              jsPlumbUtil.log("Cannot establish connection - source does not exist");
+              _ju.log("Cannot establish connection - source does not exist");
               return;
             }
             if (_p.target == null && _p.targetEndpoint == null) {
-              jsPlumbUtil.log("Cannot establish connection - target does not exist");
+              _ju.log("Cannot establish connection - target does not exist");
               return;
             }
             _ensureContainer(_p.source);
@@ -42186,7 +42493,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               forceDetach = params.forceDetach,
               conn = firstArgIsConnection ? arguments[0] : params.connection;
           if (conn) {
-            if (forceDetach || jsPlumbUtil.functionChain(true, false, [[conn.endpoints[0], "isDetachAllowed", [conn]], [conn.endpoints[1], "isDetachAllowed", [conn]], [conn, "isDetachAllowed", [conn]], [_currentInstance, "checkCondition", ["beforeDetach", conn]]])) {
+            if (forceDetach || _ju.functionChain(true, false, [[conn.endpoints[0], "isDetachAllowed", [conn]], [conn.endpoints[1], "isDetachAllowed", [conn]], [conn, "isDetachAllowed", [conn]], [_currentInstance, "checkCondition", ["beforeDetach", conn]]])) {
               conn.endpoints[0].detach(conn, false, true, fireEvent);
             }
           } else {
@@ -42281,7 +42588,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           for (var i in result.connections) {
             var c = result.connections[i];
             if (c._jsPlumb) {
-              jsPlumbUtil.removeWithFunction(connections, function(_c) {
+              _ju.removeWithFunction(connections, function(_c) {
                 return c.id == _c.id;
               });
               fireDetachEvent(c, params.fireEvent === false ? false : !c.pending, params.originalEvent);
@@ -42302,20 +42609,23 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return result;
         };
         this.draggable = function(el, options) {
-          var i,
-              j,
-              info;
-          if (typeof el == 'object' && el.length) {
-            for (i = 0, j = el.length; i < j; i++) {
-              info = _info(el[i]);
-              if (info.el)
-                _initDraggableIfNecessary(info.el, true, options, info.id);
-            }
-          } else {
-            info = _info(el);
+          var info;
+          _each(function(_el) {
+            info = _info(_el);
             if (info.el)
               _initDraggableIfNecessary(info.el, true, options, info.id);
-          }
+          }, el);
+          return _currentInstance;
+        };
+        this.droppable = function(el, options) {
+          var info;
+          options = options || {};
+          options.allowLoopback = false;
+          _each(function(_el) {
+            info = _info(_el);
+            if (info.el)
+              _currentInstance.initDroppable(info.el, options);
+          }, el);
           return _currentInstance;
         };
         var _setOperation = function(list, func, args, selector) {
@@ -42622,7 +42932,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               fn.apply(this, arguments);
               jsPlumb.ConnectorRenderers[renderer].apply(this, arguments);
             };
-            jsPlumbUtil.extend(jsPlumb.Connectors[renderer][name], [fn, jsPlumb.ConnectorRenderers[renderer]]);
+            _ju.extend(jsPlumb.Connectors[renderer][name], [fn, jsPlumb.ConnectorRenderers[renderer]]);
           };
           if (!jsPlumb.connectorsInitialized) {
             for (var i = 0; i < connectorTypes.length; i++) {
@@ -42847,6 +43157,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 elInfo.def = _def;
                 this.targetEndpointDefinitions[elid][type] = _def;
                 _makeElementDropHandler(elInfo, p, dropOptions, p.isSource === true, true);
+                elInfo.el._katavorioDrop[elInfo.el._katavorioDrop.length - 1].targetDef = _def;
               }.bind(this);
           var inputs = el.length && el.constructor != String ? el : [el];
           for (var i = 0,
@@ -42935,7 +43246,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                     return;
                   elid = this.getId(this.getElement(elInfo.el));
                   if (p.filter) {
-                    var r = jsPlumbUtil.isString(p.filter) ? selectorFilter(e, elInfo.el, p.filter, this, p.filterExclude) : p.filter(e, elInfo.el);
+                    var r = _ju.isString(p.filter) ? selectorFilter(e, elInfo.el, p.filter, this, p.filterExclude) : p.filter(e, elInfo.el);
                     if (r === false)
                       return;
                   }
@@ -42989,11 +43300,11 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                     }
                   }
                   _currentInstance.trigger(ep.canvas, "mousedown", e, payload);
-                  jsPlumbUtil.consume(e);
+                  _ju.consume(e);
                 }.bind(this);
                 this.on(elInfo.el, "mousedown", mouseDownListener);
                 _def.trigger = mouseDownListener;
-                if (p.filter && (jsPlumbUtil.isString(p.filter) || jsPlumbUtil.isFunction(p.filter))) {
+                if (p.filter && (_ju.isString(p.filter) || _ju.isFunction(p.filter))) {
                   _currentInstance.setDragFilter(elInfo.el, p.filter);
                 }
                 var dropOptions = jsPlumb.extend({}, p.dropOptions || {});
@@ -43030,7 +43341,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return this;
         };
         var _getScope = function(el, types, connectionType) {
-          types = jsPlumbUtil.isArray(types) ? types : [types];
+          types = _ju.isArray(types) ? types : [types];
           var id = _getId(el);
           connectionType = connectionType || "default";
           for (var i = 0; i < types.length; i++) {
@@ -43040,7 +43351,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           }
         }.bind(this);
         var _setScope = function(el, scope, types, connectionType) {
-          types = jsPlumbUtil.isArray(types) ? types : [types];
+          types = _ju.isArray(types) ? types : [types];
           var id = _getId(el);
           connectionType = connectionType || "default";
           for (var i = 0; i < types.length; i++) {
@@ -43316,7 +43627,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         };
         this.setId = function(el, newId, doNotSetAttribute) {
           var id;
-          if (jsPlumbUtil.isString(el)) {
+          if (_ju.isString(el)) {
             id = el;
           } else {
             el = this.getElement(el);
@@ -43407,7 +43718,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         this.toggleDraggable = _toggleDraggable;
         this.addListener = this.bind;
       };
-      jsPlumbUtil.extend(jsPlumbInstance, jsPlumbUtil.EventGenerator, {
+      _ju.extend(jsPlumbInstance, _ju.EventGenerator, {
         setAttribute: function(el, a, v) {
           this.setAttribute(el, a, v);
         },
@@ -43415,10 +43726,10 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return this.getAttribute(jsPlumb.getElement(el), a);
         },
         convertToFullOverlaySpec: function(spec) {
-          if (jsPlumbUtil.isString(spec)) {
+          if (_ju.isString(spec)) {
             spec = [spec, {}];
           }
-          spec[1].id = spec[1].id || jsPlumbUtil.uuid();
+          spec[1].id = spec[1].id || _ju.uuid();
           return spec;
         },
         registerConnectionType: function(id, type) {
@@ -43482,8 +43793,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         }
       });
       var jsPlumb = new jsPlumbInstance();
-      if (typeof window != 'undefined')
-        window.jsPlumb = jsPlumb;
+      root.jsPlumb = jsPlumb;
       jsPlumb.getInstance = function(_defaults) {
         var j = new jsPlumbInstance(_defaults);
         j.init();
@@ -43517,17 +43827,6 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
       var root = this,
           _ju = root.jsPlumbUtil;
       var svgAvailable = !!window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"),
-          iev = (function() {
-            var rv = -1;
-            if (navigator.appName == 'Microsoft Internet Explorer') {
-              var ua = navigator.userAgent,
-                  re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-              if (re.exec(ua) != null)
-                rv = parseFloat(RegExp.$1);
-            }
-            return rv;
-          })(),
-          isIELT9 = iev > -1 && iev < 9,
           _genLoc = function(e, prefix) {
             if (e == null)
               return [0, 0];
@@ -43538,11 +43837,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           _pageLocation = function(e) {
             if (e == null)
               return [0, 0];
-            if (isIELT9) {
-              return [e.clientX + document.documentElement.scrollLeft, e.clientY + document.documentElement.scrollTop];
-            } else {
-              return _genLoc(e, "page");
-            }
+            return _genLoc(e, "page");
           },
           _screenLocation = function(e) {
             return _genLoc(e, "screen");
@@ -43849,9 +44144,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             sel = ctx.querySelectorAll(spec);
           return sel;
         },
-        getOffset: function(el, relativeToRoot) {
+        getOffset: function(el, relativeToRoot, container) {
           el = jsPlumb.getElement(el);
-          var container = this.getContainer();
+          container = container || this.getContainer();
           var out = {
             left: el.offsetLeft,
             top: el.offsetTop
@@ -44017,11 +44312,11 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           }
           for (i in component._jsPlumb.overlays) {
             if (keep[component._jsPlumb.overlays[i].id] == null)
-              component.removeOverlay(component._jsPlumb.overlays[i].id);
+              component.removeOverlay(component._jsPlumb.overlays[i].id, true);
           }
         }
       };
-      _ju.extend(_jp.OverlayCapableJsPlumbUIComponent, jsPlumbUIComponent, {
+      _ju.extend(_jp.OverlayCapableJsPlumbUIComponent, root.jsPlumbUIComponent, {
         setHover: function(hover, ignoreAttachedElements) {
           if (this._jsPlumb && !this._jsPlumb.instance.isConnectionBeingDragged()) {
             for (var i in this._jsPlumb.overlays) {
@@ -44069,10 +44364,10 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           if (!doNotRepaint)
             this.repaint();
         },
-        removeOverlay: function(overlayId) {
+        removeOverlay: function(overlayId, dontCleanup) {
           var o = this._jsPlumb.overlays[overlayId];
           if (o) {
-            if (o.cleanup)
+            if (!dontCleanup && o.cleanup)
               o.cleanup();
             delete this._jsPlumb.overlays[overlayId];
             if (this._jsPlumb.overlayPositions)
@@ -44145,6 +44440,19 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         },
         getAbsoluteOverlayPosition: function(overlay) {
           return this._jsPlumb.overlayPositions ? this._jsPlumb.overlayPositions[overlay.id] : null;
+        },
+        _clazzManip: function(action, clazz, dontUpdateOverlays) {
+          if (!dontUpdateOverlays) {
+            for (var i in this._jsPlumb.overlays) {
+              this._jsPlumb.overlays[i][action + "Class"](clazz);
+            }
+          }
+        },
+        addClass: function(clazz, dontUpdateOverlays) {
+          this._clazzManip("add", clazz, dontUpdateOverlays);
+        },
+        removeClass: function(clazz, dontUpdateOverlays) {
+          this._clazzManip("remove", clazz, dontUpdateOverlays);
         }
       });
     }).call(this);
@@ -44162,7 +44470,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               return true;
             }
             if (placeholder.element) {
-              var _ui = _jp.getUIPosition(arguments, _jsPlumb.getZoom());
+              var _ui = _jsPlumb.getUIPosition(arguments, _jsPlumb.getZoom());
               jsPlumb.setPosition(placeholder.element, _ui);
               _jsPlumb.repaint(placeholder.element, _ui);
               endpoint.paint({anchorPoint: endpoint.anchor.getCurrentLocation({element: endpoint.element})});
@@ -44619,6 +44927,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                   type: this.connectionType,
                   cssClass: this.connectorClass,
                   hoverClass: this.connectorHoverClass,
+                  scope: params.scope,
                   data: beforeDrag
                 });
                 jpc.pending = true;
@@ -44712,6 +45021,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                   }
                 }
                 _jsPlumb.fire("connectionDragStop", jpc, originalEvent);
+                if (jpc.pending) {
+                  _jsPlumb.fire("connectionAborted", jpc, originalEvent);
+                }
                 _jsPlumb.currentlyDragging = false;
                 jpc = null;
               }
@@ -45143,6 +45455,16 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         this.bind("mouseout", function() {
           this.setHover(false);
         }.bind(this));
+        this.editableRequested = params.editable !== false;
+        this.setEditable = function(e) {
+          return this.connector ? this.connector.setEditable(e) : false;
+        };
+        this.isEditable = function() {
+          return this.connector ? this.connector.isEditable() : false;
+        };
+        this.isEditing = function() {
+          return this.connector ? this.connector.isEditing() : false;
+        };
         this.makeEndpoint = function(isSource, el, elId, ep) {
           elId = elId || this._jsPlumb.instance.getId(el);
           return this.prepareEndpoint(_jsPlumb, _newEndpoint, this, ep, isSource ? 0 : 1, params, el, elId);
@@ -45177,7 +45499,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         var _reattach = params.reattach || this.endpoints[0].reattachConnections || this.endpoints[1].reattachConnections || _jsPlumb.Defaults.ReattachConnections;
         this.appendToDefaultType({
           detachable: _detachable,
-          rettach: _reattach,
+          reattach: _reattach,
           paintStyle: this.endpoints[0].connectorStyle || this.endpoints[1].connectorStyle || params.paintStyle || _jsPlumb.Defaults.PaintStyle || jsPlumb.Defaults.PaintStyle,
           hoverPaintStyle: this.endpoints[0].connectorHoverStyle || this.endpoints[1].connectorHoverStyle || params.hoverPaintStyle || _jsPlumb.Defaults.HoverPaintStyle || jsPlumb.Defaults.HoverPaintStyle
         });
@@ -45246,6 +45568,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         _jp.extend(_p, this.getParameters());
         this.setParameters(_p);
         this.setConnector(this.endpoints[0].connector || this.endpoints[1].connector || params.connector || _jsPlumb.Defaults.Connector || _jp.Defaults.Connector, true);
+        if (params.geometry) {
+          this.connector.setGeometry(params.geometry);
+        }
         var data = params.data == null || !jsPlumbUtil.isObject(params.data) ? {} : params.data;
         this.getData = function() {
           return data;
@@ -45336,8 +45661,10 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           this.connector = null;
         },
         updateConnectedClass: function(remove) {
-          _updateConnectedClass(this, this.source, this._jsPlumb.instance, remove);
-          _updateConnectedClass(this, this.target, this._jsPlumb.instance, remove);
+          if (this._jsPlumb) {
+            _updateConnectedClass(this, this.source, this._jsPlumb.instance, remove);
+            _updateConnectedClass(this, this.target, this._jsPlumb.instance, remove);
+          }
         },
         setHover: function(state) {
           if (this.connector && this._jsPlumb && !this._jsPlumb.instance.isConnectionBeingDragged()) {
@@ -45350,7 +45677,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return [this.endpoints[0].getUuid(), this.endpoints[1].getUuid()];
         },
         getCost: function() {
-          return this._jsPlumb.cost;
+          return this._jsPlumb ? this._jsPlumb.cost : -Infinity;
         },
         setCost: function(c) {
           this._jsPlumb.cost = c;
@@ -45361,12 +45688,20 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         getConnector: function() {
           return this.connector;
         },
+        getGeometry: function() {
+          return this.connector ? this.connector.getGeometry() : null;
+        },
+        setGeometry: function(g) {
+          if (this.connector)
+            this.connector.setGeometry(g);
+        },
         prepareConnector: function(connectorSpec, typeId) {
           var connectorArgs = {
             _jsPlumb: this._jsPlumb.instance,
-            cssClass: this._jsPlumb.params.cssClass,
+            cssClass: (this._jsPlumb.params.cssClass || "") + (this.isEditable() ? this._jsPlumb.instance.editableConnectorClass : ""),
             container: this._jsPlumb.params.container,
-            "pointer-events": this._jsPlumb.params["pointer-events"]
+            "pointer-events": this._jsPlumb.params["pointer-events"],
+            editable: this.editableRequested
           },
               renderMode = this._jsPlumb.instance.getRenderMode(),
               connector;
@@ -45596,13 +45931,11 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               })(["source", "target"], [sd, td]);
               for (var sf = 0; sf < axes.length; sf++) {
                 for (var tf = 0; tf < axes.length; tf++) {
-                  if (sf != tf) {
-                    candidates.push({
-                      source: axes[sf],
-                      target: axes[tf],
-                      dist: Biltong.lineLength(midpoints.source[axes[sf]], midpoints.target[axes[tf]])
-                    });
-                  }
+                  candidates.push({
+                    source: axes[sf],
+                    target: axes[tf],
+                    dist: Biltong.lineLength(midpoints.source[axes[sf]], midpoints.target[axes[tf]])
+                  });
                 }
               }
               candidates.sort(function(a, b) {
@@ -45696,7 +46029,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                             weAreTarget = c.endpoints[1].elementId === elementId;
                         if (weAreSource)
                           _setAnchorLocation(c.endpoints[0], anchors[i]);
-                        else if (weAreTarget)
+                        if (weAreTarget)
                           _setAnchorLocation(c.endpoints[1], anchors[i]);
                       }
                     }
@@ -45977,6 +46310,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                     sd = jsPlumbInstance.getCachedData(sourceId);
                 if (targetId == sourceId && (sourceContinuous || targetContinuous)) {
                   _updateAnchorList(anchorLists[sourceId], -Math.PI / 2, 0, conn, false, targetId, 0, false, "top", sourceId, connectionsToPaint, endpointsToPaint);
+                  _updateAnchorList(anchorLists[targetId], -Math.PI / 2, 0, conn, false, sourceId, 1, false, "top", targetId, connectionsToPaint, endpointsToPaint);
                 } else {
                   if (!o) {
                     o = calculateOrientation(sourceId, targetId, sd.o, td.o, conn.endpoints[0].anchor, conn.endpoints[1].anchor);
@@ -46828,9 +47162,33 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             targetGap = _ju.isArray(gap) ? gap[1] : gap,
             userProvidedSegments = null,
             edited = false,
-            paintInfo = null;
-        this.getPath = function() {};
-        this.setPath = function(path) {};
+            paintInfo = null,
+            geometry = null,
+            editable = params.editable !== false && jsPlumb.ConnectorEditors != null && jsPlumb.ConnectorEditors[this.type] != null;
+        var _setGeometry = this.setGeometry = function(g, internallyComputed) {
+          edited = (!internallyComputed);
+          geometry = g;
+        };
+        var _getGeometry = this.getGeometry = function() {
+          return geometry;
+        };
+        this.hasBeenEdited = function() {
+          return edited;
+        };
+        this.isEditing = function() {
+          return this.editor != null && this.editor.isActive();
+        };
+        this.setEditable = function(e) {
+          if (e && jsPlumb.ConnectorEditors != null && jsPlumb.ConnectorEditors[this.type] != null && (this.overrideSetEditable == null || this.overrideSetEditable())) {
+            editable = e;
+          } else {
+            editable = false;
+          }
+          return editable;
+        };
+        this.isEditable = function() {
+          return editable;
+        };
         this.findSegmentForPoint = function(x, y) {
           var out = {
             d: Infinity,
@@ -46993,8 +47351,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return seg.segment && seg.segment.pointAlongPathFrom(seg.proportion, distance, false) || [0, 0];
         };
         this.compute = function(params) {
-          if (!edited)
-            paintInfo = _prepareCompute.call(this, params);
+          paintInfo = _prepareCompute.call(this, params);
           _clearSegments();
           this._compute(paintInfo, params);
           this.x = paintInfo.points[0];
@@ -47012,7 +47369,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           maxStub: Math.max(sourceStub, targetStub),
           sourceGap: sourceGap,
           targetGap: targetGap,
-          maxGap: Math.max(sourceGap, targetGap)
+          maxGap: Math.max(sourceGap, targetGap),
+          setGeometry: _setGeometry,
+          getGeometry: _getGeometry
         };
       };
       _ju.extend(_jp.Connectors.AbstractConnector, AbstractComponent);
@@ -47242,6 +47601,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
         this.component = params.component;
         this.loc = params.location == null ? 0.5 : params.location;
         this.endpointLoc = params.endpointLocation == null ? [0.5, 0.5] : params.endpointLocation;
+        this.visible = params.visible !== false;
       };
       AbstractOverlay.prototype = {
         cleanup: function(force) {
@@ -47291,6 +47651,14 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             foldback = params.foldback || 0.623;
         this.computeMaxSize = function() {
           return self.width * 1.5;
+        };
+        this.elementCreated = function(p, component) {
+          this.path = p;
+          if (params.events) {
+            for (var i in params.events) {
+              jsPlumb.on(p, i, params.events[i]);
+            }
+          }
         };
         this.draw = function(component, currentConnectionPaintStyle) {
           var hxy,
@@ -47667,11 +48035,12 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             _super = _jp.Connectors.AbstractConnector.apply(this, arguments),
             midpoint = params.midpoint == null ? 0.5 : params.midpoint,
             alwaysRespectStubs = params.alwaysRespectStubs === true,
-            userSuppliedSegments = null,
             lastx = null,
             lasty = null,
             lastOrientation,
             cornerRadius = params.cornerRadius != null ? params.cornerRadius : 0,
+            loopbackRadius = params.loopbackRadius || 25,
+            isLoopbackCurrently = false,
             sgn = function(n) {
               return n < 0 ? -1 : n === 0 ? 0 : 1;
             },
@@ -47750,35 +48119,14 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                 });
               }
             };
-        this.setSegments = function(s) {
-          userSuppliedSegments = s;
-        };
-        this.isEditable = function() {
-          return true;
-        };
-        this.getOriginalSegments = function() {
-          return userSuppliedSegments || segments;
-        };
         this._compute = function(paintInfo, params) {
-          if (params.clearEdits)
-            userSuppliedSegments = null;
-          if (userSuppliedSegments != null) {
-            writeSegments(this, userSuppliedSegments, paintInfo);
-            return;
-          }
           segments = [];
           lastx = null;
           lasty = null;
           lastOrientation = null;
-          var midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint),
-              midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
-          var orientations = {
-            x: [0, 1],
-            y: [1, 0]
+          var commonStubCalculator = function() {
+            return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
           },
-              commonStubCalculator = function() {
-                return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
-              },
               stubCalculators = {
                 perpendicular: commonStubCalculator,
                 orthogonal: commonStubCalculator,
@@ -47802,96 +48150,6 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
                     return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
                   }
                 }
-              },
-              lineCalculators = {
-                perpendicular: function(axis) {
-                  var pi = paintInfo,
-                      sis = {
-                        x: [[[1, 2, 3, 4], null, [2, 1, 4, 3]], null, [[4, 3, 2, 1], null, [3, 4, 1, 2]]],
-                        y: [[[3, 2, 1, 4], null, [2, 3, 4, 1]], null, [[4, 1, 2, 3], null, [1, 4, 3, 2]]]
-                      },
-                      stubs = {
-                        x: [[pi.startStubX, pi.endStubX], null, [pi.endStubX, pi.startStubX]],
-                        y: [[pi.startStubY, pi.endStubY], null, [pi.endStubY, pi.startStubY]]
-                      },
-                      midLines = {
-                        x: [[midx, pi.startStubY], [midx, pi.endStubY]],
-                        y: [[pi.startStubX, midy], [pi.endStubX, midy]]
-                      },
-                      linesToEnd = {
-                        x: [[pi.endStubX, pi.startStubY]],
-                        y: [[pi.startStubX, pi.endStubY]]
-                      },
-                      startToEnd = {
-                        x: [[pi.startStubX, pi.endStubY], [pi.endStubX, pi.endStubY]],
-                        y: [[pi.endStubX, pi.startStubY], [pi.endStubX, pi.endStubY]]
-                      },
-                      startToMidToEnd = {
-                        x: [[pi.startStubX, midy], [pi.endStubX, midy], [pi.endStubX, pi.endStubY]],
-                        y: [[midx, pi.startStubY], [midx, pi.endStubY], [pi.endStubX, pi.endStubY]]
-                      },
-                      otherStubs = {
-                        x: [pi.startStubY, pi.endStubY],
-                        y: [pi.startStubX, pi.endStubX]
-                      },
-                      soIdx = orientations[axis][0],
-                      toIdx = orientations[axis][1],
-                      _so = pi.so[soIdx] + 1,
-                      _to = pi.to[toIdx] + 1,
-                      otherFlipped = (pi.to[toIdx] == -1 && (otherStubs[axis][1] < otherStubs[axis][0])) || (pi.to[toIdx] == 1 && (otherStubs[axis][1] > otherStubs[axis][0])),
-                      stub1 = stubs[axis][_so][0],
-                      stub2 = stubs[axis][_so][1],
-                      segmentIndexes = sis[axis][_so][_to];
-                  if (pi.segment == segmentIndexes[3] || (pi.segment == segmentIndexes[2] && otherFlipped)) {
-                    return midLines[axis];
-                  } else if (pi.segment == segmentIndexes[2] && stub2 < stub1) {
-                    return linesToEnd[axis];
-                  } else if ((pi.segment == segmentIndexes[2] && stub2 >= stub1) || (pi.segment == segmentIndexes[1] && !otherFlipped)) {
-                    return startToMidToEnd[axis];
-                  } else if (pi.segment == segmentIndexes[0] || (pi.segment == segmentIndexes[1] && otherFlipped)) {
-                    return startToEnd[axis];
-                  }
-                },
-                orthogonal: function(axis, startStub, otherStartStub, endStub, otherEndStub) {
-                  var pi = paintInfo,
-                      extent = {
-                        "x": pi.so[0] == -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub),
-                        "y": pi.so[1] == -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub)
-                      }[axis];
-                  return {
-                    "x": [[extent, otherStartStub], [extent, otherEndStub], [endStub, otherEndStub]],
-                    "y": [[otherStartStub, extent], [otherEndStub, extent], [otherEndStub, endStub]]
-                  }[axis];
-                },
-                opposite: function(axis, ss, oss, es) {
-                  var pi = paintInfo,
-                      otherAxis = {
-                        "x": "y",
-                        "y": "x"
-                      }[axis],
-                      dim = {
-                        "x": "height",
-                        "y": "width"
-                      }[axis],
-                      comparator = pi["is" + axis.toUpperCase() + "GreaterThanStubTimes2"];
-                  if (params.sourceEndpoint.elementId == params.targetEndpoint.elementId) {
-                    var _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) + _super.maxStub;
-                    return {
-                      "x": [[ss, _val], [es, _val]],
-                      "y": [[_val, ss], [_val, es]]
-                    }[axis];
-                  } else if (!comparator || (pi.so[idx] == 1 && ss > es) || (pi.so[idx] == -1 && ss < es)) {
-                    return {
-                      "x": [[ss, midy], [es, midy]],
-                      "y": [[midx, ss], [midx, es]]
-                    }[axis];
-                  } else if ((pi.so[idx] == 1 && ss < es) || (pi.so[idx] == -1 && ss > es)) {
-                    return {
-                      "x": [[midx, pi.sy], [midx, pi.ty]],
-                      "y": [[pi.sx, midy], [pi.tx, midy]]
-                    }[axis];
-                  }
-                }
               };
           var stubs = stubCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis),
               idx = paintInfo.sourceAxis == "x" ? 0 : 1,
@@ -47901,56 +48159,247 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
               es = stubs[idx + 2],
               oes = stubs[oidx + 2];
           addSegment(segments, stubs[0], stubs[1], paintInfo);
-          var p = lineCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis, ss, oss, es, oes);
-          if (p) {
-            for (var i = 0; i < p.length; i++) {
-              addSegment(segments, p[i][0], p[i][1], paintInfo);
-            }
-          }
-          addSegment(segments, stubs[2], stubs[3], paintInfo);
-          addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
-          writeSegments(this, segments, paintInfo);
-        };
-        this.getPath = function() {
-          var _last = null,
-              _lastAxis = null,
-              s = [],
-              segs = userSuppliedSegments || segments;
-          for (var i = 0; i < segs.length; i++) {
-            var seg = segs[i],
-                axis = seg[4],
-                axisIndex = (axis == "v" ? 3 : 2);
-            if (_last != null && _lastAxis === axis) {
-              _last[axisIndex] = seg[axisIndex];
-            } else {
-              if (seg[0] != seg[2] || seg[1] != seg[3]) {
-                s.push({
-                  start: [seg[0], seg[1]],
-                  end: [seg[2], seg[3]]
-                });
-                _last = seg;
-                _lastAxis = seg[4];
+          if (false && params.sourcePos[0] == params.targetPos[0] && params.sourcePos[1] == params.targetPos[1]) {
+            addSegment(segments, stubs[0] - loopbackRadius, stubs[1], paintInfo);
+            addSegment(segments, stubs[0] - loopbackRadius, stubs[1] - (2 * loopbackRadius), paintInfo);
+            addSegment(segments, stubs[0] + loopbackRadius, stubs[1] - (2 * loopbackRadius), paintInfo);
+            addSegment(segments, stubs[0] + loopbackRadius, stubs[1], paintInfo);
+            addSegment(segments, stubs[0], stubs[1], paintInfo);
+          } else {
+            var midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint),
+                midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
+            var orientations = {
+              x: [0, 1],
+              y: [1, 0]
+            },
+                lineCalculators = {
+                  perpendicular: function(axis) {
+                    var pi = paintInfo,
+                        sis = {
+                          x: [[[1, 2, 3, 4], null, [2, 1, 4, 3]], null, [[4, 3, 2, 1], null, [3, 4, 1, 2]]],
+                          y: [[[3, 2, 1, 4], null, [2, 3, 4, 1]], null, [[4, 1, 2, 3], null, [1, 4, 3, 2]]]
+                        },
+                        stubs = {
+                          x: [[pi.startStubX, pi.endStubX], null, [pi.endStubX, pi.startStubX]],
+                          y: [[pi.startStubY, pi.endStubY], null, [pi.endStubY, pi.startStubY]]
+                        },
+                        midLines = {
+                          x: [[midx, pi.startStubY], [midx, pi.endStubY]],
+                          y: [[pi.startStubX, midy], [pi.endStubX, midy]]
+                        },
+                        linesToEnd = {
+                          x: [[pi.endStubX, pi.startStubY]],
+                          y: [[pi.startStubX, pi.endStubY]]
+                        },
+                        startToEnd = {
+                          x: [[pi.startStubX, pi.endStubY], [pi.endStubX, pi.endStubY]],
+                          y: [[pi.endStubX, pi.startStubY], [pi.endStubX, pi.endStubY]]
+                        },
+                        startToMidToEnd = {
+                          x: [[pi.startStubX, midy], [pi.endStubX, midy], [pi.endStubX, pi.endStubY]],
+                          y: [[midx, pi.startStubY], [midx, pi.endStubY], [pi.endStubX, pi.endStubY]]
+                        },
+                        otherStubs = {
+                          x: [pi.startStubY, pi.endStubY],
+                          y: [pi.startStubX, pi.endStubX]
+                        },
+                        soIdx = orientations[axis][0],
+                        toIdx = orientations[axis][1],
+                        _so = pi.so[soIdx] + 1,
+                        _to = pi.to[toIdx] + 1,
+                        otherFlipped = (pi.to[toIdx] == -1 && (otherStubs[axis][1] < otherStubs[axis][0])) || (pi.to[toIdx] == 1 && (otherStubs[axis][1] > otherStubs[axis][0])),
+                        stub1 = stubs[axis][_so][0],
+                        stub2 = stubs[axis][_so][1],
+                        segmentIndexes = sis[axis][_so][_to];
+                    if (pi.segment == segmentIndexes[3] || (pi.segment == segmentIndexes[2] && otherFlipped)) {
+                      return midLines[axis];
+                    } else if (pi.segment == segmentIndexes[2] && stub2 < stub1) {
+                      return linesToEnd[axis];
+                    } else if ((pi.segment == segmentIndexes[2] && stub2 >= stub1) || (pi.segment == segmentIndexes[1] && !otherFlipped)) {
+                      return startToMidToEnd[axis];
+                    } else if (pi.segment == segmentIndexes[0] || (pi.segment == segmentIndexes[1] && otherFlipped)) {
+                      return startToEnd[axis];
+                    }
+                  },
+                  orthogonal: function(axis, startStub, otherStartStub, endStub, otherEndStub) {
+                    var pi = paintInfo,
+                        extent = {
+                          "x": pi.so[0] == -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub),
+                          "y": pi.so[1] == -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub)
+                        }[axis];
+                    return {
+                      "x": [[extent, otherStartStub], [extent, otherEndStub], [endStub, otherEndStub]],
+                      "y": [[otherStartStub, extent], [otherEndStub, extent], [otherEndStub, endStub]]
+                    }[axis];
+                  },
+                  opposite: function(axis, ss, oss, es) {
+                    var pi = paintInfo,
+                        otherAxis = {
+                          "x": "y",
+                          "y": "x"
+                        }[axis],
+                        dim = {
+                          "x": "height",
+                          "y": "width"
+                        }[axis],
+                        comparator = pi["is" + axis.toUpperCase() + "GreaterThanStubTimes2"];
+                    if (params.sourceEndpoint.elementId == params.targetEndpoint.elementId) {
+                      var _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) + _super.maxStub;
+                      return {
+                        "x": [[ss, _val], [es, _val]],
+                        "y": [[_val, ss], [_val, es]]
+                      }[axis];
+                    } else if (!comparator || (pi.so[idx] == 1 && ss > es) || (pi.so[idx] == -1 && ss < es)) {
+                      return {
+                        "x": [[ss, midy], [es, midy]],
+                        "y": [[midx, ss], [midx, es]]
+                      }[axis];
+                    } else if ((pi.so[idx] == 1 && ss < es) || (pi.so[idx] == -1 && ss > es)) {
+                      return {
+                        "x": [[midx, pi.sy], [midx, pi.ty]],
+                        "y": [[pi.sx, midy], [pi.tx, midy]]
+                      }[axis];
+                    }
+                  }
+                };
+            var p = lineCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis, ss, oss, es, oes);
+            if (p) {
+              for (var i = 0; i < p.length; i++) {
+                addSegment(segments, p[i][0], p[i][1], paintInfo);
               }
             }
+            addSegment(segments, stubs[2], stubs[3], paintInfo);
           }
-          return s;
-        };
-        this.setPath = function(path) {
-          userSuppliedSegments = [];
-          for (var i = 0; i < path.length; i++) {
-            var lx = path[i].start[0],
-                ly = path[i].start[1],
-                x = path[i].end[0],
-                y = path[i].end[1],
-                o = lx == x ? "v" : "h",
-                sgnx = sgn(x - lx),
-                sgny = sgn(y - ly);
-            userSuppliedSegments.push([lx, ly, x, y, o, sgnx, sgny]);
-          }
+          addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
+          writeSegments(this, segments, paintInfo);
         };
       };
       _ju.extend(Flowchart, _jp.Connectors.AbstractConnector);
       _jp.registerConnectorType(Flowchart, "Flowchart");
+    }).call(this);
+    ;
+    (function() {
+      "use strict";
+      var root = this,
+          _jp = root.jsPlumb,
+          _ju = root.jsPlumbUtil;
+      _jp.Connectors.AbstractBezierConnector = function(params) {
+        params = params || {};
+        var showLoopback = params.showLoopback !== false,
+            curviness = params.curviness || 10,
+            margin = params.margin || 5,
+            proximityLimit = params.proximityLimit || 80,
+            clockwise = params.orientation && params.orientation === "clockwise",
+            loopbackRadius = params.loopbackRadius || 25,
+            isLoopbackCurrently = false,
+            _super;
+        this.overrideSetEditable = function() {
+          return !isLoopbackCurrently;
+        };
+        this._compute = function(paintInfo, p) {
+          var sp = p.sourcePos,
+              tp = p.targetPos,
+              _w = Math.abs(sp[0] - tp[0]),
+              _h = Math.abs(sp[1] - tp[1]);
+          if (!showLoopback || (p.sourceEndpoint.elementId !== p.targetEndpoint.elementId)) {
+            isLoopbackCurrently = false;
+            this._computeBezier(paintInfo, p, sp, tp, _w, _h);
+          } else {
+            isLoopbackCurrently = true;
+            var x1 = p.sourcePos[0],
+                y1 = p.sourcePos[1] - margin,
+                cx = x1,
+                cy = y1 - loopbackRadius,
+                _x = cx - loopbackRadius,
+                _y = cy - loopbackRadius;
+            _w = 2 * loopbackRadius;
+            _h = 2 * loopbackRadius;
+            paintInfo.points[0] = _x;
+            paintInfo.points[1] = _y;
+            paintInfo.points[2] = _w;
+            paintInfo.points[3] = _h;
+            _super.addSegment(this, "Arc", {
+              loopback: true,
+              x1: (x1 - _x) + 4,
+              y1: y1 - _y,
+              startAngle: 0,
+              endAngle: 2 * Math.PI,
+              r: loopbackRadius,
+              ac: !clockwise,
+              x2: (x1 - _x) - 4,
+              y2: y1 - _y,
+              cx: cx - _x,
+              cy: cy - _y
+            });
+          }
+        };
+        _super = _jp.Connectors.AbstractConnector.apply(this, arguments);
+        return _super;
+      };
+      _ju.extend(_jp.Connectors.AbstractBezierConnector, _jp.Connectors.AbstractConnector);
+      var Bezier = function(params) {
+        params = params || {};
+        this.type = "Bezier";
+        var _super = _jp.Connectors.AbstractBezierConnector.apply(this, arguments),
+            majorAnchor = params.curviness || 150,
+            minorAnchor = 10;
+        this.getCurviness = function() {
+          return majorAnchor;
+        };
+        this._findControlPoint = function(point, sourceAnchorPosition, targetAnchorPosition, sourceEndpoint, targetEndpoint, soo, too) {
+          var perpendicular = soo[0] != too[0] || soo[1] == too[1],
+              p = [];
+          if (!perpendicular) {
+            if (soo[0] === 0)
+              p.push(sourceAnchorPosition[0] < targetAnchorPosition[0] ? point[0] + minorAnchor : point[0] - minorAnchor);
+            else
+              p.push(point[0] - (majorAnchor * soo[0]));
+            if (soo[1] === 0)
+              p.push(sourceAnchorPosition[1] < targetAnchorPosition[1] ? point[1] + minorAnchor : point[1] - minorAnchor);
+            else
+              p.push(point[1] + (majorAnchor * too[1]));
+          } else {
+            if (too[0] === 0)
+              p.push(targetAnchorPosition[0] < sourceAnchorPosition[0] ? point[0] + minorAnchor : point[0] - minorAnchor);
+            else
+              p.push(point[0] + (majorAnchor * too[0]));
+            if (too[1] === 0)
+              p.push(targetAnchorPosition[1] < sourceAnchorPosition[1] ? point[1] + minorAnchor : point[1] - minorAnchor);
+            else
+              p.push(point[1] + (majorAnchor * soo[1]));
+          }
+          return p;
+        };
+        this._computeBezier = function(paintInfo, p, sp, tp, _w, _h) {
+          var geometry = this.getGeometry(),
+              _CP,
+              _CP2,
+              _sx = sp[0] < tp[0] ? _w : 0,
+              _sy = sp[1] < tp[1] ? _h : 0,
+              _tx = sp[0] < tp[0] ? 0 : _w,
+              _ty = sp[1] < tp[1] ? 0 : _h;
+          if ((this.hasBeenEdited() || this.isEditing()) && geometry != null && geometry.controlPoints != null && geometry.controlPoints[0] != null && geometry.controlPoints[1] != null) {
+            _CP = geometry.controlPoints[0];
+            _CP2 = geometry.controlPoints[1];
+          } else {
+            _CP = this._findControlPoint([_sx, _sy], sp, tp, p.sourceEndpoint, p.targetEndpoint, paintInfo.so, paintInfo.to);
+            _CP2 = this._findControlPoint([_tx, _ty], tp, sp, p.targetEndpoint, p.sourceEndpoint, paintInfo.to, paintInfo.so);
+          }
+          _super.setGeometry({controlPoints: [_CP, _CP2]}, true);
+          _super.addSegment(this, "Bezier", {
+            x1: _sx,
+            y1: _sy,
+            x2: _tx,
+            y2: _ty,
+            cp1x: _CP[0],
+            cp1y: _CP[1],
+            cp2x: _CP2[0],
+            cp2y: _CP2[1]
+          });
+        };
+      };
+      _ju.extend(Bezier, _jp.Connectors.AbstractBezierConnector);
+      _jp.registerConnectorType(Bezier, "Bezier");
     }).call(this);
     ;
     (function() {
@@ -48003,148 +48452,69 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
       var StateMachine = function(params) {
         params = params || {};
         this.type = "StateMachine";
-        var _super = _jp.Connectors.AbstractConnector.apply(this, arguments),
+        var _super = _jp.Connectors.AbstractBezierConnector.apply(this, arguments),
             curviness = params.curviness || 10,
             margin = params.margin || 5,
             proximityLimit = params.proximityLimit || 80,
             clockwise = params.orientation && params.orientation === "clockwise",
-            loopbackRadius = params.loopbackRadius || 25,
-            showLoopback = params.showLoopback !== false;
-        this._compute = function(paintInfo, params) {
-          var w = Math.abs(params.sourcePos[0] - params.targetPos[0]),
-              h = Math.abs(params.sourcePos[1] - params.targetPos[1]);
-          if (!showLoopback || (params.sourceEndpoint.elementId !== params.targetEndpoint.elementId)) {
-            var _sx = params.sourcePos[0] < params.targetPos[0] ? 0 : w,
-                _sy = params.sourcePos[1] < params.targetPos[1] ? 0 : h,
-                _tx = params.sourcePos[0] < params.targetPos[0] ? w : 0,
-                _ty = params.sourcePos[1] < params.targetPos[1] ? h : 0;
-            if (params.sourcePos[2] === 0)
-              _sx -= margin;
-            if (params.sourcePos[2] === 1)
-              _sx += margin;
-            if (params.sourcePos[3] === 0)
-              _sy -= margin;
-            if (params.sourcePos[3] === 1)
-              _sy += margin;
-            if (params.targetPos[2] === 0)
-              _tx -= margin;
-            if (params.targetPos[2] === 1)
-              _tx += margin;
-            if (params.targetPos[3] === 0)
-              _ty -= margin;
-            if (params.targetPos[3] === 1)
-              _ty += margin;
-            var _midx = (_sx + _tx) / 2,
-                _midy = (_sy + _ty) / 2,
-                segment = _segment(_sx, _sy, _tx, _ty),
-                distance = Math.sqrt(Math.pow(_tx - _sx, 2) + Math.pow(_ty - _sy, 2)),
-                _controlPoint = _findControlPoint(_midx, _midy, segment, params.sourcePos, params.targetPos, curviness, curviness, distance, proximityLimit);
-            _super.addSegment(this, "Bezier", {
-              x1: _tx,
-              y1: _ty,
-              x2: _sx,
-              y2: _sy,
-              cp1x: _controlPoint[0],
-              cp1y: _controlPoint[1],
-              cp2x: _controlPoint[0],
-              cp2y: _controlPoint[1]
-            });
+            _controlPoint;
+        this._computeBezier = function(paintInfo, params, sp, tp, w, h) {
+          var _sx = params.sourcePos[0] < params.targetPos[0] ? 0 : w,
+              _sy = params.sourcePos[1] < params.targetPos[1] ? 0 : h,
+              _tx = params.sourcePos[0] < params.targetPos[0] ? w : 0,
+              _ty = params.sourcePos[1] < params.targetPos[1] ? h : 0;
+          if (params.sourcePos[2] === 0)
+            _sx -= margin;
+          if (params.sourcePos[2] === 1)
+            _sx += margin;
+          if (params.sourcePos[3] === 0)
+            _sy -= margin;
+          if (params.sourcePos[3] === 1)
+            _sy += margin;
+          if (params.targetPos[2] === 0)
+            _tx -= margin;
+          if (params.targetPos[2] === 1)
+            _tx += margin;
+          if (params.targetPos[3] === 0)
+            _ty -= margin;
+          if (params.targetPos[3] === 1)
+            _ty += margin;
+          var _midx = (_sx + _tx) / 2,
+              _midy = (_sy + _ty) / 2,
+              segment = _segment(_sx, _sy, _tx, _ty),
+              distance = Math.sqrt(Math.pow(_tx - _sx, 2) + Math.pow(_ty - _sy, 2)),
+              cp1x,
+              cp2x,
+              cp1y,
+              cp2y,
+              geometry = _super.getGeometry();
+          if ((this.hasBeenEdited() || this.isEditing()) && geometry != null) {
+            cp1x = geometry.controlPoints[0][0];
+            cp1y = geometry.controlPoints[0][1];
+            cp2x = geometry.controlPoints[1][0];
+            cp2y = geometry.controlPoints[1][1];
           } else {
-            var x1 = params.sourcePos[0],
-                y1 = params.sourcePos[1] - margin,
-                cx = x1,
-                cy = y1 - loopbackRadius,
-                _w = 2 * loopbackRadius,
-                _h = 2 * loopbackRadius,
-                _x = cx - loopbackRadius,
-                _y = cy - loopbackRadius;
-            paintInfo.points[0] = _x;
-            paintInfo.points[1] = _y;
-            paintInfo.points[2] = _w;
-            paintInfo.points[3] = _h;
-            _super.addSegment(this, "Arc", {
-              loopback: true,
-              x1: (x1 - _x) + 4,
-              y1: y1 - _y,
-              startAngle: 0,
-              endAngle: 2 * Math.PI,
-              r: loopbackRadius,
-              ac: !clockwise,
-              x2: (x1 - _x) - 4,
-              y2: y1 - _y,
-              cx: cx - _x,
-              cy: cy - _y
-            });
+            _controlPoint = _findControlPoint(_midx, _midy, segment, params.sourcePos, params.targetPos, curviness, curviness, distance, proximityLimit);
+            cp1x = _controlPoint[0];
+            cp2x = _controlPoint[0];
+            cp1y = _controlPoint[1];
+            cp2y = _controlPoint[1];
+            _super.setGeometry({controlPoints: [_controlPoint, _controlPoint]}, true);
           }
-        };
-      };
-      _ju.extend(StateMachine, _jp.Connectors.AbstractConnector);
-      _jp.registerConnectorType(StateMachine, "StateMachine");
-    }).call(this);
-    ;
-    (function() {
-      "use strict";
-      var root = this,
-          _jp = root.jsPlumb,
-          _ju = root.jsPlumbUtil;
-      var Bezier = function(params) {
-        params = params || {};
-        var _super = _jp.Connectors.AbstractConnector.apply(this, arguments),
-            majorAnchor = params.curviness || 150,
-            minorAnchor = 10;
-        this.type = "Bezier";
-        this.getCurviness = function() {
-          return majorAnchor;
-        };
-        this._findControlPoint = function(point, sourceAnchorPosition, targetAnchorPosition, sourceEndpoint, targetEndpoint, soo, too) {
-          var perpendicular = soo[0] != too[0] || soo[1] == too[1],
-              p = [];
-          if (!perpendicular) {
-            if (soo[0] === 0)
-              p.push(sourceAnchorPosition[0] < targetAnchorPosition[0] ? point[0] + minorAnchor : point[0] - minorAnchor);
-            else
-              p.push(point[0] - (majorAnchor * soo[0]));
-            if (soo[1] === 0)
-              p.push(sourceAnchorPosition[1] < targetAnchorPosition[1] ? point[1] + minorAnchor : point[1] - minorAnchor);
-            else
-              p.push(point[1] + (majorAnchor * too[1]));
-          } else {
-            if (too[0] === 0)
-              p.push(targetAnchorPosition[0] < sourceAnchorPosition[0] ? point[0] + minorAnchor : point[0] - minorAnchor);
-            else
-              p.push(point[0] + (majorAnchor * too[0]));
-            if (too[1] === 0)
-              p.push(targetAnchorPosition[1] < sourceAnchorPosition[1] ? point[1] + minorAnchor : point[1] - minorAnchor);
-            else
-              p.push(point[1] + (majorAnchor * soo[1]));
-          }
-          return p;
-        };
-        this._compute = function(paintInfo, p) {
-          var sp = p.sourcePos,
-              tp = p.targetPos,
-              _w = Math.abs(sp[0] - tp[0]),
-              _h = Math.abs(sp[1] - tp[1]),
-              _sx = sp[0] < tp[0] ? _w : 0,
-              _sy = sp[1] < tp[1] ? _h : 0,
-              _tx = sp[0] < tp[0] ? 0 : _w,
-              _ty = sp[1] < tp[1] ? 0 : _h,
-              _CP = this._findControlPoint([_sx, _sy], sp, tp, p.sourceEndpoint, p.targetEndpoint, paintInfo.so, paintInfo.to),
-              _CP2 = this._findControlPoint([_tx, _ty], tp, sp, p.targetEndpoint, p.sourceEndpoint, paintInfo.to, paintInfo.so);
           _super.addSegment(this, "Bezier", {
-            x1: _sx,
-            y1: _sy,
-            x2: _tx,
-            y2: _ty,
-            cp1x: _CP[0],
-            cp1y: _CP[1],
-            cp2x: _CP2[0],
-            cp2y: _CP2[1]
+            x1: _tx,
+            y1: _ty,
+            x2: _sx,
+            y2: _sy,
+            cp1x: cp1x,
+            cp1y: cp1y,
+            cp2x: cp2x,
+            cp2y: cp2y
           });
         };
       };
-      _ju.extend(Bezier, _jp.Connectors.AbstractConnector);
-      _jp.registerConnectorType(Bezier, "Bezier");
+      _ju.extend(StateMachine, _jp.Connectors.AbstractBezierConnector);
+      _jp.registerConnectorType(StateMachine, "StateMachine");
     }).call(this);
     ;
     (function() {
@@ -48363,11 +48733,16 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
       _jp.ConnectorRenderers.svg = function(params) {
         var self = this,
             _super = SvgComponent.apply(this, [{
-              cssClass: params._jsPlumb.connectorClass,
+              cssClass: params._jsPlumb.connectorClass + (this.isEditable() ? " " + params._jsPlumb.editableConnectorClass : ""),
               originalArgs: arguments,
               pointerEventsSpec: "none",
               _jsPlumb: params._jsPlumb
             }]);
+        var _superSetEditable = this.setEditable;
+        this.setEditable = function(e) {
+          var result = _superSetEditable.apply(this, [e]);
+          jsPlumb[result ? "addClass" : "removeClass"](this.canvas, this._jsPlumb.instance.editableConnectorClass);
+        };
         _super.renderer.paint = function(style, anchor, extents) {
           var segments = self.getSegments(),
               p = "",
@@ -48509,6 +48884,9 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             if (this.path == null) {
               this.path = _node("path", {"pointer-events": "all"});
               params.component.svg.appendChild(this.path);
+              if (this.elementCreated) {
+                this.elementCreated(this.path, params.component);
+              }
               this.canvas = params.component.svg;
             }
             var clazz = originalArgs && (originalArgs.length == 1) ? (originalArgs[0].cssClass || "") : "",
@@ -48636,7 +49014,7 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             unbind: e.off,
             getSize: jsPlumb.getSize,
             getPosition: function(el) {
-              var o = instance.getOffset(el);
+              var o = instance.getOffset(el, false, el._katavorioDrag ? el.offsetParent : null);
               return [o.left, o.top];
             },
             setPosition: function(el, xy) {
@@ -48752,10 +49130,17 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           return args[0].e;
         },
         getUIPosition: function(eventArgs, zoom) {
-          return {
+          var el = eventArgs[0].el;
+          var p = {
             left: eventArgs[0].pos[0],
             top: eventArgs[0].pos[1]
           };
+          if (el._katavorioDrag && el.offsetParent !== this.getContainer()) {
+            var oc = this.getOffset(el.offsetParent);
+            p.left += oc.left;
+            p.top += oc.top;
+          }
+          return p;
         },
         setDragFilter: function(el, filter, _exclude) {
           if (el._katavorioDrag) {
@@ -48785,6 +49170,15 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
             dm.addToPosse.apply(dm, _el);
           });
         },
+        setPosse: function(el, spec) {
+          var specs = Array.prototype.slice.call(arguments, 1);
+          var dm = _getDragManager(this);
+          jsPlumb.each(el, function(_el) {
+            _el = [jsPlumb.getElement(_el)];
+            _el.push.apply(_el, specs);
+            dm.setPosse.apply(dm, _el);
+          });
+        },
         removeFromPosse: function(el, posseId) {
           var specs = Array.prototype.slice.call(arguments, 1);
           var dm = _getDragManager(this);
@@ -48798,6 +49192,12 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
           var dm = _getDragManager(this);
           jsPlumb.each(el, function(_el) {
             dm.removeFromAllPosses(jsPlumb.getElement(_el));
+          });
+        },
+        setPosseState: function(el, posseId, state) {
+          var dm = _getDragManager(this);
+          jsPlumb.each(el, function(_el) {
+            dm.setPosseState(jsPlumb.getElement(_el), posseId, state);
           });
         },
         dragEvents: {
@@ -48851,31 +49251,29 @@ $__System.registerDynamic("90", ["3b"], true, function($__require, exports, modu
       ready(_jp.init);
     }).call(this);
   })($__require('3b'));
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("91", ["90"], true, function($__require, exports, module) {
+$__System.registerDynamic("99", ["98"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('90');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('98');
   return module.exports;
 });
 
-$__System.registerDynamic("92", ["91"], true, function($__require, exports, module) {
+$__System.registerDynamic("9a", ["99"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   "format cjs";
   (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
       define(['jsplumb'], factory);
     } else if (typeof module === 'object' && module.exports) {
-      module.exports = factory($__require('91').jsPlumb);
+      module.exports = factory($__require('99').jsPlumb);
     } else {
       root.Remapper = factory(root.jsPlumb);
     }
@@ -49027,31 +49425,29 @@ $__System.registerDynamic("92", ["91"], true, function($__require, exports, modu
     };
     return Remapper;
   }));
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("93", ["92"], true, function($__require, exports, module) {
+$__System.registerDynamic("9b", ["9a"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('92');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('9a');
   return module.exports;
 });
 
-$__System.register("94", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("9c", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('95', ['68', '87'], function (_export) {
+$__System.register('9d', ['57', '8f'], function (_export) {
   'use strict';
 
   var Format, loadJSON, CatRemap;
   return {
     setters: [function (_) {
       Format = _['default'];
-    }, function (_2) {
-      loadJSON = _2.loadJSON;
+    }, function (_f) {
+      loadJSON = _f.loadJSON;
     }],
     execute: function () {
       CatRemap = (function (_Format) {
@@ -49092,33 +49488,33 @@ $__System.register('95', ['68', '87'], function (_export) {
   };
 });
 
-$__System.register('96', ['54', '67', '78', '86', '87', '93', '94', '95', '97', '8f'], function (_export) {
+$__System.register('9e', ['52', '56', '97', '9b', '9c', '9f', '6c', '8f', '8e', '9d'], function (_export) {
   'use strict';
 
-  var CoverageData, $, $$, HTML, COVJSON_GRID, Action, VIEW, PROCESS, i18n, Remapper, CatRemap, withCategories, Modal, html, TEMPLATES, CoverageRemapCategories;
+  var CoverageData, $, $$, HTML, Modal, Remapper, withCategories, COVJSON_GRID, i18n, Action, VIEW, PROCESS, CatRemap, html, TEMPLATES, CoverageRemapCategories;
   return {
-    setters: [function (_8) {
-      CoverageData = _8['default'];
+    setters: [function (_3) {
+      CoverageData = _3['default'];
     }, function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_5) {
-      COVJSON_GRID = _5.COVJSON_GRID;
-    }, function (_7) {
-      Action = _7['default'];
-      VIEW = _7.VIEW;
-      PROCESS = _7.PROCESS;
-    }, function (_6) {
-      i18n = _6.i18n;
     }, function (_2) {
-      Remapper = _2['default'];
-    }, function (_3) {}, function (_9) {
-      CatRemap = _9['default'];
-    }, function (_4) {
-      withCategories = _4.withCategories;
-    }, function (_f) {
-      Modal = _f['default'];
+      Modal = _2['default'];
+    }, function (_b) {
+      Remapper = _b['default'];
+    }, function (_c) {}, function (_f) {
+      withCategories = _f.withCategories;
+    }, function (_c2) {
+      COVJSON_GRID = _c2.COVJSON_GRID;
+    }, function (_f2) {
+      i18n = _f2.i18n;
+    }, function (_e) {
+      Action = _e['default'];
+      VIEW = _e.VIEW;
+      PROCESS = _e.PROCESS;
+    }, function (_d) {
+      CatRemap = _d['default'];
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="paramSelectModalLabel">Select a categorical parameter</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n      \n        <div class="panel panel-primary parameter-select">\n          <div class="panel-body">\n            <p>\n              Which of the following categorical parameters do you like to remap?\n            </p>\n          </div>\n          <ul class="list-group parameter-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="remapModal" tabindex="-1" role="dialog" aria-labelledby="remapModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="remapModalLabel">Remap <strong class="parameter-label"></strong> Categories</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n        \n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Option A: Apply ready-made remapping definitions</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Using a ready-made remapping definition is the fastest way to apply a remapping.\n              The remapping definition defines both the target categories and their mapping\n              from the source categories.\n            </p>\n            <div class="alert alert-info remapping-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group remapping-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-primary remap-categorical-distributions">\n          <div class="panel-heading">\n            <h4>Option B: Remap manually with categories from existing datasets</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              A manual remapping can be done more quickly by loading the desired\n              target categories from an existing dataset. The connections then have\n              to be created manually via drag and drop.\n            </p>\n            <div class="alert alert-info categorical-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group categorical-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-default remap-manual">\n          <div class="panel-heading">\n            <h4>Option C: Fully manual remapping</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              When the above methods cannot be used then the only option left is\n              to manually create the target categories and connect\n              them to the source categories. NOTE: This is currently not supported.\n            </p>\n          </div>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n<div id="remapper"></div>\n<style>\n/* above sidebar */\n.modal, #remapper {\n  z-index: 3000; \n}\n.modal-backdrop {\n  z-index: 2500;\n}\n.categorical-distribution-list-empty, .remapping-distribution-list-empty {\n  margin-bottom: 0;\n}\n.workspace-dataset-distribution-action .btn {\n  margin-bottom: 5px;\n}\n</style>\n';
@@ -49577,7 +49973,6 @@ $__System.register('96', ['54', '67', '78', '86', '87', '93', '94', '95', '97', 
                 var dataset = _ref.dataset;
 
                 if (dataset === virtualDataset) {
-                  window.ac = dataset.distributions[0].actions;
                   dataset.distributions[0].actions.find(function (a) {
                     return a.type === VIEW;
                   }).run();
@@ -49727,7 +50122,9 @@ $__System.register('96', ['54', '67', '78', '86', '87', '93', '94', '95', '97', 
   };
 });
 
-$__System.register('6c', [], function (_export) {
+$__System.register('5b', [], function (_export) {
+  // TODO move to covutils
+
   /**
    * @external {Range} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Range.md
    */
@@ -49871,7 +50268,7 @@ $__System.register('6c', [], function (_export) {
   };
 });
 
-$__System.register('98', ['67', '78', '86', '87', '8f', '6c', '6d'], function (_export) {
+$__System.register('a0', ['56', '97', '8f', '5b', '5c', '6c', '8e'], function (_export) {
   /*
    * For a given categorical coverage parameter, calculate and show
    * percentages of each category for a given time step or combined
@@ -49880,25 +50277,25 @@ $__System.register('98', ['67', '78', '86', '87', '8f', '6c', '6d'], function (_
 
   'use strict';
 
-  var $, $$, HTML, COVJSON_GRID, Action, PROCESS, i18n, Modal, rangeUtil, referencingUtil, html, TEMPLATES, CoverageCategoriesStatistics;
+  var $, $$, HTML, Modal, i18n, rangeUtil, referencingUtil, COVJSON_GRID, Action, PROCESS, html, TEMPLATES, CoverageCategoriesStatistics;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_3) {
-      COVJSON_GRID = _3.COVJSON_GRID;
-    }, function (_4) {
-      Action = _4['default'];
-      PROCESS = _4.PROCESS;
     }, function (_2) {
-      i18n = _2.i18n;
+      Modal = _2['default'];
     }, function (_f) {
-      Modal = _f['default'];
+      i18n = _f.i18n;
+    }, function (_b) {
+      rangeUtil = _b;
     }, function (_c) {
-      rangeUtil = _c;
-    }, function (_d) {
-      referencingUtil = _d;
+      referencingUtil = _c;
+    }, function (_c2) {
+      COVJSON_GRID = _c2.COVJSON_GRID;
+    }, function (_e) {
+      Action = _e['default'];
+      PROCESS = _e.PROCESS;
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="statisticsOptionsModal" tabindex="-1" role="dialog" aria-labelledby="statisticsOptionsModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="statisticsOptionsModalLabel">Select reference periods</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Select the reference periods for which the summary statistics shall be calculated.\n              The more periods you select, the longer the processing time will be.\n            </p>\n              \n            <select multiple class="form-control ref-periods-select">\n            </select>\n            \n            <div class="calculate-button-container"></div>\n          </div>\n          \n       \n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="statisticsProgressModal" tabindex="-1" role="dialog" aria-labelledby="statisticsProgressModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <h4 class="modal-title" id="statisticsProgressModalLabel">Progress</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Please wait until the operation is finished.\n            </p>\n            <progress max="1" value="0"></progress>\n          </div>\n        </div>\n       \n      </div>\n    </div>\n  </div>\n</div>\n\n<style>\n.calculate-button-container {\n  margin-top: 20px;\n}\n#statisticsProgressModal progress {\n  width: 100%;\n}\n</style>\n';
@@ -50301,8 +50698,8 @@ $__System.register('98', ['67', '78', '86', '87', '8f', '6c', '6d'], function (_
                     "t": t
                   },
                   "referencing": [{
-                    "dimensions": ["t"],
-                    "trs": referencingUtil.getRefSystem(domain, ['t'])
+                    "components": ["t"],
+                    "system": referencingUtil.getRefSystem(domain, ['t'])
                   }]
                 },
                 "parameters": params,
@@ -50358,12 +50755,12 @@ $__System.register('98', ['67', '78', '86', '87', '8f', '6c', '6d'], function (_
   };
 });
 
-$__System.registerDynamic("99", [], true, function($__require, exports, module) {
+$__System.registerDynamic("a1", [], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   function iota(n) {
     var result = new Array(n);
     for (var i = 0; i < n; ++i) {
@@ -50372,25 +50769,23 @@ $__System.registerDynamic("99", [], true, function($__require, exports, module) 
     return result;
   }
   module.exports = iota;
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9a", ["99"], true, function($__require, exports, module) {
+$__System.registerDynamic("a2", ["a1"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('99');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('a1');
   return module.exports;
 });
 
-$__System.registerDynamic("9b", [], true, function($__require, exports, module) {
+$__System.registerDynamic("a3", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   ;
   (function(exports) {
@@ -50488,25 +50883,23 @@ $__System.registerDynamic("9b", [], true, function($__require, exports, module) 
     exports.toByteArray = b64ToByteArray;
     exports.fromByteArray = uint8ToBase64;
   }(typeof exports === 'undefined' ? (this.base64js = {}) : exports));
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9c", ["9b"], true, function($__require, exports, module) {
+$__System.registerDynamic("a4", ["a3"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('9b');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('a3');
   return module.exports;
 });
 
-$__System.registerDynamic("9d", [], true, function($__require, exports, module) {
+$__System.registerDynamic("a5", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   exports.read = function(buffer, offset, isLE, mLen, nBytes) {
     var e,
         m;
@@ -50583,52 +50976,48 @@ $__System.registerDynamic("9d", [], true, function($__require, exports, module) 
     for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
     buffer[offset + i - d] |= s * 128;
   };
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("9e", ["9d"], true, function($__require, exports, module) {
+$__System.registerDynamic("a6", ["a5"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('9d');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('a5');
   return module.exports;
 });
 
-$__System.registerDynamic("9f", [], true, function($__require, exports, module) {
+$__System.registerDynamic("a7", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var toString = {}.toString;
   module.exports = Array.isArray || function(arr) {
     return toString.call(arr) == '[object Array]';
   };
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("a0", ["9f"], true, function($__require, exports, module) {
+$__System.registerDynamic("a8", ["a7"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('9f');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('a7');
   return module.exports;
 });
 
-$__System.registerDynamic("a1", ["9c", "9e", "a0"], true, function($__require, exports, module) {
+$__System.registerDynamic("a9", ["a4", "a6", "a8"], true, function($__require, exports, module) {
   "use strict";
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var base64 = $__require('9c');
-  var ieee754 = $__require('9e');
-  var isArray = $__require('a0');
+  var define,
+      global = this,
+      GLOBAL = this;
+  var base64 = $__require('a4');
+  var ieee754 = $__require('a6');
+  var isArray = $__require('a8');
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
   exports.INSPECT_MAX_BYTES = 50;
@@ -51921,71 +52310,65 @@ $__System.registerDynamic("a1", ["9c", "9e", "a0"], true, function($__require, e
     }
     return i;
   }
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("a2", ["a1"], true, function($__require, exports, module) {
+$__System.registerDynamic("aa", ["a9"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('a1');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('a9');
   return module.exports;
 });
 
-$__System.registerDynamic("a3", ["a2"], true, function($__require, exports, module) {
+$__System.registerDynamic("ab", ["aa"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('a2');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('aa');
   return module.exports;
 });
 
-$__System.registerDynamic("a4", ["a3"], true, function($__require, exports, module) {
+$__System.registerDynamic("ac", ["ab"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('a3');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('ab');
   return module.exports;
 });
 
-$__System.registerDynamic("a5", ["a4"], true, function($__require, exports, module) {
+$__System.registerDynamic("ad", ["ac"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   (function(Buffer) {
     module.exports = function(obj) {
       return !!(obj != null && (obj._isBuffer || (obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj))));
     };
-  })($__require('a4').Buffer);
-  global.define = __define;
+  })($__require('ac').Buffer);
   return module.exports;
 });
 
-$__System.registerDynamic("a6", ["a5"], true, function($__require, exports, module) {
+$__System.registerDynamic("ae", ["ad"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('a5');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('ad');
   return module.exports;
 });
 
-$__System.registerDynamic("a7", ["9a", "a6"], true, function($__require, exports, module) {
+$__System.registerDynamic("af", ["a2", "ae"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var iota = $__require('9a');
-  var isBuffer = $__require('a6');
+  var define,
+      global = this,
+      GLOBAL = this;
+  var iota = $__require('a2');
+  var isBuffer = $__require('ae');
   var hasTypedArrays = ((typeof Float64Array) !== "undefined");
   function compare1st(a, b) {
     return a[0] - b[0];
@@ -52272,21 +52655,50 @@ b" + i + "*=d\
     return ctor(data, shape, stride, offset);
   }
   module.exports = wrappedNDArrayCtor;
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("56", ["a7"], true, function($__require, exports, module) {
+$__System.registerDynamic("5f", ["af"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('a7');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('af');
   return module.exports;
 });
 
-$__System.register('97', ['56', '78'], function (_export) {
+$__System.registerDynamic("5d", ["68"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.isCoverage = isCoverage;
+  exports.checkCoverage = checkCoverage;
+  exports.isDomain = isDomain;
+  exports.checkDomain = checkDomain;
+  var _constants = $__require('68');
+  function isCoverage(obj) {
+    return obj.type === _constants.COVERAGE;
+  }
+  function checkCoverage(obj) {
+    if (!isCoverage(obj)) {
+      throw new Error('must be a Coverage');
+    }
+  }
+  function isDomain(obj) {
+    return obj.type === _constants.DOMAIN;
+  }
+  function checkDomain(obj) {
+    if (!isDomain(obj)) {
+      throw new Error('must be a Domain');
+    }
+  }
+  return module.exports;
+});
+
+$__System.register('9f', ['5f', '6c', '5c', '5d'], function (_export) {
   /* */
 
   /**
@@ -52297,7 +52709,7 @@ $__System.register('97', ['56', '78'], function (_export) {
    */
   'use strict';
 
-  var ndarray, COVJSON_GRID;
+  var ndarray, COVJSON_GRID, COVJSON_DATATYPE_TUPLE, COVERAGE, DOMAIN, getHorizontalCRSReferenceObject, getProjection, checkCoverage;
 
   /**
    * Returns a copy of the given Coverage object with the categories 
@@ -52353,6 +52765,28 @@ $__System.register('97', ['56', '78'], function (_export) {
   _export('maskByPolygon', maskByPolygon);
 
   /**
+   * Reproject a coverage.
+   * 
+   * Reprojecting means returning a new coverage where the horizontal CRS is replaced
+   * and the horizontal domain coordinates are reprojected.
+   * 
+   * Current limitations:
+   * - only point-type coverage domains are supported (Tuple only)
+   * - only horizontal CRSs (2-dimensional) are supported
+   * - only ellipsoidal CRSs (lat/lon) are supported (restriction of getProjection() function of referencing module)
+   * 
+   * Given the limitations, the current purpose for reprojection is simply to intercompare
+   * a grid to a point coverage, or point to point, where both are in lat/lon but possibly
+   * with a different longitude wrapping, e.g. [0,360] vs [-180,180].
+   * 
+   * @param {Coverage} cov The Coverage object to reproject.
+   * @param {Domain} refDomain The reference domain from which the horizontal CRS is used.
+   * @returns {Promise<Coverage>} A promise with the reprojected Coverage object as result.
+   */
+
+  _export('subsetByBbox', subsetByBbox);
+
+  /**
    * Returns whether a point is inside a polygon.
    * 
    * Based on Point Inclusion in Polygon Test (PNPOLY) by W. Randolph Franklin:
@@ -52368,7 +52802,7 @@ $__System.register('97', ['56', '78'], function (_export) {
    * @returns {boolean} true if point is inside or false if not
    */
 
-  _export('subsetByBbox', subsetByBbox);
+  _export('reproject', reproject);
 
   /**
    * Shallow clone a given object.
@@ -52380,10 +52814,9 @@ $__System.register('97', ['56', '78'], function (_export) {
 
   function withParameters(cov, params) {
     var newcov = {
+      type: COVERAGE,
       profiles: cov.profiles,
       domainProfiles: cov.domainProfiles,
-      bbox: cov.bbox,
-      timeExtent: cov.timeExtent,
       parameters: params,
       loadDomain: function loadDomain() {
         return cov.loadDomain();
@@ -52414,6 +52847,7 @@ $__System.register('97', ['56', '78'], function (_export) {
       throw new Error('mapping parameter must be a Map from/to category ID')
     }
     */
+    checkCoverage(cov);
     if (observedProperty.categories.some(function (c) {
       return !c.id;
     })) {
@@ -52492,6 +52926,8 @@ $__System.register('97', ['56', '78'], function (_export) {
   }
 
   function mapRange(cov, key, fn, dataType) {
+    checkCoverage(cov);
+
     var rangeWrapper = function rangeWrapper(range) {
       var newrange = {
         shape: range.shape,
@@ -52520,10 +52956,9 @@ $__System.register('97', ['56', '78'], function (_export) {
     };
 
     var newcov = {
+      type: COVERAGE,
       profiles: cov.profiles,
       domainProfiles: cov.domainProfiles,
-      bbox: cov.bbox,
-      timeExtent: cov.timeExtent,
       parameters: cov.parameters,
       loadDomain: function loadDomain() {
         return cov.loadDomain();
@@ -52546,6 +52981,7 @@ $__System.register('97', ['56', '78'], function (_export) {
   }
 
   function maskByPolygon(cov, polygon) {
+    checkCoverage(cov);
     if (cov.domainProfiles.indexOf(COVJSON_GRID) === -1) {
       throw new Error('Only grids can be masked by polygon currently, domain profiles: ' + cov.domainProfiles);
     }
@@ -52663,6 +53099,136 @@ $__System.register('97', ['56', '78'], function (_export) {
     return cov.subsetByValue({ x: { start: xmin, stop: xmax }, y: { start: ymin, stop: ymax } });
   }
 
+  function reproject(cov, refDomain) {
+    return cov.loadDomain().then(function (sourceDomain) {
+      var sourceRef = getHorizontalCRSReferenceObject(sourceDomain);
+      // check that the CRS components don't refer to grid axes
+      if (sourceRef.components.some(sourceDomain.axes.has)) {
+        throw new Error('Grid reprojection not supported yet');
+      }
+
+      var _sourceRef$components = babelHelpers.slicedToArray(sourceRef.components, 2);
+
+      var xComp = _sourceRef$components[0];
+      var yComp = _sourceRef$components[1];
+
+      // TODO reproject bounds
+
+      // find the composite axis that contains the horizontal coordinates
+      var axes = [].concat(babelHelpers.toConsumableArray(sourceDomain.axes.values()));
+      var axis = axes.find(function (axis) {
+        return sourceRef.components.every(function (comp) {
+          return axis.components.indexOf(comp) !== -1;
+        });
+      });
+      var xCompIdx = axis.components.indexOf(xComp);
+      var yCompIdx = axis.components.indexOf(yComp);
+
+      // find the target CRS and get the projection
+      var sourceProjection = getProjection(sourceDomain);
+      var targetProjection = getProjection(refDomain);
+
+      // reproject the x/y part of every axis value
+      // this is done by unprojecting to lon/lat, followed by projecting to the target x/y
+      var values = undefined;
+      if (axis.dataType === COVJSON_DATATYPE_TUPLE) {
+        // make a deep copy of the axis values and replace x,y values by the reprojected ones
+        values = axis.values.map(function (tuple) {
+          return tuple.slice();
+        });
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+          for (var _iterator5 = values[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var tuple = _step5.value;
+            var sourceX = tuple[xCompIdx];
+            var sourceY = tuple[yCompIdx];
+
+            var latlon = sourceProjection.unproject({ x: sourceX, y: sourceY });
+
+            var _targetProjection$project = targetProjection.project(latlon);
+
+            var x = _targetProjection$project.x;
+            var y = _targetProjection$project.y;
+
+            tuple[xCompIdx] = x;
+            tuple[yCompIdx] = y;
+          }
+        } catch (err) {
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+              _iterator5['return']();
+            }
+          } finally {
+            if (_didIteratorError5) {
+              throw _iteratorError5;
+            }
+          }
+        }
+      } else {
+        throw new Error('Unsupported data type: ' + axis.dataType);
+      }
+
+      // assemble reprojected coverage   
+      var newAxes = new Map(sourceDomain.axes);
+      var newAxis = shallowcopy(axis);
+      delete newAxis.bounds;
+      newAxis.values = values;
+      newAxes.set(axis.key, newAxis);
+
+      var targetRef = getHorizontalCRSReferenceObject(refDomain);
+      var newReferencing = sourceDomain.referencing.map(function (ref) {
+        if (ref === sourceRef) {
+          return {
+            components: sourceRef.components,
+            system: targetRef.system
+          };
+        } else {
+          return ref;
+        }
+      });
+
+      var newDomain = {
+        type: DOMAIN,
+        profiles: sourceDomain.profiles,
+        axes: newAxes,
+        referencing: newReferencing
+      };
+
+      var newCoverage = {
+        type: COVERAGE,
+        profiles: cov.profiles,
+        domainProfiles: cov.domainProfiles,
+        parameters: cov.parameters,
+        loadDomain: function loadDomain() {
+          return Promise.resolve(newDomain);
+        },
+        loadRange: function loadRange(paramKey) {
+          return cov.loadRange(paramKey);
+        },
+        loadRanges: function loadRanges(paramKeys) {
+          return cov.loadRanges(paramKeys);
+        },
+        subsetByIndex: function subsetByIndex(constraints) {
+          return cov.subsetByIndex(constraints).then(function (sub) {
+            return reproject(sub, refDomain);
+          });
+        },
+        subsetByValue: function subsetByValue(constraints) {
+          return cov.subsetByValue(constraints).then(function (sub) {
+            return reproject(sub, refDomain);
+          });
+        }
+      };
+      return newCoverage;
+    });
+  }
+
   function pnpoly(x, y, vertx, verty) {
     var inside = false;
     var nvert = vertx.length;
@@ -52692,24 +53258,32 @@ $__System.register('97', ['56', '78'], function (_export) {
     return copy;
   }
   return {
-    setters: [function (_) {
-      ndarray = _['default'];
-    }, function (_2) {
-      COVJSON_GRID = _2.COVJSON_GRID;
+    setters: [function (_f) {
+      ndarray = _f['default'];
+    }, function (_c) {
+      COVJSON_GRID = _c.COVJSON_GRID;
+      COVJSON_DATATYPE_TUPLE = _c.COVJSON_DATATYPE_TUPLE;
+      COVERAGE = _c.COVERAGE;
+      DOMAIN = _c.DOMAIN;
+    }, function (_c2) {
+      getHorizontalCRSReferenceObject = _c2.getHorizontalCRSReferenceObject;
+      getProjection = _c2.getProjection;
+    }, function (_d) {
+      checkCoverage = _d.checkCoverage;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('a8', ['68', '87'], function (_export) {
+$__System.register('b0', ['57', '8f'], function (_export) {
   'use strict';
 
   var Format, loadJSON, GeoJSON;
   return {
     setters: [function (_) {
       Format = _['default'];
-    }, function (_2) {
-      loadJSON = _2.loadJSON;
+    }, function (_f) {
+      loadJSON = _f.loadJSON;
     }],
     execute: function () {
       GeoJSON = (function (_Format) {
@@ -52750,10 +53324,10 @@ $__System.register('a8', ['68', '87'], function (_export) {
   };
 });
 
-$__System.register('a9', ['48', '67', '78', '86', '87', '97', '8f', '6d', 'a8'], function (_export) {
+$__System.register('b1', ['48', '56', '97', '9f', '5c', '6c', '8f', 'b0', '8e'], function (_export) {
   'use strict';
 
-  var L, $, $$, HTML, COVJSON_GRID, Action, PROCESS, i18n, transformUtil, Modal, referencingUtil, GeoJSON, html, TEMPLATES, CoverageSubsetByPolygon;
+  var L, $, $$, HTML, Modal, transformUtil, referencingUtil, COVJSON_GRID, i18n, GeoJSON, Action, PROCESS, html, TEMPLATES, CoverageSubsetByPolygon;
 
   function getPolygonFeatures(geojson) {
     var features = []; // array of GeoJSON feature objects with (Multi)Polygon geometries
@@ -52815,21 +53389,21 @@ $__System.register('a9', ['48', '67', '78', '86', '87', '97', '8f', '6d', 'a8'],
       $ = _2.$;
       $$ = _2.$$;
       HTML = _2.HTML;
-    }, function (_4) {
-      COVJSON_GRID = _4.COVJSON_GRID;
-    }, function (_6) {
-      Action = _6['default'];
-      PROCESS = _6.PROCESS;
-    }, function (_5) {
-      i18n = _5.i18n;
     }, function (_3) {
-      transformUtil = _3;
+      Modal = _3['default'];
     }, function (_f) {
-      Modal = _f['default'];
-    }, function (_d) {
-      referencingUtil = _d;
-    }, function (_a8) {
-      GeoJSON = _a8['default'];
+      transformUtil = _f;
+    }, function (_c) {
+      referencingUtil = _c;
+    }, function (_c2) {
+      COVJSON_GRID = _c2.COVJSON_GRID;
+    }, function (_f2) {
+      i18n = _f2.i18n;
+    }, function (_b0) {
+      GeoJSON = _b0['default'];
+    }, function (_e) {
+      Action = _e['default'];
+      PROCESS = _e.PROCESS;
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="geojsonSelectModal" tabindex="-1" role="dialog" aria-labelledby="geojsonSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="geojsonSelectModalLabel">Select a GeoJSON resource</h4>\n      </div>\n      <div class="modal-body">\n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Select the GeoJSON resource containing the subsetting polygon</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Only those GeoJSON resources are shown which contain at least one (multi)polygon.\n              After selecting a GeoJSON resource, all polygons will be displayed on the map\n              and you can pick the one that should be used for subsetting.\n            </p>\n            <div class="alert alert-info geojson-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group geojson-distribution-list"></ul>\n        </div>\n               \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
@@ -53047,59 +53621,46 @@ $__System.register('a9', ['48', '67', '78', '86', '87', '97', '8f', '6d', 'a8'],
   };
 });
 
-$__System.register('6b', [], function (_export) {
-  /***
-   * Return the indices of the two neighbors in the sorted array closest to the given number.
-   * 
-   * @example
-   * var a = [2,5,8,12,13]
-   * var i = indicesOfNearest(a, 6)
-   * // i == [1,2]
-   * var j = indicesOfNearest(a, 5)
-   * // j == [1,1]
-   * var k = indicesOfNearest(a, 50)
-   * // k == [4,4] 
-   * 
-   * @param {Array<number>} a The array to search through. Must be sorted, ascending or descending.
-   * @param {number} x The target number.
-   * @return {[lo,hi]} The indices of the two closest values, may be equal.
-   *   If `x` exists in the array, both neighbors point to `x`.
-   *   If `x` is lower (greater if descending) than the first value, both neighbors point to 0.
-   *   If `x` is greater (lower if descending) than the last value, both neighbors point to the last index.
-   */
-  'use strict';
-
-  /**
-   * Return the index of the value closest to the given number in a sorted array.
-   * 
-   * @example
-   * var a = [2,5,8,12,13]
-   * var i = indexOfNearest(a, 6)
-   * // i == 1
-   * var j = indexOfNearest(a, 7)
-   * // j == 2
-   * var k = indexOfNearest(a, 50)
-   * // k == 4
-   * 
-   * @param {Array<number>} a The array to search through. Must be sorted, ascending or descending.
-   * @param {number} x The target number.
-   * @return {number} The array index whose value is closest to `x`.
-   *   If `x` happens to be exactly between two values, then the lower index is returned.
-   */
-
-  _export('indicesOfNearest', indicesOfNearest);
-
-  _export('indexOfNearest', indexOfNearest);
-
+$__System.registerDynamic("7a", [], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  exports.minMax = minMax;
+  exports.indicesOfNearest = indicesOfNearest;
+  exports.indexOfNearest = indexOfNearest;
+  function minMax(arr) {
+    var len = arr.length;
+    var min = Infinity;
+    var max = -Infinity;
+    while (len--) {
+      var el = arr[len];
+      if (el == null) {} else if (el < min) {
+        min = el;
+      } else if (el > max) {
+        max = el;
+      }
+    }
+    if (min === Infinity) {
+      min = max;
+    } else if (max === -Infinity) {
+      max = min;
+    }
+    if (min === Infinity || min === -Infinity) {
+      min = null;
+      max = null;
+    }
+    return [min, max];
+  }
   function indicesOfNearest(a, x) {
-    // adapted from https://stackoverflow.com/a/4431347
     if (a.length === 0) {
       throw new Error('Array must have at least one element');
     }
     var lo = -1;
     var hi = a.length;
     var ascending = a.length === 1 || a[0] < a[1];
-    // we have two separate code paths to help the runtime optimize the loop
     if (ascending) {
       while (hi - lo > 1) {
         var mid = Math.round((lo + hi) / 2);
@@ -53111,97 +53672,412 @@ $__System.register('6b', [], function (_export) {
       }
     } else {
       while (hi - lo > 1) {
-        var mid = Math.round((lo + hi) / 2);
-        if (a[mid] >= x) {
-          // here's the difference
-          lo = mid;
+        var _mid = Math.round((lo + hi) / 2);
+        if (a[_mid] >= x) {
+          lo = _mid;
         } else {
-          hi = mid;
+          hi = _mid;
         }
       }
     }
-    if (a[lo] === x) hi = lo;
-    if (lo === -1) lo = hi;
-    if (hi === a.length) hi = lo;
+    if (a[lo] === x)
+      hi = lo;
+    if (lo === -1)
+      lo = hi;
+    if (hi === a.length)
+      hi = lo;
     return [lo, hi];
   }
-
   function indexOfNearest(a, x) {
     var i = indicesOfNearest(a, x);
-
-    var _i = babelHelpers.slicedToArray(i, 2);
-
-    var lo = _i[0];
-    var hi = _i[1];
-
+    var lo = i[0];
+    var hi = i[1];
     if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
       return lo;
     } else {
       return hi;
     }
   }
+  return module.exports;
+});
+
+$__System.register('5a', ['7a'], function (_export) {
+  /* */
+  'use strict';
 
   return {
-    setters: [],
+    setters: [function (_a) {
+      var _exportObj = {};
+      _exportObj['indicesOfNearest'] = _a.indicesOfNearest;
+      _exportObj['indexOfNearest'] = _a.indexOfNearest;
+
+      _export(_exportObj);
+    }],
     execute: function () {}
   };
 });
 
-$__System.register('6d', [], function (_export) {
-  /** 3D WGS84 in lat-lon-height order */
+$__System.register('5c', ['6c'], function (_export) {
+  // TODO merge with covutils/lib/referencing.js
+
   'use strict';
 
-  var EPSG4979, EPSG4326, CRS84, GeodeticWGS84CRS;
+  var COVJSON_DATATYPE_TUPLE, COVJSON_DATATYPE_POLYGON, OPENGIS_CRS_PREFIX, EPSG4979, EPSG4326, CRS84, EllipsoidalCRSs, LongitudeAxisIndex, isGeodeticWGS84CRS, getRefSystem;
+
+  var _LongitudeAxisIndex;
+
+  /** @deprecated */
+
+  _export('isEllipsoidalCRS', isEllipsoidalCRS);
+
+  /** @deprecated */
+
+  _export('getReferenceSystem', getReferenceSystem);
 
   /**
-   * Returns the referencing system matching the given dimension identifiers.
-   * 
-   * Note: If the input dimensions used for searching are associated
-   * to multiple referencing systems, then this function returns `undefined`.
+   * Return the reference system connection object of the horizontal CRS of the domain,
+   * or ``undefined`` if none found.
+   * A horizontal CRS is either geodetic (typically ellipsoidal, meaning lat/lon)
+   * or projected and has exactly two axes.
    */
 
-  _export('isGeodeticWGS84CRS', isGeodeticWGS84CRS);
+  _export('getReferenceObject', getReferenceObject);
 
-  _export('getRefSystem', getRefSystem);
+  /**
+   * Return a projection object based on the CRS found in the coverage domain.
+   * If no CRS is found or it is unsupported, then ``undefined`` is returned.
+   * 
+   * A projection converts between geodetic lat/lon and projected x/y values.
+   * 
+   * For lat/lon CRSs the projection is defined such that an input lat/lon
+   * position gets projected/wrapped to the longitude range used in the domain, for example
+   * [0,360]. The purpose of this is to make intercomparison between different coverages easier.
+   * 
+   * The following limitations currently apply:
+   * - only ellipsoidal CRSs are supported (lat/lon)
+   * - only primitive axes and Tuple/Polygon composite axes are supported 
+   * 
+   * @param {Domain} domain A coverage domain object.
+   * @return {IProjection} A stripped-down leaflet IProjection object.
+   */
 
-  function isGeodeticWGS84CRS(rs) {
-    return GeodeticWGS84CRS.indexOf(rs.id) !== -1;
+  _export('getHorizontalCRSReferenceObject', getHorizontalCRSReferenceObject);
+
+  /**
+   * Reprojects coordinates from one projection to another.
+   */
+
+  _export('getProjection', getProjection);
+
+  _export('reproject', reproject);
+
+  /**
+   * Return whether the reference system is a CRS in which
+   * horizontal position is specified by geodetic latitude and longitude.
+   */
+
+  function isEllipsoidalCRS(rs) {
+    // TODO should support unknown CRSs with embedded axis information
+    // this also covers the case when there is no ID property
+    return EllipsoidalCRSs.indexOf(rs.id) !== -1;
   }
 
-  function getRefSystem(domain, dimensions) {
-    var refs = domain.referencing;
-    var ref = refs.find(function (ref) {
-      return dimensions.every(function (id) {
-        return ref.dimensions.indexOf(id) !== -1;
-      });
-    });
+  /**
+   * Returns the referencing system matching the given component identifiers.
+   * 
+   * Note: If the input components used for searching are associated
+   * to multiple reference systems, then this function returns `undefined`.
+   */
+
+  function getReferenceSystem(domain, components) {
+    var ref = getReferenceObject(domain, components);
     if (ref) {
       return ref.system;
     }
   }
 
+  /**
+   * Return the reference system connection object matching the given component identifiers.
+   * 
+   * Note: If the input components used for searching are associated
+   * to multiple reference systems, then this function returns ``undefined``.
+   */
+
+  function getReferenceObject(domain, components) {
+    var ref = domain.referencing.find(function (ref) {
+      return components.every(function (id) {
+        return ref.components.indexOf(id) !== -1;
+      });
+    });
+    return ref;
+  }
+
+  function getHorizontalCRSReferenceObject(domain) {
+    var isHorizontal = function isHorizontal(ref) {
+      return ['GeodeticCRS', 'ProjectedCRS'].indexOf(ref.system.type) !== -1 && ref.components.length === 2;
+    };
+    var ref = domain.referencing.find(isHorizontal);
+    return ref;
+  }
+
+  function getProjection(domain) {
+    var ref = domain.referencing.find(function (ref) {
+      return isEllipsoidalCRS(ref.system);
+    });
+    if (!ref) {
+      // either no CRS found or not ellipsoidal
+      return;
+    }
+
+    var lonIdx = LongitudeAxisIndex[ref.system.id];
+    if (lonIdx > 1) {
+      // this should never happen as longitude is always the first or second axis
+      throw new Error();
+    }
+
+    var lonComponent = ref.components[lonIdx];
+
+    // we find the min and max longitude occuring in the domain by inspecting the axis values
+    // Note: this is inefficient for big composite axes.
+    //       In that case, something like a domain extent might help which has the min/max values for each component.
+    // TODO handle bounds
+    var lonMin = undefined,
+        lonMax = undefined;
+    if (domain.axes.has(lonComponent)) {
+      // longitude is a grid axis
+      var lonAxisName = lonComponent;
+      var lonAxisVals = domain.axes.get(lonAxisName).values;
+      lonMin = lonAxisVals[0];
+      lonMax = lonAxisVals[lonAxisVals.length - 1];
+      if (lonMin > lonMax) {
+        var _ref = [lonMax, lonMin];
+        lonMin = _ref[0];
+        lonMax = _ref[1];
+      }
+    } else {
+      // longitude is not a primitive grid axis but a component of a composite axis
+
+      // find the composite axis containing the longitude component
+      var axes = [].concat(babelHelpers.toConsumableArray(domain.axes.values()));
+      var axis = axes.find(function (axis) {
+        return axis.components.indexOf(lonComponent) !== -1;
+      });
+      var lonCompIdx = axis.components.indexOf(lonComponent);
+
+      // scan the composite axis for min/max longitude values
+      lonMin = Infinity;
+      lonMax = -Infinity;
+      if (axis.dataType === COVJSON_DATATYPE_TUPLE) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = axis.values[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var tuple = _step.value;
+
+            var lon = tuple[lonCompIdx];
+            lonMin = Math.min(lon, lonMin);
+            lonMax = Math.max(lon, lonMax);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator['return']) {
+              _iterator['return']();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      } else if (axis.dataType === COVJSON_DATATYPE_POLYGON) {
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+          for (var _iterator2 = axis.values[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var poly = _step2.value;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+              for (var _iterator3 = poly[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                var ring = _step3.value;
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
+
+                try {
+                  for (var _iterator4 = ring[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var point = _step4.value;
+
+                    var lon = point[lonCompIdx];
+                    lonMin = Math.min(lon, lonMin);
+                    lonMax = Math.max(lon, lonMax);
+                  }
+                } catch (err) {
+                  _didIteratorError4 = true;
+                  _iteratorError4 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                      _iterator4['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError4) {
+                      throw _iteratorError4;
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              _didIteratorError3 = true;
+              _iteratorError3 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+                  _iterator3['return']();
+                }
+              } finally {
+                if (_didIteratorError3) {
+                  throw _iteratorError3;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+              _iterator2['return']();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+      } else {
+        throw new Error('Unsupported data type: ' + axis.dataType);
+      }
+    }
+
+    var lonMid = (lonMax + lonMin) / 2;
+    var lonMinExtended = lonMid - 180;
+    var lonMaxExtended = lonMid + 180;
+
+    return {
+      project: function project(_ref2) {
+        var lon = _ref2.lon;
+        var lat = _ref2.lat;
+
+        var lonProjected = undefined;
+        if (lonMinExtended <= lon && lon <= lonMaxExtended) {
+          // use unchanged to avoid introducing rounding errors
+          lonProjected = lon;
+        } else {
+          lonProjected = ((lon - lonMinExtended) % 360 + 360) % 360 + lonMinExtended;
+        }
+
+        var _ref3 = lonIdx === 0 ? [lonProjected, lat] : [lat, lonProjected];
+
+        var _ref32 = babelHelpers.slicedToArray(_ref3, 2);
+
+        var x = _ref32[0];
+        var y = _ref32[1];
+
+        return { x: x, y: y };
+      },
+      unproject: function unproject(_ref4) {
+        var x = _ref4.x;
+        var y = _ref4.y;
+
+        var _ref5 = lonIdx === 0 ? [x, y] : [y, x];
+
+        var _ref52 = babelHelpers.slicedToArray(_ref5, 2);
+
+        var lon = _ref52[0];
+        var lat = _ref52[1];
+
+        return { lon: lon, lat: lat };
+      }
+    };
+  }
+
+  function reproject(pos, fromProjection, toProjection) {
+    return toProjection.project(fromProjection.unproject(pos));
+  }
+
   return {
-    setters: [],
+    setters: [function (_c) {
+      COVJSON_DATATYPE_TUPLE = _c.COVJSON_DATATYPE_TUPLE;
+      COVJSON_DATATYPE_POLYGON = _c.COVJSON_DATATYPE_POLYGON;
+    }],
     execute: function () {
-      EPSG4979 = 'http://www.opengis.net/def/crs/EPSG/0/4979';
+      OPENGIS_CRS_PREFIX = 'http://www.opengis.net/def/crs/';
+
+      /** 3D WGS84 in lat-lon-height order */
+      EPSG4979 = OPENGIS_CRS_PREFIX + 'EPSG/0/4979';
 
       /** 2D WGS84 in lat-lon order */
-      EPSG4326 = 'http://www.opengis.net/def/crs/EPSG/0/4326';
+      EPSG4326 = OPENGIS_CRS_PREFIX + 'EPSG/0/4326';
 
       /** 2D WGS84 in lon-lat order */
-      CRS84 = 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
-      GeodeticWGS84CRS = [EPSG4979, EPSG4326, CRS84];
+      CRS84 = OPENGIS_CRS_PREFIX + 'OGC/1.3/CRS84';
+
+      /** CRSs in which horizontal position is specified by geodetic latitude and longitude */
+      EllipsoidalCRSs = [EPSG4979, EPSG4326, CRS84];
+
+      /** Position of longitude axis */
+      LongitudeAxisIndex = (_LongitudeAxisIndex = {}, babelHelpers.defineProperty(_LongitudeAxisIndex, EPSG4979, 1), babelHelpers.defineProperty(_LongitudeAxisIndex, EPSG4326, 1), babelHelpers.defineProperty(_LongitudeAxisIndex, CRS84, 0), _LongitudeAxisIndex);
+      isGeodeticWGS84CRS = isEllipsoidalCRS;
+
+      _export('isGeodeticWGS84CRS', isGeodeticWGS84CRS);
+
+      getRefSystem = getReferenceSystem;
+
+      _export('getRefSystem', getRefSystem);
     }
   };
 });
 
-$__System.register('78', [], function (_export) {
+$__System.registerDynamic("68", [], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  Object.defineProperty(exports, "__esModule", {value: true});
+  var DOMAIN = exports.DOMAIN = 'Domain';
+  var COVERAGE = exports.COVERAGE = 'Coverage';
+  var COVERAGECOLLECTION = exports.COVERAGECOLLECTION = COVERAGE + 'Collection';
+  return module.exports;
+});
+
+$__System.register('6c', ['68'], function (_export) {
   /* */
   'use strict';
 
-  var COVJSON_PREFIX, COLLECTION_SUFFIX, COVJSON_POINT, COVJSON_POINTCOLLECTION, COVJSON_VERTICALPROFILE, COVJSON_VERTICALPROFILECOLLECTION, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON;
+  var COVJSON_PREFIX, COLLECTION_SUFFIX, COVJSON_POINT, COVJSON_POINTCOLLECTION, COVJSON_VERTICALPROFILE, COVJSON_VERTICALPROFILECOLLECTION, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, COVJSON_DATATYPE_TUPLE, COVJSON_DATATYPE_POLYGON;
   return {
-    setters: [],
+    setters: [function (_) {
+      var _exportObj = {};
+
+      // JS API object types
+      _exportObj['COVERAGE'] = _.COVERAGE;
+      _exportObj['COVERAGECOLLECTION'] = _.COVERAGECOLLECTION;
+      _exportObj['DOMAIN'] = _.DOMAIN;
+
+      _export(_exportObj);
+    }],
     execute: function () {
       COVJSON_PREFIX = 'http://coveragejson.org/def#';
       COLLECTION_SUFFIX = 'CoverageCollection';
@@ -53232,11 +54108,21 @@ $__System.register('78', [], function (_export) {
       COVJSON_MULTIPOLYGON = COVJSON_PREFIX + 'MultiPolygon';
 
       _export('COVJSON_MULTIPOLYGON', COVJSON_MULTIPOLYGON);
+
+      // FIXME these should maybe live under a different namespace (Polygon collides with the same-named profile)
+      // alternatively, profile URIs should live somewhere else
+      COVJSON_DATATYPE_TUPLE = COVJSON_PREFIX + 'Tuple';
+
+      _export('COVJSON_DATATYPE_TUPLE', COVJSON_DATATYPE_TUPLE);
+
+      COVJSON_DATATYPE_POLYGON = COVJSON_PREFIX + 'Polygon';
+
+      _export('COVJSON_DATATYPE_POLYGON', COVJSON_DATATYPE_POLYGON);
     }
   };
 });
 
-$__System.register('73', ['48'], function (_export) {
+$__System.register('65', ['48'], function (_export) {
   /* */
 
   /**
@@ -53317,6 +54203,52 @@ $__System.register('73', ['48'], function (_export) {
 
           return (_L$Mixin$Events$hasEventListeners = L.Mixin.Events.hasEventListeners).call.apply(_L$Mixin$Events$hasEventListeners, [this].concat(args));
         }
+
+        // aliases
+      }, {
+        key: 'addEventListener',
+        value: function addEventListener() {
+          var _L$Mixin$Events$addEventListener;
+
+          for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
+          }
+
+          return (_L$Mixin$Events$addEventListener = L.Mixin.Events.addEventListener).call.apply(_L$Mixin$Events$addEventListener, [this].concat(args));
+        }
+      }, {
+        key: 'removeEventListener',
+        value: function removeEventListener() {
+          var _L$Mixin$Events$removeEventListener;
+
+          for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+            args[_key7] = arguments[_key7];
+          }
+
+          return (_L$Mixin$Events$removeEventListener = L.Mixin.Events.removeEventListener).call.apply(_L$Mixin$Events$removeEventListener, [this].concat(args));
+        }
+      }, {
+        key: 'addOneTimeEventListener',
+        value: function addOneTimeEventListener() {
+          var _L$Mixin$Events$addOneTimeEventListener;
+
+          for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+            args[_key8] = arguments[_key8];
+          }
+
+          return (_L$Mixin$Events$addOneTimeEventListener = L.Mixin.Events.addOneTimeEventListener).call.apply(_L$Mixin$Events$addOneTimeEventListener, [this].concat(args));
+        }
+      }, {
+        key: 'fireEvent',
+        value: function fireEvent() {
+          var _L$Mixin$Events$fireEvent;
+
+          for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+            args[_key9] = arguments[_key9];
+          }
+
+          return (_L$Mixin$Events$fireEvent = L.Mixin.Events.fireEvent).call.apply(_L$Mixin$Events$fireEvent, [this].concat(args));
+        }
       }]);
       return _class;
     })(base);
@@ -53330,7 +54262,7 @@ $__System.register('73', ['48'], function (_export) {
   };
 });
 
-$__System.register('89', ['48', '67', '73'], function (_export) {
+$__System.register('91', ['48', '56', '65'], function (_export) {
   /* */
   'use strict';
 
@@ -53609,7 +54541,7 @@ $__System.register('89', ['48', '67', '73'], function (_export) {
   };
 });
 
-$__System.register('88', ['48', '67'], function (_export) {
+$__System.register('90', ['48', '56'], function (_export) {
   'use strict';
 
   var L, $, HTML, TEMPLATE, SelectControl;
@@ -53700,7 +54632,7 @@ $__System.register('88', ['48', '67'], function (_export) {
         return SelectControl;
       })(L.Control);
 
-      _export('default', SelectControl);
+      _export('SelectControl', SelectControl);
 
       SelectControl.include(L.Mixin.Events);
 
@@ -53711,7 +54643,58 @@ $__System.register('88', ['48', '67'], function (_export) {
   };
 });
 
-$__System.register('68', ['4f'], function (_export) {
+$__System.register('b2', ['48', '56'], function (_export) {
+  'use strict';
+
+  var L, $, HTML, TEMPLATE, ButtonControl;
+  return {
+    setters: [function (_) {
+      L = _['default'];
+    }, function (_2) {
+      $ = _2.$;
+      HTML = _2.HTML;
+    }],
+    execute: function () {
+      TEMPLATE = '<div class="info" style="clear:none">\n  <button></button>\n</div>';
+
+      ButtonControl = (function (_L$Control) {
+        babelHelpers.inherits(ButtonControl, _L$Control);
+
+        function ButtonControl(options) {
+          babelHelpers.classCallCheck(this, ButtonControl);
+
+          babelHelpers.get(Object.getPrototypeOf(ButtonControl.prototype), 'constructor', this).call(this, options.position ? { position: options.position } : { position: 'topleft' });
+          this._title = options.title;
+        }
+
+        babelHelpers.createClass(ButtonControl, [{
+          key: 'onAdd',
+          value: function onAdd(map) {
+            var _this = this;
+
+            var el = HTML(TEMPLATE)[0];
+            L.DomEvent.disableClickPropagation(el);
+
+            $('button', el).fill(this._title).on('click', function () {
+              return _this.fire('click');
+            });
+
+            return el;
+          }
+        }]);
+        return ButtonControl;
+      })(L.Control);
+
+      ButtonControl.include(L.Mixin.Events);
+
+      //work-around for Babel bug, otherwise ButtonControl cannot be referenced here
+
+      _export('default', ButtonControl);
+    }
+  };
+});
+
+$__System.register('57', ['4f'], function (_export) {
   'use strict';
 
   var Eventable, Format;
@@ -53778,12 +54761,11 @@ $__System.register('68', ['4f'], function (_export) {
           }
         }, {
           key: 'load',
-          value: function load(input) {
+          value: function load(input, options) {
             var _this = this;
 
             this.fire('loading');
-            return this.doLoad(input).then(function (data) {
-              console.log(data);
+            return this.doLoad(input, options).then(function (data) {
               _this.fire('load');
               return data;
             })['catch'](function (error) {
@@ -53800,7 +54782,7 @@ $__System.register('68', ['4f'], function (_export) {
   };
 });
 
-$__System.register('54', ['68'], function (_export) {
+$__System.register('52', ['57'], function (_export) {
 
   /**
    * An object-only format that is used for derived data.
@@ -53866,10 +54848,10 @@ $__System.register('54', ['68'], function (_export) {
   };
 });
 
-$__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', '8f'], function (_export) {
+$__System.register('b3', ['52', '56', '90', '91', '97', '5a', '5c', '6c', 'b2', '8f', '8e'], function (_export) {
   'use strict';
 
-  var CoverageData, $, $$, HTML, COVJSON_GRID, Action, PROCESS, i18n, COVJSON_PREFIX, SelectControl, TimeAxis, indexOfNearest, referencingUtil, Modal, PointCollection, ProfileCollection, TYPE, html, TEMPLATES, CoverageModelObservationCompare;
+  var CoverageData, $, $$, HTML, SelectControl, TimeAxis, Modal, indexOfNearest, indicesOfNearest, referencingUtil, COVJSON_GRID, ButtonControl, i18n, COVJSON_PREFIX, Action, VIEW, PROCESS, PointCollection, ProfileCollection, TYPE, html, TEMPLATES, CoverageModelObservationCompare;
 
   /**
    * Prepares coverage data for comparison, i.e. assigns the semantic type (model or observations)
@@ -53902,6 +54884,461 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
     return params.filter(function (param) {
       return !param.observedProperty.categories;
     });
+  }
+
+  // TODO move to reusable module
+  function subsetGridToPointsSimple(gridCov, points) {
+    return Promise.all(points.map(function (_ref5) {
+      var _ref52 = babelHelpers.slicedToArray(_ref5, 2);
+
+      var x = _ref52[0];
+      var y = _ref52[1];
+
+      // we want exactly the grid cell in which the point is locatedlink:
+      return gridCov.subsetByValue({ x: { start: x, stop: x }, y: { start: y, stop: y } }, { eagerload: true });
+    }));
+  }
+
+  /**
+   * Returns a subsetted XY grid which fits the given x and y extent.
+   */
+  function subsetHorizontalGrid(xVals, yVals, xExtent, yExtent) {
+    var _xExtent = babelHelpers.slicedToArray(xExtent, 2);
+
+    var xMin = _xExtent[0];
+    var xMax = _xExtent[1];
+
+    var _yExtent = babelHelpers.slicedToArray(yExtent, 2);
+
+    var yMin = _yExtent[0];
+    var yMax = _yExtent[1];
+
+    // snap xMin, xMax etc to grid
+    xMin = xVals[indexOfNearest(xVals, xMin)];
+    xMax = xVals[indexOfNearest(xVals, xMax)];
+    yMin = yVals[indexOfNearest(yVals, yMin)];
+    yMax = yVals[indexOfNearest(yVals, yMax)];
+
+    // determine resolution of grid (assumes a regular grid)
+    // TODO support non-regular grids (rectilinear)
+    var dx = Math.abs(xVals[0] - xVals[1]);
+    var dy = Math.abs(yVals[0] - yVals[1]);
+
+    var nx = Math.round((xMax - xMin) / dx + 1);
+    var ny = Math.round((yMax - yMin) / dy + 1);
+    var arr = new Uint8Array(nx * ny);
+
+    // convenience functions
+    var idx = function idx(ix, iy) {
+      return nx * iy + ix;
+    };
+    var xv2i = function xv2i(x) {
+      return Math.round((x - xMin) / dx);
+    };
+    var yv2i = function yv2i(y) {
+      return Math.round((y - yMin) / dy);
+    };
+    var vidx = function vidx(x, y) {
+      return idx(xv2i(x), yv2i(y));
+    };
+
+    return {
+      nx: nx, ny: ny,
+      dx: dx, dy: dy,
+      get: function get(ix, iy) {
+        return arr[idx(ix, iy)];
+      },
+      set: function set(ix, iy, v) {
+        return arr[idx(ix, iy)] = v;
+      },
+      vset: function vset(x, y, v) {
+        return arr[vidx(x, y)] = v;
+      },
+      ix2v: function ix2v(ix) {
+        return xMin + ix * dx;
+      },
+      iy2v: function iy2v(iy) {
+        return yMin + iy * dy;
+      }
+    };
+  }
+
+  /*
+  // debug function
+  function print2D (matrix) {
+    for (let iy=0; iy < matrix.ny; iy++) {
+      let line = ''
+      for (let ix=0; ix < matrix.nx; ix++) {
+        line += matrix.get(ix,iy) + ' '
+      }
+      console.log(line)
+    }
+  }
+  
+  // debug function
+  function print2DCoords (matrix) {
+    console.log('x:')
+    let line = ''
+    for (let ix=0; ix < matrix.nx; ix++) {
+      line += matrix.ix2v(ix) + ' '
+    }
+    console.log(line)
+    console.log('y:')
+    for (let iy=0; iy < matrix.ny; iy++) {
+      console.log(matrix.iy2v(iy))
+    }
+  }
+  */
+
+  // TODO move to reusable module
+  function subsetGridToPointsConnected(gridCov, points) {
+    // try to find rectangles in order to limit the number of grid subset queries
+
+    if (points.length === 0) {
+      return Promise.resolve([]);
+    }
+
+    var X = 'x';
+    var Y = 'y';
+
+    // TODO handle points outside grid domain
+
+    var xs = points.map(function (_ref6) {
+      var _ref62 = babelHelpers.slicedToArray(_ref6, 1);
+
+      var x = _ref62[0];
+      return x;
+    });
+    var ys = points.map(function (_ref7) {
+      var _ref72 = babelHelpers.slicedToArray(_ref7, 2);
+
+      var y = _ref72[1];
+      return y;
+    });
+    var xExtent = [Math.min.apply(Math, babelHelpers.toConsumableArray(xs)), Math.max.apply(Math, babelHelpers.toConsumableArray(xs))];
+    var yExtent = [Math.min.apply(Math, babelHelpers.toConsumableArray(ys)), Math.max.apply(Math, babelHelpers.toConsumableArray(ys))];
+
+    return gridCov.loadDomain().then(function (domain) {
+      var hits = subsetHorizontalGrid(domain.axes.get(X).values, domain.axes.get(Y).values, xExtent, yExtent);
+
+      // all points are placed into a 2D hit matrix
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = points[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var _step3$value = babelHelpers.slicedToArray(_step3.value, 2);
+
+          var x = _step3$value[0];
+          var y = _step3$value[1];
+
+          hits.vset(x, y, 1);
+        }
+
+        // find hit rectangles, as big as possible
+        // an approximative algorithm is used, picking the first rectangles it finds
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+            _iterator3['return']();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+
+      var rectangles = findRectangles(hits);
+
+      // some debug stats
+      var sizes = rectangles.map(function (_ref8) {
+        var _ref82 = babelHelpers.slicedToArray(_ref8, 4);
+
+        var ix1 = _ref82[0];
+        var iy1 = _ref82[1];
+        var ix2 = _ref82[2];
+        var iy2 = _ref82[3];
+        return (ix2 - ix1 + 1) * (iy2 - iy1 + 1);
+      });
+      var connected = sizes.filter(function (s) {
+        return s > 1;
+      }).length;
+      console.log('grid subset queries total: ' + rectangles.length + ', connected: ' + connected);
+
+      // convert to axis values
+      var rectanglesCenter = rectangles.map(function (_ref9) {
+        var _ref92 = babelHelpers.slicedToArray(_ref9, 4);
+
+        var ix1 = _ref92[0];
+        var iy1 = _ref92[1];
+        var ix2 = _ref92[2];
+        var iy2 = _ref92[3];
+        return [hits.ix2v(ix1), hits.iy2v(iy1), hits.ix2v(ix2), hits.iy2v(iy2)];
+      });
+
+      var dx = hits.dx;
+      var dy = hits.dy;
+
+      var rectanglesBounds = rectanglesCenter.map(function (_ref10) {
+        var _ref102 = babelHelpers.slicedToArray(_ref10, 4);
+
+        var x1 = _ref102[0];
+        var y1 = _ref102[1];
+        var x2 = _ref102[2];
+        var y2 = _ref102[3];
+        return [x1 - dx / 2, y1 - dy / 2, x2 + dx / 2, y2 + dy / 2];
+      });
+
+      // map to subsets
+      // the center coordinates are used to avoid fetching neighboring cells
+      var rectSubsetPromises = rectanglesCenter.map(function (_ref11) {
+        var _ref112 = babelHelpers.slicedToArray(_ref11, 4);
+
+        var x1 = _ref112[0];
+        var y1 = _ref112[1];
+        var x2 = _ref112[2];
+        var y2 = _ref112[3];
+        return gridCov.subsetByValue({ x: { start: x1, stop: x2 }, y: { start: y1, stop: y2 } }, { eagerload: true });
+      });
+
+      return Promise.all(rectSubsetPromises).then(function (rectSubsets) {
+        var pointSubsetPromises = [];
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+
+        try {
+          for (var _iterator4 = points[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var _step4$value = babelHelpers.slicedToArray(_step4.value, 2);
+
+            var x = _step4$value[0];
+            var y = _step4$value[1];
+
+            var rectSubset = undefined;
+            for (var i = 0; i < rectangles.length; i++) {
+              var _rectanglesBounds$i = babelHelpers.slicedToArray(rectanglesBounds[i], 4);
+
+              var x1 = _rectanglesBounds$i[0];
+              var y1 = _rectanglesBounds$i[1];
+              var x2 = _rectanglesBounds$i[2];
+              var y2 = _rectanglesBounds$i[3];
+
+              if (x1 <= x && x <= x2 && y1 <= y && y <= y2) {
+                rectSubset = rectSubsets[i];
+                break;
+              }
+            }
+            if (!rectSubset) {
+              throw new Error('bug');
+            }
+            // the following subsetting will not do a network request since all data has been eagerly loaded already
+            pointSubsetPromises.push(rectSubset.subsetByValue({ x: { start: x, stop: x }, y: { start: y, stop: y } }));
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+              _iterator4['return']();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+
+        return Promise.all(pointSubsetPromises);
+      });
+    });
+  }
+
+  /**
+   * Returns as-big-as-possible rectangles of 1's in a 2D matrix.
+   * 
+   * Note: The matrix gets modified in-place during processing.
+   * 
+   * TODO move to reusable module
+   * 
+   * @param {object} matrix An object with get(ix,iy), set(ix,iy,v) functions and nx, ny properties
+   * @returns {array<[x1,y1,x2,y2]>} rectangles with top-left and bottom-right index coordinates
+   */
+  function findRectangles(matrix) {
+    /* matrix:
+     * 1 1 1 0 1
+     * 1 1 0 1 1
+     * 0 0 1 1 1
+     */
+
+    var nx = matrix.nx;
+    var ny = matrix.ny;
+
+    // find hit rectangles, as big as possible
+    // an approximative algorithm is used, picking the first rectangles it finds
+
+    // pre-compute vertical lengths of consecutive 1s
+    for (var iy = ny - 2; iy >= 0; iy--) {
+      for (var ix = 0; ix < nx; ix++) {
+        var val = matrix.get(ix, iy);
+        if (val > 0) {
+          matrix.set(ix, iy, val + matrix.get(ix, iy + 1));
+        }
+      }
+    }
+
+    /* matrix:
+     * 2 2 1 0 3
+     * 1 1 0 2 2
+     * 0 0 1 1 1
+     */
+
+    // now iterate through each row and if v > 0 then expand to the right until value <  v
+    // and mark found rectangles as 0 in matrix matrix
+    var rectangles = [];
+
+    for (var iy = 0; iy < ny; iy++) {
+      for (var ix = 0; ix < nx; ix++) {
+        // any hit here?
+        var v = matrix.get(ix, iy);
+        if (v === 0) {
+          continue;
+        }
+        // expand rectangle to the right keeping initial height
+        var ix2 = ix + 1;
+        while (ix2 < nx && matrix.get(ix2, iy) >= v) {
+          ix2++;
+        }
+        ix2 -= 1;
+        var iy2 = iy + v - 1;
+        // add the found rectangle
+        rectangles.push([ix, iy, ix2, iy2]);
+        // clear rectangle area (skip over first row as we don't look at it again)
+        for (var iy3 = iy + 1; iy3 <= iy2; iy3++) {
+          for (var ix3 = ix; ix3 <= ix2; ix3++) {
+            matrix.set(ix3, iy3, 0);
+          }
+        }
+        // skip over rectangle
+        ix = ix2;
+      }
+    }
+
+    return rectangles;
+  }
+
+  /**
+   * Load and return all coverages of all pages of the collection.
+   * 
+   * TODO move to reusable module
+   * 
+   * @param {CoverageCollection} collection The first page of the collection.
+   * @param {object} [options] Options to use when loading pages.
+   * @returns {Promise<Array>} Promise succeeding with an array of coverage objects.
+   */
+  function loadAllCoverages(collection, options) {
+    var hasNext = collection.paging && collection.paging.next;
+    var nextPage = hasNext ? collection.paging.next.load(options) : Promise.resolve();
+    var covs = collection.coverages;
+    return nextPage.then(function (nextPageColl) {
+      if (nextPageColl) {
+        return loadAllCoverages(nextPageColl, options).then(function (nextCovs) {
+          return covs.concat(nextCovs);
+        });
+      } else {
+        return covs;
+      }
+    });
+  }
+
+  /**
+   * Returns a derived collection where coverages are organized into tile pages.
+   * Each page corresponds to a tile.
+   * A tile will contain all coverages which intersect that tile, meaning that
+   * coverages may appear in multiple tiles if they have an extent greater than
+   * a point. 
+   *  
+   * TODO move to reusable module
+   * 
+   * @param {CoverageCollection} coll A coverage collection with coverages having x/y components.
+   * @param {array<[xmin,ymin,xmax,ymax]>} tileExtents A non-empty array of tile extents in domain coordinates.
+   * @param {object} [queryOptions] Options to use when filtering or paging through the collection (e.g. ``{eagerload: true}``).
+   * @return {Promise<CoverageCollection>} A Promise succeeding with the tiled coverage collection.
+   */
+  function getTiledCollection(coll, tileExtents, queryOptions) {
+    function getCollectionTile(i) {
+      var _tileExtents$i = babelHelpers.slicedToArray(tileExtents[i], 4);
+
+      var xmin = _tileExtents$i[0];
+      var ymin = _tileExtents$i[1];
+      var xmax = _tileExtents$i[2];
+      var ymax = _tileExtents$i[3];
+
+      var filter = {
+        x: { start: xmin, stop: xmax },
+        y: { start: ymin, stop: ymax }
+      };
+      return coll.query().filter(filter).execute(queryOptions).then(function (filteredColl) {
+        return loadAllCoverages(filteredColl, queryOptions);
+      }).then(function (covs) {
+        var tiledColl = {
+          id: coll.id,
+          profiles: coll.profiles, // TODO may not be valid anymore, what do we do?
+          parameters: coll.parameters,
+          coverages: covs
+          // we don't implement .query() for now since we don't need it
+        };
+        if (i < tileExtents.length - 1) {
+          tiledColl.paging = {
+            next: {
+              load: function load(options) {
+                return getCollectionTile(i + 1);
+              }
+            }
+          };
+        }
+        return tiledColl;
+      });
+    }
+    return getCollectionTile(0);
+  }
+
+  /**
+   * Return tile extents for use in getTiledCollection().
+   * 
+   * @param {array} xExtent
+   * @param {array} yExtent
+   * @param {number} nx number of tiles along x axis
+   * @param {number} ny number of tiles along y axis
+   * @returns {Array<[xmin,ymin,xmax,ymax]>} of size nx*ny
+   */
+  function getTileExtents(xExtent, yExtent, nx, ny) {
+    /** Lazy version of numpy's linspace function. */
+    function linspace(start, stop, num) {
+      var step = (stop - start) / (num - 1);
+      return function (i) {
+        return start + i * step;
+      };
+    }
+    var xs = linspace(xExtent[0], xExtent[1], nx);
+    var ys = linspace(yExtent[0], yExtent[1], ny);
+    var extents = [];
+    for (var i = 0; i < nx - 1; i++) {
+      for (var j = 0; j < ny - 1; j++) {
+        var xmin = xs(i);
+        var xmax = xs(i + 1);
+        var ymin = ys(j);
+        var ymax = ys(j + 1);
+
+        extents.push([xmin, ymin, xmax, ymax]);
+      }
+    }
+    return extents;
   }
 
   function deriveIntercomparisonStatistics(modelGridCoverage, insituCoverageCollection, modelParamKey, insituParamKey) {
@@ -53949,271 +55386,392 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
     // instead each new observation is a separate coverage (the reason is that the z values are often not the same).
     var Z = 'z';
 
+    var X = 'x';
+    var Y = 'y';
+
     // TODO check that model and insitu coverages have the same CRSs
 
     var model = modelGridCoverage;
-    var insituCovs = insituCoverageCollection.coverages;
-
     var modelParam = model.parameters.get(modelParamKey);
 
-    var promises = [model.loadDomain(), Promise.all(insituCovs.map(function (cov) {
-      return cov.loadDomain();
-    })), Promise.all(insituCovs.map(function (cov) {
-      return cov.loadRange(insituParamKey);
-    }))];
+    function getAxisExtent(axis) {
+      var withBounds = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-    return Promise.all(promises).then(function (_ref4) {
-      var _ref42 = babelHelpers.slicedToArray(_ref4, 3);
+      if (!axis) {
+        return [undefined, undefined];
+      }
+      var vals = axis.values;
+      var min = Math.min(vals[0], vals[vals.length - 1]);
+      var max = Math.max(vals[0], vals[vals.length - 1]);
+      // TODO handle explicit bounds
+      if (withBounds && vals.length > 1) {
+        var halfCell = Math.abs(vals[0] - vals[1]) / 2;
+        min -= halfCell;
+        max += halfCell;
+      }
+      return [min, max];
+    }
 
-      var modelDomain = _ref42[0];
-      var insituDomains = _ref42[1];
-      var insituRanges = _ref42[2];
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
+    return model.loadDomain().then(function (modelDomain) {
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
 
       try {
-        for (var _iterator3 = modelDomain.axes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var _step3$value = babelHelpers.slicedToArray(_step3.value, 2);
+        for (var _iterator5 = modelDomain.axes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var _step5$value = babelHelpers.slicedToArray(_step5.value, 2);
 
-          var key = _step3$value[0];
-          var axis = _step3$value[1];
+          var key = _step5$value[0];
+          var axis = _step5$value[1];
 
-          if (['x', 'y', Z].indexOf(key) === -1 && axis.values.length > 1) {
+          if ([X, Y, Z].indexOf(key) === -1 && axis.values.length > 1) {
             throw new Error('Only x,y,' + Z + ' can be varying axes in the model grid, not: ' + key);
           }
         }
       } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-            _iterator3['return']();
+          if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+            _iterator5['return']();
           }
         } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
+          if (_didIteratorError5) {
+            throw _iteratorError5;
           }
         }
       }
 
       var modelHasZ = modelDomain.axes.has(Z);
       var modelZ = modelHasZ ? modelDomain.axes.get(Z).values : null;
+      var modelHasVaryingZ = modelZ && modelZ.length > 1;
 
-      var insitus = insituCovs.map(function (cov, i) {
-        return {
-          cov: cov,
-          domain: insituDomains[i],
-          range: insituRanges[i]
-        };
-      });
+      var _getAxisExtent = getAxisExtent(modelDomain.axes.get(Z));
 
-      var promises = [];
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
+      var _getAxisExtent2 = babelHelpers.slicedToArray(_getAxisExtent, 2);
 
-      try {
-        var _loop2 = function () {
-          var insitu = _step4.value;
-          _iteratorNormalCompletion5 = true;
-          _didIteratorError5 = false;
-          _iteratorError5 = undefined;
+      var modelZMin = _getAxisExtent2[0];
+      var modelZMax = _getAxisExtent2[1];
 
-          try {
-            for (_iterator5 = insitu.domain.axes[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-              var _step5$value = babelHelpers.slicedToArray(_step5.value, 2);
+      function deriveCovJSONs(insituCollection) {
+        var hasNextPage = insituCollection.paging && insituCollection.paging.next;
+        var nextPage = hasNextPage ? insituCollection.paging.next.load({ eagerload: true }) : undefined;
 
-              var key = _step5$value[0];
-              var axis = _step5$value[1];
+        var insituCovs = insituCollection.coverages;
 
-              if (key !== Z && axis.values.length > 1) {
-                throw new Error('Only ' + Z + ' can be a varying axis in in-situ coverages, not: ' + key);
-              }
-            }
-          } catch (err) {
-            _didIteratorError5 = true;
-            _iteratorError5 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-                _iterator5['return']();
-              }
-            } finally {
-              if (_didIteratorError5) {
-                throw _iteratorError5;
-              }
-            }
-          }
+        var promises = [Promise.all(insituCovs.map(function (cov) {
+          return cov.loadDomain();
+        })), Promise.all(insituCovs.map(function (cov) {
+          return cov.loadRange(insituParamKey);
+        }))];
 
-          var insituX = insitu.domain.axes.get('x').values[0];
-          var insituY = insitu.domain.axes.get('y').values[0];
-          var insituHasZ = insitu.domain.axes.has(Z);
-          var insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null;
+        return Promise.all(promises).then(function (_ref12) {
+          var _ref122 = babelHelpers.slicedToArray(_ref12, 2);
 
-          if (insituHasZ && insituZ.length > 1 && !modelHasZ) {
-            throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis');
-          }
-          if (!insituHasZ && modelHasZ && modelZ.length > 1) {
-            throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis');
-          }
+          var insituDomains = _ref122[0];
+          var insituRanges = _ref122[1];
 
-          // TODO handle nodata values
-
-          // we want exactly the grid cell in which the observation is located
-          var modelX = { start: insituX, stop: insituX };
-          var modelY = { start: insituY, stop: insituY };
-          var promise = model.subsetByValue({ x: modelX, y: modelY }).then(function (modelSubset) {
-            return Promise.all([modelSubset.loadDomain(), modelSubset.loadRange(modelParamKey)]).then(function (_ref5) {
-              var _ref52 = babelHelpers.slicedToArray(_ref5, 2);
-
-              var modelSubsetDomain = _ref52[0];
-              var modelSubsetRange = _ref52[1];
-
-              // collect the values to compare against each other
-              var modelVals = [];
-              var insituVals = [];
-              if (!modelHasZ || modelZ.length === 1) {
-                modelVals = [modelSubsetRange.get({})];
-
-                if (!insituHasZ || insituZ.length === 1) {
-                  insituVals = [insitu.range.get({})];
-                } else {
-                  // varying insitu z, get closest value to grid z
-                  var zIdxClosest = indexOfNearest(insituZ, modelZ[0]);
-                  var val = insitu.range.get(babelHelpers.defineProperty({}, Z, zIdxClosest));
-                  insituVals.push(val);
-                }
-              } else {
-                // varying model z
-                var _iteratorNormalCompletion6 = true;
-                var _didIteratorError6 = false;
-                var _iteratorError6 = undefined;
-
-                try {
-                  for (var _iterator6 = insituZ[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    var z = _step6.value;
-
-                    var zIdxClosest = indexOfNearest(modelZ, z);
-                    var val = modelSubsetRange.get(babelHelpers.defineProperty({}, Z, zIdxClosest));
-                    modelVals.push(val);
-                  }
-                } catch (err) {
-                  _didIteratorError6 = true;
-                  _iteratorError6 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-                      _iterator6['return']();
-                    }
-                  } finally {
-                    if (_didIteratorError6) {
-                      throw _iteratorError6;
-                    }
-                  }
-                }
-
-                for (var i = 0; i < insituZ.length; i++) {
-                  var val = insitu.range.get(babelHelpers.defineProperty({}, Z, i));
-                  insituVals.push(val);
-                }
-              }
-
-              // calculate RMSE = sqrt ( ( sum_{i=1}^n (x_i - y_i)^2 ) / n)
-              var n = modelVals.length;
-              var sum = zip(modelVals, insituVals).map(function (_ref6) {
-                var _ref62 = babelHelpers.slicedToArray(_ref6, 2);
-
-                var v1 = _ref62[0];
-                var v2 = _ref62[1];
-                return Math.pow(v1 - v2, 2);
-              }).reduce(function (l, r) {
-                return l + r;
-              });
-              var rmse = Math.sqrt(sum / n);
-
-              // assemble the result into a CovJSON Point coverage           
-              var covjson = {
-                "type": "Coverage",
-                "profile": "PointCoverage",
-                "wasGeneratedBy": {
-                  "type": "ModelObservationComparisonActivity",
-                  "qualifiedUsage": [{
-                    "entity": modelGridCoverage.id,
-                    "hadRole": "modelToCompareAgainst"
-                  }, {
-                    "entity": insitu.cov.id,
-                    "hadRole": "observationToCompareAgainst"
-                  }]
-                },
-                "domain": {
-                  "type": "Domain",
-                  "profile": "Point",
-                  "axes": {
-                    "x": { "values": [insituX] },
-                    "y": { "values": [insituY] }
-                  }
-                },
-                "ranges": {
-                  "rmse": {
-                    "type": "Range",
-                    "values": [rmse],
-                    "dataType": "float"
-                  }
-                }
-              };
-
-              return covjson;
-            });
+          var insitus = insituCovs.map(function (cov, i) {
+            return {
+              cov: cov,
+              domain: insituDomains[i],
+              range: insituRanges[i]
+            };
           });
 
-          promises.push(promise);
-        };
-
-        for (var _iterator4 = insitus[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var _iteratorNormalCompletion5;
-
-          var _didIteratorError5;
-
-          var _iteratorError5;
-
-          var _iterator5, _step5;
-
-          _loop2();
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-            _iterator4['return']();
+          var points = insitus.map(function (insitu) {
+            return { x: insitu.domain.axes.get(X).values[0], y: insitu.domain.axes.get(Y).values[0] };
+          });
+          if (points.length > 0) {
+            (function () {
+              var fromProj = referencingUtil.getProjection(insituDomains[0]);
+              var toProj = referencingUtil.getProjection(modelDomain);
+              points = points.map(function (point) {
+                return referencingUtil.reproject(point, fromProj, toProj);
+              }).map(function (_ref13) {
+                var x = _ref13.x;
+                var y = _ref13.y;
+                return [x, y];
+              });
+            })();
           }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
+          var modelSubsetsPromise = subsetGridToPointsConnected(model, points);
+
+          return modelSubsetsPromise.then(function (modelSubsets) {
+            var promises = [];
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+              var _loop2 = function () {
+                var _step6$value = babelHelpers.slicedToArray(_step6.value, 2);
+
+                var insitu = _step6$value[0];
+                var modelSubset = _step6$value[1];
+                _iteratorNormalCompletion7 = true;
+                _didIteratorError7 = false;
+                _iteratorError7 = undefined;
+
+                try {
+                  for (_iterator7 = insitu.domain.axes[Symbol.iterator](); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var _step7$value = babelHelpers.slicedToArray(_step7.value, 2);
+
+                    var key = _step7$value[0];
+                    var axis = _step7$value[1];
+
+                    if (key !== Z && axis.values.length > 1) {
+                      throw new Error('Only ' + Z + ' can be a varying axis in in-situ coverages, not: ' + key);
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError7 = true;
+                  _iteratorError7 = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+                      _iterator7['return']();
+                    }
+                  } finally {
+                    if (_didIteratorError7) {
+                      throw _iteratorError7;
+                    }
+                  }
+                }
+
+                var insituX = insitu.domain.axes.get(X).values[0];
+                var insituY = insitu.domain.axes.get(Y).values[0];
+                var insituHasZ = insitu.domain.axes.has(Z);
+                var insituZ = insituHasZ ? insitu.domain.axes.get(Z).values : null;
+                var insituHasVaryingZ = insituZ && insituZ.length > 1;
+
+                if (insituHasVaryingZ && !modelHasZ) {
+                  throw new Error('Model grid must have a ' + Z + ' axis if insitu data has a varying ' + Z + ' axis');
+                }
+                if (!insituHasZ && modelHasVaryingZ) {
+                  throw new Error('Model grid must not have a varying ' + Z + ' axis if insitu data has no ' + Z + ' axis');
+                }
+
+                var promise = modelSubset.loadRange(modelParamKey).then(function (modelSubsetRange) {
+                  // collect the values to compare against each other
+                  var modelVals = [];
+                  var insituVals = [];
+                  if (!modelHasVaryingZ) {
+                    var modelVal = modelSubsetRange.get({});
+
+                    var insituVal = undefined;
+                    if (!insituHasVaryingZ) {
+                      insituVal = insitu.range.get({});
+                    } else {
+                      // varying insitu z, get closest value to grid z
+                      var zIdxClosest = indexOfNearest(insituZ, modelZ[0]);
+                      insituVal = insitu.range.get(babelHelpers.defineProperty({}, Z, zIdxClosest));
+                    }
+                    if (modelVal !== null && insituVal !== null) {
+                      modelVals = [modelVal];
+                      insituVals = [insituVal];
+                    }
+                  } else {
+                    // varying model z
+
+                    // linear interpolation
+                    var interp = function interp(z, z0, v0, z1, v1) {
+                      return v0 + (v1 - v0) * (z - z0) / (z1 - z0);
+                    };
+
+                    for (var i = 0; i < insituZ.length; i++) {
+                      var z = insituZ[i];
+                      if (z < modelZMin || z > modelZMax) {
+                        // we don't extrapolate
+                        continue;
+                      }
+                      var insituVal = insitu.range.get(babelHelpers.defineProperty({}, Z, i));
+                      if (insituVal === null) {
+                        continue;
+                      }
+
+                      // interpolate between nearest model points on z axis
+
+                      var _indicesOfNearest = indicesOfNearest(modelZ, z);
+
+                      var _indicesOfNearest2 = babelHelpers.slicedToArray(_indicesOfNearest, 2);
+
+                      var zIdxClosest1 = _indicesOfNearest2[0];
+                      var zIdxClosest2 = _indicesOfNearest2[1];
+                      var zClosest1 = modelZ[zIdxClosest1];
+                      var zClosest2 = modelZ[zIdxClosest2];
+
+                      var val1 = modelSubsetRange.get(babelHelpers.defineProperty({}, Z, zIdxClosest1));
+                      var val2 = modelSubsetRange.get(babelHelpers.defineProperty({}, Z, zIdxClosest2));
+                      if (val1 === null || val2 === null) {
+                        // We could be more clever here and search for other points.
+                        // However, model grids will likely not have partially missing values at one x/y point anyway.
+                        continue;
+                      }
+
+                      var val = undefined;
+                      if (zIdxClosest1 === zIdxClosest2) {
+                        val = val1;
+                      } else {
+                        val = interp(z, zClosest1, val1, zClosest2, val2);
+                      }
+                      modelVals.push(val);
+                      insituVals.push(insituVal);
+                    }
+                  }
+
+                  if (modelVals.length === 0) {
+                    return;
+                  }
+
+                  // calculate RMSE = sqrt ( ( sum_{i=1}^n (x_i - y_i)^2 ) / n)
+                  var n = modelVals.length;
+                  var sum = zip(modelVals, insituVals).map(function (_ref14) {
+                    var _ref142 = babelHelpers.slicedToArray(_ref14, 2);
+
+                    var v1 = _ref142[0];
+                    var v2 = _ref142[1];
+                    return Math.pow(v1 - v2, 2);
+                  }).reduce(function (l, r) {
+                    return l + r;
+                  });
+                  var rmse = Math.sqrt(sum / n);
+
+                  // assemble the result into a CovJSON Point coverage           
+                  var covjson = {
+                    "type": "Coverage",
+                    "profile": "PointCoverage",
+                    "wasGeneratedBy": {
+                      "type": "ModelObservationComparisonActivity",
+                      "qualifiedUsage": {
+                        "model": {
+                          "entity": modelGridCoverage.id,
+                          "hadRole": "modelToCompareAgainst",
+                          "parameterKey": modelParamKey
+                        },
+                        "observation": {
+                          "entity": insitu.cov.id,
+                          "hadRole": "observationToCompareAgainst",
+                          "parameterKey": insituParamKey
+                        }
+                      }
+                    },
+                    "domain": {
+                      "type": "Domain",
+                      "profile": "Point",
+                      "axes": {
+                        "x": { "values": [insituX] },
+                        "y": { "values": [insituY] }
+                      }
+                    },
+                    "ranges": {
+                      "rmse": {
+                        "type": "Range",
+                        "values": [rmse],
+                        "dataType": "float"
+                      }
+                    }
+                  };
+
+                  return covjson;
+                });
+
+                promises.push(promise);
+              };
+
+              for (var _iterator6 = insitus.map(function (v, i) {
+                return [v, modelSubsets[i]];
+              })[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                var _iteratorNormalCompletion7;
+
+                var _didIteratorError7;
+
+                var _iteratorError7;
+
+                var _iterator7, _step7;
+
+                _loop2();
+              }
+            } catch (err) {
+              _didIteratorError6 = true;
+              _iteratorError6 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+                  _iterator6['return']();
+                }
+              } finally {
+                if (_didIteratorError6) {
+                  throw _iteratorError6;
+                }
+              }
+            }
+
+            return Promise.all([Promise.all(promises), nextPage]).then(function (_ref15) {
+              var _ref152 = babelHelpers.slicedToArray(_ref15, 2);
+
+              var covjsons = _ref152[0];
+              var nextPageColl = _ref152[1];
+
+              if (nextPageColl) {
+                return deriveCovJSONs(nextPageColl).then(function (nextCovjsons) {
+                  return covjsons.concat(nextCovjsons);
+                });
+              } else {
+                return covjsons;
+              }
+            });
+          });
+        });
       }
 
-      return Promise.all(promises).then(function (covjsons) {
+      // get a tiled collection to help the model subsetting rectangle-based algorithm
+      var modelXExtent = getAxisExtent(modelDomain.axes.get(X), true);
+      var modelYExtent = getAxisExtent(modelDomain.axes.get(Y), true);
+      // TODO make this depend on something
+      var nx = 6;
+      var ny = nx;
+      var tileExtents = getTileExtents(modelXExtent, modelYExtent, nx, ny);
+      var tiledInsituCoverageCollection = undefined;
+      return getTiledCollection(insituCoverageCollection, tileExtents, { eagerload: true }).then(deriveCovJSONs).then(function (covjsons) {
         // put statistical point coverages into a CovJSON collection
+
+        covjsons = covjsons.filter(function (o) {
+          return o;
+        }); // filter empty results
 
         var coll = {
           "@context": {
             "prov": "http://www.w3.org/ns/prov#",
             "wasGeneratedBy": "prov:wasGeneratedBy",
-            "qualifiedUsage": "prov:qualifiedUsage",
+            "qualifiedUsage": { "@id": "prov:qualifiedUsage", "@container": "@index" },
             "entity": { "@id": "prov:entity", "@type": "@id" },
             "hadRole": { "@id": "prov:hadRole", "@type": "@vocab" },
             "covstats": "http://covstats#",
             "ModelObservationComparisonActivity": "covstats:ModelObservationComparisonActivity",
             "modelToCompareAgainst": "covstats:modelToCompareAgainst",
-            "observationToCompareAgainst": "covstats:observationToCompareAgainst"
+            "observationsToCompareAgainst": "covstats:observationsToCompareAgainst",
+            "observationToCompareAgainst": "covstats:observationToCompareAgainst",
+            "parameterKey": "covstats:parameterKey"
           },
           "type": "CoverageCollection",
           "profile": "PointCoverageCollection",
+          "wasGeneratedBy": {
+            "type": "ModelObservationComparisonActivity",
+            "qualifiedUsage": {
+              "model": {
+                "entity": modelGridCoverage.id,
+                "hadRole": "modelToCompareAgainst",
+                "parameterKey": modelParamKey
+              },
+              "observations": {
+                "entity": insituCoverageCollection.id,
+                "hadRole": "observationsToCompareAgainst",
+                "parameterKey": insituParamKey
+              }
+            }
+          },
           "parameters": {
             "rmse": {
               "type": "Parameter",
@@ -54224,13 +55782,17 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
                 },
                 // TODO is stddev ok here? uncertml doesn't know RMSE
                 "statisticalMeasure": "http://www.uncertml.org/statistics/standard-deviation"
+              },
+              "preferredPalette": {
+                "interpolation": "linear",
+                "colors": ["green", "orange", "red"]
               }
             }
           },
           "referencing": [{
             // FIXME the order could be different, or even be a x-y-z CRS
-            "dimensions": ["x", "y"],
-            "srs": referencingUtil.getRefSystem(modelDomain, ['x', 'y'])
+            "components": ["x", "y"],
+            "system": referencingUtil.getRefSystem(modelDomain, [X, Y])
           }],
           "coverages": covjsons
         };
@@ -54245,30 +55807,34 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
     });
   }
   return {
-    setters: [function (_6) {
-      CoverageData = _6['default'];
-    }, function (_4) {
-      $ = _4.$;
-      $$ = _4.$$;
-      HTML = _4.HTML;
-    }, function (_) {
-      COVJSON_GRID = _.COVJSON_GRID;
-    }, function (_7) {
-      Action = _7['default'];
-      PROCESS = _7.PROCESS;
-    }, function (_5) {
-      i18n = _5.i18n;
-      COVJSON_PREFIX = _5.COVJSON_PREFIX;
+    setters: [function (_5) {
+      CoverageData = _5['default'];
     }, function (_3) {
-      SelectControl = _3['default'];
+      $ = _3.$;
+      $$ = _3.$$;
+      HTML = _3.HTML;
     }, function (_2) {
-      TimeAxis = _2['default'];
-    }, function (_b) {
-      indexOfNearest = _b.indexOfNearest;
-    }, function (_d) {
-      referencingUtil = _d;
+      SelectControl = _2['default'];
+    }, function (_) {
+      TimeAxis = _['default'];
+    }, function (_4) {
+      Modal = _4['default'];
+    }, function (_a) {
+      indexOfNearest = _a.indexOfNearest;
+      indicesOfNearest = _a.indicesOfNearest;
+    }, function (_c) {
+      referencingUtil = _c;
+    }, function (_c2) {
+      COVJSON_GRID = _c2.COVJSON_GRID;
+    }, function (_b2) {
+      ButtonControl = _b2['default'];
     }, function (_f) {
-      Modal = _f['default'];
+      i18n = _f.i18n;
+      COVJSON_PREFIX = _f.COVJSON_PREFIX;
+    }, function (_e) {
+      Action = _e['default'];
+      VIEW = _e.VIEW;
+      PROCESS = _e.PROCESS;
     }],
     execute: function () {
       PointCollection = COVJSON_PREFIX + 'PointCoverageCollection';
@@ -54316,11 +55882,9 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
             //           and have an observation time dimension extent selector (e.g. +- 1h)
             //         - the intercomparison data is calculated for the current model time step and observation time extent
             //           (don't subset by bounding box for now, do globally, we'll see how it goes)
-            //         - the result is a virtual dataset which is NOT added to the workspace,
-            //           it is just used for displaying the data as if it was added as a dataset
-            //         - there is a button "Store as Dataset" which adds the current virtual comparison dataset
-            //           to the workspace
+            //         - the result is a virtual dataset which is added to the workspace and displayed
             //         - when clicking on a comparison point, a popup is shown with plots etc.
+            //         - when changing times the virtual dataset is replaced by a new one
 
             this._displayDistributionSelectModal();
           }
@@ -54474,12 +56038,13 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
             this._intercomparisonActive = true;
 
             var doIntercomparison = function doIntercomparison(modelTime, obsTimeDelta) {
+              _this3.fire('loading');
               var promises = undefined;
               if (modelTime) {
                 // subset model + filter observations
-                var obsStart = new Date(modelTime - obsTimeDelta * 1000);
-                var obsStop = new Date(modelTime + obsTimeDelta * 1000);
-                promises = [modelCov.subsetByValue({ t: modelTime }), observationsColl.query().filter({ t: { start: obsStart, stop: obsStop } }).execute()];
+                var obsStart = new Date(modelTime.getTime() - obsTimeDelta * 1000);
+                var obsStop = new Date(modelTime.getTime() + obsTimeDelta * 1000);
+                promises = [modelCov.subsetByValue({ t: modelTime.toISOString() }), observationsColl.query().filter({ t: { start: obsStart.toISOString(), stop: obsStop.toISOString() } }).execute({ eagerload: true })];
               } else {
                 promises = [modelCov, observationsColl];
               }
@@ -54489,9 +56054,52 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
                 var modelCovSubset = _ref2[0];
                 var obsCollFiltered = _ref2[1];
 
-                deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(function (covjson) {
-                  // TODO implement
-                  console.log(covjson);
+                deriveIntercomparisonStatistics(modelCovSubset, obsCollFiltered, modelParamKey, observationsParamKey).then(function (covjsonobj) {
+                  _this3.fire('load');
+                  var workspace = _this3.context.workspace;
+
+                  // discard old intercomparison dataset
+                  if (_this3._intercomparisonResultDataset) {
+                    workspace.removeDataset(_this3._intercomparisonResultDataset);
+                  }
+
+                  // create new dataset and display         
+                  var covjson = JSON.stringify(covjsonobj, null, 2);
+
+                  // NOTE: we don't call URL.revokeObjectURL() currently when removing the dataset again
+                  var blobUrl = URL.createObjectURL(new Blob([covjson], { type: 'application/prs.coverage+json' }));
+
+                  var prefixTitle = 'Intercomparison';
+                  if (modelTime) {
+                    var modelTimeISO = modelTime.toISOString();
+                    var obsTimeDeltaStr = '± ' + Math.round(obsTimeDelta / 60) + ' min';
+                    prefixTitle += ' [Model: ' + modelTimeISO + ', Observations: ' + obsTimeDeltaStr + ']';
+                  }
+
+                  var virtualDataset = {
+                    title: { en: prefixTitle },
+                    virtual: true,
+                    distributions: [{
+                      title: { en: prefixTitle },
+                      mediaType: 'application/prs.coverage+json',
+                      url: blobUrl
+                    }]
+                  };
+                  _this3._intercomparisonResultDataset = virtualDataset;
+
+                  // display after loading
+                  var done = function done(_ref3) {
+                    var dataset = _ref3.dataset;
+
+                    if (dataset === virtualDataset) {
+                      dataset.distributions[0].actions.find(function (a) {
+                        return a.type === VIEW;
+                      }).run();
+                      workspace.off('distributionsLoad', done);
+                    }
+                  };
+                  workspace.on('distributionsLoad', done);
+                  workspace.addDataset(virtualDataset, _this3.context.dataset);
                 });
               });
             };
@@ -54499,38 +56107,51 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
             // UI
             modelCov.loadDomain().then(function (modelDomain) {
               if (modelDomain.axes.has('t')) {
-                // display time controls
+                (function () {
+                  // display time controls
 
-                // Model: simple time axis control
-                var modelTimeSlices = modelDomain.axes.get('t').values.map(function (t) {
-                  return new Date(t);
-                });
-                _this3._modelTimeControl = new TimeAxis({ timeSlices: modelTimeSlices }, { title: 'Model time' }).on('change', function (_ref3) {
-                  var time = _ref3.time;
+                  // Model: simple time axis control
+                  var modelTimeSlices = modelDomain.axes.get('t').values.map(function (t) {
+                    return new Date(t);
+                  });
+                  var modelFakeLayer = { timeSlices: modelTimeSlices, time: modelTimeSlices[0] };
+                  _this3._modelTimeControl = new TimeAxis(modelFakeLayer, { title: 'Model time' }).on('change', function (_ref4) {
+                    var time = _ref4.time;
 
-                  var obsTimeDelta = parseInt(_this3._obsTimeDeltaControl.value);
-                  doIntercomparison(time, obsTimeDelta);
-                }).addTo(map);
+                    var obsTimeDelta = parseInt(_this3._obsTimeDeltaControl.value);
+                    doIntercomparison(time, obsTimeDelta);
+                  }).addTo(map);
 
-                // Observations: time delta control
-                var choices = [{ value: 60, label: '± 1 min' }, { value: 60 * 10, label: '± 10 min' }, { value: 60 * 30, label: '± 30 min' }, { value: 60 * 60, label: '± 1 hour' }, { value: 60 * 60 * 24, label: '± 1 day' }, { value: 60 * 60 * 24 * 30, label: '± 30 days' }];
-                _this3._obsTimeDeltaControl = new SelectControl(null, choices, { title: 'Observation time delta' }).on('change', function (event) {
-                  var obsTimeDelta = parseInt(event.value);
-                  var modelTime = _this3._modelTimeControl.time;
-                  doIntercomparison(modelTime, obsTimeDelta);
-                }).addTo(map);
+                  // Observations: time delta control
+                  var choices = [{ value: 60, label: '± 1 min' }, { value: 60 * 10, label: '± 10 min' }, { value: 60 * 30, label: '± 30 min' }, { value: 60 * 60, label: '± 1 hour' }, { value: 60 * 60 * 24, label: '± 1 day' }, { value: 60 * 60 * 24 * 30, label: '± 30 days' }];
+                  _this3._obsTimeDeltaControl = new SelectControl(null, choices, { title: 'Observation time delta' }).on('change', function (event) {
+                    var obsTimeDelta = parseInt(event.value);
+                    var modelTime = modelFakeLayer.time;
+                    doIntercomparison(modelTime, obsTimeDelta);
+                  }).addTo(map);
 
-                // to start, apply first model time slice and first delta choice
-                doIntercomparison(modelTimeSlices[0], choices[0].value);
+                  // to start, apply first model time slice and first delta choice
+                  doIntercomparison(modelFakeLayer.time, choices[0].value);
+
+                  var doneButton = new ButtonControl({ title: 'Exit Intercomparison' }).addTo(map);
+                  doneButton.on('click', function () {
+                    map.removeControl(_this3._modelTimeControl);
+                    map.removeControl(_this3._obsTimeDeltaControl);
+                    map.removeControl(doneButton);
+                    var viewAction = _this3._intercomparisonResultDataset.distributions[0].actions.find(function (a) {
+                      return a.type === VIEW;
+                    });
+                    if (viewAction.visible) {
+                      // hide it
+                      viewAction.run();
+                    }
+                    _this3._intercomparisonActive = false;
+                  });
+                })();
               } else {
                 doIntercomparison();
               }
             });
-
-            // add "finish intercomparison" control
-            // -> this._intercomparisonActive = false
-
-            // add "store as dataset" control
           }
         }, {
           key: 'isSupported',
@@ -54548,18 +56169,18 @@ $__System.register('aa', ['54', '67', '78', '86', '87', '88', '89', '6b', '6d', 
   };
 });
 
-$__System.register('ab', ['48', '86', '87'], function (_export) {
+$__System.register('b4', ['48', '8f', '8e'], function (_export) {
   'use strict';
 
-  var L, Action, VIEW, i18n, GeoJSONView;
+  var L, i18n, Action, VIEW, GeoJSONView;
   return {
     setters: [function (_) {
       L = _['default'];
-    }, function (_3) {
-      Action = _3['default'];
-      VIEW = _3.VIEW;
-    }, function (_2) {
-      i18n = _2.i18n;
+    }, function (_f) {
+      i18n = _f.i18n;
+    }, function (_e) {
+      Action = _e['default'];
+      VIEW = _e.VIEW;
     }],
     execute: function () {
       GeoJSONView = (function (_Action) {
@@ -54700,7 +56321,7 @@ $__System.register('ab', ['48', '86', '87'], function (_export) {
   };
 });
 
-$__System.register('ac', ['48', '67'], function (_export) {
+$__System.register('b5', ['48', '56'], function (_export) {
   'use strict';
 
   var L, $, HTML, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, ImageLegend;
@@ -54782,10 +56403,10 @@ $__System.register('ac', ['48', '67'], function (_export) {
   };
 });
 
-$__System.register('ad', ['48', '86', '87', 'ac'], function (_export) {
+$__System.register('b6', ['48', '8f', 'b5', '8e'], function (_export) {
   'use strict';
 
-  var L, Action, VIEW, i18n, ImageLegend, WMSView;
+  var L, i18n, ImageLegend, Action, VIEW, WMSView;
 
   function getLegendUrl(wmsEndpoint, layer) {
     return wmsEndpoint + '?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&transparent=true&layer=' + layer;
@@ -54793,13 +56414,13 @@ $__System.register('ad', ['48', '86', '87', 'ac'], function (_export) {
   return {
     setters: [function (_) {
       L = _['default'];
-    }, function (_3) {
-      Action = _3['default'];
-      VIEW = _3.VIEW;
-    }, function (_2) {
-      i18n = _2.i18n;
-    }, function (_ac) {
-      ImageLegend = _ac['default'];
+    }, function (_f) {
+      i18n = _f.i18n;
+    }, function (_b5) {
+      ImageLegend = _b5['default'];
+    }, function (_e) {
+      Action = _e['default'];
+      VIEW = _e.VIEW;
     }],
     execute: function () {
       WMSView = (function (_Action) {
@@ -54956,14 +56577,14 @@ $__System.register('ad', ['48', '86', '87', 'ac'], function (_export) {
   };
 });
 
-$__System.register('ae', ['86'], function (_export) {
+$__System.register('b7', ['8e'], function (_export) {
   'use strict';
 
   var Action, EXTERNAL_LINK, GoToSource;
   return {
-    setters: [function (_) {
-      Action = _['default'];
-      EXTERNAL_LINK = _.EXTERNAL_LINK;
+    setters: [function (_e) {
+      Action = _e['default'];
+      EXTERNAL_LINK = _e.EXTERNAL_LINK;
     }],
     execute: function () {
       GoToSource = (function (_Action) {
@@ -54999,7 +56620,7 @@ $__System.register('ae', ['86'], function (_export) {
   };
 });
 
-$__System.register('af', ['50', '51', '54', '65', '66', '85', '95', '96', '98', '4f', '4d', 'a8', '8e', 'a9', 'aa', 'ab', 'ad', 'ae'], function (_export) {
+$__System.register('b8', ['50', '51', '52', '55', '96', '4f', '4d', '8c', 'b0', '9d', '8d', '9e', 'a0', 'b1', 'b3', 'b4', 'b6', 'b7'], function (_export) {
 
   /**
    * Something like a main controller.
@@ -55009,44 +56630,44 @@ $__System.register('af', ['50', '51', '54', '65', '66', '85', '95', '96', '98', 
    */
   'use strict';
 
-  var Workspace, CovJSON, CoverageData, CovCBOR, WMS, GeoCoverageView, CatRemap, CoverageRemapCategories, CoverageCategoriesStatistics, Eventable, Catalogue, GeoJSON, StatisticalCoverageView, CoverageSubsetByPolygon, CoverageModelObservationCompare, GeoJSONView, WMSView, GoToSource, App;
+  var Workspace, CovCBOR, CoverageData, WMS, StatisticalCoverageView, Eventable, Catalogue, CovJSON, GeoJSON, CatRemap, GeoCoverageView, CoverageRemapCategories, CoverageCategoriesStatistics, CoverageSubsetByPolygon, CoverageModelObservationCompare, GeoJSONView, WMSView, GoToSource, App;
   return {
     setters: [function (_) {
       Workspace = _['default'];
     }, function (_3) {
-      CovJSON = _3['default'];
+      CovCBOR = _3['default'];
     }, function (_2) {
       CoverageData = _2['default'];
     }, function (_4) {
-      CovCBOR = _4['default'];
-    }, function (_6) {
-      WMS = _6['default'];
-    }, function (_7) {
-      GeoCoverageView = _7['default'];
+      WMS = _4['default'];
     }, function (_5) {
-      CatRemap = _5['default'];
-    }, function (_8) {
-      CoverageRemapCategories = _8['default'];
-    }, function (_9) {
-      CoverageCategoriesStatistics = _9['default'];
+      StatisticalCoverageView = _5['default'];
     }, function (_f) {
       Eventable = _f['default'];
     }, function (_d) {
       Catalogue = _d['default'];
-    }, function (_a8) {
-      GeoJSON = _a8['default'];
+    }, function (_c) {
+      CovJSON = _c['default'];
+    }, function (_b0) {
+      GeoJSON = _b0['default'];
+    }, function (_d2) {
+      CatRemap = _d2['default'];
+    }, function (_d3) {
+      GeoCoverageView = _d3['default'];
     }, function (_e) {
-      StatisticalCoverageView = _e['default'];
-    }, function (_a9) {
-      CoverageSubsetByPolygon = _a9['default'];
-    }, function (_aa) {
-      CoverageModelObservationCompare = _aa['default'];
-    }, function (_ab) {
-      GeoJSONView = _ab['default'];
-    }, function (_ad) {
-      WMSView = _ad['default'];
-    }, function (_ae) {
-      GoToSource = _ae['default'];
+      CoverageRemapCategories = _e['default'];
+    }, function (_a0) {
+      CoverageCategoriesStatistics = _a0['default'];
+    }, function (_b1) {
+      CoverageSubsetByPolygon = _b1['default'];
+    }, function (_b3) {
+      CoverageModelObservationCompare = _b3['default'];
+    }, function (_b4) {
+      GeoJSONView = _b4['default'];
+    }, function (_b6) {
+      WMSView = _b6['default'];
+    }, function (_b7) {
+      GoToSource = _b7['default'];
     }],
     execute: function () {
       App = (function (_Eventable) {
@@ -55133,8 +56754,8 @@ $__System.register('af', ['50', '51', '54', '65', '66', '85', '95', '96', '98', 
   };
 });
 
-$__System.registerDynamic("b0", [], false, function(__require, __exports, __module) {
-  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+$__System.registerDynamic("b9", [], false, function($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
   (function() {
     "format global";
     L.Control.Sidebar = L.Control.extend({
@@ -55251,15 +56872,15 @@ $__System.registerDynamic("b0", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.register("b1", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("ba", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register("b2", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("bb", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic("b3", [], true, function($__require, exports, module) {
+$__System.registerDynamic("bc", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   (function(factory) {
     if (typeof module !== "undefined" && typeof exports == "object") {
       if (typeof window != "undefined") {
@@ -55358,15 +56979,14 @@ $__System.registerDynamic("b3", [], true, function($__require, exports, module) 
     }
     return Tab;
   });
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b4", ["3b"], true, function($__require, exports, module) {
+$__System.registerDynamic("bd", ["3b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   "format cjs";
   (function(process) {
     (function() {
@@ -55878,35 +57498,32 @@ $__System.registerDynamic("b4", ["3b"], true, function($__require, exports, modu
       }
     }).call(this);
   })($__require('3b'));
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b5", ["b4"], true, function($__require, exports, module) {
+$__System.registerDynamic("be", ["bd"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('b4');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('bd');
   return module.exports;
 });
 
-$__System.registerDynamic("b6", [], true, function($__require, exports, module) {
+$__System.registerDynamic("bf", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   "format cjs";
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b7", [], true, function($__require, exports, module) {
+$__System.registerDynamic("c0", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   var process = module.exports = {};
   var queue = [];
   var draining = false;
@@ -55990,48 +57607,43 @@ $__System.registerDynamic("b7", [], true, function($__require, exports, module) 
   process.umask = function() {
     return 0;
   };
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("b8", ["b7"], true, function($__require, exports, module) {
+$__System.registerDynamic("c1", ["c0"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('b7');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('c0');
   return module.exports;
 });
 
-$__System.registerDynamic("b9", ["b8"], true, function($__require, exports, module) {
+$__System.registerDynamic("c2", ["c1"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__System._nodeRequire ? process : $__require('b8');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__System._nodeRequire ? process : $__require('c1');
   return module.exports;
 });
 
-$__System.registerDynamic("3b", ["b9"], true, function($__require, exports, module) {
+$__System.registerDynamic("3b", ["c2"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('b9');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('c2');
   return module.exports;
 });
 
-$__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, exports, module) {
+$__System.registerDynamic("c3", ["be", "bf", "3b"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $__pathVars = $__System.get('@@cjs-helpers').getPathVars(module.id),
-      __filename = $__pathVars.filename,
-      __dirname = $__pathVars.dirname;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var __filename = 'jspm_packages\npm\jsonld@0.4.6\js\jsonld.js',
+      __dirname = '';
   "format cjs";
   (function(process) {
     (function() {
@@ -56884,7 +58496,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
             };
           }
           try {
-            jsonld.Promise = global.Promise || $__require('b5').Promise;
+            jsonld.Promise = global.Promise || $__require('be').Promise;
           } catch (e) {
             var f = function() {
               throw new Error('Unable to find a Promise implementation.');
@@ -56898,7 +58510,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
         jsonld.promisify = function(op) {
           if (!jsonld.Promise) {
             try {
-              jsonld.Promise = global.Promise || $__require('b5').Promise;
+              jsonld.Promise = global.Promise || $__require('be').Promise;
             } catch (e) {
               throw new Error('Unable to find a Promise implementation.');
             }
@@ -57175,13 +58787,18 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
           options = options || {};
           var strictSSL = ('strictSSL' in options) ? options.strictSSL : true;
           var maxRedirects = ('maxRedirects' in options) ? options.maxRedirects : -1;
-          var request = $__require('b6');
-          var http = $__require('b6');
+          var request = ('request' in options) ? options.request : $__require('bf');
+          var acceptHeader = 'application/ld+json, application/json';
+          var http = $__require('bf');
           var queue = new jsonld.RequestQueue();
           if (options.usePromise) {
             return queue.wrapLoader(function(url) {
               return jsonld.promisify(loadDocument, url, []);
             });
+          }
+          var headers = options.headers || {};
+          if ('Accept' in headers || 'accept' in headers) {
+            throw new RangeError('Accept header may not be specified as an option; only "' + acceptHeader + '" is supported.');
           }
           return queue.wrapLoader(function(url, callback) {
             loadDocument(url, [], callback);
@@ -57211,9 +58828,13 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
             if (doc !== null) {
               return callback(null, doc);
             }
+            var headers = {'Accept': acceptHeader};
+            for (var k in options.headers) {
+              headers[k] = options.headers[k];
+            }
             request({
               url: url,
-              headers: {'Accept': 'application/ld+json, application/json'},
+              headers: headers,
               strictSSL: strictSSL,
               followRedirect: false
             }, handleResponse);
@@ -57567,7 +59188,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
           this.details = details || {};
         };
         if (_nodejs) {
-          $__require('b6').inherits(JsonLdError, Error);
+          $__require('bf').inherits(JsonLdError, Error);
         } else if (typeof Error !== 'undefined') {
           JsonLdError.prototype = new Error();
         }
@@ -60692,7 +62313,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
         };
         (function(_nodejs) {
           if (_nodejs) {
-            var crypto = $__require('b6');
+            var crypto = $__require('bf');
             NormalizeHash._init = function(algorithm) {
               if (algorithm === 'URDNA2015') {
                 algorithm = 'sha256';
@@ -61095,7 +62716,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
         })(_nodejs);
         if (!XMLSerializer) {
           var _defineXMLSerializer = function() {
-            XMLSerializer = $__require('b6').XMLSerializer;
+            XMLSerializer = $__require('bf').XMLSerializer;
           };
         }
         jsonld.url = {};
@@ -61154,7 +62775,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
           jsonld.use = function(extension) {
             switch (extension) {
               case 'request':
-                jsonld.request = $__require('b6');
+                jsonld.request = $__require('bf');
                 break;
               default:
                 throw new JsonLdError('Unknown extension.', 'jsonld.UnknownExtension', {extension: extension});
@@ -61164,7 +62785,7 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
             exports: {},
             filename: __dirname
           };
-          $__require('b6')(_module, 'version');
+          $__require('bf')(_module, 'version');
           jsonld.version = _module.exports.version;
         }
         return jsonld;
@@ -61195,21 +62816,19 @@ $__System.registerDynamic("ba", ["b5", "b6", "3b"], true, function($__require, e
       return factory;
     })();
   })($__require('3b'));
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("61", ["ba"], true, function($__require, exports, module) {
+$__System.registerDynamic("87", ["c3"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('ba');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('c3');
   return module.exports;
 });
 
-$__System.register('4e', ['61', '87'], function (_export) {
+$__System.register('4e', ['87', '8f'], function (_export) {
   'use strict';
 
   var jsonld, loadJSON, DCAT_CONTEXT, DCAT_CATALOG_FRAME, DCAT_DATASET_FRAME, UNKNOWN_LANG, i18n;
@@ -61372,8 +62991,8 @@ $__System.register('4e', ['61', '87'], function (_export) {
   return {
     setters: [function (_) {
       jsonld = _.promises;
-    }, function (_2) {
-      loadJSON = _2.loadJSON;
+    }, function (_f) {
+      loadJSON = _f.loadJSON;
     }],
     execute: function () {
       DCAT_CONTEXT = [
@@ -61484,10 +63103,10 @@ $__System.register('4e', ['61', '87'], function (_export) {
   };
 });
 
-$__System.register('bb', ['48', '67', '86', '87', '8f', 'b3', '4e'], function (_export) {
+$__System.register('c4', ['48', '56', '97', 'bc', '8e', '8f', '4e'], function (_export) {
   'use strict';
 
-  var L, $, HTML, PROCESS, i18n, sortByKey, Modal, Tab, loadDCATCatalog, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
+  var L, $, HTML, Modal, Tab, PROCESS, i18n, sortByKey, loadDCATCatalog, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
 
   /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
   function getDistFormatLabel(dist) {
@@ -61509,16 +63128,16 @@ $__System.register('bb', ['48', '67', '86', '87', '8f', 'b3', '4e'], function (_
       $ = _.$;
       HTML = _.HTML;
     }, function (_3) {
-      PROCESS = _3.PROCESS;
-    }, function (_4) {
-      i18n = _4.i18n;
-      sortByKey = _4.sortByKey;
-    }, function (_f) {
-      Modal = _f['default'];
-    }, function (_b3) {
-      Tab = _b3['default'];
+      Modal = _3['default'];
+    }, function (_bc) {
+      Tab = _bc['default'];
     }, function (_e) {
-      loadDCATCatalog = _e.loadDCATCatalog;
+      PROCESS = _e.PROCESS;
+    }, function (_f) {
+      i18n = _f.i18n;
+      sortByKey = _f.sortByKey;
+    }, function (_e2) {
+      loadDCATCatalog = _e2.loadDCATCatalog;
     }],
     execute: function () {
       TEMPLATES = {
@@ -61887,11 +63506,11 @@ $__System.register('bb', ['48', '67', '86', '87', '8f', 'b3', '4e'], function (_
   };
 });
 
-$__System.registerDynamic("8f", [], true, function($__require, exports, module) {
+$__System.registerDynamic("97", [], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
+  var define,
+      global = this,
+      GLOBAL = this;
   (function(factory) {
     if (typeof module !== "undefined" && typeof exports == "object") {
       if (typeof window != "undefined") {
@@ -62123,12 +63742,11 @@ $__System.registerDynamic("8f", [], true, function($__require, exports, module) 
     }
     return Modal;
   });
-  global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("bc", [], false, function(__require, __exports, __module) {
-  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+$__System.registerDynamic("c5", [], false, function($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
   (function() {
     (function() {
       'use strict';
@@ -62457,17 +64075,16 @@ $__System.registerDynamic("bc", [], false, function(__require, __exports, __modu
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("bd", ["bc"], true, function($__require, exports, module) {
+$__System.registerDynamic("c6", ["c5"], true, function($__require, exports, module) {
   ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__require('bc');
-  global.define = __define;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('c5');
   return module.exports;
 });
 
-$__System.register('87', ['bd'], function (_export) {
+$__System.register('8f', ['c6'], function (_export) {
   'use strict';
 
   var COVJSON_PREFIX, DefaultMap;
@@ -62534,7 +64151,7 @@ $__System.register('87', ['bd'], function (_export) {
   }
 
   return {
-    setters: [function (_bd) {}],
+    setters: [function (_c6) {}],
     execute: function () {
       COVJSON_PREFIX = 'http://coveragejson.org/def#';
 
@@ -62579,13 +64196,13 @@ $__System.register('87', ['bd'], function (_export) {
   };
 });
 
-$__System.register('4f', ['87'], function (_export) {
+$__System.register('4f', ['8f'], function (_export) {
   'use strict';
 
   var DefaultMap, Eventable;
   return {
-    setters: [function (_) {
-      DefaultMap = _.DefaultMap;
+    setters: [function (_f) {
+      DefaultMap = _f.DefaultMap;
     }],
     execute: function () {
       Eventable = (function () {
@@ -62674,7 +64291,7 @@ $__System.register('4f', ['87'], function (_export) {
   };
 });
 
-$__System.register('86', ['4f'], function (_export) {
+$__System.register('8e', ['4f'], function (_export) {
   'use strict';
 
   var Eventable, VIEW, PROCESS, EXTERNAL_LINK, Action;
@@ -62730,23 +64347,23 @@ $__System.register('86', ['4f'], function (_export) {
   };
 });
 
-$__System.register('be', ['67', '86', '87', '8f', '4f'], function (_export) {
+$__System.register('c7', ['56', '97', '8f', '4f', '8e'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, EXTERNAL_LINK, i18n, Modal, Eventable, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
+  var $, $$, HTML, Modal, i18n, Eventable, EXTERNAL_LINK, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_3) {
-      EXTERNAL_LINK = _3.EXTERNAL_LINK;
     }, function (_2) {
-      i18n = _2.i18n;
+      Modal = _2['default'];
     }, function (_f) {
-      Modal = _f['default'];
+      i18n = _f.i18n;
     }, function (_f2) {
       Eventable = _f2['default'];
+    }, function (_e) {
+      EXTERNAL_LINK = _e.EXTERNAL_LINK;
     }],
     execute: function () {
       paneHtml = function paneHtml() {
@@ -63169,7 +64786,7 @@ $__System.register('be', ['67', '86', '87', '8f', '4f'], function (_export) {
   };
 });
 
-$__System.register('bf', ['48', '67', 'b0', 'b1', 'b2', 'bb', 'be'], function (_export) {
+$__System.register('c8', ['48', '56', 'b9', 'ba', 'bb', 'c4', 'c7'], function (_export) {
   'use strict';
 
   var L, $, HTML, SearchPane, WorkspacePane, sidebarHtml, Sidebar;
@@ -63179,10 +64796,10 @@ $__System.register('bf', ['48', '67', 'b0', 'b1', 'b2', 'bb', 'be'], function (_
     }, function (_2) {
       $ = _2.$;
       HTML = _2.HTML;
-    }, function (_b0) {}, function (_b1) {}, function (_b2) {}, function (_bb) {
-      SearchPane = _bb['default'];
-    }, function (_be) {
-      WorkspacePane = _be['default'];
+    }, function (_b9) {}, function (_ba) {}, function (_bb) {}, function (_c4) {
+      SearchPane = _c4['default'];
+    }, function (_c7) {
+      WorkspacePane = _c7['default'];
     }],
     execute: function () {
       sidebarHtml = function sidebarHtml(sidebarId, searchPaneId, workspacePaneId) {
@@ -63237,10 +64854,10 @@ $__System.register('bf', ['48', '67', 'b0', 'b1', 'b2', 'bb', 'be'], function (_
   };
 });
 
-$__System.register("c0", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("c9", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+var define = $__System.amdDefine;
 (function(window, document, undefined) {
   var oldL = window.L,
       L = {};
@@ -63248,7 +64865,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("c1", [], L);
+    define("ca", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -69742,17 +71359,15 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   });
 }(window, document));
 
-_removeDefine();
 })();
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("48", ["c1"], function(main) {
+var define = $__System.amdDefine;
+define("48", ["ca"], function(main) {
   return main;
 });
 
-_removeDefine();
 })();
-$__System.register('c2', ['48'], function (_export) {
+$__System.register('cb', ['48'], function (_export) {
 
   // https://github.com/davicustodio/Leaflet.StyledLayerControl/blob/7a3268d446d755f59bcd845cf873444d01ce1774/src/styledLayerControl.js
   // + some patches to make it 'use strict' compatible
@@ -70153,10 +71768,10 @@ $__System.register('c2', ['48'], function (_export) {
   };
 });
 
-$__System.register("c3", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("cc", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+var define = $__System.amdDefine;
 /^u/.test(typeof define) && function(a) {
   var b = this.require = function(b) {
     return a[b];
@@ -70164,7 +71779,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("c4", [], function() {
+}({}), define("cd", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -71252,21 +72867,21 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     getter: Aa,
     setter: za
   };
+}), define("minified", ["cd"], function(m) {
+  return m;
 });
 
-_removeDefine();
 })();
 (function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("67", ["c4"], function(main) {
+var define = $__System.amdDefine;
+define("56", ["cd"], function(main) {
   return main;
 });
 
-_removeDefine();
 })();
-$__System.register("c5", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("ce", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('1', ['7', '18', '45', '46', '48', '49', '67', '87', 'f', 'b2', '4b', '4c', 'af', 'bf', 'c0', 'c2', 'c3', 'c5'], function (_export) {
+$__System.register('1', ['7', '18', '45', '46', '48', '49', '56', 'f', 'bb', '4b', '4c', '8f', 'b8', 'c8', 'c9', 'cb', 'cc', 'ce'], function (_export) {
 
   // Xmas magic
   'use strict';
@@ -71311,17 +72926,17 @@ $__System.register('1', ['7', '18', '45', '46', '48', '49', '67', '87', 'f', 'b2
   return {
     setters: [function (_) {}, function (_2) {}, function (_3) {}, function (_5) {}, function (_4) {
       L = _4['default'];
-    }, function (_6) {}, function (_8) {
-      $ = _8.$;
-      HTML = _8.HTML;
-    }, function (_7) {
-      i18n = _7.i18n;
-      DefaultMap = _7.DefaultMap;
-    }, function (_f) {}, function (_b2) {}, function (_b) {}, function (_c) {}, function (_af) {
-      App = _af['default'];
-    }, function (_bf) {
-      Sidebar = _bf['default'];
-    }, function (_c0) {}, function (_c2) {}, function (_c3) {}, function (_c5) {}],
+    }, function (_6) {}, function (_7) {
+      $ = _7.$;
+      HTML = _7.HTML;
+    }, function (_f) {}, function (_bb) {}, function (_b) {}, function (_c) {}, function (_f2) {
+      i18n = _f2.i18n;
+      DefaultMap = _f2.DefaultMap;
+    }, function (_b8) {
+      App = _b8['default'];
+    }, function (_c8) {
+      Sidebar = _c8['default'];
+    }, function (_c9) {}, function (_cb) {}, function (_cc) {}, function (_ce) {}],
     execute: function () {
       $('body').add(HTML('\n  <div id="snow1" class="snow"></div>\n  <div id="snow2" class="snow"></div>\n  <div id="snow3" class="snow"></div>\n'));document.getElementById('map').addEventListener('keypress', function (e) {
         if (String.fromCharCode(e.charCode) == 's') letItSnow();
@@ -71487,16 +73102,16 @@ $__System.register('1', ['7', '18', '45', '46', '48', '49', '67', '87', 'f', 'b2
   };
 });
 
-$__System.register('github:Leaflet/Leaflet@0.7.7/dist/leaflet.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('github:ebrelsford/Leaflet.loading@0.1.18/src/Control.Loading.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('npm:c3@0.4.10/c3.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('npm:c3@0.4.11-rc4/c3.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('github:guygriffiths/category-remapper-js@master/css/remapper.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('github:Turbo87/sidebar-v2@master/css/leaflet-sidebar.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('github:twbs/bootstrap@3.3.6/css/bootstrap.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('app/css/style.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('app/css/styledLayerControl/styledLayerControl.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
-$__System.register('app/css/snow.css!github:systemjs/plugin-css@0.1.20', [], false, function() {});
+$__System.register('github:Leaflet/Leaflet@0.7.7/dist/leaflet.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('github:ebrelsford/Leaflet.loading@0.1.18/src/Control.Loading.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('npm:c3@0.4.10/c3.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('npm:c3@0.4.11-rc4/c3.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('github:guygriffiths/category-remapper-js@master/css/remapper.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('github:Turbo87/sidebar-v2@master/css/leaflet-sidebar.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('github:twbs/bootstrap@3.3.6/css/bootstrap.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('app/css/style.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('app/css/styledLayerControl/styledLayerControl.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
+$__System.register('app/css/snow.css!github:systemjs/plugin-css@0.1.20.js', [], false, function() {});
 (function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})
 (".leaflet-image-layer,.leaflet-layer,.leaflet-map-pane,.leaflet-marker-icon,.leaflet-marker-pane,.leaflet-marker-shadow,.leaflet-overlay-pane,.leaflet-overlay-pane svg,.leaflet-popup-pane,.leaflet-shadow-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-tile-pane,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-ms-touch-action:none;touch-action:none}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container img{max-width:none!important}.leaflet-container img.leaflet-image-layer{max-width:15000px!important}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-tile-pane{z-index:2}.leaflet-objects-pane{z-index:3}.leaflet-overlay-pane{z-index:4}.leaflet-shadow-pane{z-index:5}.leaflet-marker-pane{z-index:6}.leaflet-popup-pane{z-index:7}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:7;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup,.leaflet-fade-anim .leaflet-tile{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;-o-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup,.leaflet-fade-anim .leaflet-tile-loaded{opacity:1}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);-o-transition:-o-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-touching .leaflet-zoom-animated,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-clickable{cursor:pointer}.leaflet-container{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-clickable,.leaflet-dragging .leaflet-container{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078A8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font:12px/1.5 \"Helvetica Neue\",Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/github/Leaflet/Leaflet@0.7.7/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box;background:#fff;background:rgba(255,255,255,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{margin:0 auto;width:40px;height:20px;position:relative;overflow:hidden}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:0 0}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678, M12=.70710678, M21=-.70710678, M22=.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}.c3 svg{font:10px sans-serif}.c3 line,.c3 path{fill:none;stroke:#000}.c3 text{-webkit-user-select:none;-moz-user-select:none;user-select:none}.c3-bars path,.c3-event-rect,.c3-legend-item-tile,.c3-xgrid-focus,.c3-ygrid{shape-rendering:crispEdges}.c3-chart-arc path{stroke:#fff}.c3-chart-arc text{fill:#fff;font-size:13px}.c3-grid line{stroke:#aaa}.c3-grid text{fill:#aaa}.c3-xgrid,.c3-ygrid{stroke-dasharray:3 3}.c3-text.c3-empty{fill:grey;font-size:2em}.c3-line{stroke-width:1px}.c3-circle._expanded_{stroke-width:1px;stroke:#fff}.c3-selected-circle{fill:#fff;stroke-width:2px}.c3-bar{stroke-width:0}.c3-bar._expanded_{fill-opacity:.75}.c3-target.c3-focused{opacity:1}.c3-target.c3-focused path.c3-line,.c3-target.c3-focused path.c3-step{stroke-width:2px}.c3-target.c3-defocused{opacity:.3!important}.c3-region{fill:#4682b4;fill-opacity:.1}.c3-brush .extent{fill-opacity:.1}.c3-legend-item{font-size:12px}.c3-legend-item-hidden{opacity:.15}.c3-legend-background{opacity:.75;fill:#fff;stroke:#d3d3d3;stroke-width:1}.c3-tooltip-container{z-index:10}.c3-tooltip{border-collapse:collapse;border-spacing:0;background-color:#fff;empty-cells:show;-webkit-box-shadow:7px 7px 12px -9px #777;-moz-box-shadow:7px 7px 12px -9px #777;box-shadow:7px 7px 12px -9px #777;opacity:.9}.c3-tooltip tr{border:1px solid #CCC}.c3-tooltip th{background-color:#aaa;font-size:14px;padding:2px 5px;text-align:left;color:#FFF}.c3-tooltip td{font-size:13px;padding:3px 6px;background-color:#fff;border-left:1px dotted #999}.c3-tooltip td>span{display:inline-block;width:10px;height:10px;margin-right:6px}.c3-tooltip td.value{text-align:right}.c3-area{stroke-width:0;opacity:.2}.c3-chart-arcs-title{dominant-baseline:middle;font-size:1.3em}.c3-chart-arcs .c3-chart-arcs-background{fill:#e0e0e0;stroke:none}.c3-chart-arcs .c3-chart-arcs-gauge-unit{fill:#000;font-size:16px}.c3-chart-arcs .c3-chart-arcs-gauge-max{fill:#777}.c3-chart-arcs .c3-chart-arcs-gauge-min{fill:#777}.c3-chart-arc .c3-gauge-value{fill:#000}.c3 svg{font:10px sans-serif;-webkit-tap-highlight-color:transparent}.c3 line,.c3 path{fill:none;stroke:#000}.c3 text{-webkit-user-select:none;-moz-user-select:none;user-select:none}.c3-bars path,.c3-event-rect,.c3-legend-item-tile,.c3-xgrid-focus,.c3-ygrid{shape-rendering:crispEdges}.c3-chart-arc path{stroke:#fff}.c3-chart-arc text{fill:#fff;font-size:13px}.c3-grid line{stroke:#aaa}.c3-grid text{fill:#aaa}.c3-xgrid,.c3-ygrid{stroke-dasharray:3 3}.c3-text.c3-empty{fill:grey;font-size:2em}.c3-line{stroke-width:1px}.c3-circle._expanded_{stroke-width:1px;stroke:#fff}.c3-selected-circle{fill:#fff;stroke-width:2px}.c3-bar{stroke-width:0}.c3-bar._expanded_{fill-opacity:.75}.c3-target.c3-focused{opacity:1}.c3-target.c3-focused path.c3-line,.c3-target.c3-focused path.c3-step{stroke-width:2px}.c3-target.c3-defocused{opacity:.3!important}.c3-region{fill:#4682b4;fill-opacity:.1}.c3-brush .extent{fill-opacity:.1}.c3-legend-item{font-size:12px}.c3-legend-item-hidden{opacity:.15}.c3-legend-background{opacity:.75;fill:#fff;stroke:#d3d3d3;stroke-width:1}.c3-title{font:14px sans-serif}.c3-tooltip-container{z-index:10}.c3-tooltip{border-collapse:collapse;border-spacing:0;background-color:#fff;empty-cells:show;-webkit-box-shadow:7px 7px 12px -9px #777;-moz-box-shadow:7px 7px 12px -9px #777;box-shadow:7px 7px 12px -9px #777;opacity:.9}.c3-tooltip tr{border:1px solid #CCC}.c3-tooltip th{background-color:#aaa;font-size:14px;padding:2px 5px;text-align:left;color:#FFF}.c3-tooltip td{font-size:13px;padding:3px 6px;background-color:#fff;border-left:1px dotted #999}.c3-tooltip td>span{display:inline-block;width:10px;height:10px;margin-right:6px}.c3-tooltip td.value{text-align:right}.c3-area{stroke-width:0;opacity:.2}.c3-chart-arcs-title{dominant-baseline:middle;font-size:1.3em}.c3-chart-arcs .c3-chart-arcs-background{fill:#e0e0e0;stroke:none}.c3-chart-arcs .c3-chart-arcs-gauge-unit{fill:#000;font-size:16px}.c3-chart-arcs .c3-chart-arcs-gauge-max{fill:#777}.c3-chart-arcs .c3-chart-arcs-gauge-min{fill:#777}.c3-chart-arc .c3-gauge-value{fill:#000}.jsplumb-connector{z-index:9040}.jsplumb-endpoint{z-index:9050}.jsplumb-overlay{z-index:9060}.main-remapper{position:fixed;width:100%;height:100%;left:0;top:0;z-index:1000}.remap-froms,.remap-tos{position:absolute;top:0;left:0;width:250px;height:100%;background-color:rgba(150,220,255,.8);color:#000;text-align:right}.remap-tos{left:auto;right:0;width:250px;overflow:hidden;color:#000;text-align:left}.centrecontent{position:absolute;opacity:.8;bottom:0;height:100%;left:250px;right:250px;background:#fff;text-align:center;vertical-align:bottom}.buttonholder{position:absolute;bottom:0;background-color:rgba(255,255,255,0);left:250px;right:250px;text-align:center}.cancel-remap-button,.remap-button{font-size:20pt;padding:20px;margin:20px}.map-from,.map-to{margin:2px;border-style:solid;border-width:thin;font-family:sans-serif;background-color:rgba(0,210,255,1)}.map-from{padding-right:10px}.map-to{padding-left:10px}.sidebar{position:absolute;top:0;bottom:0;width:100%;overflow:hidden;z-index:2000}.sidebar.collapsed{width:40px}@media (min-width:768px){.sidebar{top:10px;bottom:10px;transition:width .5s}}@media (min-width:768px) and (max-width:991px){.sidebar{width:305px}}@media (min-width:992px) and (max-width:1199px){.sidebar{width:390px}}@media (min-width:1200px){.sidebar{width:460px}}.sidebar-left{left:0}@media (min-width:768px){.sidebar-left{left:10px}}.sidebar-right{right:0}@media (min-width:768px){.sidebar-right{right:10px}}.sidebar-tabs{top:0;bottom:0;height:100%;background-color:#fff}.sidebar-left .sidebar-tabs{left:0}.sidebar-right .sidebar-tabs{right:0}.sidebar-tabs,.sidebar-tabs>ul{position:absolute;width:40px;margin:0;padding:0}.sidebar-tabs>li,.sidebar-tabs>ul>li{width:100%;height:40px;color:#333;font-size:12pt;overflow:hidden;transition:all 80ms}.sidebar-tabs>li:hover,.sidebar-tabs>ul>li:hover{color:#000;background-color:#eee}.sidebar-tabs>li.active,.sidebar-tabs>ul>li.active{color:#fff;background-color:#0074d9}.sidebar-tabs>li.disabled,.sidebar-tabs>ul>li.disabled{color:rgba(51,51,51,.4)}.sidebar-tabs>li.disabled:hover,.sidebar-tabs>ul>li.disabled:hover{background:0 0}.sidebar-tabs>li.disabled>a,.sidebar-tabs>ul>li.disabled>a{cursor:default}.sidebar-tabs>li>a,.sidebar-tabs>ul>li>a{display:block;width:100%;height:100%;line-height:40px;color:inherit;text-decoration:none;text-align:center}.sidebar-tabs>ul+ul{bottom:0}.sidebar-content{position:absolute;top:0;bottom:0;background-color:rgba(255,255,255,.95);overflow-x:hidden;overflow-y:auto}.sidebar-left .sidebar-content{left:40px;right:0}.sidebar-right .sidebar-content{left:0;right:40px}.sidebar.collapsed>.sidebar-content{overflow-y:hidden}.sidebar-pane{display:none;left:0;right:0;box-sizing:border-box;padding:10px 20px}.sidebar-pane.active{display:block}@media (min-width:768px) and (max-width:991px){.sidebar-pane{min-width:265px}}@media (min-width:992px) and (max-width:1199px){.sidebar-pane{min-width:350px}}@media (min-width:1200px){.sidebar-pane{min-width:420px}}.sidebar-header{margin:-10px -20px 0;height:40px;padding:0 20px;line-height:40px;font-size:14.4pt;color:#fff;background-color:#0074d9}.sidebar-right .sidebar-header{padding-left:40px}.sidebar-close{position:absolute;top:0;width:40px;height:40px;text-align:center;cursor:pointer}.sidebar-left .sidebar-close{right:0}.sidebar-right .sidebar-close{left:0}.sidebar-left~.sidebar-map{margin-left:40px}@media (min-width:768px){.sidebar-left~.sidebar-map{margin-left:0}}.sidebar-right~.sidebar-map{margin-right:40px}@media (min-width:768px){.sidebar-right~.sidebar-map{margin-right:0}}.sidebar{box-shadow:0 1px 5px rgba(0,0,0,.65)}.sidebar.leaflet-touch{box-shadow:none;border-right:2px solid rgba(0,0,0,.2)}@media (min-width:768px){.sidebar{border-radius:4px}.sidebar.leaflet-touch{border:2px solid rgba(0,0,0,.2)}}@media (min-width:768px){.sidebar-left~.sidebar-map .leaflet-left{transition:left .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-left~.sidebar-map .leaflet-left{left:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-left~.sidebar-map .leaflet-left{left:400px}}@media (min-width:1200px){.sidebar-left~.sidebar-map .leaflet-left{left:470px}}@media (min-width:768px){.sidebar-left.collapsed~.sidebar-map .leaflet-left{left:50px}}@media (min-width:768px){.sidebar-right~.sidebar-map .leaflet-right{transition:right .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-right~.sidebar-map .leaflet-right{right:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-right~.sidebar-map .leaflet-right{right:400px}}@media (min-width:1200px){.sidebar-right~.sidebar-map .leaflet-right{right:470px}}@media (min-width:768px){.sidebar-right.collapsed~.sidebar-map .leaflet-right{right:50px}}/*!\n * Bootstrap v3.3.6 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type=checkbox],input[type=radio]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:0 0!important;-webkit-box-shadow:none!important;box-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000!important}.label{border:1px solid #000}.table{border-collapse:collapse!important}.table td,.table th{background-color:#fff!important}.table-bordered td,.table-bordered th{border:1px solid #ddd!important}}@font-face{font-family:'Glyphicons Halflings';src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot);src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff2) format('woff2'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff) format('woff'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.ttf) format('truetype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-eur:before,.glyphicon-euro:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}:after,:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:transparent}body{font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#337ab7;text-decoration:none}a:focus,a:hover{color:#23527c;text-decoration:underline}a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:6px}.img-thumbnail{display:inline-block;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out}.img-circle{border-radius:50%}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}.h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}.h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}.h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}.h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}.lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}.mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}.page-header{padding-bottom:9px;margin:40px 0 20px;border-bottom:1px solid #eee}ol,ul{margin-top:0;margin-bottom:10px}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;margin-left:-5px;list-style:none}.list-inline>li{display:inline-block;padding-right:5px;padding-left:5px}dl{margin-top:0;margin-bottom:20px}dd,dt{line-height:1.42857143}dt{font-weight:700}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;overflow:hidden;clear:left;text-align:right;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[data-original-title],abbr[title]{cursor:help;border-bottom:1px dotted #777}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10px 20px;margin:0 0 20px;font-size:17.5px;border-left:5px solid #eee}blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{margin-bottom:0}blockquote .small,blockquote footer,blockquote small{display:block;font-size:80%;line-height:1.42857143;color:#777}blockquote .small:before,blockquote footer:before,blockquote small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;text-align:right;border-right:5px solid #eee;border-left:0}.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{content:''}.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{content:'\\00A0 \\2014'}address{margin-bottom:20px;font-style:normal;line-height:1.42857143}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:4px}kbd{padding:2px 4px;font-size:90%;color:#fff;background-color:#333;border-radius:3px;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}kbd kbd{padding:0;font-size:100%;font-weight:700;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:9.5px;margin:0 0 10px;font-size:13px;line-height:1.42857143;color:#333;word-break:break-all;word-wrap:break-word;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{margin-right:-15px;margin-left:-15px}.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{position:relative;min-height:1px;padding-right:15px;padding-left:15px}.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0}@media (min-width:768px){.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0}}@media (min-width:992px){.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0}}@media (min-width:1200px){.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#777;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:20px}.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}.table>caption+thead>tr:first-child>td,.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>td,.table>thead:first-child>tr:first-child>th{border-top:0}.table>tbody+tbody{border-top:2px solid #ddd}.table .table{background-color:#fff}.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:5px}.table-bordered{border:1px solid #ddd}.table-bordered>tbody>tr>td,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>td,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border:1px solid #ddd}.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=col-]{position:static;display:table-column;float:none}table td[class*=col-],table th[class*=col-]{position:static;display:table-cell;float:none}.table>tbody>tr.active>td,.table>tbody>tr.active>th,.table>tbody>tr>td.active,.table>tbody>tr>th.active,.table>tfoot>tr.active>td,.table>tfoot>tr.active>th,.table>tfoot>tr>td.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>thead>tr.active>th,.table>thead>tr>td.active,.table>thead>tr>th.active{background-color:#f5f5f5}.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr.active:hover>th,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover{background-color:#e8e8e8}.table>tbody>tr.success>td,.table>tbody>tr.success>th,.table>tbody>tr>td.success,.table>tbody>tr>th.success,.table>tfoot>tr.success>td,.table>tfoot>tr.success>th,.table>tfoot>tr>td.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>thead>tr.success>th,.table>thead>tr>td.success,.table>thead>tr>th.success{background-color:#dff0d8}.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr.success:hover>th,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover{background-color:#d0e9c6}.table>tbody>tr.info>td,.table>tbody>tr.info>th,.table>tbody>tr>td.info,.table>tbody>tr>th.info,.table>tfoot>tr.info>td,.table>tfoot>tr.info>th,.table>tfoot>tr>td.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>thead>tr.info>th,.table>thead>tr>td.info,.table>thead>tr>th.info{background-color:#d9edf7}.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr.info:hover>th,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover{background-color:#c4e3f3}.table>tbody>tr.warning>td,.table>tbody>tr.warning>th,.table>tbody>tr>td.warning,.table>tbody>tr>th.warning,.table>tfoot>tr.warning>td,.table>tfoot>tr.warning>th,.table>tfoot>tr>td.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>thead>tr.warning>th,.table>thead>tr>td.warning,.table>thead>tr>th.warning{background-color:#fcf8e3}.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr.warning:hover>th,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover{background-color:#faf2cc}.table>tbody>tr.danger>td,.table>tbody>tr.danger>th,.table>tbody>tr>td.danger,.table>tbody>tr>th.danger,.table>tfoot>tr.danger>td,.table>tfoot>tr.danger>th,.table>tfoot>tr>td.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>thead>tr.danger>th,.table>thead>tr>td.danger,.table>thead>tr>th.danger{background-color:#f2dede}.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr.danger:hover>th,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover{background-color:#ebcccc}.table-responsive{min-height:.01%;overflow-x:auto}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #ddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>td,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>thead>tr>th{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}}fieldset{min-width:0;padding:0;margin:0;border:0}legend{display:block;width:100%;padding:0;margin-bottom:20px;font-size:21px;line-height:inherit;color:#333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700}input[type=search]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=checkbox],input[type=radio]{margin:4px 0 0;margin-top:1px\\9;line-height:normal}input[type=file]{display:block}input[type=range]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=file]:focus,input[type=checkbox]:focus,input[type=radio]:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:7px;font-size:14px;line-height:1.42857143;color:#555}.form-control{display:block;width:100%;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control::-ms-expand{background-color:transparent;border:0}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=search]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=date].form-control,input[type=time].form-control,input[type=datetime-local].form-control,input[type=month].form-control{line-height:34px}.input-group-sm input[type=date],.input-group-sm input[type=time],.input-group-sm input[type=datetime-local],.input-group-sm input[type=month],input[type=date].input-sm,input[type=time].input-sm,input[type=datetime-local].input-sm,input[type=month].input-sm{line-height:30px}.input-group-lg input[type=date],.input-group-lg input[type=time],.input-group-lg input[type=datetime-local],.input-group-lg input[type=month],input[type=date].input-lg,input[type=time].input-lg,input[type=datetime-local].input-lg,input[type=month].input-lg{line-height:46px}}.form-group{margin-bottom:15px}.checkbox,.radio{position:relative;display:block;margin-top:10px;margin-bottom:10px}.checkbox label,.radio label{min-height:20px;padding-left:20px;margin-bottom:0;font-weight:400;cursor:pointer}.checkbox input[type=checkbox],.checkbox-inline input[type=checkbox],.radio input[type=radio],.radio-inline input[type=radio]{position:absolute;margin-top:4px\\9;margin-left:-20px}.checkbox+.checkbox,.radio+.radio{margin-top:-5px}.checkbox-inline,.radio-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;font-weight:400;vertical-align:middle;cursor:pointer}.checkbox-inline+.checkbox-inline,.radio-inline+.radio-inline{margin-top:0;margin-left:10px}fieldset[disabled] input[type=checkbox],fieldset[disabled] input[type=radio],input[type=checkbox].disabled,input[type=checkbox][disabled],input[type=radio].disabled,input[type=radio][disabled]{cursor:not-allowed}.checkbox-inline.disabled,.radio-inline.disabled,fieldset[disabled] .checkbox-inline,fieldset[disabled] .radio-inline{cursor:not-allowed}.checkbox.disabled label,.radio.disabled label,fieldset[disabled] .checkbox label,fieldset[disabled] .radio label{cursor:not-allowed}.form-control-static{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}.form-control-static.input-lg,.form-control-static.input-sm{padding-right:0;padding-left:0}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}select[multiple].input-sm,textarea.input-sm{height:auto}.form-group-sm .form-control{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.form-group-sm select.form-control{height:30px;line-height:30px}.form-group-sm select[multiple].form-control,.form-group-sm textarea.form-control{height:auto}.form-group-sm .form-control-static{height:30px;min-height:32px;padding:6px 10px;font-size:12px;line-height:1.5}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-lg{height:46px;line-height:46px}select[multiple].input-lg,textarea.input-lg{height:auto}.form-group-lg .form-control{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.form-group-lg select.form-control{height:46px;line-height:46px}.form-group-lg select[multiple].form-control,.form-group-lg textarea.form-control{height:auto}.form-group-lg .form-control-static{height:46px;min-height:38px;padding:11px 16px;font-size:18px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:42.5px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:34px;height:34px;line-height:34px;text-align:center;pointer-events:none}.form-group-lg .form-control+.form-control-feedback,.input-group-lg+.form-control-feedback,.input-lg+.form-control-feedback{width:46px;height:46px;line-height:46px}.form-group-sm .form-control+.form-control-feedback,.input-group-sm+.form-control-feedback,.input-sm+.form-control-feedback{width:30px;height:30px;line-height:30px}.has-success .checkbox,.has-success .checkbox-inline,.has-success .control-label,.has-success .help-block,.has-success .radio,.has-success .radio-inline,.has-success.checkbox label,.has-success.checkbox-inline label,.has-success.radio label,.has-success.radio-inline label{color:#3c763d}.has-success .form-control{border-color:#3c763d;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-success .form-control:focus{border-color:#2b542c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168}.has-success .input-group-addon{color:#3c763d;background-color:#dff0d8;border-color:#3c763d}.has-success .form-control-feedback{color:#3c763d}.has-warning .checkbox,.has-warning .checkbox-inline,.has-warning .control-label,.has-warning .help-block,.has-warning .radio,.has-warning .radio-inline,.has-warning.checkbox label,.has-warning.checkbox-inline label,.has-warning.radio label,.has-warning.radio-inline label{color:#8a6d3b}.has-warning .form-control{border-color:#8a6d3b;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-warning .form-control:focus{border-color:#66512c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b}.has-warning .input-group-addon{color:#8a6d3b;background-color:#fcf8e3;border-color:#8a6d3b}.has-warning .form-control-feedback{color:#8a6d3b}.has-error .checkbox,.has-error .checkbox-inline,.has-error .control-label,.has-error .help-block,.has-error .radio,.has-error .radio-inline,.has-error.checkbox label,.has-error.checkbox-inline label,.has-error.radio label,.has-error.radio-inline label{color:#a94442}.has-error .form-control{border-color:#a94442;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-error .form-control:focus{border-color:#843534;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483}.has-error .input-group-addon{color:#a94442;background-color:#f2dede;border-color:#a94442}.has-error .form-control-feedback{color:#a94442}.has-feedback label~.form-control-feedback{top:25px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#737373}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .form-control,.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .checkbox,.form-inline .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .checkbox label,.form-inline .radio label{padding-left:0}.form-inline .checkbox input[type=checkbox],.form-inline .radio input[type=radio]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .checkbox,.form-horizontal .checkbox-inline,.form-horizontal .radio,.form-horizontal .radio-inline{padding-top:7px;margin-top:0;margin-bottom:0}.form-horizontal .checkbox,.form-horizontal .radio{min-height:27px}.form-horizontal .form-group{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.form-horizontal .control-label{padding-top:7px;margin-bottom:0;text-align:right}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:11px;font-size:18px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:6px;font-size:12px}}.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px}.btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn.focus,.btn:focus,.btn:hover{color:#333;text-decoration:none}.btn.active,.btn:active{background-image:none;outline:0;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none;opacity:.65}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333;background-color:#fff;border-color:#ccc}.btn-default.focus,.btn-default:focus{color:#333;background-color:#e6e6e6;border-color:#8c8c8c}.btn-default:hover{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active.focus,.btn-default.active:focus,.btn-default.active:hover,.btn-default:active.focus,.btn-default:active:focus,.btn-default:active:hover,.open>.dropdown-toggle.btn-default.focus,.open>.dropdown-toggle.btn-default:focus,.open>.dropdown-toggle.btn-default:hover{color:#333;background-color:#d4d4d4;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled.focus,.btn-default.disabled:focus,.btn-default.disabled:hover,.btn-default[disabled].focus,.btn-default[disabled]:focus,.btn-default[disabled]:hover,fieldset[disabled] .btn-default.focus,fieldset[disabled] .btn-default:focus,fieldset[disabled] .btn-default:hover{background-color:#fff;border-color:#ccc}.btn-default .badge{color:#fff;background-color:#333}.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active.focus,.btn-primary.active:focus,.btn-primary.active:hover,.btn-primary:active.focus,.btn-primary:active:focus,.btn-primary:active:hover,.open>.dropdown-toggle.btn-primary.focus,.open>.dropdown-toggle.btn-primary:focus,.open>.dropdown-toggle.btn-primary:hover{color:#fff;background-color:#204d74;border-color:#122b40}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled.focus,.btn-primary.disabled:focus,.btn-primary.disabled:hover,.btn-primary[disabled].focus,.btn-primary[disabled]:focus,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary.focus,fieldset[disabled] .btn-primary:focus,fieldset[disabled] .btn-primary:hover{background-color:#337ab7;border-color:#2e6da4}.btn-primary .badge{color:#337ab7;background-color:#fff}.btn-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c}.btn-success.focus,.btn-success:focus{color:#fff;background-color:#449d44;border-color:#255625}.btn-success:hover{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active.focus,.btn-success.active:focus,.btn-success.active:hover,.btn-success:active.focus,.btn-success:active:focus,.btn-success:active:hover,.open>.dropdown-toggle.btn-success.focus,.open>.dropdown-toggle.btn-success:focus,.open>.dropdown-toggle.btn-success:hover{color:#fff;background-color:#398439;border-color:#255625}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled.focus,.btn-success.disabled:focus,.btn-success.disabled:hover,.btn-success[disabled].focus,.btn-success[disabled]:focus,.btn-success[disabled]:hover,fieldset[disabled] .btn-success.focus,fieldset[disabled] .btn-success:focus,fieldset[disabled] .btn-success:hover{background-color:#5cb85c;border-color:#4cae4c}.btn-success .badge{color:#5cb85c;background-color:#fff}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn-info.focus,.btn-info:focus{color:#fff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active.focus,.btn-info.active:focus,.btn-info.active:hover,.btn-info:active.focus,.btn-info:active:focus,.btn-info:active:hover,.open>.dropdown-toggle.btn-info.focus,.open>.dropdown-toggle.btn-info:focus,.open>.dropdown-toggle.btn-info:hover{color:#fff;background-color:#269abc;border-color:#1b6d85}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled.focus,.btn-info.disabled:focus,.btn-info.disabled:hover,.btn-info[disabled].focus,.btn-info[disabled]:focus,.btn-info[disabled]:hover,fieldset[disabled] .btn-info.focus,fieldset[disabled] .btn-info:focus,fieldset[disabled] .btn-info:hover{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#fff}.btn-warning{color:#fff;background-color:#f0ad4e;border-color:#eea236}.btn-warning.focus,.btn-warning:focus{color:#fff;background-color:#ec971f;border-color:#985f0d}.btn-warning:hover{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active.focus,.btn-warning.active:focus,.btn-warning.active:hover,.btn-warning:active.focus,.btn-warning:active:focus,.btn-warning:active:hover,.open>.dropdown-toggle.btn-warning.focus,.open>.dropdown-toggle.btn-warning:focus,.open>.dropdown-toggle.btn-warning:hover{color:#fff;background-color:#d58512;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled.focus,.btn-warning.disabled:focus,.btn-warning.disabled:hover,.btn-warning[disabled].focus,.btn-warning[disabled]:focus,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning.focus,fieldset[disabled] .btn-warning:focus,fieldset[disabled] .btn-warning:hover{background-color:#f0ad4e;border-color:#eea236}.btn-warning .badge{color:#f0ad4e;background-color:#fff}.btn-danger{color:#fff;background-color:#d9534f;border-color:#d43f3a}.btn-danger.focus,.btn-danger:focus{color:#fff;background-color:#c9302c;border-color:#761c19}.btn-danger:hover{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active.focus,.btn-danger.active:focus,.btn-danger.active:hover,.btn-danger:active.focus,.btn-danger:active:focus,.btn-danger:active:hover,.open>.dropdown-toggle.btn-danger.focus,.open>.dropdown-toggle.btn-danger:focus,.open>.dropdown-toggle.btn-danger:hover{color:#fff;background-color:#ac2925;border-color:#761c19}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled.focus,.btn-danger.disabled:focus,.btn-danger.disabled:hover,.btn-danger[disabled].focus,.btn-danger[disabled]:focus,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger.focus,fieldset[disabled] .btn-danger:focus,fieldset[disabled] .btn-danger:hover{background-color:#d9534f;border-color:#d43f3a}.btn-danger .badge{color:#d9534f;background-color:#fff}.btn-link{font-weight:400;color:#337ab7;border-radius:0}.btn-link,.btn-link.active,.btn-link:active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:active,.btn-link:focus,.btn-link:hover{border-color:transparent}.btn-link:focus,.btn-link:hover{color:#23527c;text-decoration:underline;background-color:transparent}.btn-link[disabled]:focus,.btn-link[disabled]:hover,fieldset[disabled] .btn-link:focus,fieldset[disabled] .btn-link:hover{color:#777;text-decoration:none}.btn-group-lg>.btn,.btn-lg{padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-group-xs>.btn,.btn-xs{padding:1px 5px;font-size:12px;line-height:1.5;border-radius:3px}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=button].btn-block,input[type=reset].btn-block,input[type=submit].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity .15s linear;-o-transition:opacity .15s linear;transition:opacity .15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease;-webkit-transition-duration:.35s;-o-transition-duration:.35s;transition-duration:.35s;-webkit-transition-property:height,visibility;-o-transition-property:height,visibility;transition-property:height,visibility}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid\\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropdown,.dropup{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;font-size:14px;text-align:left;list-style:none;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.15);border-radius:4px;-webkit-box-shadow:0 6px 12px rgba(0,0,0,.175);box-shadow:0 6px 12px rgba(0,0,0,.175)}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{color:#262626;text-decoration:none;background-color:#f5f5f5}.dropdown-menu>.active>a,.dropdown-menu>.active>a:focus,.dropdown-menu>.active>a:hover{color:#fff;text-decoration:none;background-color:#337ab7;outline:0}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{color:#777}.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{text-decoration:none;cursor:not-allowed;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{right:0;left:auto}.dropdown-menu-left{right:auto;left:0}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.42857143;color:#777;white-space:nowrap}.dropdown-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{content:\"\";border-top:0;border-bottom:4px dashed;border-bottom:4px solid\\9}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{right:0;left:auto}.navbar-right .dropdown-menu-left{right:auto;left:0}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group-vertical>.btn,.btn-group>.btn{position:relative;float:left}.btn-group-vertical>.btn.active,.btn-group-vertical>.btn:active,.btn-group-vertical>.btn:focus,.btn-group-vertical>.btn:hover,.btn-group>.btn.active,.btn-group>.btn:active,.btn-group>.btn:focus,.btn-group>.btn:hover{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-bottom-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-right:8px;padding-left:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-right:12px;padding-left:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-top-right-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{display:table-cell;float:none;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=buttons]>.btn input[type=checkbox],[data-toggle=buttons]>.btn input[type=radio],[data-toggle=buttons]>.btn-group>.btn input[type=checkbox],[data-toggle=buttons]>.btn-group>.btn input[type=radio]{position:absolute;clip:rect(0,0,0,0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=col-]{float:none;padding-right:0;padding-left:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:46px;line-height:46px}select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn,textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:30px;line-height:30px}select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{height:auto}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group .form-control:not(:first-child):not(:last-child),.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:6px 12px;font-size:14px;font-weight:400;line-height:1;color:#555;text-align:center;background-color:#eee;border:1px solid #ccc;border-radius:4px}.input-group-addon.input-sm{padding:5px 10px;font-size:12px;border-radius:3px}.input-group-addon.input-lg{padding:10px 16px;font-size:18px;border-radius:6px}.input-group-addon input[type=checkbox],.input-group-addon input[type=radio]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn-group:not(:last-child)>.btn,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:first-child>.btn-group:not(:first-child)>.btn,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle{border-top-left-radius:0;border-bottom-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:active,.input-group-btn>.btn:focus,.input-group-btn>.btn:hover{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{padding-left:0;margin-bottom:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:focus,.nav>li>a:hover{text-decoration:none;background-color:#eee}.nav>li.disabled>a{color:#777}.nav>li.disabled>a:focus,.nav>li.disabled>a:hover{color:#777;text-decoration:none;cursor:not-allowed;background-color:transparent}.nav .open>a,.nav .open>a:focus,.nav .open>a:hover{background-color:#eee;border-color:#337ab7}.nav .nav-divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #ddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.42857143;border:1px solid transparent;border-radius:4px 4px 0 0}.nav-tabs>li>a:hover{border-color:#eee #eee #ddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:focus,.nav-tabs>li.active>a:hover{color:#555;cursor:default;background-color:#fff;border:1px solid #ddd;border-bottom-color:transparent}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border-bottom-color:#fff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:4px}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:focus,.nav-pills>li.active>a:hover{color:#fff;background-color:#337ab7}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border-bottom-color:#fff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}.navbar{position:relative;min-height:50px;margin-bottom:20px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:4px}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{padding-right:15px;padding-left:15px;overflow-x:visible;-webkit-overflow-scrolling:touch;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block!important;height:auto!important;padding-bottom:0;overflow:visible!important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse{padding-right:0;padding-left:0}}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:200px}}.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-bottom,.navbar-fixed-top{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-bottom,.navbar-fixed-top{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;height:50px;padding:15px 15px;font-size:18px;line-height:20px}.navbar-brand:focus,.navbar-brand:hover{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;padding:9px 10px;margin-top:8px;margin-right:15px;margin-bottom:8px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:4px}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:7.5px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:20px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:20px}.navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:15px;padding-bottom:15px}}.navbar-form{padding:10px 15px;margin-top:8px;margin-right:-15px;margin-bottom:8px;margin-left:-15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1)}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .form-control,.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .checkbox,.navbar-form .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .checkbox label,.navbar-form .radio label{padding-left:0}.navbar-form .checkbox input[type=checkbox],.navbar-form .radio input[type=radio]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;padding-top:0;padding-bottom:0;margin-right:0;margin-left:0;border:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:8px;margin-bottom:8px}.navbar-btn.btn-sm{margin-top:10px;margin-bottom:10px}.navbar-btn.btn-xs{margin-top:14px;margin-bottom:14px}.navbar-text{margin-top:15px;margin-bottom:15px}@media (min-width:768px){.navbar-text{float:left;margin-right:15px;margin-left:15px}}@media (min-width:768px){.navbar-left{float:left!important}.navbar-right{float:right!important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#f8f8f8;border-color:#e7e7e7}.navbar-default .navbar-brand{color:#777}.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{color:#5e5e5e;background-color:transparent}.navbar-default .navbar-text{color:#777}.navbar-default .navbar-nav>li>a{color:#777}.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:focus,.navbar-default .navbar-nav>.disabled>a:hover{color:#ccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:#ddd}.navbar-default .navbar-toggle:focus,.navbar-default .navbar-toggle:hover{background-color:#ddd}.navbar-default .navbar-toggle .icon-bar{background-color:#888}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#e7e7e7}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:focus,.navbar-default .navbar-nav>.open>a:hover{color:#555;background-color:#e7e7e7}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#777}.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#ccc;background-color:transparent}}.navbar-default .navbar-link{color:#777}.navbar-default .navbar-link:hover{color:#333}.navbar-default .btn-link{color:#777}.navbar-default .btn-link:focus,.navbar-default .btn-link:hover{color:#333}.navbar-default .btn-link[disabled]:focus,.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:focus,fieldset[disabled] .navbar-default .btn-link:hover{color:#ccc}.navbar-inverse{background-color:#222;border-color:#080808}.navbar-inverse .navbar-brand{color:#9d9d9d}.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-text{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a:focus,.navbar-inverse .navbar-nav>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:focus,.navbar-inverse .navbar-nav>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:focus,.navbar-inverse .navbar-nav>.disabled>a:hover{color:#444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:#333}.navbar-inverse .navbar-toggle:focus,.navbar-inverse .navbar-toggle:hover{background-color:#333}.navbar-inverse .navbar-toggle .icon-bar{background-color:#fff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#101010}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:focus,.navbar-inverse .navbar-nav>.open>a:hover{color:#fff;background-color:#080808}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#444;background-color:transparent}}.navbar-inverse .navbar-link{color:#9d9d9d}.navbar-inverse .navbar-link:hover{color:#fff}.navbar-inverse .btn-link{color:#9d9d9d}.navbar-inverse .btn-link:focus,.navbar-inverse .btn-link:hover{color:#fff}.navbar-inverse .btn-link[disabled]:focus,.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:focus,fieldset[disabled] .navbar-inverse .btn-link:hover{color:#444}.breadcrumb{padding:8px 15px;margin-bottom:20px;list-style:none;background-color:#f5f5f5;border-radius:4px}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{padding:0 5px;color:#ccc;content:\"/\\00a0\"}.breadcrumb>.active{color:#777}.pagination{display:inline-block;padding-left:0;margin:20px 0;border-radius:4px}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:6px 12px;margin-left:-1px;line-height:1.42857143;color:#337ab7;text-decoration:none;background-color:#fff;border:1px solid #ddd}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination>li:last-child>a,.pagination>li:last-child>span{border-top-right-radius:4px;border-bottom-right-radius:4px}.pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{z-index:2;color:#23527c;background-color:#eee;border-color:#ddd}.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span,.pagination>.active>span:focus,.pagination>.active>span:hover{z-index:3;color:#fff;cursor:default;background-color:#337ab7;border-color:#337ab7}.pagination>.disabled>a,.pagination>.disabled>a:focus,.pagination>.disabled>a:hover,.pagination>.disabled>span,.pagination>.disabled>span:focus,.pagination>.disabled>span:hover{color:#777;cursor:not-allowed;background-color:#fff;border-color:#ddd}.pagination-lg>li>a,.pagination-lg>li>span{padding:10px 16px;font-size:18px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-top-left-radius:6px;border-bottom-left-radius:6px}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-top-right-radius:6px;border-bottom-right-radius:6px}.pagination-sm>li>a,.pagination-sm>li>span{padding:5px 10px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-top-left-radius:3px;border-bottom-left-radius:3px}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-top-right-radius:3px;border-bottom-right-radius:3px}.pager{padding-left:0;margin:20px 0;text-align:center;list-style:none}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:#fff;border:1px solid #ddd;border-radius:15px}.pager li>a:focus,.pager li>a:hover{text-decoration:none;background-color:#eee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:focus,.pager .disabled>a:hover,.pager .disabled>span{color:#777;cursor:not-allowed;background-color:#fff}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:focus,a.label:hover{color:#fff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#777}.label-default[href]:focus,.label-default[href]:hover{background-color:#5e5e5e}.label-primary{background-color:#337ab7}.label-primary[href]:focus,.label-primary[href]:hover{background-color:#286090}.label-success{background-color:#5cb85c}.label-success[href]:focus,.label-success[href]:hover{background-color:#449d44}.label-info{background-color:#5bc0de}.label-info[href]:focus,.label-info[href]:hover{background-color:#31b0d5}.label-warning{background-color:#f0ad4e}.label-warning[href]:focus,.label-warning[href]:hover{background-color:#ec971f}.label-danger{background-color:#d9534f}.label-danger[href]:focus,.label-danger[href]:hover{background-color:#c9302c}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:middle;background-color:#777;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-group-xs>.btn .badge,.btn-xs .badge{top:0;padding:1px 5px}a.badge:focus,a.badge:hover{color:#fff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#337ab7;background-color:#fff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#eee}.jumbotron .h1,.jumbotron h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:21px;font-weight:200}.jumbotron>hr{border-top-color:#d5d5d5}.container .jumbotron,.container-fluid .jumbotron{padding-right:15px;padding-left:15px;border-radius:6px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-right:60px;padding-left:60px}.jumbotron .h1,.jumbotron h1{font-size:63px}}.thumbnail{display:block;padding:4px;margin-bottom:20px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail a>img,.thumbnail>img{margin-right:auto;margin-left:auto}a.thumbnail.active,a.thumbnail:focus,a.thumbnail:hover{border-color:#337ab7}.thumbnail .caption{padding:9px;color:#333}.alert{padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:700}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.alert-success hr{border-top-color:#c9e2b3}.alert-success .alert-link{color:#2b542c}.alert-info{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.alert-info hr{border-top-color:#a6e1ec}.alert-info .alert-link{color:#245269}.alert-warning{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.alert-warning hr{border-top-color:#f7e1b5}.alert-warning .alert-link{color:#66512c}.alert-danger{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.alert-danger hr{border-top-color:#e4b9c0}.alert-danger .alert-link{color:#843534}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{height:20px;margin-bottom:20px;overflow:hidden;background-color:#f5f5f5;border-radius:4px;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.1)}.progress-bar{float:left;width:0;height:100%;font-size:12px;line-height:20px;color:#fff;text-align:center;background-color:#337ab7;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition:width .6s ease;-o-transition:width .6s ease;transition:width .6s ease}.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#5cb85c}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-warning{background-color:#f0ad4e}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-danger{background-color:#d9534f}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{overflow:hidden;zoom:1}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-body,.media-left,.media-right{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{padding-left:0;margin-bottom:20px}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#fff;border:1px solid #ddd}.list-group-item:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}a.list-group-item,button.list-group-item{color:#555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:focus,.list-group-item.disabled:hover{color:#777;cursor:not-allowed;background-color:#eee}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text{color:#777}.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#fff;background-color:#337ab7;border-color:#337ab7}.list-group-item.active .list-group-item-heading,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#c7ddef}.list-group-item-success{color:#3c763d;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#3c763d}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:focus,a.list-group-item-success:hover,button.list-group-item-success:focus,button.list-group-item-success:hover{color:#3c763d;background-color:#d0e9c6}a.list-group-item-success.active,a.list-group-item-success.active:focus,a.list-group-item-success.active:hover,button.list-group-item-success.active,button.list-group-item-success.active:focus,button.list-group-item-success.active:hover{color:#fff;background-color:#3c763d;border-color:#3c763d}.list-group-item-info{color:#31708f;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#31708f}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:focus,a.list-group-item-info:hover,button.list-group-item-info:focus,button.list-group-item-info:hover{color:#31708f;background-color:#c4e3f3}a.list-group-item-info.active,a.list-group-item-info.active:focus,a.list-group-item-info.active:hover,button.list-group-item-info.active,button.list-group-item-info.active:focus,button.list-group-item-info.active:hover{color:#fff;background-color:#31708f;border-color:#31708f}.list-group-item-warning{color:#8a6d3b;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#8a6d3b}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:focus,a.list-group-item-warning:hover,button.list-group-item-warning:focus,button.list-group-item-warning:hover{color:#8a6d3b;background-color:#faf2cc}a.list-group-item-warning.active,a.list-group-item-warning.active:focus,a.list-group-item-warning.active:hover,button.list-group-item-warning.active,button.list-group-item-warning.active:focus,button.list-group-item-warning.active:hover{color:#fff;background-color:#8a6d3b;border-color:#8a6d3b}.list-group-item-danger{color:#a94442;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#a94442}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:focus,a.list-group-item-danger:hover,button.list-group-item-danger:focus,button.list-group-item-danger:hover{color:#a94442;background-color:#ebcccc}a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-group-item-danger.active:hover,button.list-group-item-danger.active,button.list-group-item-danger.active:focus,button.list-group-item-danger.active:hover{color:#fff;background-color:#a94442;border-color:#a94442}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,.05);box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-left-radius:3px;border-top-right-radius:3px}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.panel-title>.small,.panel-title>.small>a,.panel-title>a,.panel-title>small,.panel-title>small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-left-radius:3px;border-top-right-radius:3px}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-left-radius:0;border-top-right-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.panel-collapse>.table,.panel>.table,.panel>.table-responsive>.table{margin-bottom:0}.panel>.panel-collapse>.table caption,.panel>.table caption,.panel>.table-responsive>.table caption{padding-right:15px;padding-left:15px}.panel>.table-responsive:first-child>.table:first-child,.panel>.table:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table:first-child>thead:first-child>tr:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child{border-top-left-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child{border-top-right-radius:3px}.panel>.table-responsive:last-child>.table:last-child,.panel>.table:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:3px}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #ddd}.panel>.table>tbody:first-child>tr:first-child td,.panel>.table>tbody:first-child>tr:first-child th{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{margin-bottom:0;border:0}.panel-group{margin-bottom:20px}.panel-group .panel{margin-bottom:0;border-radius:4px}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.list-group,.panel-group .panel-heading+.panel-collapse>.panel-body{border-top:1px solid #ddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #ddd}.panel-default{border-color:#ddd}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ddd}.panel-primary{border-color:#337ab7}.panel-primary>.panel-heading{color:#fff;background-color:#337ab7;border-color:#337ab7}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#337ab7}.panel-primary>.panel-heading .badge{color:#337ab7;background-color:#fff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#337ab7}.panel-success{border-color:#d6e9c6}.panel-success>.panel-heading{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d6e9c6}.panel-success>.panel-heading .badge{color:#dff0d8;background-color:#3c763d}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d6e9c6}.panel-info{border-color:#bce8f1}.panel-info>.panel-heading{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#bce8f1}.panel-info>.panel-heading .badge{color:#d9edf7;background-color:#31708f}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#bce8f1}.panel-warning{border-color:#faebcc}.panel-warning>.panel-heading{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#faebcc}.panel-warning>.panel-heading .badge{color:#fcf8e3;background-color:#8a6d3b}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#faebcc}.panel-danger{border-color:#ebccd1}.panel-danger>.panel-heading{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ebccd1}.panel-danger>.panel-heading .badge{color:#f2dede;background-color:#a94442}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ebccd1}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video{position:absolute;top:0;bottom:0;left:0;width:100%;height:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.05);box-shadow:inset 0 1px 1px rgba(0,0,0,.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,.15)}.well-lg{padding:24px;border-radius:6px}.well-sm{padding:9px;border-radius:3px}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;filter:alpha(opacity=20);opacity:.2}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;filter:alpha(opacity=50);opacity:.5}button.close{-webkit-appearance:none;padding:0;cursor:pointer;background:0 0;border:0}.modal-open{overflow:hidden}.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;display:none;overflow:hidden;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out;-webkit-transform:translate(0,-25%);-ms-transform:translate(0,-25%);-o-transform:translate(0,-25%);transform:translate(0,-25%)}.modal.in .modal-dialog{-webkit-transform:translate(0,0);-ms-transform:translate(0,0);-o-transform:translate(0,0);transform:translate(0,0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);box-shadow:0 3px 9px rgba(0,0,0,.5)}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000}.modal-backdrop.fade{filter:alpha(opacity=0);opacity:0}.modal-backdrop.in{filter:alpha(opacity=50);opacity:.5}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.42857143}.modal-body{position:relative;padding:15px}.modal-footer{padding:15px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-bottom:0;margin-left:5px}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,.5);box-shadow:0 5px 15px rgba(0,0,0,.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto}.tooltip.in{filter:alpha(opacity=90);opacity:.9}.tooltip.top{padding:5px 0;margin-top:-3px}.tooltip.right{padding:0 5px;margin-left:3px}.tooltip.bottom{padding:5px 0;margin-top:3px}.tooltip.left{padding:0 5px;margin-left:-3px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#fff;text-align:center;background-color:#000;border-radius:4px}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-left .tooltip-arrow{right:5px;bottom:0;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#000}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#000}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.2);border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,.2);box-shadow:0 5px 10px rgba(0,0,0,.2);line-break:auto}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{padding:8px 14px;margin:0;font-size:14px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;border-radius:5px 5px 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{content:\"\";border-width:10px}.popover.top>.arrow{bottom:-11px;left:50%;margin-left:-11px;border-top-color:#999;border-top-color:rgba(0,0,0,.25);border-bottom-width:0}.popover.top>.arrow:after{bottom:1px;margin-left:-10px;content:\" \";border-top-color:#fff;border-bottom-width:0}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-right-color:#999;border-right-color:rgba(0,0,0,.25);border-left-width:0}.popover.right>.arrow:after{bottom:-10px;left:1px;content:\" \";border-right-color:#fff;border-left-width:0}.popover.bottom>.arrow{top:-11px;left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#999;border-bottom-color:rgba(0,0,0,.25)}.popover.bottom>.arrow:after{top:1px;margin-left:-10px;content:\" \";border-top-width:0;border-bottom-color:#fff}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#999;border-left-color:rgba(0,0,0,.25)}.popover.left>.arrow:after{right:1px;bottom:-10px;content:\" \";border-right-width:0;border-left-color:#fff}.carousel{position:relative}.carousel-inner{position:relative;width:100%;overflow:hidden}.carousel-inner>.item{position:relative;display:none;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>a>img,.carousel-inner>.item>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.active.right,.carousel-inner>.item.next{left:0;-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0)}.carousel-inner>.item.active.left,.carousel-inner>.item.prev{left:0;-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0)}.carousel-inner>.item.active,.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right{left:0;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;bottom:0;left:0;width:15%;font-size:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);background-color:rgba(0,0,0,0);filter:alpha(opacity=50);opacity:.5}.carousel-control.left{background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,.0001)));background-image:linear-gradient(to right,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);background-repeat:repeat-x}.carousel-control.right{right:0;left:auto;background-image:-webkit-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.0001)),to(rgba(0,0,0,.5)));background-image:linear-gradient(to right,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);background-repeat:repeat-x}.carousel-control:focus,.carousel-control:hover{color:#fff;text-decoration:none;filter:alpha(opacity=90);outline:0;opacity:.9}.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{position:absolute;top:50%;z-index:5;display:inline-block;margin-top:-10px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{left:50%;margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{right:50%;margin-right:-10px}.carousel-control .icon-next,.carousel-control .icon-prev{width:20px;height:20px;font-family:serif;line-height:1}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;padding-left:0;margin-left:-30%;text-align:center;list-style:none}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;cursor:pointer;background-color:#000\\9;background-color:rgba(0,0,0,0);border:1px solid #fff;border-radius:10px}.carousel-indicators .active{width:12px;height:12px;margin:0;background-color:#fff}.carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:10;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{right:20%;left:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.btn-group-vertical>.btn-group:after,.btn-group-vertical>.btn-group:before,.btn-toolbar:after,.btn-toolbar:before,.clearfix:after,.clearfix:before,.container-fluid:after,.container-fluid:before,.container:after,.container:before,.dl-horizontal dd:after,.dl-horizontal dd:before,.form-horizontal .form-group:after,.form-horizontal .form-group:before,.modal-footer:after,.modal-footer:before,.modal-header:after,.modal-header:before,.nav:after,.nav:before,.navbar-collapse:after,.navbar-collapse:before,.navbar-header:after,.navbar-header:before,.navbar:after,.navbar:before,.pager:after,.pager:before,.panel-body:after,.panel-body:before,.row:after,.row:before{display:table;content:\" \"}.btn-group-vertical>.btn-group:after,.btn-toolbar:after,.clearfix:after,.container-fluid:after,.container:after,.dl-horizontal dd:after,.form-horizontal .form-group:after,.modal-footer:after,.modal-header:after,.nav:after,.navbar-collapse:after,.navbar-header:after,.navbar:after,.pager:after,.panel-body:after,.row:after{clear:both}.center-block{display:block;margin-right:auto;margin-left:auto}.pull-right{float:right!important}.pull-left{float:left!important}.hide{display:none!important}.show{display:block!important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none!important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-lg,.visible-md,.visible-sm,.visible-xs{display:none!important}.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block{display:none!important}@media (max-width:767px){.visible-xs{display:block!important}table.visible-xs{display:table!important}tr.visible-xs{display:table-row!important}td.visible-xs,th.visible-xs{display:table-cell!important}}@media (max-width:767px){.visible-xs-block{display:block!important}}@media (max-width:767px){.visible-xs-inline{display:inline!important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block!important}table.visible-sm{display:table!important}tr.visible-sm{display:table-row!important}td.visible-sm,th.visible-sm{display:table-cell!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block!important}table.visible-md{display:table!important}tr.visible-md{display:table-row!important}td.visible-md,th.visible-md{display:table-cell!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block!important}}@media (min-width:1200px){.visible-lg{display:block!important}table.visible-lg{display:table!important}tr.visible-lg{display:table-row!important}td.visible-lg,th.visible-lg{display:table-cell!important}}@media (min-width:1200px){.visible-lg-block{display:block!important}}@media (min-width:1200px){.visible-lg-inline{display:inline!important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block!important}}@media (max-width:767px){.hidden-xs{display:none!important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none!important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none!important}}@media (min-width:1200px){.hidden-lg{display:none!important}}.visible-print{display:none!important}@media print{.visible-print{display:block!important}table.visible-print{display:table!important}tr.visible-print{display:table-row!important}td.visible-print,th.visible-print{display:table-cell!important}}.visible-print-block{display:none!important}@media print{.visible-print-block{display:block!important}}.visible-print-inline{display:none!important}@media print{.visible-print-inline{display:inline!important}}.visible-print-inline-block{display:none!important}@media print{.visible-print-inline-block{display:inline-block!important}}@media print{.hidden-print{display:none!important}}body,html{height:100%;margin:0}#map{height:100%}.info{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}.external{background-image:linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cg%20transform%3D%22translate%28-826.429%20-698.791%29%22%3E%3Crect%20width%3D%225.982%22%20height%3D%225.982%22%20x%3D%22826.929%22%20y%3D%22702.309%22%20fill%3D%22%23fff%22%20stroke%3D%22%2306c%22%2F%3E%3Cg%3E%3Cpath%20d%3D%22M831.194%20698.791h5.234v5.391l-1.571%201.545-1.31-1.31-2.725%202.725-2.689-2.689%202.808-2.808-1.311-1.311z%22%20fill%3D%22%2306f%22%2F%3E%3Cpath%20d%3D%22M835.424%20699.795l.022%204.885-1.817-1.817-2.881%202.881-1.228-1.228%202.881-2.881-1.851-1.851z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E);background-position:right center;background-repeat:no-repeat;padding-right:13px}.dataset-spatial-minimap{height:120px}.code-nowrap{word-wrap:normal;white-space:pre}.ac-container{width:auto;margin:10px auto 10px auto;text-align:left;overflow-y:auto;overflow-x:hidden;height:auto}.ac-container label{font-family:BebasNeueRegular,'Arial Narrow',Arial,sans-serif;padding:5px 20px;position:relative;z-index:20;display:block;cursor:pointer;color:#777;text-shadow:1px 1px 1px rgba(255,255,255,.8);line-height:30px;font-size:17px;background:#fff;background:-moz-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-webkit-gradient(linear,left top,left bottom,color-stop(1%,#fff),color-stop(100%,#eaeaea));background:-webkit-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-o-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-ms-linear-gradient(top,#fff 1%,#eaeaea 100%);background:linear-gradient(top,#fff 1%,#eaeaea 100%);filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea', GradientType=0 );box-shadow:0 0 0 1px rgba(155,155,155,.3),1px 0 0 0 rgba(255,255,255,.9) inset,0 2px 2px rgba(0,0,0,.1);box-sizing:content-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.ac-container label:hover{background:#fff}.ac-container input.menu:checked+label,.ac-container input.menu:checked+label:hover{background:#c6e1ec;color:#3d7489;text-shadow:0 1px 1px rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(155,155,155,.3),0 2px 2px rgba(0,0,0,.1)}.ac-container input.menu:checked+label:after,.ac-container label:hover:after{content:'';position:absolute;width:24px;height:24px;right:13px;top:7px;background:transparent url(app/css/styledLayerControl/images/arrow_down.png) no-repeat center center}.ac-container input.menu:checked+label:after{background-image:url(app/css/styledLayerControl/images/arrow_up.png)}.ac-container input.menu{display:none}.ac-container article{background:rgba(255,255,255,.5);margin-top:-1px;overflow:hidden;height:0;position:relative;z-index:10;-webkit-transition:height .3s ease-in-out,box-shadow .6s linear;-moz-transition:height .3s ease-in-out,box-shadow .6s linear;-o-transition:height .3s ease-in-out,box-shadow .6s linear;-ms-transition:height .3s ease-in-out,box-shadow .6s linear;transition:height .3s ease-in-out,box-shadow .6s linear}.ac-container input.menu:checked~article{-webkit-transition:height .5s ease-in-out,box-shadow .1s linear;-moz-transition:height .5s ease-in-out,box-shadow .1s linear;-o-transition:height .5s ease-in-out,box-shadow .1s linear;-ms-transition:height .5s ease-in-out,box-shadow .1s linear;transition:height .5s ease-in-out,box-shadow .1s linear;box-shadow:0 0 0 1px rgba(155,155,155,.3)}.ac-container input.menu:checked~article.ac-large{height:auto;max-height:200px;padding-top:5px;overflow-y:auto}.menu-item-radio{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.menu-item-checkbox{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.bt_delete{position:relative;float:right;background-image:url(app/css/styledLayerControl/images/delete.png);background-color:transparent;background-repeat:no-repeat;background-position:0 0;border:none;cursor:pointer;height:16px;width:16px;vertical-align:middle}.leaflet-control-layers{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}input[type=checkbox].leaflet-control-layers-selector,input[type=radio].leaflet-control-layers-selector{margin:3px 3px 0 5px}.snow{display:none;height:100%;left:0;position:absolute;top:0;width:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}#snow1{background-image:url(http://www.wearewebstars.dk/codepen/img/s1.png);animation:snow1 5s linear infinite}#snow2{background-image:url(http://www.wearewebstars.dk/codepen/img/s2.png);animation:snow2 20s linear infinite}#snow3{background-image:url(http://www.wearewebstars.dk/codepen/img/s3.png);animation:snow3 30s linear infinite}@keyframes snow1{from{background-position:0 0}to{background-position:500px 500px}}@keyframes snow2{from{background-position:0 0}to{background-position:400px 800px}}@keyframes snow3{from{background-position:0 0}to{background-position:-600px 900px}}");
 })
