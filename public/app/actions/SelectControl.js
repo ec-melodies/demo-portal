@@ -7,7 +7,7 @@ let TEMPLATE =
   <select></select>
 </div>`
 
-export default class SelectControl extends L.Control {
+export class SelectControl extends L.Control {
   constructor (covLayer, choices, options) {
     super(options.position ? {position: options.position} : {position: 'topleft'})
     this._title = options.title || ''
