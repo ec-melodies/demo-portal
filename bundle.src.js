@@ -7860,7 +7860,7 @@ $__System.register('72', ['48', '56', '70', '71'], function (_export) {
        *       label: { en: 'Temperature' }
        *     },
        *     unit: {
-       *       symbol: 'K',
+       *       symbol: { value: 'K' },
        *       label: { en: 'Kelvin' }
        *     }
        *   },
@@ -7934,6 +7934,27 @@ $__System.register('72', ['48', '56', '70', '71'], function (_export) {
           value: function update() {
             this._doUpdate(true);
           }
+
+          // TODO move this into a reusable unit-formatting module
+        }, {
+          key: '_getUnitString',
+          value: function _getUnitString(param, language) {
+            if (!param.unit) {
+              return '';
+            }
+            if (param.unit.symbol) {
+              var unit = param.unit.symbol.value || param.unit.symbol;
+              var scheme = param.unit.symbol.type;
+              if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
+                if (unit === 'Cel') {
+                  unit = '°C';
+                }
+              }
+              return unit;
+            } else {
+              return i18n.getLanguageString(param.unit.label, language);
+            }
+          }
         }, {
           key: '_doUpdate',
           value: function _doUpdate(fullUpdate) {
@@ -7944,7 +7965,7 @@ $__System.register('72', ['48', '56', '70', '71'], function (_export) {
               // if requested language doesn't exist, use the returned one for all other labels
               var language = i18n.getLanguageTag(param.observedProperty.label, this._language);
               var title = i18n.getLanguageString(param.observedProperty.label, language);
-              var unit = param.unit ? param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language) : '';
+              var unit = this._getUnitString(param, language);
               $('.legend-title', el).fill(title);
               $('.legend-uom', el).fill(unit);
             }
@@ -15181,6 +15202,28 @@ $__System.register('78', ['48', '71', '76', '77', '5c'], function (_export) {
             var refParam = refCov.parameters.get(refParamKey);
             return refParam;
           }
+
+          // TODO move this into a reusable unit-formatting module
+          // TODO code duplication with ContinuousLegend
+        }, {
+          key: '_getUnitString',
+          value: function _getUnitString(param, language) {
+            if (!param.unit) {
+              return '';
+            }
+            if (param.unit.symbol) {
+              var unit = param.unit.symbol.value || param.unit.symbol;
+              var scheme = param.unit.symbol.type;
+              if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
+                if (unit === 'Cel') {
+                  unit = '°C';
+                }
+              }
+              return unit;
+            } else {
+              return i18n.getLanguageString(param.unit.label, language);
+            }
+          }
         }, {
           key: '_getPlotElement',
           value: function _getPlotElement(paramKeyGroup) {
@@ -15199,7 +15242,7 @@ $__System.register('78', ['48', '71', '76', '77', '5c'], function (_export) {
             if (vertSrs) {
               if (vertSrs.cs && vertSrs.cs.axes) {
                 var ax = vertSrs.cs.axes[0];
-                zUnit = ax.unit.symbol;
+                zUnit = this._getUnitString(ax, this._language);
                 if (ax.name) {
                   zName = i18n.getLanguageString(ax.name, this._language);
                 }
@@ -15211,7 +15254,7 @@ $__System.register('78', ['48', '71', '76', '77', '5c'], function (_export) {
               xLabel += ' (' + zUnit + ')';
             }
 
-            var unit = refParam.unit ? refParam.unit.symbol ? refParam.unit.symbol : i18n.getLanguageString(refParam.unit.label, this._language) : '';
+            var unit = this._getUnitString(refParam, this._language);
             var obsPropLabel = i18n.getLanguageString(refParam.observedProperty.label, this._language);
 
             // http://c3js.org/samples/simple_xy_multiple.html
@@ -15999,42 +16042,44 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
     return Coverage;
   }();
   exports.default = Coverage;
+  function getRangeAxisOrder(domain, range) {
+    var needsRangeAxisOrder = [].concat(_toConsumableArray(domain.axes.values())).filter(function(axis) {
+      return axis.values.length > 1;
+    }).length > 1;
+    var axisOrder = domain._rangeAxisOrder || range._axisNames;
+    if (needsRangeAxisOrder && !axisOrder) {
+      throw new Error('Range axis order missing');
+    }
+    axisOrder = axisOrder || [].concat(_toConsumableArray(domain.axes.keys()));
+    return axisOrder;
+  }
+  function getRangeShapeArray(domain, range) {
+    var axisOrder = getRangeAxisOrder(domain, range);
+    var shape = axisOrder.map(function(k) {
+      return domain.axes.get(k).values.length;
+    });
+    if (range._shape) {
+      var matchesDomain = range._shape.length === shape.length && range._shape.every(function(v, i) {
+        return v === shape[i];
+      });
+      if (!matchesDomain) {
+        throw new Error('range.shape must match domain axis sizes');
+      }
+    }
+    return shape;
+  }
   function _subsetByIndex(cov, constraints) {
     return cov.loadDomain().then(function(domain) {
       constraints = (0, _subset.normalizeIndexSubsetConstraints)(domain, constraints);
       var newdomain = (0, _subset.subsetDomainByIndex)(domain, constraints);
-      newdomain._rangeAxisOrder = domain._rangeAxisOrder;
-      newdomain._rangeShape = {};
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-      try {
-        for (var _iterator2 = newdomain.axes[Symbol.iterator](),
-            _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _step2$value = _slicedToArray(_step2.value, 2);
-          var axisName = _step2$value[0];
-          var axis = _step2$value[1];
-          newdomain._rangeShape[domain._rangeAxisOrder.indexOf(axisName)] = axis.values.length;
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
+      if (domain._rangeAxisOrder) {
+        newdomain._rangeAxisOrder = domain._rangeAxisOrder;
       }
       var rangeWrapper = function rangeWrapper(range) {
         var _ndarr$hi$lo,
             _ndarr$hi;
         var ndarr = range._ndarr;
-        var axisNames = domain._rangeAxisOrder;
+        var axisNames = getRangeAxisOrder(domain, range);
         var los = axisNames.map(function(name) {
           return constraints[name].start;
         });
@@ -16047,31 +16092,35 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
         var newndarr = (_ndarr$hi$lo = (_ndarr$hi = ndarr.hi.apply(ndarr, _toConsumableArray(his))).lo.apply(_ndarr$hi, _toConsumableArray(los))).step.apply(_ndarr$hi$lo, _toConsumableArray(steps));
         var newrange = {
           dataType: range.dataType,
-          get: createRangeGetFunction(newndarr, domain._rangeAxisOrder),
-          _ndarr: newndarr
+          get: createRangeGetFunction(newndarr, axisNames),
+          _ndarr: newndarr,
+          _axisNames: axisNames,
+          _shape: axisNames.map(function(axisName) {
+            return newdomain.axes.get(axisName).values.length;
+          })
         };
         newrange.shape = new Map();
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
         try {
-          for (var _iterator3 = domain.axes.keys()[Symbol.iterator](),
-              _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var axisName = _step3.value;
+          for (var _iterator2 = axisNames[Symbol.iterator](),
+              _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var axisName = _step2.value;
             var size = newdomain.axes.get(axisName).values.length;
             newrange.shape.set(axisName, size);
           }
         } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
             }
           } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
+            if (_didIteratorError2) {
+              throw _iteratorError2;
             }
           }
         }
@@ -16111,15 +16160,20 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
       return;
     var param = params[key];
     param.key = key;
+    if (param.unit) {
+      if (typeof param.unit.symbol === 'string') {
+        param.unit.symbol = {value: param.unit.symbol};
+      }
+    }
     if (param.categoryEncoding) {
       var map = new Map();
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
       try {
-        for (var _iterator4 = Object.keys(param.categoryEncoding)[Symbol.iterator](),
-            _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var category = _step4.value;
+        for (var _iterator3 = Object.keys(param.categoryEncoding)[Symbol.iterator](),
+            _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var category = _step3.value;
           var vals = param.categoryEncoding[category];
           if (!Array.isArray(vals)) {
             vals = [vals];
@@ -16127,16 +16181,16 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
           map.set(category, vals);
         }
       } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
           }
         } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
+          if (_didIteratorError3) {
+            throw _iteratorError3;
           }
         }
       }
@@ -16208,34 +16262,45 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
         range.actualMax = max;
       }
     }
-    var shape = new Map();
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
+    if (range.shape) {
+      range._shape = range.shape;
+    }
+    if (range.axisNames) {
+      range._axisNames = range.axisNames;
+      delete range.axisNames;
+    }
+    var axisNames = getRangeAxisOrder(domain, range);
+    var shapeArr = getRangeShapeArray(domain, range);
+    var ndarr = (0, _ndarray2.default)(vals, shapeArr);
+    range._ndarr = ndarr;
+    range.get = createRangeGetFunction(ndarr, axisNames);
+    var shapeMap = new Map();
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
+    var _iteratorError4 = undefined;
     try {
-      for (var _iterator5 = domain.axes.keys()[Symbol.iterator](),
-          _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-        var axisName = _step5.value;
-        shape.set(axisName, domain.axes.get(axisName).values.length);
+      for (var _iterator4 = domain.axes[Symbol.iterator](),
+          _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+        var _step4$value = _slicedToArray(_step4.value, 2);
+        var axisName = _step4$value[0];
+        var axis = _step4$value[1];
+        shapeMap.set(axisName, axis.values.length);
       }
     } catch (err) {
-      _didIteratorError5 = true;
-      _iteratorError5 = err;
+      _didIteratorError4 = true;
+      _iteratorError4 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-          _iterator5.return();
+        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+          _iterator4.return();
         }
       } finally {
-        if (_didIteratorError5) {
-          throw _iteratorError5;
+        if (_didIteratorError4) {
+          throw _iteratorError4;
         }
       }
     }
-    range.shape = shape;
-    var ndarr = (0, _ndarray2.default)(vals, domain._rangeShape);
-    range._ndarr = ndarr;
-    range.get = createRangeGetFunction(ndarr, domain._rangeAxisOrder);
+    range.shape = shapeMap;
     range.__transformDone = true;
     return range;
   }
@@ -16261,39 +16326,39 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
       domain.profiles.push(profile);
     }
     var axes = new Map();
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
     try {
-      for (var _iterator6 = Object.keys(domain.axes)[Symbol.iterator](),
-          _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-        var axisName = _step6.value;
+      for (var _iterator5 = Object.keys(domain.axes)[Symbol.iterator](),
+          _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var axisName = _step5.value;
         axes.set(axisName, domain.axes[axisName]);
       }
     } catch (err) {
-      _didIteratorError6 = true;
-      _iteratorError6 = err;
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion6 && _iterator6.return) {
-          _iterator6.return();
+        if (!_iteratorNormalCompletion5 && _iterator5.return) {
+          _iterator5.return();
         }
       } finally {
-        if (_didIteratorError6) {
-          throw _iteratorError6;
+        if (_didIteratorError5) {
+          throw _iteratorError5;
         }
       }
     }
     domain.axes = axes;
-    var _iteratorNormalCompletion7 = true;
-    var _didIteratorError7 = false;
-    var _iteratorError7 = undefined;
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
     try {
-      for (var _iterator7 = axes[Symbol.iterator](),
-          _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-        var _step7$value = _slicedToArray(_step7.value, 2);
-        var key = _step7$value[0];
-        var axis = _step7$value[1];
+      for (var _iterator6 = axes[Symbol.iterator](),
+          _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var _step6$value = _slicedToArray(_step6.value, 2);
+        var key = _step6$value[0];
+        var axis = _step6$value[1];
         axis.key = key;
         if (axis.dataType === 'Tuple' || axis.dataType === 'Polygon') {
           axis.dataType = _util.PREFIX + axis.dataType;
@@ -16337,6 +16402,40 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
         axis.bounds = wrapBounds(axis);
       }
     } catch (err) {
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+          _iterator6.return();
+        }
+      } finally {
+        if (_didIteratorError6) {
+          throw _iteratorError6;
+        }
+      }
+    }
+    if (referencing) {
+      domain.referencing = referencing;
+    }
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+    try {
+      for (var _iterator7 = domain.referencing[Symbol.iterator](),
+          _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var obj = _step7.value;
+        if (obj.system)
+          break;
+        obj.system = obj.srs || obj.trs || obj.rs;
+        if (obj.dimensions) {
+          obj.components = obj.dimensions;
+        }
+        delete obj.srs;
+        delete obj.trs;
+        delete obj.rs;
+      }
+    } catch (err) {
       _didIteratorError7 = true;
       _iteratorError7 = err;
     } finally {
@@ -16350,49 +16449,9 @@ $__System.registerDynamic("7b", ["5f", "69", "7a", "7c", "7d", "7e"], true, func
         }
       }
     }
-    var needsRangeAxisOrder = [].concat(_toConsumableArray(axes.values())).filter(function(axis) {
-      return axis.values.length > 1;
-    }).length > 1;
-    if (needsRangeAxisOrder && !domain.rangeAxisOrder) {
-      throw new Error('Domain requires "rangeAxisOrder"');
-    }
-    domain._rangeAxisOrder = domain.rangeAxisOrder || [].concat(_toConsumableArray(axes.keys()));
-    domain._rangeShape = domain._rangeAxisOrder.map(function(k) {
-      return axes.get(k).values.length;
-    });
-    if (referencing) {
-      domain.referencing = referencing;
-    }
-    var _iteratorNormalCompletion8 = true;
-    var _didIteratorError8 = false;
-    var _iteratorError8 = undefined;
-    try {
-      for (var _iterator8 = domain.referencing[Symbol.iterator](),
-          _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-        var obj = _step8.value;
-        if (obj.system)
-          break;
-        obj.system = obj.srs || obj.trs || obj.rs;
-        if (obj.dimensions) {
-          obj.components = obj.dimensions;
-        }
-        delete obj.srs;
-        delete obj.trs;
-        delete obj.rs;
-      }
-    } catch (err) {
-      _didIteratorError8 = true;
-      _iteratorError8 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion8 && _iterator8.return) {
-          _iterator8.return();
-        }
-      } finally {
-        if (_didIteratorError8) {
-          throw _iteratorError8;
-        }
-      }
+    if (domain.rangeAxisOrder) {
+      domain._rangeAxisOrder = domain.rangeAxisOrder;
+      delete domain.rangeAxisOrder;
     }
     domain.__transformDone = true;
     return domain;
@@ -17345,6 +17404,7 @@ $__System.registerDynamic("82", [], true, function($__require, exports, module) 
       GLOBAL = this;
   Object.defineProperty(exports, "__esModule", {value: true});
   exports.getAcceptHeader = getAcceptHeader;
+  exports.matchesMediaTypes = matchesMediaTypes;
   var MEDIATYPE = exports.MEDIATYPE = {
     COVCBOR: 'application/prs.coverage+cbor',
     COVJSON: 'application/prs.coverage+json',
@@ -17358,6 +17418,14 @@ $__System.registerDynamic("82", [], true, function($__require, exports, module) 
     var covjsonProfile = standalone ? '; profile="' + COVJSON_PROFILE_STANDALONE + '"' : '';
     var accept = MEDIATYPE.COVCBOR + '; q=1.0, ' + MEDIATYPE.COVJSON + covjsonProfile + '; q=0.5, ' + MEDIATYPE.JSONLD + '; q=0.1, ' + MEDIATYPE.JSON + '; q=0.1';
     return accept;
+  }
+  function matchesMediaTypes(mediaType, matchingMediaTypes) {
+    if (!Array.isArray(matchingMediaTypes)) {
+      matchingMediaTypes = [matchingMediaTypes];
+    }
+    return matchingMediaTypes.some(function(t) {
+      return mediaType.indexOf(t) === 0;
+    });
   }
   var EXT = exports.EXT = {
     COVJSON: '.covjson',
@@ -17426,7 +17494,7 @@ $__System.registerDynamic("7e", ["81", "7d", "82"], true, function($__require, e
             return;
           }
           var type = req.getResponseHeader('Content-Type');
-          if (type.indexOf(_httpCommon.MEDIATYPE.OCTETSTREAM) === 0 || type.indexOf(_httpCommon.MEDIATYPE.TEXT) === 0) {
+          if ((0, _httpCommon.matchesMediaTypes)(type, [_httpCommon.MEDIATYPE.OCTETSTREAM, _httpCommon.MEDIATYPE.TEXT])) {
             if ((0, _util.endsWith)(url, _httpCommon.EXT.COVJSON)) {
               type = _httpCommon.MEDIATYPE.COVJSON;
             } else if ((0, _util.endsWith)(url, _httpCommon.EXT.COVCBOR)) {
@@ -17434,12 +17502,12 @@ $__System.registerDynamic("7e", ["81", "7d", "82"], true, function($__require, e
             }
           }
           var data = undefined;
-          if (type === _httpCommon.MEDIATYPE.COVCBOR) {
+          if ((0, _httpCommon.matchesMediaTypes)(type, _httpCommon.MEDIATYPE.COVCBOR)) {
             var arrayBuffer = req.response;
             var t0 = new Date();
             data = _cborJs2.default.decode(arrayBuffer);
             console.log('CBOR decoding: ' + (new Date() - t0) + 'ms');
-          } else if ([_httpCommon.MEDIATYPE.COVJSON, _httpCommon.MEDIATYPE.JSONLD, _httpCommon.MEDIATYPE.JSON].indexOf(type) > -1) {
+          } else if ((0, _httpCommon.matchesMediaTypes)(type, [_httpCommon.MEDIATYPE.COVJSON, _httpCommon.MEDIATYPE.JSONLD, _httpCommon.MEDIATYPE.JSON])) {
             if (responseType === 'arraybuffer') {
               if (window.TextDecoder) {
                 var t0 = new Date();
