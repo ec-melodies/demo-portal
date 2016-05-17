@@ -11,6 +11,7 @@ import WMS from './formats/WMS.js'
 
 import GeoCoverageView from './actions/GeoCoverageView.js'
 import StatisticalCoverageView from './actions/StatisticalCoverageView.js'
+import CoverageDeriveParameter from './actions/CoverageDeriveParameter.js'
 import CoverageRemapCategories from './actions/CoverageRemapCategories.js'
 import CoverageCategoriesStatistics from './actions/CoverageCategoriesStatistics.js'
 import CoverageSubsetByPolygon from './actions/CoverageSubsetByPolygon.js'
@@ -36,6 +37,7 @@ export default class App extends Eventable {
       new CovJSON([
          GeoCoverageView,
          StatisticalCoverageView,
+         CoverageDeriveParameter,
          CoverageRemapCategories,
          CoverageCategoriesStatistics,
          CoverageSubsetByPolygon,
@@ -45,6 +47,7 @@ export default class App extends Eventable {
       new CovCBOR([
          GeoCoverageView,
          StatisticalCoverageView,
+         CoverageDeriveParameter,
          CoverageRemapCategories,
          CoverageCategoriesStatistics,
          CoverageSubsetByPolygon,
@@ -54,6 +57,7 @@ export default class App extends Eventable {
       new CoverageData([
          GeoCoverageView,
          StatisticalCoverageView,
+         CoverageDeriveParameter,
          CoverageRemapCategories,
          CoverageCategoriesStatistics,
          CoverageSubsetByPolygon,

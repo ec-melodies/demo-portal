@@ -21,8 +21,9 @@ System.config({
     "clean-css": "npm:clean-css@3.4.11",
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
-    "covjson-reader": "npm:covjson-reader@0.11.0",
-    "css": "github:systemjs/plugin-css@0.1.20",
+    "covjson-reader": "npm:covjson-reader@0.11.6",
+    "covutils": "npm:covutils@0.2.3",
+    "css": "github:systemjs/plugin-css@0.1.21",
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
     "leaflet": "github:Leaflet/Leaflet@0.7.7",
@@ -39,8 +40,8 @@ System.config({
     },
     "github:Reading-eScience-Centre/leaflet-coverage@master": {
       "c3": "npm:c3@0.4.10",
-      "covutils": "npm:covutils@0.1.1",
-      "css": "github:systemjs/plugin-css@0.1.20",
+      "covutils": "npm:covutils@0.2.3",
+      "css": "github:systemjs/plugin-css@0.1.21",
       "leaflet": "github:Leaflet/Leaflet@0.7.7",
       "minified": "github:timjansen/minified.js@2015.1.1",
       "ndarray": "npm:ndarray@1.0.18"
@@ -76,7 +77,7 @@ System.config({
       "path-browserify": "npm:path-browserify@0.0.0"
     },
     "github:jspm/nodelibs-process@0.1.2": {
-      "process": "npm:process@0.11.2"
+      "process": "npm:process@0.11.3"
     },
     "github:jspm/nodelibs-stream@0.1.0": {
       "stream-browserify": "npm:stream-browserify@1.0.0"
@@ -148,15 +149,19 @@ System.config({
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:covjson-reader@0.11.0": {
+    "npm:covjson-reader@0.11.6": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "cbor-js": "npm:cbor-js@0.1.0",
-      "covutils": "npm:covutils@0.1.1",
+      "covutils": "npm:covutils@0.2.3",
+      "ndarray": "npm:ndarray@1.0.18"
+    },
+    "npm:covutils@0.2.3": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "ndarray": "npm:ndarray@1.0.18"
     },
     "npm:d3@3.5.0": {
@@ -174,13 +179,13 @@ System.config({
       "domelementtype": "npm:domelementtype@1.3.0"
     },
     "npm:entities@1.1.1": {
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:es6-promise@2.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:graceful-readlink@1.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2"
@@ -193,7 +198,7 @@ System.config({
       "events": "github:jspm/nodelibs-events@0.1.1",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "stream": "github:jspm/nodelibs-stream@0.1.0",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2",
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:https-browserify@0.0.0": {
@@ -225,7 +230,7 @@ System.config({
     },
     "npm:jsplumb@2.0.7": {
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:ndarray@1.0.18": {
       "iota-array": "npm:iota-array@1.0.0",
@@ -243,13 +248,13 @@ System.config({
     "npm:path-browserify@0.0.0": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:process@0.11.2": {
+    "npm:process@0.11.3": {
       "assert": "github:jspm/nodelibs-assert@0.1.0"
     },
     "npm:punycode@1.3.2": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:readable-stream@1.1.13": {
+    "npm:readable-stream@1.1.14": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "core-util-is": "npm:core-util-is@1.0.2",
       "events": "github:jspm/nodelibs-events@0.1.1",
@@ -266,7 +271,7 @@ System.config({
     "npm:stream-browserify@1.0.0": {
       "events": "github:jspm/nodelibs-events@0.1.1",
       "inherits": "npm:inherits@2.0.1",
-      "readable-stream": "npm:readable-stream@1.1.13"
+      "readable-stream": "npm:readable-stream@1.1.14"
     },
     "npm:string_decoder@0.10.31": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
