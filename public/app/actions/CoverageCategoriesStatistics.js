@@ -323,10 +323,7 @@ export default class CoverageCategoriesStatistics extends Action {
           "axes": {
             "t": t
           },
-          "referencing": [{
-            "components": ["t"],
-            "system": referencingUtil.getRefSystem(domain, ['t'])
-          }]
+          "referencing": [referencingUtil.getReferenceObject(domain, 't')]
         },
         "parameters": params,
         "ranges": ranges

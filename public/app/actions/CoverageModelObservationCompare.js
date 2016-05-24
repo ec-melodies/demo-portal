@@ -1013,7 +1013,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
         "referencing": [{
           // FIXME the order could be different, or even be a x-y-z CRS
           "components": ["x","y"],
-          "system": referencingUtil.getRefSystem(modelDomain, [X,Y])
+          "system": referencingUtil.getReferenceObject(modelDomain, X).system
         }],
         "coverages": covjsons
       }
