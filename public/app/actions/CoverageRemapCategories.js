@@ -188,7 +188,7 @@ export default class CoverageRemapCategories extends Action {
   get isSupported () {
     // Use Case: Category Remapping for grids
     // Current restriction: data is single grid coverage with one or more categorical parameters
-    if (this._isSingleCoverage(this.cov) && this.cov.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+    if (this._isSingleCoverage(this.cov) && this.cov.domainType === COVJSON_GRID) {
       if (this._getCategoricalParams().length > 0) {
         return true
       }

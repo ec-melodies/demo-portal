@@ -3,7 +3,6 @@ import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import * as transformUtil from 'leaflet-coverage/util/transform.js'
-import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 
 import {i18n} from '../util.js'
@@ -75,7 +74,7 @@ export default class CoverageSubsetByPolygon extends Action {
   // TODO code duplication with CoverageRemapCategories.js
   get isSupported () {
     // data is single grid coverage
-    if (this._isSingleCoverage(this.cov) && this.cov.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+    if (this._isSingleCoverage(this.cov) && this.cov.domainType === COVJSON_GRID) {
       return true
     }
     return false

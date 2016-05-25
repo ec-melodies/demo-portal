@@ -1,6 +1,7 @@
 import LayerFactory from 'leaflet-coverage'
 import {getLayerClass} from 'leaflet-coverage'
 import ParameterSync from 'leaflet-coverage/layers/ParameterSync.js'
+import {COVJSON_VERTICALPROFILE} from 'leaflet-coverage/util/constants.js'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
@@ -161,8 +162,7 @@ export default class GeoCoverageView extends Action {
     layer.on('click', ({coverage}) => {
       let genBy = coverage.ld.wasGeneratedBy
       
-      // TODO use full URI
-      if (coverage.domainProfiles.some(p => p.endsWith('VerticalProfile'))) {
+      if (coverage.domainType === COVJSON_VERTICALPROFILE) {
         new ProfilePlot(coverage).addTo(map)
       } else if (genBy && genBy.type === ModelObservationComparisonActivity) {
         let usage = genBy.qualifiedUsage

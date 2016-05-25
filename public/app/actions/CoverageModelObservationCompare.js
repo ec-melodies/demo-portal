@@ -1,6 +1,6 @@
 import {indexOfNearest, indicesOfNearest} from 'leaflet-coverage/util/arrays.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
-import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
+import {COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE} from 'leaflet-coverage/util/constants.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
 import SelectControl from './SelectControl.js'
 import ButtonControl from './ButtonControl.js'
@@ -368,14 +368,14 @@ function getCovData (data) {
   // also, there must be non-categorical parameters
   let res
   if (data.coverages) {
-    if (data.profiles.indexOf(PointCollection) !== -1 || data.profiles.indexOf(ProfileCollection) !== -1) {
+    if (data.domainType === COVJSON_POINT || data.domainType === COVJSON_VERTICALPROFILE) {
       res = {type: TYPE.OBSERVATIONS, data}
     }
     // check if Grid in a 1-element collection
-    if (data.coverages.length === 1 && data.coverages[0].domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+    if (data.coverages.length === 1 && data.coverages[0].domainType === COVJSON_GRID) {
       res = {type: TYPE.MODEL, data: data.coverages[0]}
     }
-  } else if (data.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+  } else if (data.domainType === COVJSON_GRID) {
     res = {type: TYPE.MODEL, data}      
   }
   if (res && getNonCategoricalParams(res.data).length === 0) {
@@ -655,7 +655,7 @@ function getTiledCollection (coll, tileExtents, queryOptions) {
       .then(covs => {
         let tiledColl = {
           id: coll.id,
-          profiles: coll.profiles, // TODO may not be valid anymore, what do we do?
+          domainType: coll.domainType,
           parameters: coll.parameters,
           coverages: covs
           // we don't implement .query() for now since we don't need it

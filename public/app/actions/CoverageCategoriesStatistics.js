@@ -105,7 +105,7 @@ export default class CoverageCategoriesStatistics extends Action {
     // TODO check if there are other multi-valued axes except x,y,t -> if yes, unsupported
     
     // data is single grid coverage with one or more categorical parameters
-    if (this._isSingleCoverage(this.cov) && this.cov.domainProfiles.indexOf(COVJSON_GRID) !== -1) {
+    if (this._isSingleCoverage(this.cov) && this.cov.domainType === COVJSON_GRID) {
       if (this._getCategoricalParams().length > 0) {
         return true
       }
