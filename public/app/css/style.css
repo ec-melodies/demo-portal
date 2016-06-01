@@ -26,3 +26,7 @@ html, body { height: 100%; margin: 0; }
   word-wrap: normal;
   white-space: pre;
 }
+
+.leaflet-popup-draggable .leaflet-popup-content-wrapper {
+  cursor: move
+}

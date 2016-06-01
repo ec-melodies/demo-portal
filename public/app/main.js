@@ -10,6 +10,8 @@ import 'leaflet-providers'
 import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 
+import DraggableValuePopup from 'leaflet-coverage/popups/DraggableValuePopup.js'
+
 import {i18n, DefaultMap} from './util.js'
 import App from './App.js'
 import Sidebar from './sidebar/Sidebar.js'
@@ -36,7 +38,8 @@ function letItSnow() {
 document.getElementById('map').addEventListener('keypress', e => {
   if (String.fromCharCode(e.charCode) == 's') letItSnow()
 }, false);
-if (new Date('2015-12-22') <= new Date() && new Date() <= new Date('2016-01-03'))
+let year = new Date().getFullYear()
+if (new Date(year + '-12-22') <= new Date() && new Date() <= new Date(year + '-01-03'))
   letItSnow()
 // end of Xmas magic
   
@@ -114,8 +117,19 @@ class SmartLayerControl {
       this.addOverlay(layer, name, {groupName: newName, expanded: true})
     }
   }
+  getLayers () {
+    return [...this._layers.keys()]
+  }
 }
 map.layerControl = new SmartLayerControl(layerControl)
+
+map.on('click', e => {
+  new DraggableValuePopup({
+    layers: map.layerControl.getLayers(),
+    className: 'leaflet-popup-draggable'
+  }).setLatLng(e.latlng).openOn(map)
+})
+
 
 let app = new App(map)
 app.on('dataLoading', () => map.fire('dataloading'))
