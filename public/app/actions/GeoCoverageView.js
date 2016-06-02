@@ -4,11 +4,11 @@ import ParameterSync from 'leaflet-coverage/layers/ParameterSync.js'
 import {COVJSON_VERTICALPROFILE} from 'leaflet-coverage/util/constants.js'
 import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
+import VerticalAxis from 'leaflet-coverage/controls/VerticalAxis.js'
 import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
 
 import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
-import SelectControl from './SelectControl.js'
 
 import CovJSON from '../formats/CovJSON.js'
 
@@ -140,16 +140,8 @@ export default class GeoCoverageView extends Action {
           }
           
           if (covLayer.verticalSlices) {
-            let choices = covLayer.verticalSlices.map(val => ({
-              value: val,
-              label: val
-            }))
-            new SelectControl(covLayer, choices, {title: 'Vertical axis'})
-              .on('change', event => {
-                let vertical = parseFloat(event.value)
-                covLayer.vertical = vertical
-              })
-              .addTo(map)
+            let vertAxis = new VerticalAxis(covLayer)
+            vertAxis.addTo(map)
           }
         }
       })

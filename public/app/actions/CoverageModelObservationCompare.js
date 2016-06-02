@@ -2,8 +2,9 @@ import {indexOfNearest, indicesOfNearest} from 'leaflet-coverage/util/arrays.js'
 import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
 import {COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE} from 'leaflet-coverage/util/constants.js'
 import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
-import SelectControl from './SelectControl.js'
+import Dropdown from 'leaflet-coverage/controls/Dropdown.js'
 import ButtonControl from './ButtonControl.js'
+import * as unitUtils from 'covutils/lib/unit.js'
 
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
@@ -213,7 +214,7 @@ export default class CoverageModelObservationCompare extends Action {
     let fillSelect = (el, params) => {
       el.fill()
       for (let param of params) {
-        let unit = (param.unit.symbol || i18n(param.unit.label)) || 'unknown unit'
+        let unit = unitUtils.toAscii(param.unit) || 'unknown unit'
         let label = i18n(param.observedProperty.label) + ' (' + unit + ')'
         el.add(HTML('<option value="' + param.key + '">' + label + '</option>'))
       }
@@ -325,7 +326,7 @@ export default class CoverageModelObservationCompare extends Action {
           { value: 60*60, label: '± 1 hour' },
           { value: 60*60*24, label: '± 1 day' }, 
           { value: 60*60*24*30, label: '± 30 days' }]
-        this._obsTimeDeltaControl = new SelectControl(null, choices, {title: 'Observation time delta'})
+        this._obsTimeDeltaControl = new Dropdown(choices, {title: 'Observation time delta'})
           .on('change', event => {
             let obsTimeDelta = parseInt(event.value)
             let modelTime = modelFakeLayer.time

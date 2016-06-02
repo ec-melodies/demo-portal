@@ -22,7 +22,7 @@ System.config({
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
     "covjson-reader": "npm:covjson-reader@0.11.6",
-    "covutils": "npm:covutils@0.2.4",
+    "covutils": "npm:covutils@0.2.6",
     "css": "github:systemjs/plugin-css@0.1.21",
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
@@ -40,7 +40,7 @@ System.config({
     },
     "github:Reading-eScience-Centre/leaflet-coverage@master": {
       "c3": "npm:c3@0.4.10",
-      "covutils": "npm:covutils@0.2.4",
+      "covutils": "npm:covutils@0.2.6",
       "css": "github:systemjs/plugin-css@0.1.21",
       "leaflet": "github:Leaflet/Leaflet@0.7.7",
       "minified": "github:timjansen/minified.js@2015.1.1",
@@ -183,10 +183,10 @@ System.config({
     "npm:covjson-reader@0.11.6": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "cbor-js": "npm:cbor-js@0.1.0",
-      "covutils": "npm:covutils@0.2.4",
+      "covutils": "npm:covutils@0.2.6",
       "ndarray": "npm:ndarray@1.0.18"
     },
-    "npm:covutils@0.2.4": {
+    "npm:covutils@0.2.6": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "ndarray": "npm:ndarray@1.0.18",
       "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
