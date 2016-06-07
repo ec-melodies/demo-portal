@@ -4,7 +4,7 @@ import Modal from 'bootstrap-native/lib/modal-native.js'
 import Tab from 'bootstrap-native/lib/tab-native.js'
 
 import {PROCESS} from '../actions/Action.js'
-import {i18n, sortByKey} from '../util.js'
+import {i18n, sortByKey, MELODIES_DCAT_CATALOG_URL} from '../util.js'
 import {loadDCATCatalog} from '../dcat.js'
 
 const TEMPLATES = {
@@ -74,6 +74,9 @@ let html = `
 .dataset-spatial-minimap {
   margin-bottom: 10px;
 }
+.catalog-load-default {
+  padding-top: 0;
+}
 </style>
 `
 $('body').add(HTML(html))
@@ -94,6 +97,9 @@ let paneHtml = () => `
   <div class="panel-body catalog-url-info">
     <a href="#" class="catalog-url-edit"><i class="glyphicon glyphicon-pencil"></i></a>
     <a class="catalog-url"></a>
+  </div>
+  <div class="panel-body catalog-load-default" style="display:none">
+    <button type="button" name="load-default" class="btn btn-primary">Load MELODIES Catalogue</button>
   </div>
   <div class="panel-body catalog-url-form" style="display:none">
     <form>
@@ -143,6 +149,9 @@ export default class SearchPane {
       $('.catalog-url-info', el).show()
       $('.catalog-url-form', el).hide()
     })
+    $('button', $('.catalog-load-default', el)).on('click', () => {
+      this.catalogue.loadFromDCAT(MELODIES_DCAT_CATALOG_URL)
+    })
     $('.jsonld-view-button', el).on('click', () => {
       this._showDCATInfoModal()
     })
@@ -172,6 +181,13 @@ export default class SearchPane {
       this._clearList()      
       this._addDatasets(this.catalogue.datasets)
       this._setCatalogueUrl(url)
+      
+      let btnDiv = $('.catalog-load-default', $('#' + this.id))
+      if (url !== MELODIES_DCAT_CATALOG_URL) {
+        btnDiv.show()
+      } else {
+        btnDiv.hide()
+      }
     })
     this.catalogue.on('loadError', ({url, error}) => {
       this._clearList()

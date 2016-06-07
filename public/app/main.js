@@ -3,6 +3,8 @@ import 'core-js/fn/string/ends-with.js'
 import 'core-js/fn/array/find.js'
 import 'core-js/es6/promise.js'
 
+import {stringQs} from 'qs-hash'
+
 import 'bootstrap/css/bootstrap.css!'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css!'
@@ -12,7 +14,7 @@ import 'leaflet-loading/src/Control.Loading.css!'
 
 import DraggableValuePopup from 'leaflet-coverage/popups/DraggableValuePopup.js'
 
-import {i18n, DefaultMap} from './util.js'
+import {i18n, DefaultMap, MELODIES_DCAT_CATALOG_URL} from './util.js'
 import App from './App.js'
 import Sidebar from './sidebar/Sidebar.js'
 import './css/style.css!'
@@ -42,8 +44,6 @@ let year = new Date().getFullYear()
 if (new Date(year + '-12-22') <= new Date() && new Date() <= new Date(year + '-01-03'))
   letItSnow()
 // end of Xmas magic
-  
-const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
 let map = L.map('map', {
   loadingControl: true,
@@ -141,12 +141,31 @@ app.workspace.on('titleChange', ({oldTitle, newTitle}) => {
 
 // Sidebar setup
 let catalogUrl
-if (window.location.hash) {
-  let url = window.location.hash.substr(1)
-  if (url.toLowerCase().startsWith('http://') || url.toLowerCase().startsWith('https://')) {
-    catalogUrl = url
+
+function handleHash (first) {
+  if (window.location.hash) {
+    let hash = window.location.hash.substr(1)
+    let params = stringQs(hash)
+    if (params.url) {
+      if (params.url.toLowerCase().startsWith('http://') || params.url.toLowerCase().startsWith('https://')) {
+        if (app.catalogue.url !== params.url) {
+          catalogUrl = params.url
+          if (!first) {
+            app.catalogue.loadFromDCAT(catalogUrl) 
+          }
+        }
+      }
+    }
+    if (params.map) {
+      let [zoom,lat,lon] = params.map.split('/').map(parseFloat)
+      map.setView([lat, lon], zoom)
+    }
   }
 }
+handleHash(true)
+
+window.addEventListener('hashchange', () => handleHash(false), false)
+
 if (!catalogUrl) {
   catalogUrl = MELODIES_DCAT_CATALOG_URL
 }
@@ -157,3 +176,5 @@ app.catalogue.loadFromDCAT(catalogUrl).then(() => {
 }).catch(() => {
   sidebar.open(sidebar.panes.Search)
 })
+
+window.api = {map}

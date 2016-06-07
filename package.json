@@ -34,6 +34,7 @@
       "leaflet-loading": "github:ebrelsford/Leaflet.loading@^0.1.16",
       "leaflet-providers": "github:leaflet-extras/leaflet-providers@^1.1.5",
       "minified": "github:timjansen/minified.js@^2015.1.1",
+      "qs-hash": "npm:qs-hash@^0.0.0",
       "sidebar-v2": "github:Turbo87/sidebar-v2@master"
     },
     "devDependencies": {

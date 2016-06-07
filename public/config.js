@@ -31,6 +31,7 @@ System.config({
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.18",
     "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.9",
     "minified": "github:timjansen/minified.js@2015.1.1",
+    "qs-hash": "npm:qs-hash@0.0.0",
     "sidebar-v2": "github:Turbo87/sidebar-v2@master",
     "traceur": "github:jmcriffey/bower-traceur@0.0.93",
     "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93",
@@ -41,9 +42,7 @@ System.config({
     "github:Reading-eScience-Centre/leaflet-coverage@master": {
       "c3": "npm:c3@0.4.10",
       "covutils": "npm:covutils@0.2.6",
-      "css": "github:systemjs/plugin-css@0.1.21",
       "leaflet": "github:Leaflet/Leaflet@0.7.7",
-      "minified": "github:timjansen/minified.js@2015.1.1",
       "ndarray": "npm:ndarray@1.0.18"
     },
     "github:guygriffiths/category-remapper-js@master": {

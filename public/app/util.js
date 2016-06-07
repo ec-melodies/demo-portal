@@ -1,6 +1,7 @@
 import 'fetch'
 
 export const COVJSON_PREFIX = 'http://coveragejson.org/def#'
+export const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
 /**
  * A Map which returns a default value for get(key) if key does not exist.
