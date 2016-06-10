@@ -1,3 +1,4 @@
+import 'c3/c3.css!'
 import LayerFactory from 'leaflet-coverage'
 import {getLayerClass} from 'leaflet-coverage'
 import ParameterSync from 'leaflet-coverage/layers/ParameterSync.js'
