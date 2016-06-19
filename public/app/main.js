@@ -124,8 +124,10 @@ class SmartLayerControl {
 map.layerControl = new SmartLayerControl(layerControl)
 
 map.on('click', e => {
+  let layers = map.layerControl.getLayers()
+  layers = layers.filter(layer => map.hasLayer(layer))
   new DraggableValuePopup({
-    layers: map.layerControl.getLayers(),
+    layers,
     className: 'leaflet-popup-draggable'
   }).setLatLng(e.latlng).openOn(map)
 })
