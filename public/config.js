@@ -22,7 +22,7 @@ System.config({
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
     "covjson-reader": "npm:covjson-reader@0.11.6",
-    "covutils": "npm:covutils@0.2.6",
+    "covutils": "npm:covutils@0.3.0",
     "css": "github:systemjs/plugin-css@0.1.21",
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
@@ -76,7 +76,7 @@ System.config({
       "path-browserify": "npm:path-browserify@0.0.0"
     },
     "github:jspm/nodelibs-process@0.1.2": {
-      "process": "npm:process@0.11.4"
+      "process": "npm:process@0.11.5"
     },
     "github:jspm/nodelibs-stream@0.1.0": {
       "stream-browserify": "npm:stream-browserify@1.0.0"
@@ -86,6 +86,9 @@ System.config({
     },
     "github:jspm/nodelibs-util@0.1.0": {
       "util": "npm:util@0.10.3"
+    },
+    "github:jspm/nodelibs-vm@0.1.0": {
+      "vm-browserify": "npm:vm-browserify@0.0.4"
     },
     "github:twbs/bootstrap@3.3.6": {
       "jquery": "github:components/jquery@2.2.1"
@@ -194,6 +197,12 @@ System.config({
       "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
       "topojson": "npm:topojson@1.6.26"
     },
+    "npm:covutils@0.3.0": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
+      "ndarray": "npm:ndarray@1.0.18",
+      "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
+      "topojson": "npm:topojson@1.6.26"
+    },
     "npm:d3-geo-projection@0.2.16": {
       "brfs": "npm:brfs@1.4.3",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -231,7 +240,7 @@ System.config({
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "source-map": "npm:source-map@0.4.4",
+      "source-map": "npm:source-map@0.1.43",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:escodegen@1.3.3": {
@@ -345,8 +354,10 @@ System.config({
     "npm:process-nextick-args@1.0.7": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:process@0.11.4": {
-      "assert": "github:jspm/nodelibs-assert@0.1.0"
+    "npm:process@0.11.5": {
+      "assert": "github:jspm/nodelibs-assert@0.1.0",
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "vm": "github:jspm/nodelibs-vm@0.1.0"
     },
     "npm:punycode@1.3.2": {
       "process": "github:jspm/nodelibs-process@0.1.2"
@@ -480,7 +491,7 @@ System.config({
       "xtend": "npm:xtend@4.0.1"
     },
     "npm:topojson@1.6.26": {
-      "d3": "npm:d3@3.5.0",
+      "d3": "npm:d3@3.5.17",
       "d3-geo-projection": "npm:d3-geo-projection@0.2.16",
       "d3-queue": "npm:d3-queue@2.0.3",
       "optimist": "npm:optimist@0.3.7",
@@ -500,6 +511,9 @@ System.config({
     "npm:util@0.10.3": {
       "inherits": "npm:inherits@2.0.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:vm-browserify@0.0.4": {
+      "indexof": "npm:indexof@0.0.1"
     },
     "npm:xmlhttprequest@1.8.0": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
