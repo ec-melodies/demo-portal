@@ -84713,6 +84713,409 @@ $__System.register('103', ['102', '4a', 'f4', 'f5', 'f6', '5d', 'ff'], function 
 
 $__System.register("104", [], function() { return { setters: [], execute: function() {} } });
 
+$__System.register('105', ['4a'], function (_export) {
+
+  // https://github.com/davicustodio/Leaflet.StyledLayerControl/blob/7a3268d446d755f59bcd845cf873444d01ce1774/src/styledLayerControl.js
+  // + some patches to make it 'use strict' compatible
+
+  'use strict';
+
+  var L;
+  return {
+    setters: [function (_a) {
+      L = _a['default'];
+    }],
+    execute: function () {
+      L.Control.StyledLayerControl = L.Control.Layers.extend({
+        options: {
+          collapsed: true,
+          position: 'topright',
+          autoZIndex: true
+        },
+
+        initialize: function initialize(baseLayers, groupedOverlays, options) {
+          var i, j;
+          L.Util.setOptions(this, options);
+
+          this._layers = {};
+          this._lastZIndex = 0;
+          this._handlingClick = false;
+          this._groupList = [];
+          this._domGroups = [];
+
+          for (i in baseLayers) {
+            for (var j in baseLayers[i].layers) {
+              this._addLayer(baseLayers[i].layers[j], j, baseLayers[i], false);
+            }
+          }
+
+          for (i in groupedOverlays) {
+            for (var j in groupedOverlays[i].layers) {
+              this._addLayer(groupedOverlays[i].layers[j], j, groupedOverlays[i], true);
+            }
+          }
+        },
+
+        onAdd: function onAdd(map) {
+          this._initLayout();
+          this._update();
+
+          map.on('layeradd', this._onLayerChange, this).on('layerremove', this._onLayerChange, this);
+
+          return this._container;
+        },
+
+        onRemove: function onRemove(map) {
+          map.off('layeradd', this._onLayerChange).off('layerremove', this._onLayerChange);
+        },
+
+        addBaseLayer: function addBaseLayer(layer, name, group) {
+          this._addLayer(layer, name, group, false);
+          this._update();
+          return this;
+        },
+
+        addOverlay: function addOverlay(layer, name, group) {
+          this._addLayer(layer, name, group, true);
+          this._update();
+          return this;
+        },
+
+        removeLayer: function removeLayer(layer) {
+          var id = L.Util.stamp(layer);
+          delete this._layers[id];
+          this._update();
+          return this;
+        },
+
+        removeGroup: function removeGroup(group_Name) {
+          for (var group in this._groupList) {
+            if (this._groupList[group].groupName == group_Name) {
+              for (var layer in this._layers) {
+                if (this._layers[layer].group && this._layers[layer].group.name == group_Name) {
+                  delete this._layers[layer];
+                }
+              }
+              delete this._groupList[group];
+              this._update();
+              break;
+            }
+          }
+        },
+
+        _initLayout: function _initLayout() {
+          var className = 'leaflet-control-layers',
+              container = this._container = L.DomUtil.create('div', className);
+
+          //Makes this work on IE10 Touch devices by stopping it from firing a mouseout event when the touch is released
+          container.setAttribute('aria-haspopup', true);
+
+          if (!L.Browser.touch) {
+            L.DomEvent.disableClickPropagation(container);
+            L.DomEvent.on(container, 'wheel', L.DomEvent.stopPropagation);
+          } else {
+            L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);
+          }
+
+          var section = document.createElement('section');
+          section.className = 'ac-container ' + className + '-list';
+
+          var form = this._form = L.DomUtil.create('form');
+
+          section.appendChild(form);
+
+          if (this.options.collapsed) {
+            if (!L.Browser.android) {
+              L.DomEvent.on(container, 'mouseover', this._expand, this).on(container, 'mouseout', this._collapse, this);
+            }
+            var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+            link.href = '#';
+            link.title = 'Layers';
+
+            if (L.Browser.touch) {
+              L.DomEvent.on(link, 'click', L.DomEvent.stop).on(link, 'click', this._expand, this);
+            } else {
+              L.DomEvent.on(link, 'focus', this._expand, this);
+            }
+
+            this._map.on('click', this._collapse, this);
+            // TODO keyboard accessibility
+          } else {
+              this._expand();
+            }
+
+          this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
+          this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
+
+          container.appendChild(section);
+
+          this._containers = container.getElementsByClassName('ac-container');
+
+          // process options of ac-container css class - to options.container_width and options.container_maxHeight
+          for (var c = 0; c < this._containers.length; c++) {
+            if (this.options.container_width) {
+              this._containers[c].style.width = this.options.container_width;
+            }
+
+            // set the max-height of control to y value of map object
+            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : this._map._size.y - 70;
+            this._containers[c].style.maxHeight = this._default_maxHeight + "px";
+          }
+
+          window.onresize = this._on_resize_window.bind(this);
+        },
+
+        _on_resize_window: function _on_resize_window() {
+          // listen to resize of screen to reajust de maxHeight of container
+          for (var c = 0; c < this._containers.length; c++) {
+            // input the new value to height
+            this._containers[c].style.maxHeight = window.innerHeight - 90 < this._removePxToInt(this._default_maxHeight) ? window.innerHeight - 90 + "px" : this._removePxToInt(this._default_maxHeight) + "px";
+          }
+        },
+
+        // remove the px from a css value and convert to a int
+        _removePxToInt: function _removePxToInt(value) {
+          return parseInt(value.replace("px", ""));
+        },
+
+        _addLayer: function _addLayer(layer, name, group, overlay) {
+          var id = L.Util.stamp(layer);
+
+          this._layers[id] = {
+            layer: layer,
+            name: name,
+            overlay: overlay
+          };
+
+          if (group) {
+            var groupId = this._groupList.indexOf(group);
+
+            // if not find the group search for the name
+            if (groupId === -1) {
+              for (var g in this._groupList) {
+                if (this._groupList[g].groupName == group.groupName) {
+                  groupId = g;
+                  break;
+                }
+              }
+            }
+
+            if (groupId === -1) {
+              groupId = this._groupList.push(group) - 1;
+            }
+
+            this._layers[id].group = {
+              name: group.groupName,
+              id: groupId,
+              expanded: group.expanded
+            };
+          }
+
+          if (this.options.autoZIndex && layer.setZIndex) {
+            this._lastZIndex++;
+            layer.setZIndex(this._lastZIndex);
+          }
+        },
+
+        _update: function _update() {
+          if (!this._container) {
+            return;
+          }
+
+          this._baseLayersList.innerHTML = '';
+          this._overlaysList.innerHTML = '';
+          this._domGroups.length = 0;
+
+          var baseLayersPresent = false,
+              overlaysPresent = false,
+              i,
+              obj;
+
+          for (i in this._layers) {
+            obj = this._layers[i];
+            this._addItem(obj);
+            overlaysPresent = overlaysPresent || obj.overlay;
+            baseLayersPresent = baseLayersPresent || !obj.overlay;
+          }
+        },
+
+        _onLayerChange: function _onLayerChange(e) {
+          var obj = this._layers[L.Util.stamp(e.layer)];
+
+          if (!obj) {
+            return;
+          }
+
+          if (!this._handlingClick) {
+            this._update();
+          }
+
+          var type = obj.overlay ? e.type === 'layeradd' ? 'overlayadd' : 'overlayremove' : e.type === 'layeradd' ? 'baselayerchange' : null;
+
+          if (type) {
+            this._map.fire(type, obj);
+          }
+        },
+
+        // IE7 bugs out if you create a radio dynamically, so you have to do it this hacky way (see http://bit.ly/PqYLBe)
+        _createRadioElement: function _createRadioElement(name, checked) {
+
+          var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' + name + '"';
+          if (checked) {
+            radioHtml += ' checked="checked"';
+          }
+          radioHtml += '/>';
+
+          var radioFragment = document.createElement('div');
+          radioFragment.innerHTML = radioHtml;
+
+          return radioFragment.firstChild;
+        },
+
+        _addItem: function _addItem(obj) {
+          var label = document.createElement('div'),
+              input,
+              checked = this._map.hasLayer(obj.layer),
+              container;
+
+          if (obj.overlay) {
+            input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'leaflet-control-layers-selector';
+            input.defaultChecked = checked;
+
+            label.className = "menu-item-checkbox";
+          } else {
+            input = this._createRadioElement('leaflet-base-layers', checked);
+
+            label.className = "menu-item-radio";
+          }
+
+          input.layerId = L.Util.stamp(obj.layer);
+
+          L.DomEvent.on(input, 'click', this._onInputClick, this);
+
+          var name = document.createElement('span');
+          name.innerHTML = ' ' + obj.name;
+
+          label.appendChild(input);
+          label.appendChild(name);
+
+          // configure the delete button for layers with attribute removable = true
+          if (obj.layer.StyledLayerControl && obj.layer.StyledLayerControl.removable) {
+            var bt_delete = document.createElement("input");
+            bt_delete.type = "button";
+            bt_delete.className = "bt_delete";
+            L.DomEvent.on(bt_delete, 'click', this._onDeleteClick, this);
+            label.appendChild(bt_delete);
+          }
+
+          if (obj.overlay) {
+            container = this._overlaysList;
+          } else {
+            container = this._baseLayersList;
+          }
+
+          var groupContainer = this._domGroups[obj.group.id];
+
+          if (!groupContainer) {
+
+            groupContainer = document.createElement('div');
+            groupContainer.id = 'leaflet-control-accordion-layers-' + obj.group.id;
+
+            // verify if group is expanded
+            var s_expanded = obj.group.expanded ? ' checked = "true" ' : '';
+
+            // verify if type is exclusive
+            var s_type_exclusive = this.options.exclusive ? ' type="radio" ' : ' type="checkbox" ';
+
+            var inputElement = '<input id="ac' + obj.group.id + '" name="accordion-1" class="menu" ' + s_expanded + s_type_exclusive + '/>';
+            var inputLabel = '<label for="ac' + obj.group.id + '">' + obj.group.name + '</label>';
+
+            var article = document.createElement('article');
+            article.className = 'ac-large';
+            article.appendChild(label);
+
+            // process options of ac-large css class - to options.group_maxHeight property
+            if (this.options.group_maxHeight) {
+              article.style.maxHeight = this.options.group_maxHeight;
+            }
+
+            groupContainer.innerHTML = inputElement + inputLabel;
+            groupContainer.appendChild(article);
+            container.appendChild(groupContainer);
+
+            this._domGroups[obj.group.id] = groupContainer;
+          } else {
+            groupContainer.lastElementChild.appendChild(label);
+          }
+
+          return label;
+        },
+
+        _onInputClick: function _onInputClick() {
+          var i,
+              input,
+              obj,
+              inputs = this._form.getElementsByTagName('input'),
+              inputsLen = inputs.length;
+
+          this._handlingClick = true;
+
+          for (i = 0; i < inputsLen; i++) {
+            input = inputs[i];
+            obj = this._layers[input.layerId];
+
+            if (!obj) {
+              continue;
+            }
+
+            if (input.checked && !this._map.hasLayer(obj.layer)) {
+              this._map.addLayer(obj.layer);
+            } else if (!input.checked && this._map.hasLayer(obj.layer)) {
+              this._map.removeLayer(obj.layer);
+            }
+          }
+
+          this._handlingClick = false;
+        },
+
+        _onDeleteClick: function _onDeleteClick(obj) {
+          var node = obj.target.parentElement.childNodes[0];
+          var n_obj = this._layers[node.layerId];
+
+          // verify if obj is a basemap and checked to not remove
+          if (!n_obj.overlay && node.checked) {
+            return false;
+          }
+
+          if (this._map.hasLayer(n_obj.layer)) {
+            this._map.removeLayer(n_obj.layer);
+          }
+          this.removeLayer(n_obj.layer);
+          obj.target.parentNode.remove();
+
+          return false;
+        },
+
+        _expand: function _expand() {
+          L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
+        },
+
+        _collapse: function _collapse() {
+          this._container.className = this._container.className.replace(' leaflet-control-layers-expanded', '');
+        }
+      });
+
+      L.Control.styledLayerControl = function (baseLayers, overlays, options) {
+        return new L.Control.StyledLayerControl(baseLayers, overlays, options);
+      };
+    }
+  };
+});
+
+$__System.register("106", [], function() { return { setters: [], execute: function() {} } });
+
 (function() {
 var define = $__System.amdDefine;
 (function(window, document, undefined) {
@@ -84722,7 +85125,7 @@ var define = $__System.amdDefine;
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("105", [], L);
+    define("107", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -91219,413 +91622,66 @@ var define = $__System.amdDefine;
 })();
 (function() {
 var define = $__System.amdDefine;
-define("4a", ["105"], function(main) {
+define("4a", ["107"], function(main) {
   return main;
 });
 
 })();
-$__System.register('106', ['4a'], function (_export) {
+$__System.register('108', ['4a'], function (_export) {
 
-  // https://github.com/davicustodio/Leaflet.StyledLayerControl/blob/7a3268d446d755f59bcd845cf873444d01ce1774/src/styledLayerControl.js
-  // + some patches to make it 'use strict' compatible
+    // https://github.com/Outdooractive/leaflet-singleclick_0.7
 
-  'use strict';
+    'use strict';
 
-  var L;
-  return {
-    setters: [function (_a) {
-      L = _a['default'];
-    }],
-    execute: function () {
-      L.Control.StyledLayerControl = L.Control.Layers.extend({
-        options: {
-          collapsed: true,
-          position: 'topright',
-          autoZIndex: true
-        },
+    var L;
+    return {
+        setters: [function (_a) {
+            L = _a['default'];
+        }],
+        execute: function () {
+            L.Map.addInitHook(function () {
 
-        initialize: function initialize(baseLayers, groupedOverlays, options) {
-          var i, j;
-          L.Util.setOptions(this, options);
+                var that = this,
+                    h,
+                    ignoreDragging = false;
 
-          this._layers = {};
-          this._lastZIndex = 0;
-          this._handlingClick = false;
-          this._groupList = [];
-          this._domGroups = [];
-
-          for (i in baseLayers) {
-            for (var j in baseLayers[i].layers) {
-              this._addLayer(baseLayers[i].layers[j], j, baseLayers[i], false);
-            }
-          }
-
-          for (i in groupedOverlays) {
-            for (var j in groupedOverlays[i].layers) {
-              this._addLayer(groupedOverlays[i].layers[j], j, groupedOverlays[i], true);
-            }
-          }
-        },
-
-        onAdd: function onAdd(map) {
-          this._initLayout();
-          this._update();
-
-          map.on('layeradd', this._onLayerChange, this).on('layerremove', this._onLayerChange, this);
-
-          return this._container;
-        },
-
-        onRemove: function onRemove(map) {
-          map.off('layeradd', this._onLayerChange).off('layerremove', this._onLayerChange);
-        },
-
-        addBaseLayer: function addBaseLayer(layer, name, group) {
-          this._addLayer(layer, name, group, false);
-          this._update();
-          return this;
-        },
-
-        addOverlay: function addOverlay(layer, name, group) {
-          this._addLayer(layer, name, group, true);
-          this._update();
-          return this;
-        },
-
-        removeLayer: function removeLayer(layer) {
-          var id = L.Util.stamp(layer);
-          delete this._layers[id];
-          this._update();
-          return this;
-        },
-
-        removeGroup: function removeGroup(group_Name) {
-          for (var group in this._groupList) {
-            if (this._groupList[group].groupName == group_Name) {
-              for (var layer in this._layers) {
-                if (this._layers[layer].group && this._layers[layer].group.name == group_Name) {
-                  delete this._layers[layer];
+                if (that.on) {
+                    that.on('click', check_later);
+                    that.on('dblclick', function () {
+                        setTimeout(clear_h, 0);
+                    });
+                    that.on('dragstart', function () {
+                        ignoreDragging = true;
+                    });
+                    that.on('dragend', function () {
+                        ignoreDragging = false;
+                    });
                 }
-              }
-              delete this._groupList[group];
-              this._update();
-              break;
-            }
-          }
-        },
 
-        _initLayout: function _initLayout() {
-          var className = 'leaflet-control-layers',
-              container = this._container = L.DomUtil.create('div', className);
+                function check_later(e) {
+                    clear_h();
 
-          //Makes this work on IE10 Touch devices by stopping it from firing a mouseout event when the touch is released
-          container.setAttribute('aria-haspopup', true);
+                    h = setTimeout(check, 300);
 
-          if (!L.Browser.touch) {
-            L.DomEvent.disableClickPropagation(container);
-            L.DomEvent.on(container, 'wheel', L.DomEvent.stopPropagation);
-          } else {
-            L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);
-          }
-
-          var section = document.createElement('section');
-          section.className = 'ac-container ' + className + '-list';
-
-          var form = this._form = L.DomUtil.create('form');
-
-          section.appendChild(form);
-
-          if (this.options.collapsed) {
-            if (!L.Browser.android) {
-              L.DomEvent.on(container, 'mouseover', this._expand, this).on(container, 'mouseout', this._collapse, this);
-            }
-            var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-            link.href = '#';
-            link.title = 'Layers';
-
-            if (L.Browser.touch) {
-              L.DomEvent.on(link, 'click', L.DomEvent.stop).on(link, 'click', this._expand, this);
-            } else {
-              L.DomEvent.on(link, 'focus', this._expand, this);
-            }
-
-            this._map.on('click', this._collapse, this);
-            // TODO keyboard accessibility
-          } else {
-              this._expand();
-            }
-
-          this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
-          this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
-
-          container.appendChild(section);
-
-          this._containers = container.getElementsByClassName('ac-container');
-
-          // process options of ac-container css class - to options.container_width and options.container_maxHeight
-          for (var c = 0; c < this._containers.length; c++) {
-            if (this.options.container_width) {
-              this._containers[c].style.width = this.options.container_width;
-            }
-
-            // set the max-height of control to y value of map object
-            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : this._map._size.y - 70;
-            this._containers[c].style.maxHeight = this._default_maxHeight + "px";
-          }
-
-          window.onresize = this._on_resize_window.bind(this);
-        },
-
-        _on_resize_window: function _on_resize_window() {
-          // listen to resize of screen to reajust de maxHeight of container
-          for (var c = 0; c < this._containers.length; c++) {
-            // input the new value to height
-            this._containers[c].style.maxHeight = window.innerHeight - 90 < this._removePxToInt(this._default_maxHeight) ? window.innerHeight - 90 + "px" : this._removePxToInt(this._default_maxHeight) + "px";
-          }
-        },
-
-        // remove the px from a css value and convert to a int
-        _removePxToInt: function _removePxToInt(value) {
-          return parseInt(value.replace("px", ""));
-        },
-
-        _addLayer: function _addLayer(layer, name, group, overlay) {
-          var id = L.Util.stamp(layer);
-
-          this._layers[id] = {
-            layer: layer,
-            name: name,
-            overlay: overlay
-          };
-
-          if (group) {
-            var groupId = this._groupList.indexOf(group);
-
-            // if not find the group search for the name
-            if (groupId === -1) {
-              for (var g in this._groupList) {
-                if (this._groupList[g].groupName == group.groupName) {
-                  groupId = g;
-                  break;
+                    function check() {
+                        if (!ignoreDragging) {
+                            that.fire('singleclick', L.Util.extend(e, { type: 'singleclick' }));
+                        } else {
+                            ignoreDragging = false;
+                        }
+                    }
                 }
-              }
-            }
 
-            if (groupId === -1) {
-              groupId = this._groupList.push(group) - 1;
-            }
-
-            this._layers[id].group = {
-              name: group.groupName,
-              id: groupId,
-              expanded: group.expanded
-            };
-          }
-
-          if (this.options.autoZIndex && layer.setZIndex) {
-            this._lastZIndex++;
-            layer.setZIndex(this._lastZIndex);
-          }
-        },
-
-        _update: function _update() {
-          if (!this._container) {
-            return;
-          }
-
-          this._baseLayersList.innerHTML = '';
-          this._overlaysList.innerHTML = '';
-          this._domGroups.length = 0;
-
-          var baseLayersPresent = false,
-              overlaysPresent = false,
-              i,
-              obj;
-
-          for (i in this._layers) {
-            obj = this._layers[i];
-            this._addItem(obj);
-            overlaysPresent = overlaysPresent || obj.overlay;
-            baseLayersPresent = baseLayersPresent || !obj.overlay;
-          }
-        },
-
-        _onLayerChange: function _onLayerChange(e) {
-          var obj = this._layers[L.Util.stamp(e.layer)];
-
-          if (!obj) {
-            return;
-          }
-
-          if (!this._handlingClick) {
-            this._update();
-          }
-
-          var type = obj.overlay ? e.type === 'layeradd' ? 'overlayadd' : 'overlayremove' : e.type === 'layeradd' ? 'baselayerchange' : null;
-
-          if (type) {
-            this._map.fire(type, obj);
-          }
-        },
-
-        // IE7 bugs out if you create a radio dynamically, so you have to do it this hacky way (see http://bit.ly/PqYLBe)
-        _createRadioElement: function _createRadioElement(name, checked) {
-
-          var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' + name + '"';
-          if (checked) {
-            radioHtml += ' checked="checked"';
-          }
-          radioHtml += '/>';
-
-          var radioFragment = document.createElement('div');
-          radioFragment.innerHTML = radioHtml;
-
-          return radioFragment.firstChild;
-        },
-
-        _addItem: function _addItem(obj) {
-          var label = document.createElement('div'),
-              input,
-              checked = this._map.hasLayer(obj.layer),
-              container;
-
-          if (obj.overlay) {
-            input = document.createElement('input');
-            input.type = 'checkbox';
-            input.className = 'leaflet-control-layers-selector';
-            input.defaultChecked = checked;
-
-            label.className = "menu-item-checkbox";
-          } else {
-            input = this._createRadioElement('leaflet-base-layers', checked);
-
-            label.className = "menu-item-radio";
-          }
-
-          input.layerId = L.Util.stamp(obj.layer);
-
-          L.DomEvent.on(input, 'click', this._onInputClick, this);
-
-          var name = document.createElement('span');
-          name.innerHTML = ' ' + obj.name;
-
-          label.appendChild(input);
-          label.appendChild(name);
-
-          // configure the delete button for layers with attribute removable = true
-          if (obj.layer.StyledLayerControl && obj.layer.StyledLayerControl.removable) {
-            var bt_delete = document.createElement("input");
-            bt_delete.type = "button";
-            bt_delete.className = "bt_delete";
-            L.DomEvent.on(bt_delete, 'click', this._onDeleteClick, this);
-            label.appendChild(bt_delete);
-          }
-
-          if (obj.overlay) {
-            container = this._overlaysList;
-          } else {
-            container = this._baseLayersList;
-          }
-
-          var groupContainer = this._domGroups[obj.group.id];
-
-          if (!groupContainer) {
-
-            groupContainer = document.createElement('div');
-            groupContainer.id = 'leaflet-control-accordion-layers-' + obj.group.id;
-
-            // verify if group is expanded
-            var s_expanded = obj.group.expanded ? ' checked = "true" ' : '';
-
-            // verify if type is exclusive
-            var s_type_exclusive = this.options.exclusive ? ' type="radio" ' : ' type="checkbox" ';
-
-            var inputElement = '<input id="ac' + obj.group.id + '" name="accordion-1" class="menu" ' + s_expanded + s_type_exclusive + '/>';
-            var inputLabel = '<label for="ac' + obj.group.id + '">' + obj.group.name + '</label>';
-
-            var article = document.createElement('article');
-            article.className = 'ac-large';
-            article.appendChild(label);
-
-            // process options of ac-large css class - to options.group_maxHeight property
-            if (this.options.group_maxHeight) {
-              article.style.maxHeight = this.options.group_maxHeight;
-            }
-
-            groupContainer.innerHTML = inputElement + inputLabel;
-            groupContainer.appendChild(article);
-            container.appendChild(groupContainer);
-
-            this._domGroups[obj.group.id] = groupContainer;
-          } else {
-            groupContainer.lastElementChild.appendChild(label);
-          }
-
-          return label;
-        },
-
-        _onInputClick: function _onInputClick() {
-          var i,
-              input,
-              obj,
-              inputs = this._form.getElementsByTagName('input'),
-              inputsLen = inputs.length;
-
-          this._handlingClick = true;
-
-          for (i = 0; i < inputsLen; i++) {
-            input = inputs[i];
-            obj = this._layers[input.layerId];
-
-            if (!obj) {
-              continue;
-            }
-
-            if (input.checked && !this._map.hasLayer(obj.layer)) {
-              this._map.addLayer(obj.layer);
-            } else if (!input.checked && this._map.hasLayer(obj.layer)) {
-              this._map.removeLayer(obj.layer);
-            }
-          }
-
-          this._handlingClick = false;
-        },
-
-        _onDeleteClick: function _onDeleteClick(obj) {
-          var node = obj.target.parentElement.childNodes[0];
-          var n_obj = this._layers[node.layerId];
-
-          // verify if obj is a basemap and checked to not remove
-          if (!n_obj.overlay && node.checked) {
-            return false;
-          }
-
-          if (this._map.hasLayer(n_obj.layer)) {
-            this._map.removeLayer(n_obj.layer);
-          }
-          this.removeLayer(n_obj.layer);
-          obj.target.parentNode.remove();
-
-          return false;
-        },
-
-        _expand: function _expand() {
-          L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
-        },
-
-        _collapse: function _collapse() {
-          this._container.className = this._container.className.replace(' leaflet-control-layers-expanded', '');
+                function clear_h() {
+                    if (h != null) {
+                        clearTimeout(h);
+                        h = null;
+                    }
+                }
+            });
         }
-      });
-
-      L.Control.styledLayerControl = function (baseLayers, overlays, options) {
-        return new L.Control.StyledLayerControl(baseLayers, overlays, options);
-      };
-    }
-  };
+    };
 });
-
-$__System.register("107", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var define = $__System.amdDefine;
@@ -91636,7 +91692,7 @@ var define = $__System.amdDefine;
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("108", [], function() {
+}({}), define("109", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -92724,21 +92780,21 @@ var define = $__System.amdDefine;
     getter: Aa,
     setter: za
   };
-}), define("minified", ["108"], function(m) {
+}), define("minified", ["109"], function(m) {
   return m;
 });
 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("5d", ["108"], function(main) {
+define("5d", ["109"], function(main) {
   return main;
 });
 
 })();
-$__System.register("109", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("10a", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('1', ['7', '18', '45', '47', '48', '53', '103', '104', '106', '107', '109', 'f', 'f6', '4a', '4b', '4d', '4e', '9f', 'f3', '5d'], function (_export) {
+$__System.register('1', ['7', '18', '45', '47', '48', '53', '103', '104', '105', '106', '108', 'f', 'f6', '4a', '4b', '4d', '4e', '9f', 'f3', '5d', '10a'], function (_export) {
 
   // Xmas magic
   'use strict';
@@ -92826,7 +92882,7 @@ $__System.register('1', ['7', '18', '45', '47', '48', '53', '103', '104', '106',
     }, function (_d2) {
       $ = _d2.$;
       HTML = _d2.HTML;
-    }],
+    }, function (_a2) {}],
     execute: function () {
       $('body').add(HTML('\n  <div id="snow1" class="snow"></div>\n  <div id="snow2" class="snow"></div>\n  <div id="snow3" class="snow"></div>\n'));document.getElementById('map').addEventListener('keypress', function (e) {
         if (String.fromCharCode(e.charCode) == 's') letItSnow();
@@ -92957,7 +93013,7 @@ $__System.register('1', ['7', '18', '45', '47', '48', '53', '103', '104', '106',
 
       map.layerControl = new SmartLayerControl(layerControl);
 
-      map.on('click', function (e) {
+      map.on('singleclick', function (e) {
         var layers = map.layerControl.getLayers();
         layers = layers.filter(function (layer) {
           return map.hasLayer(layer);
