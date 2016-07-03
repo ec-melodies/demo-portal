@@ -3,6 +3,8 @@ import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import * as transformUtil from 'leaflet-coverage/util/transform.js'
+import {maskByPolygon} from 'covutils/lib/coverage/transform-polygon.js'
+import {subsetByBbox} from 'covutils/lib/coverage/subset.js'
 import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
 
 import {i18n} from '../util.js'
@@ -182,8 +184,8 @@ export default class CoverageSubsetByPolygon extends Action {
     
     this.fire('loading')
     let bbox = L.geoJson(feature).getBounds()
-    transformUtil.subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
-      transformUtil.maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
+    subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
+      maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
         let virtualDataset = {
           title: { en: i18n(this.context.dataset.title) + appendTitle },
           virtual: true,

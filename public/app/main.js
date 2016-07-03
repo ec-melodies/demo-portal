@@ -22,6 +22,8 @@ import './css/style.css!'
 import './styledLayerControl.js'
 import './css/styledLayerControl/styledLayerControl.css!'
 
+import './leaflet-singleclick.js'
+
 // Xmas magic
 import {$,HTML} from 'minified'
 import './css/snow.css!'
@@ -123,7 +125,7 @@ class SmartLayerControl {
 }
 map.layerControl = new SmartLayerControl(layerControl)
 
-map.on('click', e => {
+map.on('singleclick', e => {
   let layers = map.layerControl.getLayers()
   layers = layers.filter(layer => map.hasLayer(layer))
   new DraggableValuePopup({
