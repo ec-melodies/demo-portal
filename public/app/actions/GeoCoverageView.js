@@ -1,12 +1,7 @@
 import 'c3/c3.css!'
-import LayerFactory from 'leaflet-coverage'
-import {getLayerClass} from 'leaflet-coverage'
-import ParameterSync from 'leaflet-coverage/layers/ParameterSync.js'
-import {COVJSON_VERTICALPROFILE} from 'leaflet-coverage/util/constants.js'
-import CoverageLegend from 'leaflet-coverage/controls/Legend.js'
-import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
-import VerticalAxis from 'leaflet-coverage/controls/VerticalAxis.js'
-import ProfilePlot from 'leaflet-coverage/popups/VerticalProfilePlot.js'
+import {dataLayer, dataLayerClass, ParameterSync, legend, 
+  TimeAxis, VerticalAxis, VerticalProfilePlot, COVJSON_VERTICALPROFILE} from 'leaflet-coverage'
+import 'leaflet-coverage/leaflet-coverage.css!'
 
 import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
@@ -48,12 +43,12 @@ export default class GeoCoverageView extends Action {
     // see https://github.com/Reading-eScience-Centre/coveragejson/issues/55
     
     // check if leaflet-coverage can directly visualize it
-    if (getLayerClass(cov)) {
+    if (dataLayerClass(cov)) {
       return true
     }
     // otherwise, if it's a 1-element collection, check if the single coverage can be visualized
     if (cov.coverages && cov.coverages.length === 1) {
-      if (getLayerClass(cov.coverages[0])) {
+      if (dataLayerClass(cov.coverages[0])) {
         return true
       }
     }
@@ -75,7 +70,7 @@ export default class GeoCoverageView extends Action {
     this._setVisible()
     
     let cov = this.cov
-    if (!getLayerClass(cov)) {
+    if (!dataLayerClass(cov)) {
       if (cov.coverages && cov.coverages.length === 1) {
         cov = cov.coverages[0]
       }
@@ -96,7 +91,7 @@ export default class GeoCoverageView extends Action {
         // The sync layer will fire a 'remove' event if all real layers for that parameter were removed.
         let layer = e.syncLayer
         if (layer.palette) {
-          CoverageLegend(layer, {
+          legend(layer, {
             position: 'bottomright'
           }).addTo(map)
         }
@@ -121,7 +116,7 @@ export default class GeoCoverageView extends Action {
     let isCollection = cov.coverages
     
     let map = this.context.map
-    let layer = LayerFactory()(cov, opts)
+    let layer = dataLayer(cov, opts)
       .on('add', e => {
         let covLayer = e.target
         
@@ -156,7 +151,7 @@ export default class GeoCoverageView extends Action {
       let genBy = coverage.ld.wasGeneratedBy
       
       if (coverage.domainType === COVJSON_VERTICALPROFILE) {
-        new ProfilePlot(coverage).addTo(map)
+        new VerticalProfilePlot(coverage).addTo(map)
       } else if (genBy && genBy.type === ModelObservationComparisonActivity) {
         let usage = genBy.qualifiedUsage
         let modelParamKey = usage.model.parameterKey
@@ -174,7 +169,7 @@ export default class GeoCoverageView extends Action {
             let x = obsDomain.axes.get('x').values[0]
             let y = obsDomain.axes.get('y').values[0]
             return modelCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true}).then(modelSubset => {
-              new ProfilePlot([obsCov,modelSubset], {
+              new VerticalProfilePlot([obsCov,modelSubset], {
                 keys: [[obsParamKey, modelParamKey]],
                 labels: ['Observation', 'Model']
               }).addTo(map)

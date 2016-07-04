@@ -21,29 +21,23 @@ System.config({
     "clean-css": "npm:clean-css@3.4.11",
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
-    "covjson-reader": "npm:covjson-reader@0.11.6",
-    "covutils": "npm:covutils@0.3.0",
+    "covjson-reader": "npm:covjson-reader@0.14.0",
+    "covutils": "npm:covutils@0.4.3",
     "css": "github:systemjs/plugin-css@0.1.21",
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
-    "leaflet": "github:Leaflet/Leaflet@0.7.7",
-    "leaflet-coverage": "github:Reading-eScience-Centre/leaflet-coverage@master",
+    "leaflet": "npm:leaflet@0.7.7",
+    "leaflet-coverage": "npm:leaflet-coverage@0.5.0",
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.18",
     "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.9",
     "minified": "github:timjansen/minified.js@2015.1.1",
     "qs-hash": "npm:qs-hash@0.0.0",
-    "sidebar-v2": "github:Turbo87/sidebar-v2@master",
+    "sidebar-v2": "github:Turbo87/sidebar-v2@0.3.0",
     "traceur": "github:jmcriffey/bower-traceur@0.0.93",
     "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93",
     "github:Reading-eScience-Centre/coverage-rest-client@master": {
       "jsonld": "npm:jsonld@0.4.6",
       "url-template": "npm:url-template@2.0.6"
-    },
-    "github:Reading-eScience-Centre/leaflet-coverage@master": {
-      "c3": "npm:c3@0.4.10",
-      "covutils": "npm:covutils@0.2.6",
-      "leaflet": "github:Leaflet/Leaflet@0.7.7",
-      "ndarray": "npm:ndarray@1.0.18"
     },
     "github:guygriffiths/category-remapper-js@master": {
       "jsplumb": "npm:jsplumb@2.0.7",
@@ -139,11 +133,6 @@ System.config({
       "isarray": "npm:isarray@1.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:c3@0.4.10": {
-      "d3": "npm:d3@3.5.0",
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "path": "github:jspm/nodelibs-path@0.1.0"
-    },
     "npm:c3@0.4.11": {
       "d3": "npm:d3@3.5.17",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -185,20 +174,12 @@ System.config({
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:covjson-reader@0.11.6": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
-      "cbor-js": "npm:cbor-js@0.1.0",
-      "covutils": "npm:covutils@0.2.6",
-      "ndarray": "npm:ndarray@1.0.18"
-    },
-    "npm:covutils@0.2.6": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
+    "npm:covjson-reader@0.14.0": {
+      "covutils": "npm:covutils@0.4.3",
       "ndarray": "npm:ndarray@1.0.18",
-      "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
-      "topojson": "npm:topojson@1.6.26"
+      "url-template": "npm:url-template@2.0.7"
     },
-    "npm:covutils@0.3.0": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
+    "npm:covutils@0.4.3": {
       "ndarray": "npm:ndarray@1.0.18",
       "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
       "topojson": "npm:topojson@1.6.26"
@@ -208,25 +189,8 @@ System.config({
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "path": "github:jspm/nodelibs-path@0.1.0"
     },
-    "npm:d3@3.5.0": {
-      "jsdom": "npm:jsdom@1.0.0"
-    },
-    "npm:dom-serializer@0.1.0": {
-      "domelementtype": "npm:domelementtype@1.1.3",
-      "entities": "npm:entities@1.1.1"
-    },
-    "npm:domhandler@2.3.0": {
-      "domelementtype": "npm:domelementtype@1.3.0"
-    },
-    "npm:domutils@1.5.1": {
-      "dom-serializer": "npm:dom-serializer@0.1.0",
-      "domelementtype": "npm:domelementtype@1.3.0"
-    },
     "npm:duplexer2@0.0.2": {
       "readable-stream": "npm:readable-stream@1.1.14"
-    },
-    "npm:entities@1.1.1": {
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:es6-promise@2.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -274,17 +238,6 @@ System.config({
     "npm:has@1.0.1": {
       "function-bind": "npm:function-bind@1.1.0"
     },
-    "npm:htmlparser2@3.9.0": {
-      "domelementtype": "npm:domelementtype@1.3.0",
-      "domhandler": "npm:domhandler@2.3.0",
-      "domutils": "npm:domutils@1.5.1",
-      "entities": "npm:entities@1.1.1",
-      "events": "github:jspm/nodelibs-events@0.1.1",
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "stream": "github:jspm/nodelibs-stream@0.1.0",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2",
-      "util": "github:jspm/nodelibs-util@0.1.0"
-    },
     "npm:https-browserify@0.0.0": {
       "http": "github:jspm/nodelibs-http@1.7.1"
     },
@@ -302,20 +255,6 @@ System.config({
     "npm:is-buffer@1.1.3": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:jsdom@1.0.0": {
-      "assert": "github:jspm/nodelibs-assert@0.1.0",
-      "cssom": "npm:cssom@0.3.1",
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "htmlparser2": "npm:htmlparser2@3.9.0",
-      "http": "github:jspm/nodelibs-http@1.7.1",
-      "https": "github:jspm/nodelibs-https@0.1.0",
-      "nwmatcher": "npm:nwmatcher@1.3.7",
-      "parse5": "npm:parse5@1.5.1",
-      "path": "github:jspm/nodelibs-path@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "url": "github:jspm/nodelibs-url@0.1.0",
-      "xmlhttprequest": "npm:xmlhttprequest@1.8.0"
-    },
     "npm:jsonld@0.4.6": {
       "es6-promise": "npm:es6-promise@2.0.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
@@ -324,12 +263,15 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
+    "npm:leaflet-coverage@0.5.0": {
+      "c3": "npm:c3@0.4.11",
+      "covutils": "npm:covutils@0.4.3",
+      "leaflet": "npm:leaflet@0.7.7",
+      "ndarray": "npm:ndarray@1.0.18"
+    },
     "npm:ndarray@1.0.18": {
       "iota-array": "npm:iota-array@1.0.0",
       "is-buffer": "npm:is-buffer@1.1.3"
-    },
-    "npm:nwmatcher@1.3.7": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:optimist@0.3.7": {
       "path": "github:jspm/nodelibs-path@0.1.0",
@@ -338,9 +280,6 @@ System.config({
     },
     "npm:os-browserify@0.1.2": {
       "os": "github:jspm/nodelibs-os@0.1.0"
-    },
-    "npm:parse5@1.5.1": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:path-browserify@0.0.0": {
       "process": "github:jspm/nodelibs-process@0.1.2"
@@ -514,15 +453,6 @@ System.config({
     },
     "npm:vm-browserify@0.0.4": {
       "indexof": "npm:indexof@0.0.1"
-    },
-    "npm:xmlhttprequest@1.8.0": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
-      "child_process": "github:jspm/nodelibs-child_process@0.1.0",
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "http": "github:jspm/nodelibs-http@1.7.1",
-      "https": "github:jspm/nodelibs-https@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "url": "github:jspm/nodelibs-url@0.1.0"
     },
     "npm:xtend@2.1.2": {
       "object-keys": "npm:object-keys@0.4.0"

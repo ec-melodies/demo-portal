@@ -2,10 +2,8 @@ import L from 'leaflet'
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
-import * as transformUtil from 'leaflet-coverage/util/transform.js'
-import {maskByPolygon} from 'covutils/lib/coverage/transform-polygon.js'
-import {subsetByBbox} from 'covutils/lib/coverage/subset.js'
-import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
+import {maskByPolygon, subsetByBbox} from 'covutils'
+import {COVJSON_GRID} from 'leaflet-coverage'
 
 import {i18n} from '../util.js'
 import GeoJSON from '../formats/GeoJSON.js'

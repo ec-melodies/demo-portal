@@ -1,6 +1,6 @@
 import L from 'leaflet'
-import 'sidebar-v2/js/leaflet-sidebar.js'
-import 'sidebar-v2/css/leaflet-sidebar.css!'
+import './leaflet-sidebar.js'
+import './leaflet-sidebar.css!'
 import 'bootstrap/css/bootstrap.css!'
 import {$, HTML} from 'minified'
 

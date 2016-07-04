@@ -1,6 +1,7 @@
 import 'fetch'
 
-export const COVJSON_PREFIX = 'http://coveragejson.org/def#'
+export {getLanguageString as i18n} from 'covutils'
+
 export const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
 
 /**
@@ -22,17 +23,6 @@ export class DefaultMap {
   }
   delete (key) {
     this._map.delete(key)
-  }
-}
-
-export function i18n (prop) {
-  if (!prop) return
-  // TODO be clever and select proper language
-  if (prop.en) {
-    return prop.en
-  } else {
-    // random
-    return prop[Object.keys(prop)[0]]
   }
 }
 

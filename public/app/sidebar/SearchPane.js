@@ -224,7 +224,7 @@ export default class SearchPane {
     $('.dataset-list', '#' + this.id).add(el)
 
     let title = i18n(dataset.title)
-    let description = i18n(dataset.description)
+    let description = dataset.description ? i18n(dataset.description) : ''
     
     // TODO switch to .landingPage once https://github.com/ckan/ckanext-dcat/issues/50 is fixed
     //let landingPage = dataset.landingPage

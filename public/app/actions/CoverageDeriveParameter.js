@@ -1,7 +1,7 @@
 import {$, $$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
-import {withSimpleDerivedParameter} from 'covutils/lib/coverage/transform.js'
+import {withSimpleDerivedParameter} from 'covutils'
 
 import {i18n} from '../util.js'
 import {default as Action, PROCESS} from './Action.js'

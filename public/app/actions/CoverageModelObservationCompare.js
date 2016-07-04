@@ -1,20 +1,13 @@
-import {indexOfNearest, indicesOfNearest} from 'leaflet-coverage/util/arrays.js'
-import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
-import {COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE} from 'leaflet-coverage/util/constants.js'
-import TimeAxis from 'leaflet-coverage/controls/TimeAxis.js'
-import Dropdown from 'leaflet-coverage/controls/Dropdown.js'
+import {indexOfNearest, indicesOfNearest, reprojectCoords, getReferenceObject, stringifyUnit} from 'covutils'
+import {TimeAxis, Dropdown, COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE} from 'leaflet-coverage'
 import ButtonControl from './ButtonControl.js'
-import * as unitUtils from 'covutils/lib/unit.js'
 
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
-import {i18n, COVJSON_PREFIX} from '../util.js'
+import {i18n} from '../util.js'
 import CoverageData from '../formats/CoverageData.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
-
-const PointCollection = COVJSON_PREFIX + 'PointCoverageCollection'
-const ProfileCollection = COVJSON_PREFIX + 'VerticalProfileCoverageCollection'
 
 const TYPE = {
     MODEL: 1,
@@ -214,7 +207,7 @@ export default class CoverageModelObservationCompare extends Action {
     let fillSelect = (el, params) => {
       el.fill()
       for (let param of params) {
-        let unit = unitUtils.toAscii(param.unit) || 'unknown unit'
+        let unit = stringifyUnit(param.unit) || 'unknown unit'
         let label = i18n(param.observedProperty.label) + ' (' + unit + ')'
         el.add(HTML('<option value="' + param.key + '">' + label + '</option>'))
       }
@@ -800,9 +793,9 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
         
         let points = insitus.map(insitu => ({x: insitu.domain.axes.get(X).values[0], y: insitu.domain.axes.get(Y).values[0]}))
         if (points.length > 0) {
-          let fromProj = referencingUtil.getProjection(insituDomains[0])
-          let toProj = referencingUtil.getProjection(modelDomain)
-          points = points.map(point => referencingUtil.reproject(point, fromProj, toProj)).map(({x,y}) => [x,y])
+          let fromProj = getProjection(insituDomains[0])
+          let toProj = getProjection(modelDomain)
+          points = points.map(point => reprojectCoords(point, fromProj, toProj)).map(({x,y}) => [x,y])
         }
         let modelSubsetsPromise = subsetGridToPointsConnected(model, points)
         
@@ -900,7 +893,6 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
               // assemble the result into a CovJSON Point coverage            
               let covjson = {
                 "type": "Coverage",
-                "profile": "PointCoverage",
                 "wasGeneratedBy": {
                   "type": "ModelObservationComparisonActivity",
                   "qualifiedUsage": {
@@ -918,7 +910,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
                 },
                 "domain": {
                   "type": "Domain",
-                  "profile": "Point",
+                  "domainType": "Point",
                   "axes": {
                     "x": { "values": [insituX] },
                     "y": { "values": [insituY] }
@@ -926,7 +918,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
                 },
                 "ranges": {
                   "rmse": {
-                    "type": "Range",
+                    "type": "NdArray",
                     "values": [rmse],
                     "dataType": "float"
                   }
@@ -978,7 +970,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
           "parameterKey": "covstats:parameterKey"
         },
         "type": "CoverageCollection",
-        "profile": "PointCoverageCollection",
+        "domainType": "Point",
         "wasGeneratedBy": {
           "type": "ModelObservationComparisonActivity",
           "qualifiedUsage": {
@@ -1014,7 +1006,7 @@ function deriveIntercomparisonStatistics (modelGridCoverage, insituCoverageColle
         "referencing": [{
           // FIXME the order could be different, or even be a x-y-z CRS
           "components": ["x","y"],
-          "system": referencingUtil.getReferenceObject(modelDomain, X).system
+          "system": getReferenceObject(modelDomain, X).system
         }],
         "coverages": covjsons
       }

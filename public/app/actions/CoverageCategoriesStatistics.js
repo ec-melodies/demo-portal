@@ -9,9 +9,8 @@ import Modal from 'bootstrap-native/lib/modal-native.js'
 
 import {i18n} from '../util.js'
 
-import * as rangeUtil from 'leaflet-coverage/util/range.js'
-import * as referencingUtil from 'leaflet-coverage/util/referencing.js'
-import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
+import {iterateRange, getReferenceObject} from 'covutils'
+import {COVJSON_GRID} from 'leaflet-coverage'
 
 import {default as Action, PROCESS} from './Action.js'
 
@@ -230,7 +229,7 @@ export default class CoverageCategoriesStatistics extends Action {
       }
       
       // TODO using a Map is possibly too slow
-      rangeUtil.iterate(range, val => {
+      iterateRange(range, val => {
         if (val !== null) {
           rawCounts.set(val, rawCounts.get(val) + 1)
         }
@@ -323,7 +322,7 @@ export default class CoverageCategoriesStatistics extends Action {
           "axes": {
             "t": t
           },
-          "referencing": [referencingUtil.getReferenceObject(domain, 't')]
+          "referencing": [getReferenceObject(domain, 't')]
         },
         "parameters": params,
         "ranges": ranges

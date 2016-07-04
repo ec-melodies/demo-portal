@@ -12,7 +12,7 @@ import 'leaflet-providers'
 import 'leaflet-loading'
 import 'leaflet-loading/src/Control.Loading.css!'
 
-import DraggableValuePopup from 'leaflet-coverage/popups/DraggableValuePopup.js'
+import {DraggableValuePopup} from 'leaflet-coverage'
 
 import {i18n, DefaultMap, MELODIES_DCAT_CATALOG_URL} from './util.js'
 import App from './App.js'
@@ -128,10 +128,7 @@ map.layerControl = new SmartLayerControl(layerControl)
 map.on('singleclick', e => {
   let layers = map.layerControl.getLayers()
   layers = layers.filter(layer => map.hasLayer(layer))
-  new DraggableValuePopup({
-    layers,
-    className: 'leaflet-popup-draggable'
-  }).setLatLng(e.latlng).openOn(map)
+  new DraggableValuePopup({layers}).setLatLng(e.latlng).openOn(map)
 })
 
 

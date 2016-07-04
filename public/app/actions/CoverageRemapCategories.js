@@ -4,8 +4,8 @@ import Modal from 'bootstrap-native/lib/modal-native.js'
 import Remapper from 'category-remapper'
 import 'category-remapper/css/remapper.css!'
 
-import {withCategories} from 'leaflet-coverage/util/transform.js'
-import {COVJSON_GRID} from 'leaflet-coverage/util/constants.js'
+import {withCategories} from 'covutils'
+import {COVJSON_GRID} from 'leaflet-coverage'
 
 import {i18n} from '../util.js'
 import {default as Action, VIEW, PROCESS} from './Action.js'
