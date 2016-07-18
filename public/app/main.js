@@ -60,7 +60,7 @@ var baseLayerLabels = {
   'OpenStreetMap': 'OpenStreetMap',
   'OpenStreetMap.BlackAndWhite': 'OpenStreetMap (B/W)',
   'OpenTopoMap': 'OpenTopoMap',
-  'MapQuestOpen.Aerial': 'MapQuestOpen Aerial'  
+  'Esri.WorldImagery': 'Esri WorldImagery'  
 }
 
 var baseLayers = {}
@@ -68,7 +68,7 @@ for (let id in baseLayerLabels) {
   let layer = L.tileLayer.provider(id)
   baseLayers[baseLayerLabels[id]] = layer
 }
-baseLayers[baseLayerLabels['MapQuestOpen.Aerial']].addTo(map)
+baseLayers[baseLayerLabels['Esri.WorldImagery']].addTo(map)
 
 let baseMaps = [{
   groupName: 'Base Maps',

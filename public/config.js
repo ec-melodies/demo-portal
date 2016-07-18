@@ -21,13 +21,13 @@ System.config({
     "clean-css": "npm:clean-css@3.4.11",
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
-    "covjson-reader": "npm:covjson-reader@0.14.0",
-    "covutils": "npm:covutils@0.4.3",
+    "covjson-reader": "npm:covjson-reader@0.15.0",
+    "covutils": "npm:covutils@0.5.2",
     "css": "github:systemjs/plugin-css@0.1.21",
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
     "leaflet": "npm:leaflet@0.7.7",
-    "leaflet-coverage": "npm:leaflet-coverage@0.5.0",
+    "leaflet-coverage": "npm:leaflet-coverage@0.6.3",
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.18",
     "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.9",
     "minified": "github:timjansen/minified.js@2015.1.1",
@@ -174,15 +174,16 @@ System.config({
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:covjson-reader@0.14.0": {
-      "covutils": "npm:covutils@0.4.3",
+    "npm:covjson-reader@0.15.0": {
+      "covutils": "npm:covutils@0.5.2",
       "ndarray": "npm:ndarray@1.0.18",
-      "url-template": "npm:url-template@2.0.7"
+      "url-template": "npm:url-template@2.0.8"
     },
-    "npm:covutils@0.4.3": {
+    "npm:covutils@0.5.2": {
       "ndarray": "npm:ndarray@1.0.18",
       "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
-      "topojson": "npm:topojson@1.6.26"
+      "topojson": "npm:topojson@1.6.26",
+      "uriproj": "npm:uriproj@0.2.2"
     },
     "npm:d3-geo-projection@0.2.16": {
       "brfs": "npm:brfs@1.4.3",
@@ -230,7 +231,7 @@ System.config({
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "foreach": "npm:foreach@2.0.5",
       "isarray": "npm:isarray@0.0.1",
-      "object-keys": "npm:object-keys@1.0.9"
+      "object-keys": "npm:object-keys@1.0.11"
     },
     "npm:graceful-readlink@1.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2"
@@ -263,9 +264,9 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
-    "npm:leaflet-coverage@0.5.0": {
+    "npm:leaflet-coverage@0.6.3": {
       "c3": "npm:c3@0.4.11",
-      "covutils": "npm:covutils@0.4.3",
+      "covutils": "npm:covutils@0.5.2",
       "leaflet": "npm:leaflet@0.7.7",
       "ndarray": "npm:ndarray@1.0.18"
     },
@@ -297,6 +298,11 @@ System.config({
       "assert": "github:jspm/nodelibs-assert@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "vm": "github:jspm/nodelibs-vm@0.1.0"
+    },
+    "npm:proj4@2.3.14": {
+      "mgrs": "npm:mgrs@0.0.3",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:punycode@1.3.2": {
       "process": "github:jspm/nodelibs-process@0.1.2"
@@ -437,6 +443,13 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "rw": "npm:rw@1.3.2",
       "shapefile": "npm:shapefile@0.3.1"
+    },
+    "npm:uriproj@0.2.2": {
+      "proj4": "npm:proj4@2.3.14",
+      "whatwg-fetch": "npm:whatwg-fetch@1.0.0"
+    },
+    "npm:url-template@2.0.8": {
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:url@0.10.3": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",
