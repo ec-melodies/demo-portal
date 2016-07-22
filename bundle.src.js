@@ -7606,6 +7606,9 @@ $__System.register('6e', ['56', '70', '71', '72', '6f', '6c'], function (_export
             }).on('dataLoad', function () {
               return _this.fire('load');
             });
+            layer.on('axisChange', function () {
+              layer.paletteExtent = 'subset';
+            });
 
             // we do that outside of the above 'add' handler since we want to register only once,
             // not every time the layer is added to the map
