@@ -143,6 +143,9 @@ export default class GeoCoverageView extends Action {
       })
       .on('dataLoading', () => this.fire('loading'))
       .on('dataLoad', () => this.fire('load'))
+    layer.on('axisChange', () => {
+      layer.paletteExtent = 'subset'
+    })
     
 
     // we do that outside of the above 'add' handler since we want to register only once,
