@@ -4,6 +4,8 @@ import Modal from 'bootstrap-native/lib/modal-native.js'
 import c3 from 'c3'
 import 'c3/c3.css!'
 
+import {minMaxOfRange, iterateRange} from 'covutils'
+
 import {default as Action, VIEW} from './Action.js'
 import {i18n} from '../util.js'
 
@@ -115,7 +117,9 @@ export default class StatisticalCoverageView extends Action {
       for (let param of this.cov.parameters.values()) {
         let key = param.key
         // skip params that are 0 during the whole series
-        if (!ranges.get(key).values.some(v => v > 0)) {
+        let range = ranges.get(key)
+        let [min,max] = minMaxOfRange(range)
+        if (!min || max === 0) {
           continue
         }
         names[key] = getStatTitle(param)
@@ -125,7 +129,9 @@ export default class StatisticalCoverageView extends Action {
         if (cats && cats.length === 1 && cats[0].preferredColor) {
           colors[key] = cats[0].preferredColor
         }
-        ratioColumns.push([key].concat(ranges.get(key).values.map(v => v*100)))
+        let percentages = []
+        iterateRange(range, v => percentages.push(v*100))
+        ratioColumns.push([key].concat(percentages))
       }
       
       c3.generate({
@@ -178,9 +184,12 @@ export default class StatisticalCoverageView extends Action {
     let displaySingleParamChart = key => {
       // timeseries of single parameter
       let param = this.cov.parameters.get(key)
+      let range = ranges.get(key)
       
       // convert from ratio to percentage
-      let percentageColumn = [key].concat(ranges.get(key).values.map(v => v*100))
+      let percentages = []
+      iterateRange(range, v => percentages.push(v*100))
+      let percentageColumn = [key].concat(percentages)
      
       let obsPropLabel
       let cats = param.observedProperty.statisticalCategories
