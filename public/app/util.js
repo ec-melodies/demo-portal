@@ -2,7 +2,7 @@ import 'fetch'
 
 export {getLanguageString as i18n} from 'covutils'
 
-export const MELODIES_DCAT_CATALOG_URL = 'http://ckan-demo.melodiesproject.eu'
+export const MELODIES_DCAT_CATALOG_URL = 'https://ec-melodies.github.io/wp02-dcat/feed.jsonld'
 
 /**
  * A Map which returns a default value for get(key) if key does not exist.

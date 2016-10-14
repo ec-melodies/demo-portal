@@ -35,6 +35,7 @@ System.config({
     "sidebar-v2": "github:Turbo87/sidebar-v2@0.3.0",
     "traceur": "github:jmcriffey/bower-traceur@0.0.93",
     "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93",
+    "wellknown": "npm:wellknown@0.5.0",
     "github:Reading-eScience-Centre/coverage-rest-client@master": {
       "jsonld": "npm:jsonld@0.4.6",
       "url-template": "npm:url-template@2.0.6"
@@ -129,7 +130,7 @@ System.config({
       "base64-js": "npm:base64-js@0.0.8",
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "ieee754": "npm:ieee754@1.1.6",
+      "ieee754": "npm:ieee754@1.1.8",
       "isarray": "npm:isarray@1.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
@@ -162,6 +163,12 @@ System.config({
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "inherits": "npm:inherits@2.0.1",
       "readable-stream": "npm:readable-stream@1.1.14",
+      "typedarray": "npm:typedarray@0.0.6"
+    },
+    "npm:concat-stream@1.5.2": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
+      "inherits": "npm:inherits@2.0.1",
+      "readable-stream": "npm:readable-stream@2.0.6",
       "typedarray": "npm:typedarray@0.0.6"
     },
     "npm:core-js@1.2.6": {
@@ -465,6 +472,12 @@ System.config({
     },
     "npm:vm-browserify@0.0.4": {
       "indexof": "npm:indexof@0.0.1"
+    },
+    "npm:wellknown@0.5.0": {
+      "concat-stream": "npm:concat-stream@1.5.2",
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "minimist": "npm:minimist@1.2.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:xtend@2.1.2": {
       "object-keys": "npm:object-keys@0.4.0"

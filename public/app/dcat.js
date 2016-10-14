@@ -2,7 +2,7 @@ import {promises as jsonld} from 'jsonld'
 import {loadJSON} from './util.js'
 
 const DCAT_CONTEXT = [
-  // unmodified copy of https://github.com/ec-melodies/wp02-dcat/blob/master/context.jsonld
+  // unmodified copy of https://ec-melodies.github.io/wp02-dcat/context.jsonld
   // Note: This has to be kept in sync when changes are made to the context!
   // We embed the context here directly to save a network request.
   {
@@ -49,7 +49,6 @@ const DCAT_CONTEXT = [
     "parts": { "@id": "dct:hasPart", "@type": "@id", "@container": "@set" }
   },
   
-  // geometry override since we want the GeoJSON geometry, not the WKT one
   // Also, @language and title/description override is because CKAN
   // isn't giving us language-tagged strings which means that we
   // cannot create nice language maps by default.
@@ -62,10 +61,6 @@ const DCAT_CONTEXT = [
   // but for wider support, we do a little more effort.
   // Note that these dual fields get collapsed in a post-processing step, see loadCatalog(). 
   {
-    "geometry": { 
-      "@id": "locn:geometry", 
-      "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
-    },
     "@language": null,
     "title": { "@id": "dct:title" },
     "description": { "@id": "dct:description" },

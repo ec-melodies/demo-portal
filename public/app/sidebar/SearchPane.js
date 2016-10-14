@@ -1,5 +1,6 @@
 import {$, HTML} from 'minified'
 import L from 'leaflet'
+import parseWKT from 'wellknown'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 import Tab from 'bootstrap-native/lib/tab-native.js'
 
@@ -258,7 +259,7 @@ export default class SearchPane {
     }
     
     let isGlobal
-    let geom = dataset.spatial && dataset.spatial.geometry ? JSON.parse(dataset.spatial.geometry) : null
+    let geom = dataset.spatial && dataset.spatial.geometry ? parseWKT(dataset.spatial.geometry) : null
     // check if global bounding box and don't display map in that case
     if (geom) {
       let geomLayer = L.geoJson(geom)
