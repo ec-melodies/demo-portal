@@ -21,7 +21,7 @@ System.config({
     "clean-css": "npm:clean-css@3.4.11",
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
-    "covjson-reader": "npm:covjson-reader@0.16.1",
+    "covjson-reader": "npm:covjson-reader@0.16.2",
     "covutils": "npm:covutils@0.6.1",
     "css": "github:systemjs/plugin-css@0.1.21",
     "fetch": "github:github/fetch@0.10.1",
@@ -38,7 +38,7 @@ System.config({
     "wellknown": "npm:wellknown@0.5.0",
     "github:Reading-eScience-Centre/coverage-rest-client@master": {
       "jsonld": "npm:jsonld@0.4.6",
-      "url-template": "npm:url-template@2.0.6"
+      "url-template": "npm:url-template@2.0.8"
     },
     "github:guygriffiths/category-remapper-js@master": {
       "jsplumb": "npm:jsplumb@2.0.7",
@@ -180,7 +180,7 @@ System.config({
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:covjson-reader@0.16.1": {
+    "npm:covjson-reader@0.16.2": {
       "covutils": "npm:covutils@0.6.1",
       "ndarray": "npm:ndarray@1.0.18",
       "url-template": "npm:url-template@2.0.8"
