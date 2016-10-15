@@ -3302,214 +3302,7 @@ $__System.register('53', ['54', '55'], function (_export) {
 
 $__System.register("56", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic('57', [], true, function ($__require, exports, module) {
-  /* */
-  "format cjs";
-
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  (function (root, factory) {
-    if (typeof exports === 'object') {
-      module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) {
-      define([], factory);
-    } else {
-      root.urltemplate = factory();
-    }
-  })(this, function () {
-    /**
-     * @constructor
-     */
-    function UrlTemplate() {}
-
-    /**
-     * @private
-     * @param {string} str
-     * @return {string}
-     */
-    UrlTemplate.prototype.encodeReserved = function (str) {
-      return str.split(/(%[0-9A-Fa-f]{2})/g).map(function (part) {
-        if (!/%[0-9A-Fa-f]/.test(part)) {
-          part = encodeURI(part).replace(/%5B/g, '[').replace(/%5D/g, ']');
-        }
-        return part;
-      }).join('');
-    };
-
-    /**
-     * @private
-     * @param {string} str
-     * @return {string}
-     */
-    UrlTemplate.prototype.encodeUnreserved = function (str) {
-      return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
-        return '%' + c.charCodeAt(0).toString(16).toUpperCase();
-      });
-    };
-
-    /**
-     * @private
-     * @param {string} operator
-     * @param {string} value
-     * @param {string} key
-     * @return {string}
-     */
-    UrlTemplate.prototype.encodeValue = function (operator, value, key) {
-      value = operator === '+' || operator === '#' ? this.encodeReserved(value) : this.encodeUnreserved(value);
-
-      if (key) {
-        return this.encodeUnreserved(key) + '=' + value;
-      } else {
-        return value;
-      }
-    };
-
-    /**
-     * @private
-     * @param {*} value
-     * @return {boolean}
-     */
-    UrlTemplate.prototype.isDefined = function (value) {
-      return value !== undefined && value !== null;
-    };
-
-    /**
-     * @private
-     * @param {string}
-     * @return {boolean}
-     */
-    UrlTemplate.prototype.isKeyOperator = function (operator) {
-      return operator === ';' || operator === '&' || operator === '?';
-    };
-
-    /**
-     * @private
-     * @param {Object} context
-     * @param {string} operator
-     * @param {string} key
-     * @param {string} modifier
-     */
-    UrlTemplate.prototype.getValues = function (context, operator, key, modifier) {
-      var value = context[key],
-          result = [];
-
-      if (this.isDefined(value) && value !== '') {
-        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-          value = value.toString();
-
-          if (modifier && modifier !== '*') {
-            value = value.substring(0, parseInt(modifier, 10));
-          }
-
-          result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
-        } else {
-          if (modifier === '*') {
-            if (Array.isArray(value)) {
-              value.filter(this.isDefined).forEach(function (value) {
-                result.push(this.encodeValue(operator, value, this.isKeyOperator(operator) ? key : null));
-              }, this);
-            } else {
-              Object.keys(value).forEach(function (k) {
-                if (this.isDefined(value[k])) {
-                  result.push(this.encodeValue(operator, value[k], k));
-                }
-              }, this);
-            }
-          } else {
-            var tmp = [];
-
-            if (Array.isArray(value)) {
-              value.filter(this.isDefined).forEach(function (value) {
-                tmp.push(this.encodeValue(operator, value));
-              }, this);
-            } else {
-              Object.keys(value).forEach(function (k) {
-                if (this.isDefined(value[k])) {
-                  tmp.push(this.encodeUnreserved(k));
-                  tmp.push(this.encodeValue(operator, value[k].toString()));
-                }
-              }, this);
-            }
-
-            if (this.isKeyOperator(operator)) {
-              result.push(this.encodeUnreserved(key) + '=' + tmp.join(','));
-            } else if (tmp.length !== 0) {
-              result.push(tmp.join(','));
-            }
-          }
-        }
-      } else {
-        if (operator === ';') {
-          if (this.isDefined(value)) {
-            result.push(this.encodeUnreserved(key));
-          }
-        } else if (value === '' && (operator === '&' || operator === '?')) {
-          result.push(this.encodeUnreserved(key) + '=');
-        } else if (value === '') {
-          result.push('');
-        }
-      }
-      return result;
-    };
-
-    /**
-     * @param {string} template
-     * @return {function(Object):string}
-     */
-    UrlTemplate.prototype.parse = function (template) {
-      var that = this;
-      var operators = ['+', '#', '.', '/', ';', '?', '&'];
-
-      return {
-        expand: function (context) {
-          return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
-            if (expression) {
-              var operator = null,
-                  values = [];
-
-              if (operators.indexOf(expression.charAt(0)) !== -1) {
-                operator = expression.charAt(0);
-                expression = expression.substr(1);
-              }
-
-              expression.split(/,/g).forEach(function (variable) {
-                var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-                values.push.apply(values, that.getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
-              });
-
-              if (operator && operator !== '+') {
-                var separator = ',';
-
-                if (operator === '?') {
-                  separator = '&';
-                } else if (operator !== '#') {
-                  separator = operator;
-                }
-                return (values.length !== 0 ? operator : '') + values.join(separator);
-              } else {
-                return values.join(',');
-              }
-            } else {
-              return that.encodeReserved(literal);
-            }
-          });
-        }
-      };
-    };
-
-    return new UrlTemplate();
-  });
-  return module.exports;
-});
-$__System.registerDynamic("58", ["57"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("57");
-  return module.exports;
-});
-$__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export) {
+$__System.register('57', ['58', '59', '5b', '5c', '5d', '5a'], function (_export) {
   /**
    * @external {Parameter} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Parameter.md
    * @external {Domain} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Domain.md
@@ -3525,7 +3318,7 @@ $__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export
 
   //NO FILE EXTENSION, to work around JSPM bug in handling package.json's "browser" field
   //see https://github.com/jspm/jspm-cli/issues/1062#issuecomment-170342414
-  var template, ndarray, minMax, subsetDomainByIndex, subsetCoverageByValue, normalizeIndexSubsetConstraints, COVERAGE, shallowcopy, getNamespacePrefixes, CORE_PREFIX, DOMAINTYPES_PREFIX, load, Coverage;
+  var COVERAGE, shallowcopy, getNamespacePrefixes, CORE_PREFIX, DOMAINTYPES_PREFIX, ndarray, template, minMax, subsetDomainByIndex, subsetCoverageByValue, normalizeIndexSubsetConstraints, load, Coverage;
 
   /**
    * Transforms a CoverageJSON NdArray range to the Coverage API format. Transformation is made in-place.
@@ -3677,6 +3470,7 @@ $__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export
     });
     var idxBestTileset = indexOfBestTileset(tilesetsStats);
     var tileset = range.tileSets[idxBestTileset];
+    var urlTemplate = template.parse(tileset.urlTemplate);
     var tileShape = fillNulls(tileset.tileShape);
 
     // step 2: determine the tiles to load
@@ -3715,115 +3509,137 @@ $__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export
       subsetTilesetAxes.push(tilesetAxis);
     }
 
-    // step 3: create an empty ndarray of the subset shape that will be filled with tile data
-    // TODO check if only a single tile will be loaded and avoid copying data around in that case
+    var tiles = cartesianProduct(subsetTilesetAxes);
     var subsetShape = constraintsArr.map(function (_ref) {
       var start = _ref.start;
       var stop = _ref.stop;
       var step = _ref.step;
       return Math.floor((stop - start) / step) + (stop - start) % step;
     });
-    var subsetSize = subsetShape.reduce(function (l, r) {
-      return l * r;
-    });
-    var subsetNdArr = ndarray(new Array(subsetSize), subsetShape);
 
-    // step 4: load tiles and fill subset ndarray
-    var urlTemplate = template.parse(tileset.urlTemplate);
-    var tiles = cartesianProduct(subsetTilesetAxes);
-    var promises = tiles.map(function (tile) {
+    function getTileUrl(tile) {
       var tileUrlVars = {};
       tile.forEach(function (v, i) {
         return tileUrlVars[range.axisNames[i]] = v;
       });
-      var url = urlTemplate.expand(tileUrlVars);
+      return urlTemplate.expand(tileUrlVars);
+    }
+
+    // step 3a: check if only a single tile will be loaded and avoid copying data around in that case
+    if (tiles.length === 1 && subsetShape.every(function (v, i) {
+      return v === tileShape[i];
+    })) {
+      var url = getTileUrl(tiles[0]);
       return load(url).then(function (result) {
         var tileRange = result.data;
         transformNdArrayRange(tileRange);
+        return tileRange;
+      });
+    } else {
+      var _ret = (function () {
+        // step 3b: create an empty ndarray of the subset shape that will be filled with tile data
+        var subsetSize = subsetShape.reduce(function (l, r) {
+          return l * r;
+        });
+        var subsetNdArr = ndarray(new Array(subsetSize), subsetShape);
 
-        // figure out which parts of the tile to copy into which part of the final ndarray
-        var tileOffsets = tile.map(function (v, i) {
-          return v * tileShape[i];
+        // step 4: load tiles and fill subset ndarray
+        var promises = tiles.map(function (tile) {
+          var url = getTileUrl(tile);
+          return load(url).then(function (result) {
+            var tileRange = result.data;
+            transformNdArrayRange(tileRange);
+
+            // figure out which parts of the tile to copy into which part of the final ndarray
+            var tileOffsets = tile.map(function (v, i) {
+              return v * tileShape[i];
+            });
+
+            // iterate all tile values and for each check if they are part of the subset
+            // TODO this code is probably quite slow, consider pre-compiling etc
+            //      -> use ndarray-ops#assign for fast copies
+            var tileAxesSubsetIndices = [];
+            for (var ax = 0; ax < tileShape.length; ax++) {
+              var _constraintsArr$ax2 = constraintsArr[ax];
+              var start = _constraintsArr$ax2.start;
+              var _stop2 = _constraintsArr$ax2.stop;
+              var step = _constraintsArr$ax2.step;
+
+              var tileAxisSize = tileShape[ax];
+              var tileAxisOffset = tileOffsets[ax];
+              var tileAxisSubsetIndices = [];
+              var startIdx = 0;
+              if (tileAxisOffset < start) {
+                startIdx = start - tileAxisOffset;
+              }
+              var stopIdx = tileAxisSize;
+              if (tileAxisOffset + stopIdx > _stop2) {
+                stopIdx = _stop2 - tileAxisOffset;
+              }
+
+              for (var i = startIdx; i < stopIdx; i++) {
+                var idx = tileAxisOffset + i;
+                if ((idx - start) % step === 0) {
+                  tileAxisSubsetIndices.push(i);
+                }
+              }
+              tileAxesSubsetIndices.push(tileAxisSubsetIndices);
+            }
+            var tileSubsetIndices = cartesianProduct(tileAxesSubsetIndices);
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = tileSubsetIndices[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var _tileRange$_ndarr;
+
+                var tileInd = _step2.value;
+
+                var val = (_tileRange$_ndarr = tileRange._ndarr).get.apply(_tileRange$_ndarr, babelHelpers.toConsumableArray(tileInd));
+                var subsetInd = tileInd.map(function (i, ax) {
+                  var idx = tileOffsets[ax] + i;
+                  return Math.floor((idx - constraintsArr[ax].start) / constraintsArr[ax].step);
+                });
+                subsetNdArr.set.apply(subsetNdArr, babelHelpers.toConsumableArray(subsetInd).concat([val]));
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+                  _iterator2['return']();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+          });
         });
 
-        // iterate all tile values and for each check if they are part of the subset
-        // TODO this code is probably quite slow, consider pre-compiling etc
-        var tileAxesSubsetIndices = [];
-        for (var ax = 0; ax < tileShape.length; ax++) {
-          var _constraintsArr$ax2 = constraintsArr[ax];
-          var start = _constraintsArr$ax2.start;
-          var _stop2 = _constraintsArr$ax2.stop;
-          var step = _constraintsArr$ax2.step;
+        // step 5: create and return the new range
+        return {
+          v: Promise.all(promises).then(function () {
+            var newrange = {
+              dataType: range.dataType,
+              get: createRangeGetFunction(subsetNdArr, range.axisNames),
+              _ndarr: subsetNdArr,
+              _axisNames: range.axisNames,
+              _shape: subsetShape
+            };
+            newrange.shape = new Map(range.axisNames.map(function (v, i) {
+              return [v, subsetNdArr.shape[i]];
+            }));
+            return newrange;
+          })
+        };
+      })();
 
-          var tileAxisSize = tileShape[ax];
-          var tileAxisOffset = tileOffsets[ax];
-          var tileAxisSubsetIndices = [];
-          var startIdx = 0;
-          if (tileAxisOffset < start) {
-            startIdx = start - tileAxisOffset;
-          }
-          var stopIdx = tileAxisSize;
-          if (tileAxisOffset + stopIdx > _stop2) {
-            stopIdx = _stop2 - tileAxisOffset;
-          }
-
-          for (var i = startIdx; i < stopIdx; i++) {
-            var idx = tileAxisOffset + i;
-            if ((idx - start) % step === 0) {
-              tileAxisSubsetIndices.push(i);
-            }
-          }
-          tileAxesSubsetIndices.push(tileAxisSubsetIndices);
-        }
-        var tileSubsetIndices = cartesianProduct(tileAxesSubsetIndices);
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = tileSubsetIndices[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var _tileRange$_ndarr;
-
-            var tileInd = _step2.value;
-
-            var val = (_tileRange$_ndarr = tileRange._ndarr).get.apply(_tileRange$_ndarr, babelHelpers.toConsumableArray(tileInd));
-            var subsetInd = tileInd.map(function (i, ax) {
-              var idx = tileOffsets[ax] + i;
-              return Math.floor((idx - constraintsArr[ax].start) / constraintsArr[ax].step);
-            });
-            subsetNdArr.set.apply(subsetNdArr, babelHelpers.toConsumableArray(subsetInd).concat([val]));
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-              _iterator2['return']();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-      });
-    });
-
-    // step 5: create and return the new range
-    return Promise.all(promises).then(function () {
-      var newrange = {
-        dataType: range.dataType,
-        get: createRangeGetFunction(subsetNdArr, range.axisNames),
-        _ndarr: subsetNdArr,
-        _axisNames: range.axisNames,
-        _shape: subsetShape
-      };
-      newrange.shape = new Map(range.axisNames.map(function (v, i) {
-        return [v, subsetNdArr.shape[i]];
-      }));
-      return newrange;
-    });
+      if (typeof _ret === 'object') return _ret.v;
+    }
   }
 
   /**
@@ -4347,7 +4163,7 @@ $__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export
 
   function wrapBounds(axis) {
     if (axis.bounds) {
-      var _ret = (function () {
+      var _ret2 = (function () {
         var bounds = axis.bounds;
         return {
           v: {
@@ -4358,28 +4174,28 @@ $__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export
         };
       })();
 
-      if (typeof _ret === 'object') return _ret.v;
+      if (typeof _ret2 === 'object') return _ret2.v;
     }
   }
   return {
     setters: [function (_) {
-      template = _['default'];
-    }, function (_d) {
-      ndarray = _d['default'];
-    }, function (_e) {
-      minMax = _e.minMax;
-      subsetDomainByIndex = _e.subsetDomainByIndex;
-      subsetCoverageByValue = _e.subsetByValue;
-      normalizeIndexSubsetConstraints = _e.normalizeIndexSubsetConstraints;
-    }, function (_a) {
-      COVERAGE = _a.COVERAGE;
+      COVERAGE = _.COVERAGE;
+    }, function (_2) {
+      shallowcopy = _2.shallowcopy;
+      getNamespacePrefixes = _2.getNamespacePrefixes;
+      CORE_PREFIX = _2.CORE_PREFIX;
+      DOMAINTYPES_PREFIX = _2.DOMAINTYPES_PREFIX;
     }, function (_b) {
-      shallowcopy = _b.shallowcopy;
-      getNamespacePrefixes = _b.getNamespacePrefixes;
-      CORE_PREFIX = _b.CORE_PREFIX;
-      DOMAINTYPES_PREFIX = _b.DOMAINTYPES_PREFIX;
+      ndarray = _b['default'];
     }, function (_c) {
-      load = _c.load;
+      template = _c['default'];
+    }, function (_d) {
+      minMax = _d.minMax;
+      subsetDomainByIndex = _d.subsetDomainByIndex;
+      subsetCoverageByValue = _d.subsetByValue;
+      normalizeIndexSubsetConstraints = _d.normalizeIndexSubsetConstraints;
+    }, function (_a) {
+      load = _a.load;
     }],
     execute: function () {
       Coverage = (function () {
@@ -4685,7 +4501,7 @@ $__System.register('59', ['58', '5d', '5e', '5a', '5b', '5c'], function (_export
   };
 });
 
-$__System.register('5f', ['59', '5a', '5b', '5e'], function (_export) {
+$__System.register('5e', ['57', '58', '59', '5d'], function (_export) {
   /**
    * @external {CollectionQuery} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/CoverageCollectionQuery.md
    */
@@ -4700,18 +4516,18 @@ $__System.register('5f', ['59', '5a', '5b', '5e'], function (_export) {
 
   var Coverage, transformDomain, transformParameter, COVERAGECOLLECTION, shallowcopy, getNamespacePrefixes, DOMAINTYPES_PREFIX, CollectionQuery, CoverageCollection;
   return {
-    setters: [function (_) {
-      Coverage = _['default'];
-      transformDomain = _.transformDomain;
-      transformParameter = _.transformParameter;
-    }, function (_a) {
-      COVERAGECOLLECTION = _a.COVERAGECOLLECTION;
-    }, function (_b) {
-      shallowcopy = _b.shallowcopy;
-      getNamespacePrefixes = _b.getNamespacePrefixes;
-      DOMAINTYPES_PREFIX = _b.DOMAINTYPES_PREFIX;
-    }, function (_e) {
-      CollectionQuery = _e.CollectionQuery;
+    setters: [function (_2) {
+      Coverage = _2['default'];
+      transformDomain = _2.transformDomain;
+      transformParameter = _2.transformParameter;
+    }, function (_) {
+      COVERAGECOLLECTION = _.COVERAGECOLLECTION;
+    }, function (_3) {
+      shallowcopy = _3.shallowcopy;
+      getNamespacePrefixes = _3.getNamespacePrefixes;
+      DOMAINTYPES_PREFIX = _3.DOMAINTYPES_PREFIX;
+    }, function (_d) {
+      CollectionQuery = _d.CollectionQuery;
     }],
     execute: function () {
       CoverageCollection = (function () {
@@ -4938,17 +4754,17 @@ $__System.register('5f', ['59', '5a', '5b', '5e'], function (_export) {
   };
 });
 
-$__System.register('5a', ['5e'], function (_export) {
+$__System.register('58', ['5d'], function (_export) {
   /* */
   'use strict';
 
   var LINKRELPREFIX;
   return {
-    setters: [function (_e) {
+    setters: [function (_d) {
       var _exportObj = {};
-      _exportObj['DOMAIN'] = _e.DOMAIN;
-      _exportObj['COVERAGE'] = _e.COVERAGE;
-      _exportObj['COVERAGECOLLECTION'] = _e.COVERAGECOLLECTION;
+      _exportObj['DOMAIN'] = _d.DOMAIN;
+      _exportObj['COVERAGE'] = _d.COVERAGE;
+      _exportObj['COVERAGECOLLECTION'] = _d.COVERAGECOLLECTION;
 
       _export(_exportObj);
     }],
@@ -4960,7 +4776,7 @@ $__System.register('5a', ['5e'], function (_export) {
   };
 });
 
-$__System.register('5b', ['5e'], function (_export) {
+$__System.register('59', ['5d'], function (_export) {
   /* */
   'use strict';
 
@@ -5070,11 +4886,11 @@ $__System.register('5b', ['5e'], function (_export) {
   }
 
   return {
-    setters: [function (_e) {
+    setters: [function (_d) {
       var _exportObj = {};
-      _exportObj['minMax'] = _e.minMax;
-      _exportObj['indicesOfNearest'] = _e.indicesOfNearest;
-      _exportObj['indexOfNearest'] = _e.indexOfNearest;
+      _exportObj['minMax'] = _d.minMax;
+      _exportObj['indicesOfNearest'] = _d.indicesOfNearest;
+      _exportObj['indexOfNearest'] = _d.indexOfNearest;
 
       _export(_exportObj);
     }],
@@ -5091,7 +4907,7 @@ $__System.register('5b', ['5e'], function (_export) {
   };
 });
 
-$__System.register('60', ['5b'], function (_export) {
+$__System.register('5f', ['59'], function (_export) {
   /* */
   'use strict';
 
@@ -5131,8 +4947,8 @@ $__System.register('60', ['5b'], function (_export) {
   }
 
   return {
-    setters: [function (_b) {
-      CORE_PREFIX = _b.CORE_PREFIX;
+    setters: [function (_) {
+      CORE_PREFIX = _.CORE_PREFIX;
     }],
     execute: function () {
       MEDIATYPE = {
@@ -5157,7 +4973,7 @@ $__System.register('60', ['5b'], function (_export) {
   };
 });
 
-$__System.register('5c', ['60'], function (_export) {
+$__System.register('5a', ['5f'], function (_export) {
   /* */
 
   /**
@@ -5291,14 +5107,14 @@ $__System.register('5c', ['60'], function (_export) {
     return headers;
   }
   return {
-    setters: [function (_) {
-      getAcceptHeader = _.getAcceptHeader;
+    setters: [function (_f) {
+      getAcceptHeader = _f.getAcceptHeader;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('61', ['59', '5f', '5b', '5a', '5c'], function (_export) {
+$__System.register('60', ['57', '58', '59', '5e', '5a'], function (_export) {
   /* */
 
   /**
@@ -5320,7 +5136,7 @@ $__System.register('61', ['59', '5f', '5b', '5a', '5c'], function (_export) {
 
   // NO FILE EXTENSION, to work around JSPM bug in handling package.json's "browser" field
   // see https://github.com/jspm/jspm-cli/issues/1062#issuecomment-170342414
-  var Coverage, transformDomain, CoverageCollection, assert, COVERAGE, COVERAGECOLLECTION, DOMAIN, LINKRELPREFIX, http;
+  var Coverage, transformDomain, COVERAGE, COVERAGECOLLECTION, DOMAIN, LINKRELPREFIX, assert, CoverageCollection, http;
 
   /**
    * Reads a CoverageJSON document and returns a {@link Promise} that succeeds with
@@ -5509,23 +5325,23 @@ $__System.register('61', ['59', '5f', '5b', '5a', '5c'], function (_export) {
     setters: [function (_) {
       Coverage = _['default'];
       transformDomain = _.transformDomain;
-    }, function (_f) {
-      CoverageCollection = _f['default'];
-    }, function (_b) {
-      assert = _b.assert;
+    }, function (_3) {
+      COVERAGE = _3.COVERAGE;
+      COVERAGECOLLECTION = _3.COVERAGECOLLECTION;
+      DOMAIN = _3.DOMAIN;
+      LINKRELPREFIX = _3.LINKRELPREFIX;
+    }, function (_2) {
+      assert = _2.assert;
+    }, function (_e) {
+      CoverageCollection = _e['default'];
     }, function (_a) {
-      COVERAGE = _a.COVERAGE;
-      COVERAGECOLLECTION = _a.COVERAGECOLLECTION;
-      DOMAIN = _a.DOMAIN;
-      LINKRELPREFIX = _a.LINKRELPREFIX;
-    }, function (_c) {
-      http = _c;
+      http = _a;
     }],
     execute: function () {}
   };
 });
 
-$__System.register("62", ["61"], function (_export) {
+$__System.register("61", ["60"], function (_export) {
   "use strict";
 
   return {
@@ -5544,7 +5360,7 @@ $__System.register("62", ["61"], function (_export) {
   };
 });
 
-$__System.registerDynamic('63', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('62', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -5573,10 +5389,21 @@ $__System.registerDynamic('63', [], true, function ($__require, exports, module)
     UrlTemplate.prototype.encodeReserved = function (str) {
       return str.split(/(%[0-9A-Fa-f]{2})/g).map(function (part) {
         if (!/%[0-9A-Fa-f]/.test(part)) {
-          part = encodeURI(part);
+          part = encodeURI(part).replace(/%5B/g, '[').replace(/%5D/g, ']');
         }
         return part;
       }).join('');
+    };
+
+    /**
+     * @private
+     * @param {string} str
+     * @return {string}
+     */
+    UrlTemplate.prototype.encodeUnreserved = function (str) {
+      return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+        return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+      });
     };
 
     /**
@@ -5587,10 +5414,10 @@ $__System.registerDynamic('63', [], true, function ($__require, exports, module)
      * @return {string}
      */
     UrlTemplate.prototype.encodeValue = function (operator, value, key) {
-      value = operator === '+' || operator === '#' ? this.encodeReserved(value) : encodeURIComponent(value);
+      value = operator === '+' || operator === '#' ? this.encodeReserved(value) : this.encodeUnreserved(value);
 
       if (key) {
-        return encodeURIComponent(key) + '=' + value;
+        return this.encodeUnreserved(key) + '=' + value;
       } else {
         return value;
       }
@@ -5657,14 +5484,14 @@ $__System.registerDynamic('63', [], true, function ($__require, exports, module)
             } else {
               Object.keys(value).forEach(function (k) {
                 if (this.isDefined(value[k])) {
-                  tmp.push(encodeURIComponent(k));
+                  tmp.push(this.encodeUnreserved(k));
                   tmp.push(this.encodeValue(operator, value[k].toString()));
                 }
               }, this);
             }
 
             if (this.isKeyOperator(operator)) {
-              result.push(encodeURIComponent(key) + '=' + tmp.join(','));
+              result.push(this.encodeUnreserved(key) + '=' + tmp.join(','));
             } else if (tmp.length !== 0) {
               result.push(tmp.join(','));
             }
@@ -5672,9 +5499,11 @@ $__System.registerDynamic('63', [], true, function ($__require, exports, module)
         }
       } else {
         if (operator === ';') {
-          result.push(encodeURIComponent(key));
+          if (this.isDefined(value)) {
+            result.push(this.encodeUnreserved(key));
+          }
         } else if (value === '' && (operator === '&' || operator === '?')) {
-          result.push(encodeURIComponent(key) + '=');
+          result.push(this.encodeUnreserved(key) + '=');
         } else if (value === '') {
           result.push('');
         }
@@ -5731,18 +5560,18 @@ $__System.registerDynamic('63', [], true, function ($__require, exports, module)
   });
   return module.exports;
 });
-$__System.registerDynamic("64", ["63"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5c", ["62"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("63");
+  module.exports = $__require("62");
   return module.exports;
 });
-$__System.register('65', ['64', '66'], function (_export) {
+$__System.register('63', ['64', '5c'], function (_export) {
   /* */
   'use strict';
 
-  var urltemplate, jsonld, jsonldOriginal, PartialCollectionView, IriTemplate, COVAPI_NS, COVAPI_API, OSGEO_NS, OSTIME_NS, URL_PROPS, FRAME_CONTEXT, CONTEXTS, customLoader, jsonldOpts, API;
+  var jsonld, jsonldOriginal, urltemplate, PartialCollectionView, IriTemplate, COVAPI_NS, COVAPI_API, OSGEO_NS, OSTIME_NS, URL_PROPS, FRAME_CONTEXT, CONTEXTS, customLoader, jsonldOpts, API;
 
   _export('discover', discover);
 
@@ -5805,11 +5634,11 @@ $__System.register('65', ['64', '66'], function (_export) {
     return axis + '[' + slice + ']';
   }
   return {
-    setters: [function (_2) {
-      urltemplate = _2['default'];
-    }, function (_) {
+    setters: [function (_) {
       jsonld = _.promises;
       jsonldOriginal = _['default'];
+    }, function (_c) {
+      urltemplate = _c['default'];
     }],
     execute: function () {
       PartialCollectionView = 'PartialCollectionView';
@@ -6225,7 +6054,7 @@ $__System.register('65', ['64', '66'], function (_export) {
   };
 });
 
-$__System.register('67', [], function (_export) {
+$__System.register('65', [], function (_export) {
   // TODO this is copied from leaflet-coverage, DRY!
 
   /***
@@ -6302,7 +6131,7 @@ $__System.register('67', [], function (_export) {
   };
 });
 
-$__System.register("68", [], function (_export) {
+$__System.register("66", [], function (_export) {
   /* */
   "use strict";
 
@@ -6351,7 +6180,7 @@ $__System.register("68", [], function (_export) {
   };
 });
 
-$__System.register('69', [], function (_export) {
+$__System.register('67', [], function (_export) {
   // COPIED FROM covjson-reader -> DRY!!!!!
 
   'use strict';
@@ -6485,7 +6314,7 @@ $__System.register('69', [], function (_export) {
   };
 });
 
-$__System.register('6a', ['65', '67', '68', '69'], function (_export) {
+$__System.register('68', ['63', '65', '66', '67'], function (_export) {
   /* */
   'use strict';
 
@@ -7330,18 +7159,18 @@ $__System.register('6a', ['65', '67', '68', '69'], function (_export) {
   };
 });
 
-$__System.register("6b", ["6a"], function (_export) {
+$__System.register("69", ["68"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_a) {
+    setters: [function (_) {
       var _exportObj = {};
 
-      for (var _key in _a) {
-        if (_key !== "default") _exportObj[_key] = _a[_key];
+      for (var _key in _) {
+        if (_key !== "default") _exportObj[_key] = _[_key];
       }
 
-      _exportObj["default"] = _a["default"];
+      _exportObj["default"] = _["default"];
 
       _export(_exportObj);
     }],
@@ -7349,17 +7178,17 @@ $__System.register("6b", ["6a"], function (_export) {
   };
 });
 
-$__System.register('6c', ['62', '6b', '6d'], function (_export) {
+$__System.register('6a', ['61', '69', '6b'], function (_export) {
   'use strict';
 
   var CovJSONReader, RestAPI, CoverageData, CovJSON;
   return {
     setters: [function (_) {
       CovJSONReader = _;
+    }, function (_2) {
+      RestAPI = _2;
     }, function (_b) {
-      RestAPI = _b;
-    }, function (_d) {
-      CoverageData = _d['default'];
+      CoverageData = _b['default'];
     }],
     execute: function () {
       CovJSON = (function (_CoverageData) {
@@ -7404,27 +7233,27 @@ $__System.register('6c', ['62', '6b', '6d'], function (_export) {
   };
 });
 
-$__System.register('6e', ['56', '70', '71', '72', '6f', '6c'], function (_export) {
+$__System.register('6c', ['56', '70', '6f', '6d', '6e', '6a'], function (_export) {
   'use strict';
 
-  var i18n, dataLayer, dataLayerClass, ParameterSync, legend, TimeAxis, VerticalAxis, VerticalProfilePlot, COVJSON_VERTICALPROFILE, Action, VIEW, CovJSON, ModelObservationComparisonActivity, GeoCoverageView;
+  var dataLayer, dataLayerClass, ParameterSync, legend, TimeAxis, VerticalAxis, VerticalProfilePlot, COVJSON_VERTICALPROFILE, Action, VIEW, i18n, CovJSON, ModelObservationComparisonActivity, GeoCoverageView;
   return {
-    setters: [function (_3) {}, function (_4) {
-      i18n = _4.i18n;
-    }, function (_2) {
-      dataLayer = _2.dataLayer;
-      dataLayerClass = _2.dataLayerClass;
-      ParameterSync = _2.ParameterSync;
-      legend = _2.legend;
-      TimeAxis = _2.TimeAxis;
-      VerticalAxis = _2.VerticalAxis;
-      VerticalProfilePlot = _2.VerticalProfilePlot;
-      COVJSON_VERTICALPROFILE = _2.COVJSON_VERTICALPROFILE;
-    }, function (_) {}, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
-    }, function (_c) {
-      CovJSON = _c['default'];
+    setters: [function (_2) {}, function (_) {}, function (_f) {
+      dataLayer = _f.dataLayer;
+      dataLayerClass = _f.dataLayerClass;
+      ParameterSync = _f.ParameterSync;
+      legend = _f.legend;
+      TimeAxis = _f.TimeAxis;
+      VerticalAxis = _f.VerticalAxis;
+      VerticalProfilePlot = _f.VerticalProfilePlot;
+      COVJSON_VERTICALPROFILE = _f.COVJSON_VERTICALPROFILE;
+    }, function (_d) {
+      Action = _d['default'];
+      VIEW = _d.VIEW;
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_a) {
+      CovJSON = _a['default'];
     }],
     execute: function () {
       ModelObservationComparisonActivity = 'ModelObservationComparisonActivity';
@@ -7700,27 +7529,27 @@ $__System.register('6e', ['56', '70', '71', '72', '6f', '6c'], function (_export
   };
 });
 
-$__System.register('73', ['54', '70', '72', '74', '75', '5e', '6f'], function (_export) {
+$__System.register('71', ['54', '70', '72', '73', '5d', '6d', '6e'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, c3, Modal, minMaxOfRange, iterateRange, Action, VIEW, DISCRETE_PROB, html, TEMPLATES, StatisticalCoverageView;
+  var $, $$, HTML, c3, Modal, minMaxOfRange, iterateRange, Action, VIEW, i18n, DISCRETE_PROB, html, TEMPLATES, StatisticalCoverageView;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_5) {
-      i18n = _5.i18n;
     }, function (_4) {}, function (_3) {
       c3 = _3['default'];
     }, function (_2) {
       Modal = _2['default'];
+    }, function (_d) {
+      minMaxOfRange = _d.minMaxOfRange;
+      iterateRange = _d.iterateRange;
+    }, function (_d2) {
+      Action = _d2['default'];
+      VIEW = _d2.VIEW;
     }, function (_e) {
-      minMaxOfRange = _e.minMaxOfRange;
-      iterateRange = _e.iterateRange;
-    }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
+      i18n = _e.i18n;
     }],
     execute: function () {
       DISCRETE_PROB = 'http://www.uncertml.org/statistics/discrete-probability';
@@ -8076,24 +7905,24 @@ $__System.register('73', ['54', '70', '72', '74', '75', '5e', '6f'], function (_
   };
 });
 
-$__System.register('76', ['54', '70', '75', '5e', '6f'], function (_export) {
+$__System.register('74', ['54', '73', '5d', '6e', '6d'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, Modal, withSimpleDerivedParameter, Action, PROCESS, html, TEMPLATES, CoverageDeriveParameter;
+  var $, $$, HTML, Modal, withSimpleDerivedParameter, i18n, Action, PROCESS, html, TEMPLATES, CoverageDeriveParameter;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_3) {
-      i18n = _3.i18n;
     }, function (_2) {
       Modal = _2['default'];
+    }, function (_d) {
+      withSimpleDerivedParameter = _d.withSimpleDerivedParameter;
     }, function (_e) {
-      withSimpleDerivedParameter = _e.withSimpleDerivedParameter;
-    }, function (_f) {
-      Action = _f['default'];
-      PROCESS = _f.PROCESS;
+      i18n = _e.i18n;
+    }, function (_d2) {
+      Action = _d2['default'];
+      PROCESS = _d2.PROCESS;
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="deriveParameterModal" tabindex="-1" role="dialog" aria-labelledby="deriveParameterModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="deriveParameterModalLabel">Derive a Parameter</h4>\n      </div>\n      <div class="modal-body">\n        <div class="panel panel-primary derive-input-parameters">\n          <div class="panel-heading">\n            <h4>Select input parameters</h4>\n          </div>\n          <div class="panel-body input-parameters">\n          </div>\n        </div>\n        \n        <div class="panel panel-primary derive-ouput-parameter">\n          <div class="panel-heading">\n            <h4>Define derived parameter</h4>\n          </div>\n          <div class="panel-body">\n            \n            <div class="form-horizontal">\n              <div class="form-group">\n                <label for="inputParameterKey" class="col-sm-2 control-label">ID</label>\n                <div class="col-sm-10">\n                  <input type="text" class="form-control" id="inputParameterKey" placeholder="salinity">\n                </div>\n              </div>\n              <div class="form-group">\n                <label for="inputObservedPropertyLabel" class="col-sm-2 control-label">Observed Property</label>\n                <div class="col-sm-10">\n                  <input type="text" class="form-control" id="inputObservedPropertyLabel" placeholder="Sea Water Salinity">\n                </div>\n              </div>\n              <div class="form-group">\n                <label for="inputParameterUnits" class="col-sm-2 control-label">Units</label>\n                <div class="col-sm-10">\n                  <input type="text" class="form-control" id="inputParameterUnits">\n                </div>\n              </div>\n              <div class="form-group">\n                <label for="inputParameterFormula" class="col-sm-2 control-label">Formula</label>\n                <div class="col-sm-10">\n                  <input type="text" class="form-control" id="inputParameterFormula">\n                </div>\n              </div>\n              <div class="form-group">\n                <div class="col-sm-offset-2 col-sm-10 submit-button-container">\n                </div>\n              </div>\n            </div>\n  \n          </div>\n        </div>\n               \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
@@ -8304,7 +8133,7 @@ $__System.register('76', ['54', '70', '75', '5e', '6f'], function (_export) {
   };
 });
 
-$__System.registerDynamic("77", ["3b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("75", ["3b"], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -17915,14 +17744,14 @@ $__System.registerDynamic("77", ["3b"], true, function ($__require, exports, mod
   })($__require("3b"));
   return module.exports;
 });
-$__System.registerDynamic("78", ["77"], true, function ($__require, exports, module) {
+$__System.registerDynamic("76", ["75"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("77");
+  module.exports = $__require("75");
   return module.exports;
 });
-$__System.registerDynamic('79', ['78'], true, function ($__require, exports, module) {
+$__System.registerDynamic('77', ['76'], true, function ($__require, exports, module) {
     /* */
     "format cjs";
 
@@ -17937,7 +17766,7 @@ $__System.registerDynamic('79', ['78'], true, function ($__require, exports, mod
             // Node. Does not work with strict CommonJS, but
             // only CommonJS-like environments that support module.exports,
             // like Node.
-            module.exports = factory($__require('78').jsPlumb);
+            module.exports = factory($__require('76').jsPlumb);
         } else {
             // Browser globals (root is window)
             root.Remapper = factory(root.jsPlumb);
@@ -18170,24 +17999,24 @@ $__System.registerDynamic('79', ['78'], true, function ($__require, exports, mod
     });
     return module.exports;
 });
-$__System.registerDynamic("7a", ["79"], true, function ($__require, exports, module) {
+$__System.registerDynamic("78", ["77"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("79");
+  module.exports = $__require("77");
   return module.exports;
 });
-$__System.register("7b", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("79", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('7c', ['55', '70'], function (_export) {
+$__System.register('7a', ['55', '6e'], function (_export) {
   'use strict';
 
   var Format, loadJSON, CatRemap;
   return {
     setters: [function (_) {
       Format = _['default'];
-    }, function (_2) {
-      loadJSON = _2.loadJSON;
+    }, function (_e) {
+      loadJSON = _e.loadJSON;
     }],
     execute: function () {
       CatRemap = (function (_Format) {
@@ -18228,33 +18057,33 @@ $__System.register('7c', ['55', '70'], function (_export) {
   };
 });
 
-$__System.register('7d', ['54', '70', '71', '75', '7a', '7b', '5e', '6f', '6d', '7c'], function (_export) {
+$__System.register('7b', ['54', '73', '78', '79', '5d', '6f', '6e', '6d', '6b', '7a'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, COVJSON_GRID, Modal, Remapper, withCategories, Action, VIEW, PROCESS, CoverageData, CatRemap, html, TEMPLATES, CoverageRemapCategories;
+  var $, $$, HTML, Modal, Remapper, withCategories, COVJSON_GRID, i18n, Action, VIEW, PROCESS, CoverageData, CatRemap, html, TEMPLATES, CoverageRemapCategories;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_4) {
-      i18n = _4.i18n;
-    }, function (_3) {
-      COVJSON_GRID = _3.COVJSON_GRID;
     }, function (_2) {
       Modal = _2['default'];
-    }, function (_a) {
-      Remapper = _a['default'];
-    }, function (_b) {}, function (_e) {
-      withCategories = _e.withCategories;
+    }, function (_3) {
+      Remapper = _3['default'];
+    }, function (_4) {}, function (_d) {
+      withCategories = _d.withCategories;
     }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
-      PROCESS = _f.PROCESS;
-    }, function (_d) {
-      CoverageData = _d['default'];
-    }, function (_c) {
-      CatRemap = _c['default'];
+      COVJSON_GRID = _f.COVJSON_GRID;
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_d2) {
+      Action = _d2['default'];
+      VIEW = _d2.VIEW;
+      PROCESS = _d2.PROCESS;
+    }, function (_b) {
+      CoverageData = _b['default'];
+    }, function (_a) {
+      CatRemap = _a['default'];
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="parameterSelectModal" tabindex="-1" role="dialog" aria-labelledby="paramSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="paramSelectModalLabel">Select a categorical parameter</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n      \n        <div class="panel panel-primary parameter-select">\n          <div class="panel-body">\n            <p>\n              Which of the following categorical parameters do you like to remap?\n            </p>\n          </div>\n          <ul class="list-group parameter-list"></ul>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="remapModal" tabindex="-1" role="dialog" aria-labelledby="remapModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="remapModalLabel">Remap <strong class="parameter-label"></strong> Categories</h4>\n      </div>\n      <div class="modal-body">\n        <span class="remap-is-remapping"></span>\n        \n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Option A: Apply ready-made remapping definitions</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Using a ready-made remapping definition is the fastest way to apply a remapping.\n              The remapping definition defines both the target categories and their mapping\n              from the source categories.\n            </p>\n            <div class="alert alert-info remapping-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group remapping-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-primary remap-categorical-distributions">\n          <div class="panel-heading">\n            <h4>Option B: Remap manually with categories from existing datasets</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              A manual remapping can be done more quickly by loading the desired\n              target categories from an existing dataset. The connections then have\n              to be created manually via drag and drop.\n            </p>\n            <div class="alert alert-info categorical-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          \n          <ul class="list-group categorical-distribution-list"></ul>\n        </div>\n        \n        <div class="panel panel-default remap-manual">\n          <div class="panel-heading">\n            <h4>Option C: Fully manual remapping</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              When the above methods cannot be used then the only option left is\n              to manually create the target categories and connect\n              them to the source categories. NOTE: This is currently not supported.\n            </p>\n          </div>\n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n<div id="remapper"></div>\n<style>\n/* above sidebar */\n.modal, #remapper {\n  z-index: 3000; \n}\n.modal-backdrop {\n  z-index: 2500;\n}\n.categorical-distribution-list-empty, .remapping-distribution-list-empty {\n  margin-bottom: 0;\n}\n.workspace-dataset-distribution-action .btn {\n  margin-bottom: 5px;\n}\n</style>\n';
@@ -18862,7 +18691,7 @@ $__System.register('7d', ['54', '70', '71', '75', '7a', '7b', '5e', '6f', '6d', 
   };
 });
 
-$__System.register('7e', ['54', '70', '71', '75', '5e', '6f'], function (_export) {
+$__System.register('7c', ['54', '73', '6e', '5d', '6f', '6d'], function (_export) {
   /*
    * For a given categorical coverage parameter, calculate and show
    * percentages of each category for a given time step or combined
@@ -18871,24 +18700,24 @@ $__System.register('7e', ['54', '70', '71', '75', '5e', '6f'], function (_export
 
   'use strict';
 
-  var $, $$, HTML, i18n, COVJSON_GRID, Modal, iterateRange, getReferenceObject, Action, PROCESS, html, TEMPLATES, CoverageCategoriesStatistics;
+  var $, $$, HTML, Modal, i18n, iterateRange, getReferenceObject, COVJSON_GRID, Action, PROCESS, html, TEMPLATES, CoverageCategoriesStatistics;
   return {
     setters: [function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_3) {
-      i18n = _3.i18n;
-    }, function (_4) {
-      COVJSON_GRID = _4.COVJSON_GRID;
     }, function (_2) {
       Modal = _2['default'];
     }, function (_e) {
-      iterateRange = _e.iterateRange;
-      getReferenceObject = _e.getReferenceObject;
+      i18n = _e.i18n;
+    }, function (_d) {
+      iterateRange = _d.iterateRange;
+      getReferenceObject = _d.getReferenceObject;
     }, function (_f) {
-      Action = _f['default'];
-      PROCESS = _f.PROCESS;
+      COVJSON_GRID = _f.COVJSON_GRID;
+    }, function (_d2) {
+      Action = _d2['default'];
+      PROCESS = _d2.PROCESS;
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="statisticsOptionsModal" tabindex="-1" role="dialog" aria-labelledby="statisticsOptionsModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="statisticsOptionsModalLabel">Select reference periods</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Select the reference periods for which the summary statistics shall be calculated.\n              The more periods you select, the longer the processing time will be.\n            </p>\n              \n            <select multiple class="form-control ref-periods-select">\n            </select>\n            \n            <div class="calculate-button-container"></div>\n          </div>\n          \n       \n        </div>\n       \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div class="modal fade" id="statisticsProgressModal" tabindex="-1" role="dialog" aria-labelledby="statisticsProgressModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <h4 class="modal-title" id="statisticsProgressModalLabel">Progress</h4>\n      </div>\n      <div class="modal-body">\n        \n        <div class="panel panel-primary">\n          <div class="panel-body">\n            <p>\n              Please wait until the operation is finished.\n            </p>\n            <progress max="1" value="0"></progress>\n          </div>\n        </div>\n       \n      </div>\n    </div>\n  </div>\n</div>\n\n<style>\n.calculate-button-container {\n  margin-top: 20px;\n}\n#statisticsProgressModal progress {\n  width: 100%;\n}\n</style>\n';
@@ -19345,15 +19174,15 @@ $__System.register('7e', ['54', '70', '71', '75', '5e', '6f'], function (_export
   };
 });
 
-$__System.register('7f', ['55', '70'], function (_export) {
+$__System.register('7d', ['55', '6e'], function (_export) {
   'use strict';
 
   var Format, loadJSON, GeoJSON;
   return {
     setters: [function (_) {
       Format = _['default'];
-    }, function (_2) {
-      loadJSON = _2.loadJSON;
+    }, function (_e) {
+      loadJSON = _e.loadJSON;
     }],
     execute: function () {
       GeoJSON = (function (_Format) {
@@ -19394,10 +19223,10 @@ $__System.register('7f', ['55', '70'], function (_export) {
   };
 });
 
-$__System.register('80', ['54', '70', '71', '75', '4a', '5e', '7f', '6f'], function (_export) {
+$__System.register('7e', ['54', '73', '4a', '5d', '6f', '6e', '7d', '6d'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, COVJSON_GRID, Modal, L, maskByPolygon, subsetByBbox, GeoJSON, Action, PROCESS, html, TEMPLATES, CoverageSubsetByPolygon;
+  var $, $$, HTML, Modal, L, maskByPolygon, subsetByBbox, COVJSON_GRID, i18n, GeoJSON, Action, PROCESS, html, TEMPLATES, CoverageSubsetByPolygon;
 
   function getPolygonFeatures(geojson) {
     var features = []; // array of GeoJSON feature objects with (Multi)Polygon geometries
@@ -19457,22 +19286,22 @@ $__System.register('80', ['54', '70', '71', '75', '4a', '5e', '7f', '6f'], funct
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_4) {
-      i18n = _4.i18n;
-    }, function (_3) {
-      COVJSON_GRID = _3.COVJSON_GRID;
     }, function (_2) {
       Modal = _2['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      maskByPolygon = _e.maskByPolygon;
-      subsetByBbox = _e.subsetByBbox;
+    }, function (_d) {
+      maskByPolygon = _d.maskByPolygon;
+      subsetByBbox = _d.subsetByBbox;
     }, function (_f) {
-      GeoJSON = _f['default'];
-    }, function (_f2) {
-      Action = _f2['default'];
-      PROCESS = _f2.PROCESS;
+      COVJSON_GRID = _f.COVJSON_GRID;
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_d2) {
+      GeoJSON = _d2['default'];
+    }, function (_d3) {
+      Action = _d3['default'];
+      PROCESS = _d3.PROCESS;
     }],
     execute: function () {
       html = '\n<div class="modal fade" id="geojsonSelectModal" tabindex="-1" role="dialog" aria-labelledby="geojsonSelectModalLabel">\n  <div class="modal-dialog" role="document">\n    <div class="modal-content">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n        <h4 class="modal-title" id="geojsonSelectModalLabel">Select a GeoJSON resource</h4>\n      </div>\n      <div class="modal-body">\n        <div class="panel panel-primary remap-remapping-distributions">\n          <div class="panel-heading">\n            <h4>Select the GeoJSON resource containing the subsetting polygon</h4>\n          </div>\n          <div class="panel-body">\n            <p>\n              Only those GeoJSON resources are shown which contain at least one (multi)polygon.\n              After selecting a GeoJSON resource, all polygons will be displayed on the map\n              and you can pick the one that should be used for subsetting.\n            </p>\n            <div class="alert alert-info geojson-distribution-list-empty" role="alert"><strong>None found.</strong></div>\n          </div>\n          <ul class="list-group geojson-distribution-list"></ul>\n        </div>\n               \n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n      </div>\n    </div>\n  </div>\n</div>\n';
@@ -19690,7 +19519,7 @@ $__System.register('80', ['54', '70', '71', '75', '4a', '5e', '7f', '6f'], funct
   };
 });
 
-$__System.register('81', ['82', '4a', '5e'], function (_export) {
+$__System.register('7f', ['80', '4a', '5d'], function (_export) {
   /* */
   'use strict';
 
@@ -19703,10 +19532,10 @@ $__System.register('81', ['82', '4a', '5e'], function (_export) {
       $ = _.$;
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      getLanguageTag = _e.getLanguageTag;
-      getLanguageString = _e.getLanguageString;
-      stringifyUnit = _e.stringifyUnit;
+    }, function (_d) {
+      getLanguageTag = _d.getLanguageTag;
+      getLanguageString = _d.getLanguageString;
+      stringifyUnit = _d.stringifyUnit;
     }],
     execute: function () {
       DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend';
@@ -19884,7 +19713,7 @@ $__System.register('81', ['82', '4a', '5e'], function (_export) {
   };
 });
 
-$__System.register('83', ['81', '84'], function (_export) {
+$__System.register('81', ['82', '7f'], function (_export) {
   /* */
 
   /**
@@ -19911,7 +19740,7 @@ $__System.register('83', ['81', '84'], function (_export) {
    */
   'use strict';
 
-  var ContinuousLegend, DiscreteLegend;
+  var DiscreteLegend, ContinuousLegend;
 
   _export('default', legend);
 
@@ -19927,16 +19756,16 @@ $__System.register('83', ['81', '84'], function (_export) {
   }
 
   return {
-    setters: [function (_2) {
-      ContinuousLegend = _2['default'];
-    }, function (_) {
+    setters: [function (_) {
       DiscreteLegend = _['default'];
+    }, function (_f) {
+      ContinuousLegend = _f['default'];
     }],
     execute: function () {}
   };
 });
 
-$__System.register('84', ['82', '4a', '5e'], function (_export) {
+$__System.register('82', ['80', '4a', '5d'], function (_export) {
   /* */
   'use strict';
 
@@ -19948,9 +19777,9 @@ $__System.register('84', ['82', '4a', '5e'], function (_export) {
       $$ = _.$$;
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      getLanguageTag = _e.getLanguageTag;
-      getLanguageString = _e.getLanguageString;
+    }, function (_d) {
+      getLanguageTag = _d.getLanguageTag;
+      getLanguageString = _d.getLanguageString;
     }],
     execute: function () {
       DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend';
@@ -20104,7 +19933,7 @@ $__System.register('84', ['82', '4a', '5e'], function (_export) {
   };
 });
 
-$__System.register('85', ['82', '86', '4a'], function (_export) {
+$__System.register('83', ['80', '84', '4a'], function (_export) {
   /* */
   'use strict';
 
@@ -20380,7 +20209,7 @@ $__System.register('85', ['82', '86', '4a'], function (_export) {
   };
 });
 
-$__System.register('82', [], function (_export) {
+$__System.register('80', [], function (_export) {
   /**
    * Returns the first child element of parent (fall-back to document if not given)
    * matching the given selector.
@@ -20487,7 +20316,7 @@ $__System.register('82', [], function (_export) {
   };
 });
 
-$__System.register('87', ['82', '86', '4a'], function (_export) {
+$__System.register('85', ['80', '84', '4a'], function (_export) {
   /* */
   'use strict';
 
@@ -20586,7 +20415,7 @@ $__System.register('87', ['82', '86', '4a'], function (_export) {
   };
 });
 
-$__System.register('88', ['86', '87', '4a', '5e'], function (_export) {
+$__System.register('86', ['84', '85', '4a', '5d'], function (_export) {
   /* */
 
   /**
@@ -20628,9 +20457,9 @@ $__System.register('88', ['86', '87', '4a', '5e'], function (_export) {
       Dropdown = _['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      getLanguageString = _e.getLanguageString;
-      stringifyUnit = _e.stringifyUnit;
+    }, function (_d) {
+      getLanguageString = _d.getLanguageString;
+      stringifyUnit = _d.stringifyUnit;
     }],
     execute: function () {
       VerticalAxis = (function (_EventMixin) {
@@ -20773,11 +20602,11 @@ $__System.register('88', ['86', '87', '4a', '5e'], function (_export) {
   };
 });
 
-$__System.register('89', ['90', '91', '92', '93', '8a', '8b', '8c', '8d', '8e', '8f'], function (_export) {
+$__System.register('87', ['88', '89', '90', '91', '8a', '8b', '8c', '8d', '8e', '8f'], function (_export) {
   /* */
   'use strict';
 
-  var VerticalProfileCollection, MultiPolygon, PolygonSeries, COVJSON_POINT, COVJSON_POINTSERIES, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, COVJSON_POLYGONSERIES, COVERAGE, COVERAGECOLLECTION, DOMAIN, Grid, Trajectory, Point, PointSeries, PointCollection, VerticalProfile, DOMAIN_LAYER_CLASSES, COLLECTION_LAYER_CLASSES;
+  var Grid, Trajectory, PolygonSeries, COVJSON_POINT, COVJSON_POINTSERIES, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON, COVJSON_POLYGONSERIES, COVERAGE, COVERAGECOLLECTION, DOMAIN, Point, PointSeries, PointCollection, VerticalProfile, VerticalProfileCollection, MultiPolygon, DOMAIN_LAYER_CLASSES, COLLECTION_LAYER_CLASSES;
 
   var _DOMAIN_LAYER_CLASSES, _COLLECTION_LAYER_CLASSES;
 
@@ -20836,9 +20665,9 @@ $__System.register('89', ['90', '91', '92', '93', '8a', '8b', '8c', '8d', '8e', 
 
   return {
     setters: [function (_) {
-      VerticalProfileCollection = _['default'];
+      Grid = _['default'];
     }, function (_2) {
-      MultiPolygon = _2['default'];
+      Trajectory = _2['default'];
     }, function (_3) {
       PolygonSeries = _3['default'];
     }, function (_4) {
@@ -20853,17 +20682,17 @@ $__System.register('89', ['90', '91', '92', '93', '8a', '8b', '8c', '8d', '8e', 
       COVERAGECOLLECTION = _4.COVERAGECOLLECTION;
       DOMAIN = _4.DOMAIN;
     }, function (_a) {
-      Grid = _a['default'];
+      Point = _a['default'];
     }, function (_b) {
-      Trajectory = _b['default'];
+      PointSeries = _b['default'];
     }, function (_c) {
-      Point = _c['default'];
+      PointCollection = _c['default'];
     }, function (_d) {
-      PointSeries = _d['default'];
+      VerticalProfile = _d['default'];
     }, function (_e) {
-      PointCollection = _e['default'];
+      VerticalProfileCollection = _e['default'];
     }, function (_f) {
-      VerticalProfile = _f['default'];
+      MultiPolygon = _f['default'];
     }],
     execute: function () {
       DOMAIN_LAYER_CLASSES = (_DOMAIN_LAYER_CLASSES = {}, babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_GRID, Grid), babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_POINT, Point), babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_POINTSERIES, PointSeries), babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_VERTICALPROFILE, VerticalProfile), babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_TRAJECTORY, Trajectory), babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_MULTIPOLYGON, MultiPolygon), babelHelpers.defineProperty(_DOMAIN_LAYER_CLASSES, COVJSON_POLYGONSERIES, PolygonSeries), _DOMAIN_LAYER_CLASSES);
@@ -20872,7 +20701,7 @@ $__System.register('89', ['90', '91', '92', '93', '8a', '8b', '8c', '8d', '8e', 
   };
 });
 
-$__System.register('8a', ['94', '95', '96', '4a', '5d', '5e'], function (_export) {
+$__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export) {
   /* */
 
   /**
@@ -20916,15 +20745,15 @@ $__System.register('8a', ['94', '95', '96', '4a', '5d', '5e'], function (_export
       CoverageMixin = _3['default'];
     }, function (_a) {
       L = _a['default'];
+    }, function (_b) {
+      ndarray = _b['default'];
     }, function (_d) {
-      ndarray = _d['default'];
-    }, function (_e) {
-      indexOfNearest = _e.indexOfNearest;
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
-      minMaxOfRange = _e.minMaxOfRange;
-      getReferenceObject = _e.getReferenceObject;
-      isEllipsoidalCRS = _e.isEllipsoidalCRS;
+      indexOfNearest = _d.indexOfNearest;
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
+      minMaxOfRange = _d.minMaxOfRange;
+      getReferenceObject = _d.getReferenceObject;
+      isEllipsoidalCRS = _d.isEllipsoidalCRS;
     }],
     execute: function () {
       Grid = (function (_PaletteMixin) {
@@ -21677,7 +21506,7 @@ $__System.register('8a', ['94', '95', '96', '4a', '5d', '5e'], function (_export
   };
 });
 
-$__System.register('8b', ['94', '95', '96', '4a', '5e', '8c'], function (_export) {
+$__System.register('89', ['92', '93', '94', '4a', '5d', '8a'], function (_export) {
   /* */
 
   /**
@@ -21708,12 +21537,12 @@ $__System.register('8b', ['94', '95', '96', '4a', '5e', '8c'], function (_export
       CoverageMixin = _2['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
-      minMaxOfRange = _e.minMaxOfRange;
-    }, function (_c) {
-      DEFAULT_COLOR = _c.DEFAULT_COLOR;
+    }, function (_d) {
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
+      minMaxOfRange = _d.minMaxOfRange;
+    }, function (_a2) {
+      DEFAULT_COLOR = _a2.DEFAULT_COLOR;
     }],
     execute: function () {
       Trajectory = (function (_PaletteMixin) {
@@ -21906,7 +21735,7 @@ $__System.register('8b', ['94', '95', '96', '4a', '5e', '8c'], function (_export
   };
 });
 
-$__System.register('8d', ['86', '94', '95', '96', '97', '4a', '5e', '8c'], function (_export) {
+$__System.register('8b', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], function (_export) {
   /* */
 
   // TODO nearly identical to VerticalProfile
@@ -21935,13 +21764,13 @@ $__System.register('8d', ['86', '94', '95', '96', '97', '4a', '5e', '8c'], funct
       CircleMarkerMixin = _3['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
-      indexOfNearest = _e.indexOfNearest;
-      minMaxOfRange = _e.minMaxOfRange;
-    }, function (_c) {
-      DEFAULT_COLOR = _c.DEFAULT_COLOR;
+    }, function (_d) {
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
+      indexOfNearest = _d.indexOfNearest;
+      minMaxOfRange = _d.minMaxOfRange;
+    }, function (_a2) {
+      DEFAULT_COLOR = _a2.DEFAULT_COLOR;
     }],
     execute: function () {
       PointSeries = (function (_PaletteMixin) {
@@ -22141,7 +21970,7 @@ $__System.register('8d', ['86', '94', '95', '96', '97', '4a', '5e', '8c'], funct
   };
 });
 
-$__System.register('91', ['86', '94', '95', '96', '4a', '5e'], function (_export) {
+$__System.register('8f', ['84', '92', '93', '94', '4a', '5d'], function (_export) {
   /* */
 
   /** @ignore */
@@ -22159,12 +21988,12 @@ $__System.register('91', ['86', '94', '95', '96', '4a', '5e'], function (_export
       CoverageMixin = _3['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
-      minMaxOfRange = _e.minMaxOfRange;
-      ensureClockwisePolygon = _e.ensureClockwisePolygon;
-      getPointInPolygonsFn = _e.getPointInPolygonsFn;
+    }, function (_d) {
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
+      minMaxOfRange = _d.minMaxOfRange;
+      ensureClockwisePolygon = _d.ensureClockwisePolygon;
+      getPointInPolygonsFn = _d.getPointInPolygonsFn;
     }],
     execute: function () {
       DEFAULT_COLOR = 'black';
@@ -22394,7 +22223,7 @@ $__System.register('91', ['86', '94', '95', '96', '4a', '5e'], function (_export
   };
 });
 
-$__System.register('92', ['86', '94', '95', '96', '4a', '5e', '8c'], function (_export) {
+$__System.register('90', ['84', '92', '93', '94', '4a', '5d', '8a'], function (_export) {
   /* */
 
   // TODO nearly identical to VerticalProfile
@@ -22421,15 +22250,15 @@ $__System.register('92', ['86', '94', '95', '96', '4a', '5e', '8c'], function (_
       CoverageMixin = _2['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      indexOfNearest = _e.indexOfNearest;
-      minMaxOfRange = _e.minMaxOfRange;
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
-      ensureClockwisePolygon = _e.ensureClockwisePolygon;
-      getPointInPolygonsFn = _e.getPointInPolygonsFn;
-    }, function (_c) {
-      DEFAULT_COLOR = _c.DEFAULT_COLOR;
+    }, function (_d) {
+      indexOfNearest = _d.indexOfNearest;
+      minMaxOfRange = _d.minMaxOfRange;
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
+      ensureClockwisePolygon = _d.ensureClockwisePolygon;
+      getPointInPolygonsFn = _d.getPointInPolygonsFn;
+    }, function (_a2) {
+      DEFAULT_COLOR = _a2.DEFAULT_COLOR;
     }],
     execute: function () {
       PolygonSeries = (function (_PaletteMixin) {
@@ -22748,7 +22577,7 @@ $__System.register('92', ['86', '94', '95', '96', '4a', '5e', '8c'], function (_
   };
 });
 
-$__System.register("98", [], function (_export) {
+$__System.register("96", [], function (_export) {
   // 2016-02-23 Maik Riechert - adjust boilerplate to make it node compatible
 
   /**
@@ -23244,7 +23073,7 @@ $__System.register("98", [], function (_export) {
   };
 });
 
-$__System.register('8e', ['86', '94', '95', '98', '4a', '8c'], function (_export) {
+$__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export) {
   /* */
 
   /**
@@ -23265,9 +23094,9 @@ $__System.register('8e', ['86', '94', '95', '98', '4a', '8c'], function (_export
       kdTree = _4.kdTree;
     }, function (_a) {
       L = _a['default'];
-    }, function (_c) {
-      Point = _c['default'];
-      DEFAULT_COLOR = _c.DEFAULT_COLOR;
+    }, function (_a2) {
+      Point = _a2['default'];
+      DEFAULT_COLOR = _a2.DEFAULT_COLOR;
     }],
     execute: function () {
       PointCollection = (function (_PaletteMixin) {
@@ -23601,7 +23430,7 @@ $__System.register('8e', ['86', '94', '95', '98', '4a', '8c'], function (_export
   };
 });
 
-$__System.register('96', ['5e'], function (_export) {
+$__System.register('94', ['5d'], function (_export) {
   /* */
 
   /**
@@ -23690,15 +23519,15 @@ $__System.register('96', ['5e'], function (_export) {
   }
 
   return {
-    setters: [function (_e) {
-      loadProjection = _e.loadProjection;
-      getHorizontalCRSComponents = _e.getHorizontalCRSComponents;
+    setters: [function (_d) {
+      loadProjection = _d.loadProjection;
+      getHorizontalCRSComponents = _d.getHorizontalCRSComponents;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('97', ['4a'], function (_export) {
+$__System.register('95', ['4a'], function (_export) {
   /* */
 
   /**
@@ -23837,7 +23666,7 @@ $__System.register('97', ['4a'], function (_export) {
   };
 });
 
-$__System.register('95', ['94'], function (_export) {
+$__System.register('93', ['92'], function (_export) {
   /* */
   'use strict';
 
@@ -24152,7 +23981,7 @@ $__System.register('95', ['94'], function (_export) {
   };
 });
 
-$__System.register('8c', ['86', '94', '95', '96', '97', '4a', '5e'], function (_export) {
+$__System.register('8a', ['84', '92', '93', '94', '95', '4a', '5d'], function (_export) {
   /* */
 
   /** @ignore */
@@ -24172,9 +24001,9 @@ $__System.register('8c', ['86', '94', '95', '96', '97', '4a', '5e'], function (_
       CircleMarkerMixin = _3['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
+    }, function (_d) {
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
     }],
     execute: function () {
       DEFAULT_COLOR = 'black';
@@ -24322,7 +24151,7 @@ $__System.register('8c', ['86', '94', '95', '96', '97', '4a', '5e'], function (_
   };
 });
 
-$__System.register('8f', ['86', '94', '95', '96', '97', '4a', '5e', '8c'], function (_export) {
+$__System.register('8d', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], function (_export) {
   /* */
 
   /**
@@ -24349,13 +24178,13 @@ $__System.register('8f', ['86', '94', '95', '96', '97', '4a', '5e', '8c'], funct
       CircleMarkerMixin = _3['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      isDomain = _e.isDomain;
-      fromDomain = _e.fromDomain;
-      indexOfNearest = _e.indexOfNearest;
-      minMaxOfRange = _e.minMaxOfRange;
-    }, function (_c) {
-      DEFAULT_COLOR = _c.DEFAULT_COLOR;
+    }, function (_d) {
+      isDomain = _d.isDomain;
+      fromDomain = _d.fromDomain;
+      indexOfNearest = _d.indexOfNearest;
+      minMaxOfRange = _d.minMaxOfRange;
+    }, function (_a2) {
+      DEFAULT_COLOR = _a2.DEFAULT_COLOR;
     }],
     execute: function () {
       VerticalProfile = (function (_PaletteMixin) {
@@ -24535,7 +24364,7 @@ $__System.register('8f', ['86', '94', '95', '96', '97', '4a', '5e', '8c'], funct
   };
 });
 
-$__System.register('90', ['8e', '8f'], function (_export) {
+$__System.register('8e', ['8c', '8d'], function (_export) {
   /* */
 
   /**
@@ -24546,10 +24375,10 @@ $__System.register('90', ['8e', '8f'], function (_export) {
 
   var PointCollection, VerticalProfile, VerticalProfileCollection;
   return {
-    setters: [function (_e) {
-      PointCollection = _e['default'];
-    }, function (_f) {
-      VerticalProfile = _f['default'];
+    setters: [function (_c) {
+      PointCollection = _c['default'];
+    }, function (_d) {
+      VerticalProfile = _d['default'];
     }],
     execute: function () {
       VerticalProfileCollection = (function (_PointCollection) {
@@ -24616,7 +24445,7 @@ $__System.register('90', ['8e', '8f'], function (_export) {
   };
 });
 
-$__System.register('94', [], function (_export) {
+$__System.register('92', [], function (_export) {
   /**
    * Returns a linearly interpolated palette out of CSS colors.
    * 
@@ -24927,7 +24756,7 @@ $__System.register('94', [], function (_export) {
   };
 });
 
-$__System.register('86', ['4a'], function (_export) {
+$__System.register('84', ['4a'], function (_export) {
   /* */
 
   /**
@@ -25069,7 +24898,7 @@ $__System.register('86', ['4a'], function (_export) {
   };
 });
 
-$__System.register('99', ['86', '4a'], function (_export) {
+$__System.register('97', ['84', '4a'], function (_export) {
   /* */
 
   /**
@@ -25605,7 +25434,7 @@ $__System.register('99', ['86', '4a'], function (_export) {
   };
 });
 
-$__System.register('9a', ['74', '4a', '5e'], function (_export) {
+$__System.register('98', ['72', '4a', '5d'], function (_export) {
   /* */
 
   /**
@@ -25629,12 +25458,12 @@ $__System.register('9a', ['74', '4a', '5e'], function (_export) {
       c3 = _['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      getLanguageString = _e.getLanguageString;
-      stringifyUnit = _e.stringifyUnit;
-      getReferenceObject = _e.getReferenceObject;
-      loadProjection = _e.loadProjection;
-      getHorizontalCRSComponents = _e.getHorizontalCRSComponents;
+    }, function (_d) {
+      getLanguageString = _d.getLanguageString;
+      stringifyUnit = _d.stringifyUnit;
+      getReferenceObject = _d.getReferenceObject;
+      loadProjection = _d.loadProjection;
+      getHorizontalCRSComponents = _d.getHorizontalCRSComponents;
     }],
     execute: function () {
       VerticalProfilePlot = (function (_L$Popup) {
@@ -26037,7 +25866,7 @@ $__System.register('9a', ['74', '4a', '5e'], function (_export) {
   };
 });
 
-$__System.registerDynamic("9b", [], false, function ($__require, $__exports, $__module) {
+$__System.registerDynamic("99", [], false, function ($__require, $__exports, $__module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, "d3", null);
 
   (function ($__global) {
@@ -37027,16 +36856,16 @@ $__System.registerDynamic("9b", [], false, function ($__require, $__exports, $__
 
   return _retrieveGlobal();
 });
-$__System.registerDynamic("9c", ["9b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("9a", ["99"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("9b");
+  module.exports = $__require("99");
   return module.exports;
 });
-$__System.register("72", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("70", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic("9d", ["9c", "72"], false, function ($__require, $__exports, $__module) {
+$__System.registerDynamic("9b", ["9a", "70"], false, function ($__require, $__exports, $__module) {
     var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, "c3", null);
 
     (function ($__global) {
@@ -46038,14 +45867,14 @@ $__System.registerDynamic("9d", ["9c", "72"], false, function ($__require, $__ex
 
     return _retrieveGlobal();
 });
-$__System.registerDynamic("74", ["9d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("72", ["9b"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("9d");
+  module.exports = $__require("9b");
   return module.exports;
 });
-$__System.register('9e', ['74', '4a', '5e'], function (_export) {
+$__System.register('9c', ['72', '4a', '5d'], function (_export) {
   /* */
 
   // TODO DRY: nearly identical to VerticalProfilePlot
@@ -46073,11 +45902,11 @@ $__System.register('9e', ['74', '4a', '5e'], function (_export) {
       c3 = _['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      getLanguageString = _e.getLanguageString;
-      stringifyUnit = _e.stringifyUnit;
-      loadProjection = _e.loadProjection;
-      getHorizontalCRSComponents = _e.getHorizontalCRSComponents;
+    }, function (_d) {
+      getLanguageString = _d.getLanguageString;
+      stringifyUnit = _d.stringifyUnit;
+      loadProjection = _d.loadProjection;
+      getHorizontalCRSComponents = _d.getHorizontalCRSComponents;
     }],
     execute: function () {
       TimeSeriesPlot = (function (_L$Popup) {
@@ -46456,7 +46285,7 @@ $__System.register('9e', ['74', '4a', '5e'], function (_export) {
   };
 });
 
-$__System.register('9f', ['4a'], function (_export) {
+$__System.register('9d', ['4a'], function (_export) {
   /* */
 
   /**
@@ -46525,7 +46354,7 @@ $__System.register('9f', ['4a'], function (_export) {
   };
 });
 
-$__System.register('a0', ['9f', 'a1'], function (_export) {
+$__System.register('9e', ['9d', '9f'], function (_export) {
   /* */
 
   /**
@@ -46535,10 +46364,10 @@ $__System.register('a0', ['9f', 'a1'], function (_export) {
 
   var DraggablePopupMixin, ValuePopup, DraggableValuePopup;
   return {
-    setters: [function (_f) {
-      DraggablePopupMixin = _f['default'];
-    }, function (_a1) {
-      ValuePopup = _a1['default'];
+    setters: [function (_d) {
+      DraggablePopupMixin = _d['default'];
+    }, function (_f) {
+      ValuePopup = _f['default'];
     }],
     execute: function () {
       DraggableValuePopup = (function (_DraggablePopupMixin) {
@@ -46557,7 +46386,7 @@ $__System.register('a0', ['9f', 'a1'], function (_export) {
   };
 });
 
-$__System.register('a1', ['4a', '5e'], function (_export) {
+$__System.register('9f', ['4a', '5d'], function (_export) {
   /* */
 
   /**
@@ -46586,10 +46415,10 @@ $__System.register('a1', ['4a', '5e'], function (_export) {
   return {
     setters: [function (_a) {
       L = _a['default'];
-    }, function (_e) {
-      i18n = _e.getLanguageString;
-      stringifyUnit = _e.stringifyUnit;
-      getCategory = _e.getCategory;
+    }, function (_d) {
+      i18n = _d.getLanguageString;
+      stringifyUnit = _d.stringifyUnit;
+      getCategory = _d.getCategory;
     }],
     execute: function () {
       ValuePopup = (function (_L$Popup) {
@@ -46718,19 +46547,19 @@ $__System.register('a1', ['4a', '5e'], function (_export) {
   };
 });
 
-$__System.register('93', ['5e'], function (_export) {
+$__System.register('91', ['5d'], function (_export) {
   /* */
   'use strict';
 
   var COVJSON_PREFIX, COVJSON_CORE_NS, COVJSON_DOMAINTYPES_NS, COVJSON_POINT, COVJSON_POINTSERIES, COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_POLYGONSERIES, COVJSON_MULTIPOLYGON, COVJSON_DATATYPE_TUPLE, COVJSON_DATATYPE_POLYGON;
   return {
-    setters: [function (_e) {
+    setters: [function (_d) {
       var _exportObj = {};
 
       // JS API object types
-      _exportObj['COVERAGE'] = _e.COVERAGE;
-      _exportObj['COVERAGECOLLECTION'] = _e.COVERAGECOLLECTION;
-      _exportObj['DOMAIN'] = _e.DOMAIN;
+      _exportObj['COVERAGE'] = _d.COVERAGE;
+      _exportObj['COVERAGECOLLECTION'] = _d.COVERAGECOLLECTION;
+      _exportObj['DOMAIN'] = _d.DOMAIN;
 
       _export(_exportObj);
     }],
@@ -46787,7 +46616,7 @@ $__System.register('93', ['5e'], function (_export) {
   };
 });
 
-$__System.register('a2', ['83', '84', '85', '88', '89', '90', '91', '92', '93', '94', '99', '8a', '8f', '8b', '8c', '8d', '8e', '9a', '9e', 'a0', 'a1'], function (_export) {
+$__System.register('a0', ['81', '82', '83', '86', '87', '88', '89', '90', '91', '92', '97', '98', '8d', '8a', '8b', '8f', '8c', '8e', '9c', '9e', '9f'], function (_export) {
   /* */
   'use strict';
 
@@ -46820,26 +46649,26 @@ $__System.register('a2', ['83', '84', '85', '88', '89', '90', '91', '92', '93', 
       }
 
       _export(_exportObj5);
-    }, function (_8) {
+    }, function (_6) {
       var _exportObj6 = {};
-      _exportObj6['VerticalProfileCollection'] = _8['default'];
+      _exportObj6['Grid'] = _6['default'];
 
       _export(_exportObj6);
-    }, function (_6) {
+    }, function (_7) {
       var _exportObj7 = {};
-      _exportObj7['MultiPolygon'] = _6['default'];
+      _exportObj7['Trajectory'] = _7['default'];
 
       _export(_exportObj7);
-    }, function (_7) {
+    }, function (_8) {
       var _exportObj8 = {};
-      _exportObj8['PolygonSeries'] = _7['default'];
+      _exportObj8['PolygonSeries'] = _8['default'];
 
       _export(_exportObj8);
-    }, function (_11) {
+    }, function (_12) {
       var _exportObj9 = {};
 
-      for (var _key3 in _11) {
-        if (_key3 !== 'default') _exportObj9[_key3] = _11[_key3];
+      for (var _key3 in _12) {
+        if (_key3 !== 'default') _exportObj9[_key3] = _12[_key3];
       }
 
       _export(_exportObj9);
@@ -46856,54 +46685,54 @@ $__System.register('a2', ['83', '84', '85', '88', '89', '90', '91', '92', '93', 
       _exportObj11['ParameterSync'] = _10['default'];
 
       _export(_exportObj11);
-    }, function (_a) {
+    }, function (_11) {
       var _exportObj12 = {};
-      _exportObj12['Grid'] = _a['default'];
+      _exportObj12['VerticalProfilePlot'] = _11['default'];
 
       _export(_exportObj12);
-    }, function (_f) {
+    }, function (_d) {
       var _exportObj13 = {};
-      _exportObj13['VerticalProfile'] = _f['default'];
+      _exportObj13['VerticalProfile'] = _d['default'];
 
       _export(_exportObj13);
-    }, function (_b) {
+    }, function (_a) {
       var _exportObj14 = {};
-      _exportObj14['Trajectory'] = _b['default'];
+      _exportObj14['Point'] = _a['default'];
 
       _export(_exportObj14);
-    }, function (_c) {
+    }, function (_b) {
       var _exportObj15 = {};
-      _exportObj15['Point'] = _c['default'];
+      _exportObj15['PointSeries'] = _b['default'];
 
       _export(_exportObj15);
-    }, function (_d) {
+    }, function (_f) {
       var _exportObj16 = {};
-      _exportObj16['PointSeries'] = _d['default'];
+      _exportObj16['MultiPolygon'] = _f['default'];
 
       _export(_exportObj16);
-    }, function (_e) {
+    }, function (_c) {
       var _exportObj17 = {};
-      _exportObj17['PointCollection'] = _e['default'];
+      _exportObj17['PointCollection'] = _c['default'];
 
       _export(_exportObj17);
-    }, function (_a2) {
+    }, function (_e) {
       var _exportObj18 = {};
-      _exportObj18['VerticalProfilePlot'] = _a2['default'];
+      _exportObj18['VerticalProfileCollection'] = _e['default'];
 
       _export(_exportObj18);
-    }, function (_e2) {
+    }, function (_c2) {
       var _exportObj19 = {};
-      _exportObj19['TimeSeriesPlot'] = _e2['default'];
+      _exportObj19['TimeSeriesPlot'] = _c2['default'];
 
       _export(_exportObj19);
-    }, function (_a0) {
+    }, function (_e2) {
       var _exportObj20 = {};
-      _exportObj20['DraggableValuePopup'] = _a0['default'];
+      _exportObj20['DraggableValuePopup'] = _e2['default'];
 
       _export(_exportObj20);
-    }, function (_a1) {
+    }, function (_f2) {
       var _exportObj21 = {};
-      _exportObj21['ValuePopup'] = _a1['default'];
+      _exportObj21['ValuePopup'] = _f2['default'];
 
       _export(_exportObj21);
     }],
@@ -46911,18 +46740,18 @@ $__System.register('a2', ['83', '84', '85', '88', '89', '90', '91', '92', '93', 
   };
 });
 
-$__System.register("71", ["a2"], function (_export) {
+$__System.register("6f", ["a0"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_a2) {
+    setters: [function (_a0) {
       var _exportObj = {};
 
-      for (var _key in _a2) {
-        if (_key !== "default") _exportObj[_key] = _a2[_key];
+      for (var _key in _a0) {
+        if (_key !== "default") _exportObj[_key] = _a0[_key];
       }
 
-      _exportObj["default"] = _a2["default"];
+      _exportObj["default"] = _a0["default"];
 
       _export(_exportObj);
     }],
@@ -46930,7 +46759,7 @@ $__System.register("71", ["a2"], function (_export) {
   };
 });
 
-$__System.register('a3', ['54', '4a'], function (_export) {
+$__System.register('a1', ['54', '4a'], function (_export) {
   'use strict';
 
   var $, HTML, L, TEMPLATE, ButtonControl;
@@ -47069,7 +46898,7 @@ $__System.register('55', ['51'], function (_export) {
   };
 });
 
-$__System.register('6d', ['55'], function (_export) {
+$__System.register('6b', ['55'], function (_export) {
 
   /**
    * An object-only format that is used for derived data.
@@ -47135,10 +46964,10 @@ $__System.register('6d', ['55'], function (_export) {
   };
 });
 
-$__System.register('a4', ['54', '70', '71', '75', '5e', 'a3', '6d', '6f'], function (_export) {
+$__System.register('a2', ['54', '73', '5d', '6f', 'a1', '6e', '6b', '6d'], function (_export) {
   'use strict';
 
-  var $, $$, HTML, i18n, TimeAxis, Dropdown, COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE, Modal, indexOfNearest, indicesOfNearest, reprojectCoords, getReferenceObject, stringifyUnit, ButtonControl, CoverageData, Action, VIEW, PROCESS, TYPE, html, TEMPLATES, CoverageModelObservationCompare;
+  var $, $$, HTML, Modal, indexOfNearest, indicesOfNearest, reprojectCoords, getReferenceObject, stringifyUnit, TimeAxis, Dropdown, COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE, ButtonControl, i18n, CoverageData, Action, VIEW, PROCESS, TYPE, html, TEMPLATES, CoverageModelObservationCompare;
 
   /**
    * Prepares coverage data for comparison, i.e. assigns the semantic type (model or observations)
@@ -48093,34 +47922,34 @@ $__System.register('a4', ['54', '70', '71', '75', '5e', 'a3', '6d', '6f'], funct
     });
   }
   return {
-    setters: [function (_2) {
-      $ = _2.$;
-      $$ = _2.$$;
-      HTML = _2.HTML;
-    }, function (_4) {
-      i18n = _4.i18n;
-    }, function (_) {
-      TimeAxis = _.TimeAxis;
-      Dropdown = _.Dropdown;
-      COVJSON_GRID = _.COVJSON_GRID;
-      COVJSON_POINT = _.COVJSON_POINT;
-      COVJSON_VERTICALPROFILE = _.COVJSON_VERTICALPROFILE;
-    }, function (_3) {
-      Modal = _3['default'];
-    }, function (_e) {
-      indexOfNearest = _e.indexOfNearest;
-      indicesOfNearest = _e.indicesOfNearest;
-      reprojectCoords = _e.reprojectCoords;
-      getReferenceObject = _e.getReferenceObject;
-      stringifyUnit = _e.stringifyUnit;
-    }, function (_a3) {
-      ButtonControl = _a3['default'];
+    setters: [function (_) {
+      $ = _.$;
+      $$ = _.$$;
+      HTML = _.HTML;
+    }, function (_2) {
+      Modal = _2['default'];
     }, function (_d) {
-      CoverageData = _d['default'];
+      indexOfNearest = _d.indexOfNearest;
+      indicesOfNearest = _d.indicesOfNearest;
+      reprojectCoords = _d.reprojectCoords;
+      getReferenceObject = _d.getReferenceObject;
+      stringifyUnit = _d.stringifyUnit;
     }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
-      PROCESS = _f.PROCESS;
+      TimeAxis = _f.TimeAxis;
+      Dropdown = _f.Dropdown;
+      COVJSON_GRID = _f.COVJSON_GRID;
+      COVJSON_POINT = _f.COVJSON_POINT;
+      COVJSON_VERTICALPROFILE = _f.COVJSON_VERTICALPROFILE;
+    }, function (_a1) {
+      ButtonControl = _a1['default'];
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_b) {
+      CoverageData = _b['default'];
+    }, function (_d2) {
+      Action = _d2['default'];
+      VIEW = _d2.VIEW;
+      PROCESS = _d2.PROCESS;
     }],
     execute: function () {
       TYPE = {
@@ -48453,18 +48282,18 @@ $__System.register('a4', ['54', '70', '71', '75', '5e', 'a3', '6d', '6f'], funct
   };
 });
 
-$__System.register('a5', ['70', '4a', '6f'], function (_export) {
+$__System.register('a3', ['4a', '6e', '6d'], function (_export) {
   'use strict';
 
-  var i18n, L, Action, VIEW, GeoJSONView;
+  var L, i18n, Action, VIEW, GeoJSONView;
   return {
-    setters: [function (_) {
-      i18n = _.i18n;
-    }, function (_a) {
+    setters: [function (_a) {
       L = _a['default'];
-    }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_d) {
+      Action = _d['default'];
+      VIEW = _d.VIEW;
     }],
     execute: function () {
       GeoJSONView = (function (_Action) {
@@ -48605,7 +48434,7 @@ $__System.register('a5', ['70', '4a', '6f'], function (_export) {
   };
 });
 
-$__System.register('a6', ['54', '4a'], function (_export) {
+$__System.register('a4', ['54', '4a'], function (_export) {
   'use strict';
 
   var $, HTML, L, DEFAULT_TEMPLATE_ID, DEFAULT_TEMPLATE, ImageLegend;
@@ -48687,24 +48516,24 @@ $__System.register('a6', ['54', '4a'], function (_export) {
   };
 });
 
-$__System.register('a7', ['70', '4a', 'a6', '6f'], function (_export) {
+$__System.register('a5', ['4a', '6e', 'a4', '6d'], function (_export) {
   'use strict';
 
-  var i18n, L, ImageLegend, Action, VIEW, WMSView;
+  var L, i18n, ImageLegend, Action, VIEW, WMSView;
 
   function getLegendUrl(wmsEndpoint, layer) {
     return wmsEndpoint + '?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&transparent=true&layer=' + layer;
   }
   return {
-    setters: [function (_) {
-      i18n = _.i18n;
-    }, function (_a) {
+    setters: [function (_a) {
       L = _a['default'];
-    }, function (_a6) {
-      ImageLegend = _a6['default'];
-    }, function (_f) {
-      Action = _f['default'];
-      VIEW = _f.VIEW;
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_a4) {
+      ImageLegend = _a4['default'];
+    }, function (_d) {
+      Action = _d['default'];
+      VIEW = _d.VIEW;
     }],
     execute: function () {
       WMSView = (function (_Action) {
@@ -48861,14 +48690,14 @@ $__System.register('a7', ['70', '4a', 'a6', '6f'], function (_export) {
   };
 });
 
-$__System.register('a8', ['6f'], function (_export) {
+$__System.register('a6', ['6d'], function (_export) {
   'use strict';
 
   var Action, EXTERNAL_LINK, GoToSource;
   return {
-    setters: [function (_f) {
-      Action = _f['default'];
-      EXTERNAL_LINK = _f.EXTERNAL_LINK;
+    setters: [function (_d) {
+      Action = _d['default'];
+      EXTERNAL_LINK = _d.EXTERNAL_LINK;
     }],
     execute: function () {
       GoToSource = (function (_Action) {
@@ -48904,7 +48733,7 @@ $__System.register('a8', ['6f'], function (_export) {
   };
 });
 
-$__System.register('a9', ['51', '52', '53', '73', '76', '80', '4f', '6d', '6c', '7f', '7c', '6e', '7d', '7e', 'a4', 'a5', 'a7', 'a8'], function (_export) {
+$__System.register('a7', ['51', '52', '53', '71', '74', '4f', '6b', '6a', '7d', '7a', '6c', '7b', '7c', '7e', 'a2', 'a3', 'a5', 'a6'], function (_export) {
 
   /**
    * Something like a main controller.
@@ -48914,7 +48743,7 @@ $__System.register('a9', ['51', '52', '53', '73', '76', '80', '4f', '6d', '6c', 
    */
   'use strict';
 
-  var Eventable, Workspace, WMS, StatisticalCoverageView, CoverageDeriveParameter, CoverageSubsetByPolygon, Catalogue, CoverageData, CovJSON, GeoJSON, CatRemap, GeoCoverageView, CoverageRemapCategories, CoverageCategoriesStatistics, CoverageModelObservationCompare, GeoJSONView, WMSView, GoToSource, App;
+  var Eventable, Workspace, WMS, StatisticalCoverageView, CoverageDeriveParameter, Catalogue, CoverageData, CovJSON, GeoJSON, CatRemap, GeoCoverageView, CoverageRemapCategories, CoverageCategoriesStatistics, CoverageSubsetByPolygon, CoverageModelObservationCompare, GeoJSONView, WMSView, GoToSource, App;
   return {
     setters: [function (_) {
       Eventable = _['default'];
@@ -48926,32 +48755,32 @@ $__System.register('a9', ['51', '52', '53', '73', '76', '80', '4f', '6d', '6c', 
       StatisticalCoverageView = _4['default'];
     }, function (_5) {
       CoverageDeriveParameter = _5['default'];
-    }, function (_6) {
-      CoverageSubsetByPolygon = _6['default'];
     }, function (_f) {
       Catalogue = _f['default'];
+    }, function (_b) {
+      CoverageData = _b['default'];
+    }, function (_a) {
+      CovJSON = _a['default'];
     }, function (_d) {
-      CoverageData = _d['default'];
+      GeoJSON = _d['default'];
+    }, function (_a2) {
+      CatRemap = _a2['default'];
     }, function (_c) {
-      CovJSON = _c['default'];
-    }, function (_f2) {
-      GeoJSON = _f2['default'];
+      GeoCoverageView = _c['default'];
+    }, function (_b2) {
+      CoverageRemapCategories = _b2['default'];
     }, function (_c2) {
-      CatRemap = _c2['default'];
+      CoverageCategoriesStatistics = _c2['default'];
     }, function (_e) {
-      GeoCoverageView = _e['default'];
-    }, function (_d2) {
-      CoverageRemapCategories = _d2['default'];
-    }, function (_e2) {
-      CoverageCategoriesStatistics = _e2['default'];
-    }, function (_a4) {
-      CoverageModelObservationCompare = _a4['default'];
+      CoverageSubsetByPolygon = _e['default'];
+    }, function (_a22) {
+      CoverageModelObservationCompare = _a22['default'];
+    }, function (_a3) {
+      GeoJSONView = _a3['default'];
     }, function (_a5) {
-      GeoJSONView = _a5['default'];
-    }, function (_a7) {
-      WMSView = _a7['default'];
-    }, function (_a8) {
-      GoToSource = _a8['default'];
+      WMSView = _a5['default'];
+    }, function (_a6) {
+      GoToSource = _a6['default'];
     }],
     execute: function () {
       App = (function (_Eventable) {
@@ -49038,7 +48867,7 @@ $__System.register('a9', ['51', '52', '53', '73', '76', '80', '4f', '6d', '6c', 
   };
 });
 
-$__System.register('aa', ['4a'], function (_export) {
+$__System.register('a8', ['4a'], function (_export) {
 
     // COPY OF https://raw.githubusercontent.com/Turbo87/sidebar-v2/master/js/leaflet-sidebar.js
 
@@ -49237,11 +49066,11 @@ $__System.register('aa', ['4a'], function (_export) {
     };
 });
 
-$__System.register("ab", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("a9", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register("ac", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("aa", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.registerDynamic('ad', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('ab', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -49504,14 +49333,14 @@ $__System.registerDynamic('ad', [], true, function ($__require, exports, module)
   }
   return module.exports;
 });
-$__System.registerDynamic("ae", ["ad"], true, function ($__require, exports, module) {
+$__System.registerDynamic("ac", ["ab"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("ad");
+  module.exports = $__require("ab");
   return module.exports;
 });
-$__System.registerDynamic("af", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ad", [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -49648,7 +49477,7 @@ $__System.registerDynamic("af", [], true, function ($__require, exports, module)
 	});
 	return module.exports;
 });
-$__System.registerDynamic("b0", ["3b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("ae", ["3b"], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -50168,14 +49997,14 @@ $__System.registerDynamic("b0", ["3b"], true, function ($__require, exports, mod
   })($__require("3b"));
   return module.exports;
 });
-$__System.registerDynamic("b1", ["b0"], true, function ($__require, exports, module) {
+$__System.registerDynamic("af", ["ae"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("b0");
+  module.exports = $__require("ae");
   return module.exports;
 });
-$__System.registerDynamic("b2", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("b0", [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
   // Ignore module for browserify (see package.json)
@@ -50185,7 +50014,7 @@ $__System.registerDynamic("b2", [], true, function ($__require, exports, module)
       GLOBAL = global;
   return module.exports;
 });
-$__System.registerDynamic('b3', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('b1', [], true, function ($__require, exports, module) {
     var define,
         global = this || self,
         GLOBAL = global;
@@ -50370,28 +50199,28 @@ $__System.registerDynamic('b3', [], true, function ($__require, exports, module)
     };
     return module.exports;
 });
-$__System.registerDynamic("b4", ["b3"], true, function ($__require, exports, module) {
+$__System.registerDynamic("b2", ["b1"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("b1");
+  return module.exports;
+});
+$__System.registerDynamic('b3', ['b2'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__System._nodeRequire ? process : $__require('b2');
+  return module.exports;
+});
+$__System.registerDynamic("3b", ["b3"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   module.exports = $__require("b3");
   return module.exports;
 });
-$__System.registerDynamic('b5', ['b4'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__System._nodeRequire ? process : $__require('b4');
-  return module.exports;
-});
-$__System.registerDynamic("3b", ["b5"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("b5");
-  return module.exports;
-});
-$__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('b4', ['af', 'b0', '3b'], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -51251,7 +51080,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
             };
           }
           try {
-            jsonld.Promise = global.Promise || $__require('b1').Promise;
+            jsonld.Promise = global.Promise || $__require('af').Promise;
           } catch (e) {
             var f = function () {
               throw new Error('Unable to find a Promise implementation.');
@@ -51265,7 +51094,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
         jsonld.promisify = function (op) {
           if (!jsonld.Promise) {
             try {
-              jsonld.Promise = global.Promise || $__require('b1').Promise;
+              jsonld.Promise = global.Promise || $__require('af').Promise;
             } catch (e) {
               throw new Error('Unable to find a Promise implementation.');
             }
@@ -51542,9 +51371,9 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
           options = options || {};
           var strictSSL = 'strictSSL' in options ? options.strictSSL : true;
           var maxRedirects = 'maxRedirects' in options ? options.maxRedirects : -1;
-          var request = 'request' in options ? options.request : $__require('b2');
+          var request = 'request' in options ? options.request : $__require('b0');
           var acceptHeader = 'application/ld+json, application/json';
-          var http = $__require('b2');
+          var http = $__require('b0');
           var queue = new jsonld.RequestQueue();
           if (options.usePromise) {
             return queue.wrapLoader(function (url) {
@@ -51943,7 +51772,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
           this.details = details || {};
         };
         if (_nodejs) {
-          $__require('b2').inherits(JsonLdError, Error);
+          $__require('b0').inherits(JsonLdError, Error);
         } else if (typeof Error !== 'undefined') {
           JsonLdError.prototype = new Error();
         }
@@ -55068,7 +54897,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
         };
         (function (_nodejs) {
           if (_nodejs) {
-            var crypto = $__require('b2');
+            var crypto = $__require('b0');
             NormalizeHash._init = function (algorithm) {
               if (algorithm === 'URDNA2015') {
                 algorithm = 'sha256';
@@ -55450,7 +55279,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
         })(_nodejs);
         if (!XMLSerializer) {
           var _defineXMLSerializer = function () {
-            XMLSerializer = $__require('b2').XMLSerializer;
+            XMLSerializer = $__require('b0').XMLSerializer;
           };
         }
         jsonld.url = {};
@@ -55509,7 +55338,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
           jsonld.use = function (extension) {
             switch (extension) {
               case 'request':
-                jsonld.request = $__require('b2');
+                jsonld.request = $__require('b0');
                 break;
               default:
                 throw new JsonLdError('Unknown extension.', 'jsonld.UnknownExtension', { extension: extension });
@@ -55519,7 +55348,7 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
             exports: {},
             filename: __dirname
           };
-          $__require('b2')(_module, 'version');
+          $__require('b0')(_module, 'version');
           jsonld.version = _module.exports.version;
         }
         return jsonld;
@@ -55552,14 +55381,14 @@ $__System.registerDynamic('b6', ['b1', 'b2', '3b'], true, function ($__require, 
   })($__require('3b'));
   return module.exports;
 });
-$__System.registerDynamic("66", ["b6"], true, function ($__require, exports, module) {
+$__System.registerDynamic("64", ["b4"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("b6");
+  module.exports = $__require("b4");
   return module.exports;
 });
-$__System.register('50', ['66', '70'], function (_export) {
+$__System.register('50', ['64', '6e'], function (_export) {
   'use strict';
 
   var jsonld, loadJSON, DCAT_CONTEXT, DCAT_CATALOG_FRAME, DCAT_DATASET_FRAME, UNKNOWN_LANG, i18n;
@@ -55722,8 +55551,8 @@ $__System.register('50', ['66', '70'], function (_export) {
   return {
     setters: [function (_) {
       jsonld = _.promises;
-    }, function (_2) {
-      loadJSON = _2.loadJSON;
+    }, function (_e) {
+      loadJSON = _e.loadJSON;
     }],
     execute: function () {
       DCAT_CONTEXT = [
@@ -55829,10 +55658,10 @@ $__System.register('50', ['66', '70'], function (_export) {
   };
 });
 
-$__System.register('b7', ['50', '54', '70', '75', '4a', 'ae', 'af', '6f'], function (_export) {
+$__System.register('b5', ['50', '54', '73', '4a', 'ac', 'ad', '6d', '6e'], function (_export) {
   'use strict';
 
-  var loadDCATCatalog, $, HTML, i18n, sortByKey, MELODIES_DCAT_CATALOG_URL, Modal, L, parseWKT, Tab, PROCESS, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
+  var loadDCATCatalog, $, HTML, Modal, L, parseWKT, Tab, PROCESS, i18n, sortByKey, MELODIES_DCAT_CATALOG_URL, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
 
   /** Short label for media types that CKAN doesn't know (otherwise we can use .format) */
   function getDistFormatLabel(dist) {
@@ -55848,25 +55677,25 @@ $__System.register('b7', ['50', '54', '70', '75', '4a', 'ae', 'af', '6f'], funct
 
   // maps media types we don't support in analysis/display to short format labels
   return {
-    setters: [function (_4) {
-      loadDCATCatalog = _4.loadDCATCatalog;
+    setters: [function (_3) {
+      loadDCATCatalog = _3.loadDCATCatalog;
     }, function (_) {
       $ = _.$;
       HTML = _.HTML;
-    }, function (_3) {
-      i18n = _3.i18n;
-      sortByKey = _3.sortByKey;
-      MELODIES_DCAT_CATALOG_URL = _3.MELODIES_DCAT_CATALOG_URL;
     }, function (_2) {
       Modal = _2['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_ae) {
-      parseWKT = _ae['default'];
-    }, function (_af) {
-      Tab = _af['default'];
-    }, function (_f) {
-      PROCESS = _f.PROCESS;
+    }, function (_ac) {
+      parseWKT = _ac['default'];
+    }, function (_ad) {
+      Tab = _ad['default'];
+    }, function (_d) {
+      PROCESS = _d.PROCESS;
+    }, function (_e) {
+      i18n = _e.i18n;
+      sortByKey = _e.sortByKey;
+      MELODIES_DCAT_CATALOG_URL = _e.MELODIES_DCAT_CATALOG_URL;
     }],
     execute: function () {
       TEMPLATES = {
@@ -56245,7 +56074,7 @@ $__System.register('b7', ['50', '54', '70', '75', '4a', 'ae', 'af', '6f'], funct
   };
 });
 
-$__System.registerDynamic("75", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("73", [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -56519,7 +56348,7 @@ $__System.registerDynamic("75", [], true, function ($__require, exports, module)
 	});
 	return module.exports;
 });
-$__System.registerDynamic('b8', [], false, function ($__require, $__exports, $__module) {
+$__System.registerDynamic('b6', [], false, function ($__require, $__exports, $__module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
   (function ($__global) {
@@ -56906,14 +56735,14 @@ $__System.registerDynamic('b8', [], false, function ($__require, $__exports, $__
 
   return _retrieveGlobal();
 });
-$__System.registerDynamic("b9", ["b8"], true, function ($__require, exports, module) {
+$__System.registerDynamic("b7", ["b6"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("b8");
+  module.exports = $__require("b6");
   return module.exports;
 });
-$__System.register('ba', [], function (_export) {
+$__System.register('b8', [], function (_export) {
   /* */
   'use strict';
 
@@ -56982,7 +56811,7 @@ $__System.register('ba', [], function (_export) {
   };
 });
 
-$__System.register('bb', ['ba'], function (_export) {
+$__System.register('b9', ['b8'], function (_export) {
   /* */
 
   /**
@@ -57042,14 +56871,14 @@ $__System.register('bb', ['ba'], function (_export) {
   }
 
   return {
-    setters: [function (_ba) {
-      getLanguageString = _ba.getLanguageString;
+    setters: [function (_b8) {
+      getLanguageString = _b8.getLanguageString;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('bc', [], function (_export) {
+$__System.register('ba', [], function (_export) {
   /**
    * @external {Range} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Range.md
    */
@@ -57193,7 +57022,7 @@ $__System.register('bc', [], function (_export) {
   };
 });
 
-$__System.register("bd", [], function (_export) {
+$__System.register("bb", [], function (_export) {
   /**
    * Returns the category of the given parameter corresponding to the encoded integer value.
    *
@@ -57254,7 +57083,7 @@ $__System.register("bd", [], function (_export) {
   };
 });
 
-$__System.register('be', ['bf', 'c0', 'c1'], function (_export) {
+$__System.register('bc', ['bd', 'be', 'bf'], function (_export) {
   /* */
 
   /**
@@ -57414,21 +57243,21 @@ $__System.register('be', ['bf', 'c0', 'c1'], function (_export) {
   }
 
   return {
-    setters: [function (_bf) {
-      shallowcopy = _bf.shallowcopy;
-    }, function (_c0) {
-      COVJSON_DATATYPE_TUPLE = _c0.COVJSON_DATATYPE_TUPLE;
-      COVERAGE = _c0.COVERAGE;
-      DOMAIN = _c0.DOMAIN;
-    }, function (_c1) {
-      getHorizontalCRSReferenceObject = _c1.getHorizontalCRSReferenceObject;
-      getProjection = _c1.getProjection;
+    setters: [function (_bd) {
+      shallowcopy = _bd.shallowcopy;
+    }, function (_be) {
+      COVJSON_DATATYPE_TUPLE = _be.COVJSON_DATATYPE_TUPLE;
+      COVERAGE = _be.COVERAGE;
+      DOMAIN = _be.DOMAIN;
+    }, function (_bf) {
+      getHorizontalCRSReferenceObject = _bf.getHorizontalCRSReferenceObject;
+      getProjection = _bf.getProjection;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c2', ['c0', 'c1'], function (_export) {
+$__System.register('c0', ['be', 'bf'], function (_export) {
   /* */
 
   /**
@@ -57543,13 +57372,13 @@ $__System.register('c2', ['c0', 'c1'], function (_export) {
     }
   }
   return {
-    setters: [function (_c0) {
-      COVERAGECOLLECTION = _c0.COVERAGECOLLECTION;
-    }, function (_c1) {
-      asTime = _c1.asTime;
-      isISODateAxis = _c1.isISODateAxis;
-      isLongitudeAxis = _c1.isLongitudeAxis;
-      getLongitudeWrapper = _c1.getLongitudeWrapper;
+    setters: [function (_be) {
+      COVERAGECOLLECTION = _be.COVERAGECOLLECTION;
+    }, function (_bf) {
+      asTime = _bf.asTime;
+      isISODateAxis = _bf.isISODateAxis;
+      isLongitudeAxis = _bf.isLongitudeAxis;
+      getLongitudeWrapper = _bf.getLongitudeWrapper;
     }],
     execute: function () {
       CollectionQuery = (function () {
@@ -57680,120 +57509,120 @@ $__System.register('c2', ['c0', 'c1'], function (_export) {
   };
 });
 
-$__System.register('c3', ['c4', 'c0', 'ba', 'bb', 'bc', 'bd', 'c5', 'c1', 'c6', 'c7', 'be', 'c8', 'c9', 'c2'], function (_export) {
+$__System.register('c1', ['c2', 'be', 'b8', 'b9', 'ba', 'bb', 'c3', 'bf', 'c4', 'c5', 'bc', 'c6', 'c7', 'c0'], function (_export) {
   /* */
   'use strict';
 
   return {
-    setters: [function (_c4) {
+    setters: [function (_c2) {
       var _exportObj = {};
 
-      for (var _key in _c4) {
-        if (_key !== 'default') _exportObj[_key] = _c4[_key];
+      for (var _key in _c2) {
+        if (_key !== 'default') _exportObj[_key] = _c2[_key];
       }
 
       _export(_exportObj);
-    }, function (_c0) {
+    }, function (_be) {
       var _exportObj2 = {};
 
-      for (var _key2 in _c0) {
-        if (_key2 !== 'default') _exportObj2[_key2] = _c0[_key2];
+      for (var _key2 in _be) {
+        if (_key2 !== 'default') _exportObj2[_key2] = _be[_key2];
       }
 
       _export(_exportObj2);
-    }, function (_ba) {
+    }, function (_b8) {
       var _exportObj3 = {};
 
-      for (var _key3 in _ba) {
-        if (_key3 !== 'default') _exportObj3[_key3] = _ba[_key3];
+      for (var _key3 in _b8) {
+        if (_key3 !== 'default') _exportObj3[_key3] = _b8[_key3];
       }
 
       _export(_exportObj3);
-    }, function (_bb) {
+    }, function (_b9) {
       var _exportObj4 = {};
 
-      for (var _key4 in _bb) {
-        if (_key4 !== 'default') _exportObj4[_key4] = _bb[_key4];
+      for (var _key4 in _b9) {
+        if (_key4 !== 'default') _exportObj4[_key4] = _b9[_key4];
       }
 
       _export(_exportObj4);
-    }, function (_bc) {
+    }, function (_ba) {
       var _exportObj5 = {};
 
-      for (var _key5 in _bc) {
-        if (_key5 !== 'default') _exportObj5[_key5] = _bc[_key5];
+      for (var _key5 in _ba) {
+        if (_key5 !== 'default') _exportObj5[_key5] = _ba[_key5];
       }
 
       _export(_exportObj5);
-    }, function (_bd) {
+    }, function (_bb) {
       var _exportObj6 = {};
 
-      for (var _key6 in _bd) {
-        if (_key6 !== 'default') _exportObj6[_key6] = _bd[_key6];
+      for (var _key6 in _bb) {
+        if (_key6 !== 'default') _exportObj6[_key6] = _bb[_key6];
       }
 
       _export(_exportObj6);
-    }, function (_c5) {
+    }, function (_c3) {
       var _exportObj7 = {};
 
-      for (var _key7 in _c5) {
-        if (_key7 !== 'default') _exportObj7[_key7] = _c5[_key7];
+      for (var _key7 in _c3) {
+        if (_key7 !== 'default') _exportObj7[_key7] = _c3[_key7];
       }
 
       _export(_exportObj7);
-    }, function (_c1) {
+    }, function (_bf) {
       var _exportObj8 = {};
 
-      for (var _key8 in _c1) {
-        if (_key8 !== 'default') _exportObj8[_key8] = _c1[_key8];
+      for (var _key8 in _bf) {
+        if (_key8 !== 'default') _exportObj8[_key8] = _bf[_key8];
       }
 
       _export(_exportObj8);
-    }, function (_c6) {
+    }, function (_c4) {
       var _exportObj9 = {};
 
-      for (var _key9 in _c6) {
-        if (_key9 !== 'default') _exportObj9[_key9] = _c6[_key9];
+      for (var _key9 in _c4) {
+        if (_key9 !== 'default') _exportObj9[_key9] = _c4[_key9];
       }
 
       _export(_exportObj9);
-    }, function (_c7) {
+    }, function (_c5) {
       var _exportObj10 = {};
 
-      for (var _key10 in _c7) {
-        if (_key10 !== 'default') _exportObj10[_key10] = _c7[_key10];
+      for (var _key10 in _c5) {
+        if (_key10 !== 'default') _exportObj10[_key10] = _c5[_key10];
       }
 
       _export(_exportObj10);
-    }, function (_be) {
+    }, function (_bc) {
       var _exportObj11 = {};
 
-      for (var _key11 in _be) {
-        if (_key11 !== 'default') _exportObj11[_key11] = _be[_key11];
+      for (var _key11 in _bc) {
+        if (_key11 !== 'default') _exportObj11[_key11] = _bc[_key11];
       }
 
       _export(_exportObj11);
-    }, function (_c8) {
+    }, function (_c6) {
       var _exportObj12 = {};
 
-      for (var _key12 in _c8) {
-        if (_key12 !== 'default') _exportObj12[_key12] = _c8[_key12];
+      for (var _key12 in _c6) {
+        if (_key12 !== 'default') _exportObj12[_key12] = _c6[_key12];
       }
 
       _export(_exportObj12);
-    }, function (_c9) {
+    }, function (_c7) {
       var _exportObj13 = {};
 
-      for (var _key13 in _c9) {
-        if (_key13 !== 'default') _exportObj13[_key13] = _c9[_key13];
+      for (var _key13 in _c7) {
+        if (_key13 !== 'default') _exportObj13[_key13] = _c7[_key13];
       }
 
       _export(_exportObj13);
-    }, function (_c2) {
+    }, function (_c0) {
       var _exportObj14 = {};
 
-      for (var _key14 in _c2) {
-        if (_key14 !== 'default') _exportObj14[_key14] = _c2[_key14];
+      for (var _key14 in _c0) {
+        if (_key14 !== 'default') _exportObj14[_key14] = _c0[_key14];
       }
 
       _export(_exportObj14);
@@ -57802,7 +57631,7 @@ $__System.register('c3', ['c4', 'c0', 'ba', 'bb', 'bc', 'bd', 'c5', 'c1', 'c6', 
   };
 });
 
-$__System.registerDynamic("ca", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("c8", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -57820,14 +57649,14 @@ $__System.registerDynamic("ca", [], true, function ($__require, exports, module)
   module.exports = iota;
   return module.exports;
 });
-$__System.registerDynamic("cb", ["ca"], true, function ($__require, exports, module) {
+$__System.registerDynamic("c9", ["c8"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("ca");
+  module.exports = $__require("c8");
   return module.exports;
 });
-$__System.registerDynamic('cc', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('ca', [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -57950,14 +57779,14 @@ $__System.registerDynamic('cc', [], true, function ($__require, exports, module)
 	})(typeof exports === 'undefined' ? this.base64js = {} : exports);
 	return module.exports;
 });
-$__System.registerDynamic("cd", ["cc"], true, function ($__require, exports, module) {
+$__System.registerDynamic("cb", ["ca"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("cc");
+  module.exports = $__require("ca");
   return module.exports;
 });
-$__System.registerDynamic("ce", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("cc", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -58048,14 +57877,14 @@ $__System.registerDynamic("ce", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("cf", ["ce"], true, function ($__require, exports, module) {
+$__System.registerDynamic("cd", ["cc"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("ce");
+  module.exports = $__require("cc");
   return module.exports;
 });
-$__System.registerDynamic('d0', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('ce', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -58067,14 +57896,14 @@ $__System.registerDynamic('d0', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("d1", ["d0"], true, function ($__require, exports, module) {
+$__System.registerDynamic("cf", ["ce"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d0");
+  module.exports = $__require("ce");
   return module.exports;
 });
-$__System.registerDynamic('d2', ['cd', 'cf', 'd1'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d0', ['cb', 'cd', 'cf'], true, function ($__require, exports, module) {
   /*!
    * The buffer module from node.js, for the browser.
    *
@@ -58088,9 +57917,9 @@ $__System.registerDynamic('d2', ['cd', 'cf', 'd1'], true, function ($__require, 
   var define,
       global = this || self,
       GLOBAL = global;
-  var base64 = $__require('cd');
-  var ieee754 = $__require('cf');
-  var isArray = $__require('d1');
+  var base64 = $__require('cb');
+  var ieee754 = $__require('cd');
+  var isArray = $__require('cf');
 
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
@@ -59593,6 +59422,21 @@ $__System.registerDynamic('d2', ['cd', 'cf', 'd1'], true, function ($__require, 
   }
   return module.exports;
 });
+$__System.registerDynamic("d1", ["d0"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("d0");
+  return module.exports;
+});
+$__System.registerDynamic('d2', ['d1'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  /* */
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('d1');
+  return module.exports;
+});
 $__System.registerDynamic("d3", ["d2"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
@@ -59601,21 +59445,6 @@ $__System.registerDynamic("d3", ["d2"], true, function ($__require, exports, mod
   return module.exports;
 });
 $__System.registerDynamic('d4', ['d3'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  /* */
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('d3');
-  return module.exports;
-});
-$__System.registerDynamic("d5", ["d4"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("d4");
-  return module.exports;
-});
-$__System.registerDynamic('d6', ['d5'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -59630,23 +59459,23 @@ $__System.registerDynamic('d6', ['d5'], true, function ($__require, exports, mod
     function isSlowBuffer(obj) {
       return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0));
     }
-  })($__require('d5').Buffer);
+  })($__require('d3').Buffer);
   return module.exports;
 });
-$__System.registerDynamic("d7", ["d6"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d5", ["d4"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d6");
+  module.exports = $__require("d4");
   return module.exports;
 });
-$__System.registerDynamic("d8", ["cb", "d7"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d6", ["c9", "d5"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var iota = $__require("cb");
-  var isBuffer = $__require("d7");
+  var iota = $__require("c9");
+  var isBuffer = $__require("d5");
 
   var hasTypedArrays = typeof Float64Array !== "undefined";
 
@@ -59970,14 +59799,14 @@ b" + i + "*=d\
   module.exports = wrappedNDArrayCtor;
   return module.exports;
 });
-$__System.registerDynamic("5d", ["d8"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5b", ["d6"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d8");
+  module.exports = $__require("d6");
   return module.exports;
 });
-$__System.register("bf", [], function (_export) {
+$__System.register("bd", [], function (_export) {
   /**
    * Shallow clone a given object.
    *
@@ -60008,7 +59837,7 @@ $__System.register("bf", [], function (_export) {
   };
 });
 
-$__System.registerDynamic('d9', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('d7', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -60455,20 +60284,20 @@ $__System.registerDynamic('d9', [], true, function ($__require, exports, module)
   })(typeof self !== 'undefined' ? self : this);
   return module.exports;
 });
-$__System.registerDynamic("da", ["d9"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d8", ["d7"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d9");
+  module.exports = $__require("d7");
   return module.exports;
 });
-$__System.registerDynamic('db', ['dc', 'dd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d9', ['da', 'db'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var proj = $__require('dc');
-  var transform = $__require('dd');
+  var proj = $__require('da');
+  var transform = $__require('db');
   var wgs84 = proj('WGS84');
   function transformer(from, to, coords) {
     var transformedArray;
@@ -60527,12 +60356,12 @@ $__System.registerDynamic('db', ['dc', 'dd'], true, function ($__require, export
   module.exports = proj4;
   return module.exports;
 });
-$__System.registerDynamic('de', ['df'], true, function ($__require, exports, module) {
+$__System.registerDynamic('dc', ['dd'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var mgrs = $__require('df');
+  var mgrs = $__require('dd');
 
   function Point(x, y, z) {
     if (!(this instanceof Point)) {
@@ -60568,7 +60397,7 @@ $__System.registerDynamic('de', ['df'], true, function ($__require, exports, mod
   module.exports = Point;
   return module.exports;
 });
-$__System.registerDynamic("e0", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("de", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60671,7 +60500,7 @@ $__System.registerDynamic("e0", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('e1', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('df', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60727,7 +60556,7 @@ $__System.registerDynamic('e1', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('e2', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('e0', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60745,14 +60574,14 @@ $__System.registerDynamic('e2', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('e3', ['e2', 'e4', 'e5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e1', ['e0', 'e2', 'e3'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var globals = $__require('e2');
-  var parseProj = $__require('e4');
-  var wkt = $__require('e5');
+  var globals = $__require('e0');
+  var parseProj = $__require('e2');
+  var wkt = $__require('e3');
   function defs(name) {
     var that = this;
     if (arguments.length === 2) {
@@ -60795,13 +60624,13 @@ $__System.registerDynamic('e3', ['e2', 'e4', 'e5'], true, function ($__require, 
   module.exports = defs;
   return module.exports;
 });
-$__System.registerDynamic('e5', ['e6'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e3', ['e4'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var D2R = 0.01745329251994329577;
-  var extend = $__require('e6');
+  var extend = $__require('e4');
   function mapit(obj, key, v) {
     obj[key] = v.map(function (aa) {
       var o = {};
@@ -60978,7 +60807,7 @@ $__System.registerDynamic('e5', ['e6'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic("e7", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e5", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60999,7 +60828,7 @@ $__System.registerDynamic("e7", [], true, function ($__require, exports, module)
 
   return module.exports;
 });
-$__System.registerDynamic('e8', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('e6', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61008,14 +60837,14 @@ $__System.registerDynamic('e8', [], true, function ($__require, exports, module)
   exports['us-ft'] = { to_meter: 1200 / 3937 };
   return module.exports;
 });
-$__System.registerDynamic('e4', ['e7', 'e8'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e2', ['e5', 'e6'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var D2R = 0.01745329251994329577;
-  var PrimeMeridian = $__require('e7');
-  var units = $__require('e8');
+  var PrimeMeridian = $__require('e5');
+  var units = $__require('e6');
   module.exports = function (defData) {
     var self = {};
     var paramObj = {};
@@ -61143,14 +60972,14 @@ $__System.registerDynamic('e4', ['e7', 'e8'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic('e9', ['e3', 'e5', 'e4'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e7', ['e1', 'e3', 'e2'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var defs = $__require('e3');
-  var wkt = $__require('e5');
-  var projStr = $__require('e4');
+  var defs = $__require('e1');
+  var wkt = $__require('e3');
+  var projStr = $__require('e2');
   function testObj(code) {
     return typeof code === 'string';
   }
@@ -61182,19 +61011,19 @@ $__System.registerDynamic('e9', ['e3', 'e5', 'e4'], true, function ($__require, 
   module.exports = parse;
   return module.exports;
 });
-$__System.registerDynamic('ea', ['eb', 'ec', 'ed', 'ee'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e8', ['e9', 'ea', 'eb', 'ec'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var msfnz = $__require('eb');
+  var msfnz = $__require('e9');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
   var R2D = 57.29577951308232088;
-  var adjust_lon = $__require('ec');
+  var adjust_lon = $__require('ea');
   var FORTPI = Math.PI / 4;
-  var tsfnz = $__require('ed');
-  var phi2z = $__require('ee');
+  var tsfnz = $__require('eb');
+  var phi2z = $__require('ec');
   exports.init = function () {
     var con = this.b / this.a;
     this.es = 1 - con * con;
@@ -61266,7 +61095,7 @@ $__System.registerDynamic('ea', ['eb', 'ec', 'ed', 'ee'], true, function ($__req
   exports.names = ["Mercator", "Popular Visualisation Pseudo Mercator", "Mercator_1SP", "Mercator_Auxiliary_Sphere", "merc"];
   return module.exports;
 });
-$__System.registerDynamic("ef", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ed", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61283,12 +61112,12 @@ $__System.registerDynamic("ef", [], true, function ($__require, exports, module)
   exports.names = ["longlat", "identity"];
   return module.exports;
 });
-$__System.registerDynamic('f0', ['ea', 'ef'], true, function ($__require, exports, module) {
+$__System.registerDynamic('ee', ['e8', 'ed'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var projs = [$__require('ea'), $__require('ef')];
+  var projs = [$__require('e8'), $__require('ed')];
   var names = {};
   var projStore = [];
   function add(proj, i) {
@@ -61318,7 +61147,7 @@ $__System.registerDynamic('f0', ['ea', 'ef'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic("f1", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ef", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61405,7 +61234,7 @@ $__System.registerDynamic("f1", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("f2", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f0", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61627,7 +61456,7 @@ $__System.registerDynamic("f2", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("e6", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e4", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61648,7 +61477,7 @@ $__System.registerDynamic("e6", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('f3', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('f1', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -62040,15 +61869,15 @@ $__System.registerDynamic('f3', [], true, function ($__require, exports, module)
   module.exports = datum;
   return module.exports;
 });
-$__System.registerDynamic('f4', ['f1', 'f2', 'e6', 'f3'], true, function ($__require, exports, module) {
+$__System.registerDynamic('f2', ['ef', 'f0', 'e4', 'f1'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var Datum = $__require('f1');
-  var Ellipsoid = $__require('f2');
-  var extend = $__require('e6');
-  var datum = $__require('f3');
+  var Datum = $__require('ef');
+  var Ellipsoid = $__require('f0');
+  var extend = $__require('e4');
+  var datum = $__require('f1');
   var EPSLN = 1.0e-10;
   var SIXTH = 0.1666666666666666667;
   var RA4 = 0.04722222222222222222;
@@ -62097,15 +61926,15 @@ $__System.registerDynamic('f4', ['f1', 'f2', 'e6', 'f3'], true, function ($__req
   };
   return module.exports;
 });
-$__System.registerDynamic('dc', ['e9', 'e6', 'f0', 'f4'], true, function ($__require, exports, module) {
+$__System.registerDynamic('da', ['e7', 'e4', 'ee', 'f2'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var parseCode = $__require('e9');
-  var extend = $__require('e6');
-  var projections = $__require('f0');
-  var deriveConstants = $__require('f4');
+  var parseCode = $__require('e7');
+  var extend = $__require('e4');
+  var projections = $__require('ee');
+  var deriveConstants = $__require('f2');
   function Projection(srsCode, callback) {
     if (!(this instanceof Projection)) {
       return new Projection(srsCode);
@@ -62136,7 +61965,7 @@ $__System.registerDynamic('dc', ['e9', 'e6', 'f0', 'f4'], true, function ($__req
   module.exports = Projection;
   return module.exports;
 });
-$__System.registerDynamic("f5", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f3", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -62156,7 +61985,7 @@ $__System.registerDynamic("f5", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('dd', ['e0', 'e1', 'dc', 'f5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('db', ['de', 'df', 'da', 'f3'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -62165,10 +61994,10 @@ $__System.registerDynamic('dd', ['e0', 'e1', 'dc', 'f5'], true, function ($__req
   var R2D = 57.29577951308232088;
   var PJD_3PARAM = 1;
   var PJD_7PARAM = 2;
-  var datum_transform = $__require('e0');
-  var adjust_axis = $__require('e1');
-  var proj = $__require('dc');
-  var toPoint = $__require('f5');
+  var datum_transform = $__require('de');
+  var adjust_axis = $__require('df');
+  var proj = $__require('da');
+  var toPoint = $__require('f3');
   module.exports = function transform(source, dest, point) {
     var wgs84;
     if (Array.isArray(point)) {
@@ -62219,7 +62048,7 @@ $__System.registerDynamic('dd', ['e0', 'e1', 'dc', 'f5'], true, function ($__req
   };
   return module.exports;
 });
-$__System.registerDynamic('f6', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('f4', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -62941,35 +62770,35 @@ $__System.registerDynamic('f6', [], true, function ($__require, exports, module)
   }
   return module.exports;
 });
-$__System.registerDynamic("df", ["f6"], true, function ($__require, exports, module) {
+$__System.registerDynamic("dd", ["f4"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("f6");
+  module.exports = $__require("f4");
   return module.exports;
 });
-$__System.registerDynamic("f7", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f5", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   module.exports = { "name": "proj4", "version": "2.3.15", "description": "Proj4js is a JavaScript library to transform point coordinates from one coordinate system to another, including datum transformations.", "main": "lib/index.js", "directories": { "test": "test", "doc": "docs" }, "scripts": { "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha test/test.js" }, "repository": { "type": "git", "url": "git://github.com/proj4js/proj4js.git" }, "author": "", "license": "MIT", "jam": { "main": "dist/proj4.js", "include": ["dist/proj4.js", "README.md", "AUTHORS", "LICENSE.md"] }, "devDependencies": { "grunt-cli": "~0.1.13", "grunt": "~0.4.2", "grunt-contrib-connect": "~0.6.0", "grunt-contrib-jshint": "~0.8.0", "chai": "~1.8.1", "mocha": "~1.17.1", "grunt-mocha-phantomjs": "~0.4.0", "browserify": "~12.0.1", "grunt-browserify": "~4.0.1", "grunt-contrib-uglify": "~0.11.1", "curl": "git://github.com/cujojs/curl.git", "istanbul": "~0.2.4", "tin": "~0.4.0" }, "dependencies": { "mgrs": "~0.0.2" } };
   return module.exports;
 });
-$__System.registerDynamic('f8', ['f9', 'fa', 'fb', 'fc', 'fd', 'ec', 'fe', 'ff'], true, function ($__require, exports, module) {
+$__System.registerDynamic('f6', ['f7', 'f8', 'f9', 'fa', 'fb', 'ea', 'fc', 'fd'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var e0fn = $__require('f9');
-  var e1fn = $__require('fa');
-  var e2fn = $__require('fb');
-  var e3fn = $__require('fc');
-  var mlfn = $__require('fd');
-  var adjust_lon = $__require('ec');
+  var e0fn = $__require('f7');
+  var e1fn = $__require('f8');
+  var e2fn = $__require('f9');
+  var e3fn = $__require('fa');
+  var mlfn = $__require('fb');
+  var adjust_lon = $__require('ea');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var sign = $__require('fe');
-  var asinz = $__require('ff');
+  var sign = $__require('fc');
+  var asinz = $__require('fd');
   exports.init = function () {
     this.e0 = e0fn(this.es);
     this.e1 = e1fn(this.es);
@@ -63076,13 +62905,13 @@ $__System.registerDynamic('f8', ['f9', 'fa', 'fb', 'fc', 'fd', 'ec', 'fe', 'ff']
   exports.names = ["Transverse_Mercator", "Transverse Mercator", "tmerc"];
   return module.exports;
 });
-$__System.registerDynamic('100', ['f8'], true, function ($__require, exports, module) {
+$__System.registerDynamic('fe', ['f6'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var D2R = 0.01745329251994329577;
-  var tmerc = $__require('f8');
+  var tmerc = $__require('f6');
   exports.dependsOn = 'tmerc';
   exports.init = function () {
     if (!this.zone) {
@@ -63100,7 +62929,7 @@ $__System.registerDynamic('100', ['f8'], true, function ($__require, exports, mo
   exports.names = ["Universal Transverse Mercator System", "utm"];
   return module.exports;
 });
-$__System.registerDynamic("101", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ff", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63110,13 +62939,13 @@ $__System.registerDynamic("101", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("102", ["101"], true, function ($__require, exports, module) {
+$__System.registerDynamic("100", ["ff"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var FORTPI = Math.PI / 4;
-  var srat = $__require("101");
+  var srat = $__require("ff");
   var HALF_PI = Math.PI / 2;
   var MAX_ITER = 20;
   exports.init = function () {
@@ -63158,13 +62987,13 @@ $__System.registerDynamic("102", ["101"], true, function ($__require, exports, m
   exports.names = ["gauss"];
   return module.exports;
 });
-$__System.registerDynamic('103', ['102', 'ec'], true, function ($__require, exports, module) {
+$__System.registerDynamic('101', ['100', 'ea'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var gauss = $__require('102');
-  var adjust_lon = $__require('ec');
+  var gauss = $__require('100');
+  var adjust_lon = $__require('ea');
   exports.init = function () {
     gauss.init.apply(this);
     if (!this.rc) {
@@ -63216,18 +63045,18 @@ $__System.registerDynamic('103', ['102', 'ec'], true, function ($__require, expo
   exports.names = ["Stereographic_North_Pole", "Oblique_Stereographic", "Polar_Stereographic", "sterea", "Oblique Stereographic Alternative"];
   return module.exports;
 });
-$__System.registerDynamic('104', ['fe', 'eb', 'ed', 'ee', 'ec'], true, function ($__require, exports, module) {
+$__System.registerDynamic('102', ['fc', 'e9', 'eb', 'ec', 'ea'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var sign = $__require('fe');
-  var msfnz = $__require('eb');
-  var tsfnz = $__require('ed');
-  var phi2z = $__require('ee');
-  var adjust_lon = $__require('ec');
+  var sign = $__require('fc');
+  var msfnz = $__require('e9');
+  var tsfnz = $__require('eb');
+  var phi2z = $__require('ec');
+  var adjust_lon = $__require('ea');
   exports.ssfn_ = function (phit, sinphi, eccen) {
     sinphi *= eccen;
     return Math.tan(0.5 * (HALF_PI + phit)) * Math.pow((1 - sinphi) / (1 + sinphi), 0.5 * eccen);
@@ -63355,7 +63184,7 @@ $__System.registerDynamic('104', ['fe', 'eb', 'ed', 'ee', 'ec'], true, function 
   exports.names = ["stere", "Stereographic_South_Pole", "Polar Stereographic (variant B)"];
   return module.exports;
 });
-$__System.registerDynamic("105", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("103", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63440,14 +63269,14 @@ $__System.registerDynamic("105", [], true, function ($__require, exports, module
   exports.names = ["somerc"];
   return module.exports;
 });
-$__System.registerDynamic('106', ['ed', 'ec', 'ee'], true, function ($__require, exports, module) {
+$__System.registerDynamic('104', ['eb', 'ea', 'ec'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var tsfnz = $__require('ed');
-  var adjust_lon = $__require('ec');
-  var phi2z = $__require('ee');
+  var tsfnz = $__require('eb');
+  var adjust_lon = $__require('ea');
+  var phi2z = $__require('ec');
   var HALF_PI = Math.PI / 2;
   var FORTPI = Math.PI / 4;
   var EPSLN = 1.0e-10;
@@ -63583,7 +63412,7 @@ $__System.registerDynamic('106', ['ed', 'ec', 'ee'], true, function ($__require,
   exports.names = ["Hotine_Oblique_Mercator", "Hotine Oblique Mercator", "Hotine_Oblique_Mercator_Azimuth_Natural_Origin", "Hotine_Oblique_Mercator_Azimuth_Center", "omerc"];
   return module.exports;
 });
-$__System.registerDynamic("ed", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("eb", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63598,7 +63427,7 @@ $__System.registerDynamic("ed", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("ee", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ec", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63621,18 +63450,18 @@ $__System.registerDynamic("ee", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('107', ['eb', 'ed', 'fe', 'ec', 'ee'], true, function ($__require, exports, module) {
+$__System.registerDynamic('105', ['e9', 'eb', 'fc', 'ea', 'ec'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var EPSLN = 1.0e-10;
-  var msfnz = $__require('eb');
-  var tsfnz = $__require('ed');
+  var msfnz = $__require('e9');
+  var tsfnz = $__require('eb');
   var HALF_PI = Math.PI / 2;
-  var sign = $__require('fe');
-  var adjust_lon = $__require('ec');
-  var phi2z = $__require('ee');
+  var sign = $__require('fc');
+  var adjust_lon = $__require('ea');
+  var phi2z = $__require('ec');
   exports.init = function () {
     if (!this.lat2) {
       this.lat2 = this.lat1;
@@ -63727,12 +63556,12 @@ $__System.registerDynamic('107', ['eb', 'ed', 'fe', 'ec', 'ee'], true, function 
   exports.names = ["Lambert Tangential Conformal Conic Projection", "Lambert_Conformal_Conic", "Lambert_Conformal_Conic_2SP", "lcc"];
   return module.exports;
 });
-$__System.registerDynamic("108", ["ec"], true, function ($__require, exports, module) {
+$__System.registerDynamic("106", ["ea"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require("ec");
+  var adjust_lon = $__require("ea");
   exports.init = function () {
     this.a = 6377397.155;
     this.es = 0.006674372230614;
@@ -63819,20 +63648,20 @@ $__System.registerDynamic("108", ["ec"], true, function ($__require, exports, mo
   exports.names = ["Krovak", "krovak"];
   return module.exports;
 });
-$__System.registerDynamic('109', ['fd', 'f9', 'fa', 'fb', 'fc', '10a', 'ec', '10b', '10c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('107', ['fb', 'f7', 'f8', 'f9', 'fa', '108', 'ea', '109', '10a'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var mlfn = $__require('fd');
-  var e0fn = $__require('f9');
-  var e1fn = $__require('fa');
-  var e2fn = $__require('fb');
-  var e3fn = $__require('fc');
-  var gN = $__require('10a');
-  var adjust_lon = $__require('ec');
-  var adjust_lat = $__require('10b');
-  var imlfn = $__require('10c');
+  var mlfn = $__require('fb');
+  var e0fn = $__require('f7');
+  var e1fn = $__require('f8');
+  var e2fn = $__require('f9');
+  var e3fn = $__require('fa');
+  var gN = $__require('108');
+  var adjust_lon = $__require('ea');
+  var adjust_lat = $__require('109');
+  var imlfn = $__require('10a');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
   exports.init = function () {
@@ -63904,7 +63733,7 @@ $__System.registerDynamic('109', ['fd', 'f9', 'fa', 'fb', 'fc', '10a', 'ec', '10
   exports.names = ["Cassini", "Cassini_Soldner", "cass"];
   return module.exports;
 });
-$__System.registerDynamic('10d', ['10e', 'ec'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10b', ['10c', 'ea'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63912,8 +63741,8 @@ $__System.registerDynamic('10d', ['10e', 'ec'], true, function ($__require, expo
   var HALF_PI = Math.PI / 2;
   var FORTPI = Math.PI / 4;
   var EPSLN = 1.0e-10;
-  var qsfnz = $__require('10e');
-  var adjust_lon = $__require('ec');
+  var qsfnz = $__require('10c');
+  var adjust_lon = $__require('ea');
   exports.S_POLE = 1;
   exports.N_POLE = 2;
   exports.EQUIT = 3;
@@ -64159,16 +63988,16 @@ $__System.registerDynamic('10d', ['10e', 'ec'], true, function ($__require, expo
   exports.names = ["Lambert Azimuthal Equal Area", "Lambert_Azimuthal_Equal_Area", "laea"];
   return module.exports;
 });
-$__System.registerDynamic('10f', ['eb', '10e', 'ec', 'ff'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10d', ['e9', '10c', 'ea', 'fd'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var EPSLN = 1.0e-10;
-  var msfnz = $__require('eb');
-  var qsfnz = $__require('10e');
-  var adjust_lon = $__require('ec');
-  var asinz = $__require('ff');
+  var msfnz = $__require('e9');
+  var qsfnz = $__require('10c');
+  var adjust_lon = $__require('ea');
+  var asinz = $__require('fd');
   exports.init = function () {
     if (Math.abs(this.lat1 + this.lat2) < EPSLN) {
       return;
@@ -64263,14 +64092,14 @@ $__System.registerDynamic('10f', ['eb', '10e', 'ec', 'ff'], true, function ($__r
   exports.names = ["Albers_Conic_Equal_Area", "Albers", "aea"];
   return module.exports;
 });
-$__System.registerDynamic('110', ['ec', 'ff'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10e', ['ea', 'fd'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ec');
+  var adjust_lon = $__require('ea');
   var EPSLN = 1.0e-10;
-  var asinz = $__require('ff');
+  var asinz = $__require('fd');
   exports.init = function () {
     this.sin_p14 = Math.sin(this.lat0);
     this.cos_p14 = Math.cos(this.lat0);
@@ -64330,7 +64159,7 @@ $__System.registerDynamic('110', ['ec', 'ff'], true, function ($__require, expor
   exports.names = ["gnom"];
   return module.exports;
 });
-$__System.registerDynamic("10e", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("10c", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64346,7 +64175,7 @@ $__System.registerDynamic("10e", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("111", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("10f", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64384,15 +64213,15 @@ $__System.registerDynamic("111", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic('112', ['ec', '10e', 'eb', '111'], true, function ($__require, exports, module) {
+$__System.registerDynamic('110', ['ea', '10c', 'e9', '10f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ec');
-  var qsfnz = $__require('10e');
-  var msfnz = $__require('eb');
-  var iqsfnz = $__require('111');
+  var adjust_lon = $__require('ea');
+  var qsfnz = $__require('10c');
+  var msfnz = $__require('e9');
+  var iqsfnz = $__require('10f');
   exports.init = function () {
     if (!this.sphere) {
       this.k0 = msfnz(this.e, Math.sin(this.lat_ts), Math.cos(this.lat_ts));
@@ -64433,13 +64262,13 @@ $__System.registerDynamic('112', ['ec', '10e', 'eb', '111'], true, function ($__
   exports.names = ["cea"];
   return module.exports;
 });
-$__System.registerDynamic('113', ['ec', '10b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('111', ['ea', '109'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ec');
-  var adjust_lat = $__require('10b');
+  var adjust_lon = $__require('ea');
+  var adjust_lat = $__require('109');
   exports.init = function () {
     this.x0 = this.x0 || 0;
     this.y0 = this.y0 || 0;
@@ -64468,20 +64297,20 @@ $__System.registerDynamic('113', ['ec', '10b'], true, function ($__require, expo
   exports.names = ["Equirectangular", "Equidistant_Cylindrical", "eqc"];
   return module.exports;
 });
-$__System.registerDynamic('114', ['f9', 'fa', 'fb', 'fc', 'ec', '10b', 'fd', '10a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('112', ['f7', 'f8', 'f9', 'fa', 'ea', '109', 'fb', '108'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var e0fn = $__require('f9');
-  var e1fn = $__require('fa');
-  var e2fn = $__require('fb');
-  var e3fn = $__require('fc');
-  var adjust_lon = $__require('ec');
-  var adjust_lat = $__require('10b');
-  var mlfn = $__require('fd');
+  var e0fn = $__require('f7');
+  var e1fn = $__require('f8');
+  var e2fn = $__require('f9');
+  var e3fn = $__require('fa');
+  var adjust_lon = $__require('ea');
+  var adjust_lat = $__require('109');
+  var mlfn = $__require('fb');
   var EPSLN = 1.0e-10;
-  var gN = $__require('10a');
+  var gN = $__require('108');
   var MAX_ITER = 20;
   exports.init = function () {
     this.temp = this.b / this.a;
@@ -64581,7 +64410,7 @@ $__System.registerDynamic('114', ['f9', 'fa', 'fb', 'fc', 'ec', '10b', 'fd', '10
   exports.names = ["Polyconic", "poly"];
   return module.exports;
 });
-$__System.registerDynamic("115", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("113", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64806,12 +64635,12 @@ $__System.registerDynamic("115", [], true, function ($__require, exports, module
   exports.names = ["New_Zealand_Map_Grid", "nzmg"];
   return module.exports;
 });
-$__System.registerDynamic("116", ["ec"], true, function ($__require, exports, module) {
+$__System.registerDynamic("114", ["ea"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require("ec");
+  var adjust_lon = $__require("ea");
   exports.init = function () {};
   exports.forward = function (p) {
     var lon = p.x;
@@ -64835,7 +64664,7 @@ $__System.registerDynamic("116", ["ec"], true, function ($__require, exports, mo
   exports.names = ["Miller_Cylindrical", "mill"];
   return module.exports;
 });
-$__System.registerDynamic("117", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("115", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64866,7 +64695,7 @@ $__System.registerDynamic("117", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("118", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("116", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64878,12 +64707,12 @@ $__System.registerDynamic("118", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic('119', ['118'], true, function ($__require, exports, module) {
+$__System.registerDynamic('117', ['116'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var pj_mlfn = $__require('118');
+  var pj_mlfn = $__require('116');
   var EPSLN = 1.0e-10;
   var MAX_ITER = 20;
   module.exports = function (arg, es, en) {
@@ -64902,20 +64731,20 @@ $__System.registerDynamic('119', ['118'], true, function ($__require, exports, m
   };
   return module.exports;
 });
-$__System.registerDynamic('11a', ['ec', '10b', '117', '118', '119', 'ff'], true, function ($__require, exports, module) {
+$__System.registerDynamic('118', ['ea', '109', '115', '116', '117', 'fd'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ec');
-  var adjust_lat = $__require('10b');
-  var pj_enfn = $__require('117');
+  var adjust_lon = $__require('ea');
+  var adjust_lat = $__require('109');
+  var pj_enfn = $__require('115');
   var MAX_ITER = 20;
-  var pj_mlfn = $__require('118');
-  var pj_inv_mlfn = $__require('119');
+  var pj_mlfn = $__require('116');
+  var pj_inv_mlfn = $__require('117');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var asinz = $__require('ff');
+  var asinz = $__require('fd');
   exports.init = function () {
     if (!this.sphere) {
       this.en = pj_enfn(this.es);
@@ -64991,12 +64820,12 @@ $__System.registerDynamic('11a', ['ec', '10b', '117', '118', '119', 'ff'], true,
   exports.names = ["Sinusoidal", "sinu"];
   return module.exports;
 });
-$__System.registerDynamic("11b", ["ec"], true, function ($__require, exports, module) {
+$__System.registerDynamic("119", ["ea"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require("ec");
+  var adjust_lon = $__require("ea");
   var EPSLN = 1.0e-10;
   exports.init = function () {};
   exports.forward = function (p) {
@@ -65051,7 +64880,7 @@ $__System.registerDynamic("11b", ["ec"], true, function ($__require, exports, mo
   exports.names = ["Mollweide", "moll"];
   return module.exports;
 });
-$__System.registerDynamic("eb", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e9", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65062,32 +64891,32 @@ $__System.registerDynamic("eb", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('10b', ['fe'], true, function ($__require, exports, module) {
+$__System.registerDynamic('109', ['fc'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var HALF_PI = Math.PI / 2;
-  var sign = $__require('fe');
+  var sign = $__require('fc');
   module.exports = function (x) {
     return Math.abs(x) < HALF_PI ? x : x - sign(x) * Math.PI;
   };
   return module.exports;
 });
-$__System.registerDynamic('11c', ['f9', 'fa', 'fb', 'fc', 'eb', 'fd', 'ec', '10b', '10c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11a', ['f7', 'f8', 'f9', 'fa', 'e9', 'fb', 'ea', '109', '10a'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var e0fn = $__require('f9');
-  var e1fn = $__require('fa');
-  var e2fn = $__require('fb');
-  var e3fn = $__require('fc');
-  var msfnz = $__require('eb');
-  var mlfn = $__require('fd');
-  var adjust_lon = $__require('ec');
-  var adjust_lat = $__require('10b');
-  var imlfn = $__require('10c');
+  var e0fn = $__require('f7');
+  var e1fn = $__require('f8');
+  var e2fn = $__require('f9');
+  var e3fn = $__require('fa');
+  var msfnz = $__require('e9');
+  var mlfn = $__require('fb');
+  var adjust_lon = $__require('ea');
+  var adjust_lat = $__require('109');
+  var imlfn = $__require('10a');
   var EPSLN = 1.0e-10;
   exports.init = function () {
     if (Math.abs(this.lat1 + this.lat2) < EPSLN) {
@@ -65168,15 +64997,15 @@ $__System.registerDynamic('11c', ['f9', 'fa', 'fb', 'fc', 'eb', 'fd', 'ec', '10b
   exports.names = ["Equidistant_Conic", "eqdc"];
   return module.exports;
 });
-$__System.registerDynamic('11d', ['ec', 'ff'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11b', ['ea', 'fd'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ec');
+  var adjust_lon = $__require('ea');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var asinz = $__require('ff');
+  var asinz = $__require('fd');
   exports.init = function () {
     this.R = this.a;
   };
@@ -65268,7 +65097,7 @@ $__System.registerDynamic('11d', ['ec', 'ff'], true, function ($__require, expor
   exports.names = ["Van_der_Grinten_I", "VanDerGrinten", "vandg"];
   return module.exports;
 });
-$__System.registerDynamic("fe", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("fc", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65278,20 +65107,20 @@ $__System.registerDynamic("fe", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('ec', ['fe'], true, function ($__require, exports, module) {
+$__System.registerDynamic('ea', ['fc'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var TWO_PI = Math.PI * 2;
   var SPI = 3.14159265359;
-  var sign = $__require('fe');
+  var sign = $__require('fc');
   module.exports = function (x) {
     return Math.abs(x) <= SPI ? x : x - sign(x) * TWO_PI;
   };
   return module.exports;
 });
-$__System.registerDynamic("fd", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("fb", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65301,7 +65130,7 @@ $__System.registerDynamic("fd", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("f9", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f7", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65311,7 +65140,7 @@ $__System.registerDynamic("f9", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("fa", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f8", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65321,7 +65150,7 @@ $__System.registerDynamic("fa", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("fb", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f9", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65331,7 +65160,7 @@ $__System.registerDynamic("fb", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("fc", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("fa", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65341,7 +65170,7 @@ $__System.registerDynamic("fc", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("10a", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("108", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65352,7 +65181,7 @@ $__System.registerDynamic("10a", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("ff", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("fd", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65365,7 +65194,7 @@ $__System.registerDynamic("ff", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("10c", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("10a", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65388,22 +65217,22 @@ $__System.registerDynamic("10c", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic('11e', ['ec', 'fd', 'f9', 'fa', 'fb', 'fc', '10a', 'ff', '10c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11c', ['ea', 'fb', 'f7', 'f8', 'f9', 'fa', '108', 'fd', '10a'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ec');
+  var adjust_lon = $__require('ea');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var mlfn = $__require('fd');
-  var e0fn = $__require('f9');
-  var e1fn = $__require('fa');
-  var e2fn = $__require('fb');
-  var e3fn = $__require('fc');
-  var gN = $__require('10a');
-  var asinz = $__require('ff');
-  var imlfn = $__require('10c');
+  var mlfn = $__require('fb');
+  var e0fn = $__require('f7');
+  var e1fn = $__require('f8');
+  var e2fn = $__require('f9');
+  var e3fn = $__require('fa');
+  var gN = $__require('108');
+  var asinz = $__require('fd');
+  var imlfn = $__require('10a');
   exports.init = function () {
     this.sin_p12 = Math.sin(this.lat0);
     this.cos_p12 = Math.cos(this.lat0);
@@ -65554,12 +65383,12 @@ $__System.registerDynamic('11e', ['ec', 'fd', 'f9', 'fa', 'fb', 'fc', '10a', 'ff
   exports.names = ["Azimuthal_Equidistant", "aeqd"];
   return module.exports;
 });
-$__System.registerDynamic('11f', ['f8', '100', '103', '104', '105', '106', '107', '108', '109', '10d', '10f', '110', '112', '113', '114', '115', '116', '11a', '11b', '11c', '11d', '11e'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11d', ['f6', 'fe', '101', '102', '103', '104', '105', '106', '107', '10b', '10d', '10e', '110', '111', '112', '113', '114', '118', '119', '11a', '11b', '11c'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var projs = [$__require('f8'), $__require('100'), $__require('103'), $__require('104'), $__require('105'), $__require('106'), $__require('107'), $__require('108'), $__require('109'), $__require('10d'), $__require('10f'), $__require('110'), $__require('112'), $__require('113'), $__require('114'), $__require('115'), $__require('116'), $__require('11a'), $__require('11b'), $__require('11c'), $__require('11d'), $__require('11e')];
+  var projs = [$__require('f6'), $__require('fe'), $__require('101'), $__require('102'), $__require('103'), $__require('104'), $__require('105'), $__require('106'), $__require('107'), $__require('10b'), $__require('10d'), $__require('10e'), $__require('110'), $__require('111'), $__require('112'), $__require('113'), $__require('114'), $__require('118'), $__require('119'), $__require('11a'), $__require('11b'), $__require('11c')];
   module.exports = function (proj4) {
     projs.forEach(function (proj) {
       proj4.Proj.projections.add(proj);
@@ -65567,33 +65396,33 @@ $__System.registerDynamic('11f', ['f8', '100', '103', '104', '105', '106', '107'
   };
   return module.exports;
 });
-$__System.registerDynamic('120', ['db', 'dc', 'de', 'f5', 'e3', 'dd', 'df', 'f7', '11f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11e', ['d9', 'da', 'dc', 'f3', 'e1', 'db', 'dd', 'f5', '11d'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var proj4 = $__require('db');
+  var proj4 = $__require('d9');
   proj4.defaultDatum = 'WGS84';
-  proj4.Proj = $__require('dc');
+  proj4.Proj = $__require('da');
   proj4.WGS84 = new proj4.Proj('WGS84');
-  proj4.Point = $__require('de');
-  proj4.toPoint = $__require('f5');
-  proj4.defs = $__require('e3');
-  proj4.transform = $__require('dd');
-  proj4.mgrs = $__require('df');
-  proj4.version = $__require('f7').version;
-  $__require('11f')(proj4);
+  proj4.Point = $__require('dc');
+  proj4.toPoint = $__require('f3');
+  proj4.defs = $__require('e1');
+  proj4.transform = $__require('db');
+  proj4.mgrs = $__require('dd');
+  proj4.version = $__require('f5').version;
+  $__require('11d')(proj4);
   module.exports = proj4;
   return module.exports;
 });
-$__System.registerDynamic("121", ["120"], true, function ($__require, exports, module) {
+$__System.registerDynamic("11f", ["11e"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("120");
+  module.exports = $__require("11e");
   return module.exports;
 });
-$__System.register('122', ['121', 'da'], function (_export) {
+$__System.register('120', ['d8', '11f'], function (_export) {
   /* */
   'use strict';
 
@@ -65760,9 +65589,9 @@ $__System.register('122', ['121', 'da'], function (_export) {
     };
   }
   return {
-    setters: [function (_) {
-      proj4 = _['default'];
-    }, function (_da) {}],
+    setters: [function (_d8) {}, function (_f) {
+      proj4 = _f['default'];
+    }],
     execute: function () {
       ROOT_PREFIX = 'http://www.opengis.net/def/crs/';
       OGC_PREFIX = ROOT_PREFIX + 'OGC/';
@@ -65792,7 +65621,7 @@ $__System.register('122', ['121', 'da'], function (_export) {
   };
 });
 
-$__System.register("123", ["122"], function (_export) {
+$__System.register("121", ["120"], function (_export) {
   "use strict";
 
   return {
@@ -65811,7 +65640,7 @@ $__System.register("123", ["122"], function (_export) {
   };
 });
 
-$__System.register('c1', ['123', 'c0'], function (_export) {
+$__System.register('bf', ['121', 'be'], function (_export) {
   /* */
   'use strict';
 
@@ -66312,9 +66141,9 @@ $__System.register('c1', ['123', 'c0'], function (_export) {
   return {
     setters: [function (_) {
       uriproj = _;
-    }, function (_c0) {
-      COVJSON_DATATYPE_TUPLE = _c0.COVJSON_DATATYPE_TUPLE;
-      COVJSON_DATATYPE_POLYGON = _c0.COVJSON_DATATYPE_POLYGON;
+    }, function (_be) {
+      COVJSON_DATATYPE_TUPLE = _be.COVJSON_DATATYPE_TUPLE;
+      COVJSON_DATATYPE_POLYGON = _be.COVJSON_DATATYPE_POLYGON;
     }],
     execute: function () {
       OPENGIS_CRS_PREFIX = 'http://www.opengis.net/def/crs/';
@@ -66337,7 +66166,7 @@ $__System.register('c1', ['123', 'c0'], function (_export) {
   };
 });
 
-$__System.register('c6', ['c0'], function (_export) {
+$__System.register('c4', ['be'], function (_export) {
   /* */
 
   /**
@@ -66515,14 +66344,14 @@ $__System.register('c6', ['c0'], function (_export) {
   }
 
   return {
-    setters: [function (_c0) {
-      DOMAIN = _c0.DOMAIN;
+    setters: [function (_be) {
+      DOMAIN = _be.DOMAIN;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c4', [], function (_export) {
+$__System.register('c2', [], function (_export) {
   /* */
   'use strict';
 
@@ -66648,7 +66477,7 @@ $__System.register('c4', [], function (_export) {
   };
 });
 
-$__System.register('c8', ['c1', 'c6', 'c4', 'c0'], function (_export) {
+$__System.register('c6', ['bf', 'c4', 'c2', 'be'], function (_export) {
   /* */
 
   /**
@@ -66948,25 +66777,25 @@ $__System.register('c8', ['c1', 'c6', 'c4', 'c0'], function (_export) {
   }
 
   return {
-    setters: [function (_c1) {
-      isISODateAxis = _c1.isISODateAxis;
-      isLongitudeAxis = _c1.isLongitudeAxis;
-      getLongitudeWrapper = _c1.getLongitudeWrapper;
-      asTime = _c1.asTime;
-    }, function (_c6) {
-      normalizeIndexSubsetConstraints = _c6.normalizeIndexSubsetConstraints;
-      subsetDomainByIndex = _c6.subsetDomainByIndex;
+    setters: [function (_bf) {
+      isISODateAxis = _bf.isISODateAxis;
+      isLongitudeAxis = _bf.isLongitudeAxis;
+      getLongitudeWrapper = _bf.getLongitudeWrapper;
+      asTime = _bf.asTime;
     }, function (_c4) {
-      indexOfNearest = _c4.indexOfNearest;
-      indicesOfNearest = _c4.indicesOfNearest;
-    }, function (_c0) {
-      COVERAGE = _c0.COVERAGE;
+      normalizeIndexSubsetConstraints = _c4.normalizeIndexSubsetConstraints;
+      subsetDomainByIndex = _c4.subsetDomainByIndex;
+    }, function (_c2) {
+      indexOfNearest = _c2.indexOfNearest;
+      indicesOfNearest = _c2.indicesOfNearest;
+    }, function (_be) {
+      COVERAGE = _be.COVERAGE;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c7', ['c0', 'c5', 'c8'], function (_export) {
+$__System.register('c5', ['be', 'c3', 'c6'], function (_export) {
   /* */
 
   /**
@@ -67263,21 +67092,21 @@ $__System.register('c7', ['c0', 'c5', 'c8'], function (_export) {
   }
 
   return {
-    setters: [function (_c0) {
-      COVERAGE = _c0.COVERAGE;
-      DOMAIN = _c0.DOMAIN;
-    }, function (_c5) {
-      checkDomain = _c5.checkDomain;
-      checkCoverage = _c5.checkCoverage;
-    }, function (_c8) {
-      subsetByIndex = _c8.subsetByIndex;
-      subsetByValue = _c8.subsetByValue;
+    setters: [function (_be) {
+      COVERAGE = _be.COVERAGE;
+      DOMAIN = _be.DOMAIN;
+    }, function (_c3) {
+      checkDomain = _c3.checkDomain;
+      checkCoverage = _c3.checkCoverage;
+    }, function (_c6) {
+      subsetByIndex = _c6.subsetByIndex;
+      subsetByValue = _c6.subsetByValue;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c9', ['c0', 'c5', 'bf', 'c7'], function (_export) {
+$__System.register('c7', ['be', 'c3', 'bd', 'c5'], function (_export) {
   /* */
 
   /**
@@ -67869,21 +67698,21 @@ $__System.register('c9', ['c0', 'c5', 'bf', 'c7'], function (_export) {
   }
 
   return {
-    setters: [function (_c0) {
-      COVERAGE = _c0.COVERAGE;
-      DOMAIN = _c0.DOMAIN;
+    setters: [function (_be) {
+      COVERAGE = _be.COVERAGE;
+      DOMAIN = _be.DOMAIN;
+    }, function (_c3) {
+      checkCoverage = _c3.checkCoverage;
+    }, function (_bd) {
+      shallowcopy = _bd.shallowcopy;
     }, function (_c5) {
-      checkCoverage = _c5.checkCoverage;
-    }, function (_bf) {
-      shallowcopy = _bf.shallowcopy;
-    }, function (_c7) {
-      addLoadRangesFunction = _c7.addLoadRangesFunction;
+      addLoadRangesFunction = _c5.addLoadRangesFunction;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c0', [], function (_export) {
+$__System.register('be', [], function (_export) {
   /* */
   'use strict';
 
@@ -67915,7 +67744,7 @@ $__System.register('c0', [], function (_export) {
   };
 });
 
-$__System.register('c5', ['c0'], function (_export) {
+$__System.register('c3', ['be'], function (_export) {
   /* */
   'use strict';
 
@@ -67950,15 +67779,15 @@ $__System.register('c5', ['c0'], function (_export) {
   }
 
   return {
-    setters: [function (_c0) {
-      COVERAGE = _c0.COVERAGE;
-      DOMAIN = _c0.DOMAIN;
+    setters: [function (_be) {
+      COVERAGE = _be.COVERAGE;
+      DOMAIN = _be.DOMAIN;
     }],
     execute: function () {}
   };
 });
 
-$__System.registerDynamic("124", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("122", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -68970,14 +68799,14 @@ $__System.registerDynamic("124", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("125", ["124"], true, function ($__require, exports, module) {
+$__System.registerDynamic("123", ["122"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("124");
+  module.exports = $__require("122");
   return module.exports;
 });
-$__System.registerDynamic("126", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("124", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69140,14 +68969,14 @@ $__System.registerDynamic("126", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("127", ["126"], true, function ($__require, exports, module) {
+$__System.registerDynamic("125", ["124"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("126");
+  module.exports = $__require("124");
   return module.exports;
 });
-$__System.registerDynamic("128", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("126", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69187,14 +69016,14 @@ $__System.registerDynamic("128", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("129", ["128"], true, function ($__require, exports, module) {
+$__System.registerDynamic("127", ["126"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("128");
+  module.exports = $__require("126");
   return module.exports;
 });
-$__System.registerDynamic("12a", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("128", [], true, function ($__require, exports, module) {
 	/* */
 	"use strict";
 
@@ -69218,22 +69047,22 @@ $__System.registerDynamic("12a", [], true, function ($__require, exports, module
 	}
 	return module.exports;
 });
-$__System.registerDynamic("12b", ["12a"], true, function ($__require, exports, module) {
+$__System.registerDynamic("129", ["128"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("12a");
+  module.exports = $__require("128");
   return module.exports;
 });
-$__System.registerDynamic("12c", ["129", "12b"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12a", ["127", "129"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var twoProduct = $__require("129");
-  var twoSum = $__require("12b");
+  var twoProduct = $__require("127");
+  var twoSum = $__require("129");
 
   module.exports = scaleLinearExpansion;
 
@@ -69282,14 +69111,14 @@ $__System.registerDynamic("12c", ["129", "12b"], true, function ($__require, exp
   }
   return module.exports;
 });
-$__System.registerDynamic("12d", ["12c"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12b", ["12a"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("12c");
+  module.exports = $__require("12a");
   return module.exports;
 });
-$__System.registerDynamic("12e", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("12c", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69452,24 +69281,24 @@ $__System.registerDynamic("12e", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("12f", ["12e"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12d", ["12c"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("12e");
+  module.exports = $__require("12c");
   return module.exports;
 });
-$__System.registerDynamic("130", ["129", "127", "12d", "12f"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12e", ["127", "125", "12b", "12d"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var twoProduct = $__require("129");
-  var robustSum = $__require("127");
-  var robustScale = $__require("12d");
-  var robustSubtract = $__require("12f");
+  var twoProduct = $__require("127");
+  var robustSum = $__require("125");
+  var robustScale = $__require("12b");
+  var robustSubtract = $__require("12d");
 
   var NUM_EXPAND = 5;
 
@@ -69648,14 +69477,14 @@ return d[d.length-1];};return ", funcName].join("");
   generateOrientationProc();
   return module.exports;
 });
-$__System.registerDynamic("131", ["130"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12f", ["12e"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("130");
+  module.exports = $__require("12e");
   return module.exports;
 });
-$__System.registerDynamic("132", ["131"], true, function ($__require, exports, module) {
+$__System.registerDynamic("130", ["12f"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69664,7 +69493,7 @@ $__System.registerDynamic("132", ["131"], true, function ($__require, exports, m
       GLOBAL = global;
   module.exports = orderSegments;
 
-  var orient = $__require("131");
+  var orient = $__require("12f");
 
   function horizontalOrder(a, b) {
     var bl, br;
@@ -69757,7 +69586,7 @@ $__System.registerDynamic("132", ["131"], true, function ($__require, exports, m
   }
   return module.exports;
 });
-$__System.registerDynamic('133', ['134', '125', '131', '132'], true, function ($__require, exports, module) {
+$__System.registerDynamic('131', ['132', '123', '12f', '130'], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69765,10 +69594,10 @@ $__System.registerDynamic('133', ['134', '125', '131', '132'], true, function ($
       global = this || self,
       GLOBAL = global;
   module.exports = createSlabDecomposition;
-  var bounds = $__require('134');
-  var createRBTree = $__require('125');
-  var orient = $__require('131');
-  var orderSegments = $__require('132');
+  var bounds = $__require('132');
+  var createRBTree = $__require('123');
+  var orient = $__require('12f');
+  var orderSegments = $__require('130');
   function SlabDecomposition(slabs, coordinates, horizontal) {
     this.slabs = slabs;
     this.coordinates = coordinates;
@@ -69966,21 +69795,21 @@ $__System.registerDynamic('133', ['134', '125', '131', '132'], true, function ($
   }
   return module.exports;
 });
-$__System.registerDynamic("135", ["133"], true, function ($__require, exports, module) {
+$__System.registerDynamic("133", ["131"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("133");
+  module.exports = $__require("131");
   return module.exports;
 });
-$__System.registerDynamic("136", ["134"], true, function ($__require, exports, module) {
+$__System.registerDynamic("134", ["132"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var bounds = $__require("134");
+  var bounds = $__require("132");
 
   var NOT_FOUND = 0;
   var SUCCESS = 1;
@@ -70359,14 +70188,14 @@ $__System.registerDynamic("136", ["134"], true, function ($__require, exports, m
   }
   return module.exports;
 });
-$__System.registerDynamic("137", ["136"], true, function ($__require, exports, module) {
+$__System.registerDynamic("135", ["134"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("136");
+  module.exports = $__require("134");
   return module.exports;
 });
-$__System.registerDynamic("138", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("136", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -70425,24 +70254,24 @@ return dispatchBsearch", suffix].join(""));
   };
   return module.exports;
 });
-$__System.registerDynamic("134", ["138"], true, function ($__require, exports, module) {
+$__System.registerDynamic("132", ["136"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("138");
+  module.exports = $__require("136");
   return module.exports;
 });
-$__System.registerDynamic('139', ['131', '135', '137', '134'], true, function ($__require, exports, module) {
+$__System.registerDynamic('137', ['12f', '133', '135', '132'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   module.exports = preprocessPolygon;
 
-  var orient = $__require('131')[3];
-  var makeSlabs = $__require('135');
-  var makeIntervalTree = $__require('137');
-  var bsearch = $__require('134');
+  var orient = $__require('12f')[3];
+  var makeSlabs = $__require('133');
+  var makeIntervalTree = $__require('135');
+  var bsearch = $__require('132');
 
   function visitInterval() {
     return true;
@@ -70588,14 +70417,14 @@ $__System.registerDynamic('139', ['131', '135', '137', '134'], true, function ($
   }
   return module.exports;
 });
-$__System.registerDynamic("13a", ["139"], true, function ($__require, exports, module) {
+$__System.registerDynamic("138", ["137"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("139");
+  module.exports = $__require("137");
   return module.exports;
 });
-$__System.registerDynamic("13b", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("139", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -70681,7 +70510,7 @@ $__System.registerDynamic("13b", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("13c", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("13a", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -70724,7 +70553,7 @@ $__System.registerDynamic("13c", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.register('13d', ['13a', '13b', '13c'], function (_export) {
+$__System.register('13b', ['138', '139', '13a'], function (_export) {
   /* */
 
   /**
@@ -70778,18 +70607,18 @@ $__System.register('13d', ['13a', '13b', '13c'], function (_export) {
   }
 
   return {
-    setters: [function (_a) {
-      processPolygon = _a['default'];
-    }, function (_b) {
-      ringAreaSpherical = _b.ringArea;
-    }, function (_c) {
-      ringAreaCartesian = _c.ringArea;
+    setters: [function (_) {
+      processPolygon = _['default'];
+    }, function (_2) {
+      ringAreaSpherical = _2.ringArea;
+    }, function (_a) {
+      ringAreaCartesian = _a.ringArea;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('13e', ['5d', 'c9', 'c5', '13d'], function (_export) {
+$__System.register('13c', ['5b', 'c7', 'c3', '13b'], function (_export) {
   /* */
 
   /**
@@ -70883,47 +70712,47 @@ $__System.register('13e', ['5d', 'c9', 'c5', '13d'], function (_export) {
   }
 
   return {
-    setters: [function (_d) {
-      ndarray = _d['default'];
-    }, function (_c9) {
-      mapRange = _c9.mapRange;
-    }, function (_c5) {
-      checkCoverage = _c5.checkCoverage;
-    }, function (_d2) {
-      ensureClockwisePolygon = _d2.ensureClockwisePolygon;
-      getPointInPolygonsFn = _d2.getPointInPolygonsFn;
+    setters: [function (_b) {
+      ndarray = _b['default'];
+    }, function (_c7) {
+      mapRange = _c7.mapRange;
+    }, function (_c3) {
+      checkCoverage = _c3.checkCoverage;
+    }, function (_b2) {
+      ensureClockwisePolygon = _b2.ensureClockwisePolygon;
+      getPointInPolygonsFn = _b2.getPointInPolygonsFn;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('13f', ['c3', '13d', '13e'], function (_export) {
+$__System.register('13d', ['c1', '13b', '13c'], function (_export) {
   /* */
   'use strict';
 
   // this pulls in bigger external dependencies
   return {
-    setters: [function (_c3) {
+    setters: [function (_c1) {
       var _exportObj = {};
 
-      for (var _key in _c3) {
-        if (_key !== 'default') _exportObj[_key] = _c3[_key];
+      for (var _key in _c1) {
+        if (_key !== 'default') _exportObj[_key] = _c1[_key];
       }
 
       _export(_exportObj);
-    }, function (_d) {
+    }, function (_b) {
       var _exportObj2 = {};
 
-      for (var _key2 in _d) {
-        if (_key2 !== 'default') _exportObj2[_key2] = _d[_key2];
+      for (var _key2 in _b) {
+        if (_key2 !== 'default') _exportObj2[_key2] = _b[_key2];
       }
 
       _export(_exportObj2);
-    }, function (_e) {
+    }, function (_c) {
       var _exportObj3 = {};
 
-      for (var _key3 in _e) {
-        if (_key3 !== 'default') _exportObj3[_key3] = _e[_key3];
+      for (var _key3 in _c) {
+        if (_key3 !== 'default') _exportObj3[_key3] = _c[_key3];
       }
 
       _export(_exportObj3);
@@ -70932,18 +70761,18 @@ $__System.register('13f', ['c3', '13d', '13e'], function (_export) {
   };
 });
 
-$__System.register("5e", ["13f"], function (_export) {
+$__System.register("5d", ["13d"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_f) {
+    setters: [function (_d) {
       var _exportObj = {};
 
-      for (var _key in _f) {
-        if (_key !== "default") _exportObj[_key] = _f[_key];
+      for (var _key in _d) {
+        if (_key !== "default") _exportObj[_key] = _d[_key];
       }
 
-      _exportObj["default"] = _f["default"];
+      _exportObj["default"] = _d["default"];
 
       _export(_exportObj);
     }],
@@ -70951,7 +70780,7 @@ $__System.register("5e", ["13f"], function (_export) {
   };
 });
 
-$__System.register('70', ['b9', '5e'], function (_export) {
+$__System.register('6e', ['b7', '5d'], function (_export) {
   'use strict';
 
   var MELODIES_DCAT_CATALOG_URL, DefaultMap;
@@ -71005,9 +70834,9 @@ $__System.register('70', ['b9', '5e'], function (_export) {
   }
 
   return {
-    setters: [function (_b9) {}, function (_e) {
+    setters: [function (_b7) {}, function (_d) {
       var _exportObj2 = {};
-      _exportObj2['i18n'] = _e.getLanguageString;
+      _exportObj2['i18n'] = _d.getLanguageString;
 
       _export(_exportObj2);
     }],
@@ -71055,13 +70884,13 @@ $__System.register('70', ['b9', '5e'], function (_export) {
   };
 });
 
-$__System.register('51', ['70'], function (_export) {
+$__System.register('51', ['6e'], function (_export) {
   'use strict';
 
   var DefaultMap, Eventable;
   return {
-    setters: [function (_) {
-      DefaultMap = _.DefaultMap;
+    setters: [function (_e) {
+      DefaultMap = _e.DefaultMap;
     }],
     execute: function () {
       Eventable = (function () {
@@ -71150,7 +70979,7 @@ $__System.register('51', ['70'], function (_export) {
   };
 });
 
-$__System.register('6f', ['51'], function (_export) {
+$__System.register('6d', ['51'], function (_export) {
   'use strict';
 
   var Eventable, VIEW, PROCESS, EXTERNAL_LINK, Action;
@@ -71206,23 +71035,23 @@ $__System.register('6f', ['51'], function (_export) {
   };
 });
 
-$__System.register('140', ['51', '54', '70', '75', '6f'], function (_export) {
+$__System.register('13e', ['51', '54', '73', '6e', '6d'], function (_export) {
   'use strict';
 
-  var Eventable, $, $$, HTML, i18n, Modal, EXTERNAL_LINK, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
+  var Eventable, $, $$, HTML, Modal, i18n, EXTERNAL_LINK, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
   return {
-    setters: [function (_4) {
-      Eventable = _4['default'];
+    setters: [function (_3) {
+      Eventable = _3['default'];
     }, function (_) {
       $ = _.$;
       $$ = _.$$;
       HTML = _.HTML;
-    }, function (_3) {
-      i18n = _3.i18n;
     }, function (_2) {
       Modal = _2['default'];
-    }, function (_f) {
-      EXTERNAL_LINK = _f.EXTERNAL_LINK;
+    }, function (_e) {
+      i18n = _e.i18n;
+    }, function (_d) {
+      EXTERNAL_LINK = _d.EXTERNAL_LINK;
     }],
     execute: function () {
       paneHtml = function paneHtml() {
@@ -71645,20 +71474,20 @@ $__System.register('140', ['51', '54', '70', '75', '6f'], function (_export) {
   };
 });
 
-$__System.register('141', ['54', '140', '4a', 'aa', 'ab', 'ac', 'b7'], function (_export) {
+$__System.register('13f', ['54', '4a', 'a8', 'a9', 'aa', 'b5', '13e'], function (_export) {
   'use strict';
 
-  var $, HTML, WorkspacePane, L, SearchPane, sidebarHtml, Sidebar;
+  var $, HTML, L, SearchPane, WorkspacePane, sidebarHtml, Sidebar;
   return {
     setters: [function (_) {
       $ = _.$;
       HTML = _.HTML;
-    }, function (_2) {
-      WorkspacePane = _2['default'];
     }, function (_a) {
       L = _a['default'];
-    }, function (_aa) {}, function (_ab) {}, function (_ac) {}, function (_b7) {
-      SearchPane = _b7['default'];
+    }, function (_a8) {}, function (_a9) {}, function (_aa) {}, function (_b5) {
+      SearchPane = _b5['default'];
+    }, function (_e) {
+      WorkspacePane = _e['default'];
     }],
     execute: function () {
       sidebarHtml = function sidebarHtml(sidebarId, searchPaneId, workspacePaneId) {
@@ -71713,9 +71542,9 @@ $__System.register('141', ['54', '140', '4a', 'aa', 'ab', 'ac', 'b7'], function 
   };
 });
 
-$__System.register("142", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("140", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('143', ['4a'], function (_export) {
+$__System.register('141', ['4a'], function (_export) {
 
   // https://github.com/davicustodio/Leaflet.StyledLayerControl/blob/7a3268d446d755f59bcd845cf873444d01ce1774/src/styledLayerControl.js
   // + some patches to make it 'use strict' compatible
@@ -72116,7 +71945,7 @@ $__System.register('143', ['4a'], function (_export) {
   };
 });
 
-$__System.register("144", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("142", [], function() { return { setters: [], execute: function() {} } });
 
 (function() {
 var define = $__System.amdDefine;
@@ -72127,7 +71956,7 @@ var define = $__System.amdDefine;
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = L;
   } else if (typeof define === 'function' && define.amd) {
-    define("145", [], L);
+    define("143", [], L);
   }
   L.noConflict = function() {
     window.L = oldL;
@@ -78624,12 +78453,12 @@ var define = $__System.amdDefine;
 })();
 (function() {
 var define = $__System.amdDefine;
-define("4a", ["145"], function(main) {
+define("4a", ["143"], function(main) {
   return main;
 });
 
 })();
-$__System.register('146', ['4a'], function (_export) {
+$__System.register('144', ['4a'], function (_export) {
 
     // https://github.com/Outdooractive/leaflet-singleclick_0.7
 
@@ -78694,7 +78523,7 @@ var define = $__System.amdDefine;
   this.define = function(c, d) {
     a[c] = a[c] || d(b);
   };
-}({}), define("147", [], function() {
+}({}), define("145", [], function() {
   function a(a) {
     return a.substr(0, 3);
   }
@@ -79782,26 +79611,26 @@ var define = $__System.amdDefine;
     getter: Aa,
     setter: za
   };
-}) && define("minified", ["147"], function(m) {
+}) && define("minified", ["145"], function(m) {
   return m;
 });
 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("54", ["147"], function(main) {
+define("54", ["145"], function(main) {
   return main;
 });
 
 })();
-$__System.register("148", [], function() { return { setters: [], execute: function() {} } });
+$__System.register("146", [], function() { return { setters: [], execute: function() {} } });
 
-$__System.register('1', ['7', '18', '45', '47', '48', '54', '70', '71', '141', '142', '143', '144', '146', '148', 'f', 'ac', '4a', '4b', '4d', '4e', 'a9'], function (_export) {
+$__System.register('1', ['7', '18', '45', '47', '48', '54', '140', '141', '142', '144', '146', 'f', 'aa', '4a', '4b', '4d', '4e', '6f', '6e', 'a7', '13f'], function (_export) {
 
   // Xmas magic
   'use strict';
 
-  var stringQs, $, HTML, i18n, DefaultMap, MELODIES_DCAT_CATALOG_URL, DraggableValuePopup, Sidebar, L, App, year, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, SmartLayerControl, app, catalogUrl, sidebar;
+  var stringQs, $, HTML, L, DraggableValuePopup, i18n, DefaultMap, MELODIES_DCAT_CATALOG_URL, App, Sidebar, year, map, baseLayerLabels, baseLayers, id, layer, baseMaps, layerControl, SmartLayerControl, app, catalogUrl, sidebar;
 
   function letItSnow() {
     var _iteratorNormalCompletion = true;
@@ -79869,21 +79698,21 @@ $__System.register('1', ['7', '18', '45', '47', '48', '54', '70', '71', '141', '
   return {
     setters: [function (_) {}, function (_2) {}, function (_3) {}, function (_4) {
       stringQs = _4.stringQs;
-    }, function (_5) {}, function (_13) {
-      $ = _13.$;
-      HTML = _13.HTML;
-    }, function (_7) {
-      i18n = _7.i18n;
-      DefaultMap = _7.DefaultMap;
-      MELODIES_DCAT_CATALOG_URL = _7.MELODIES_DCAT_CATALOG_URL;
-    }, function (_6) {
-      DraggableValuePopup = _6.DraggableValuePopup;
-    }, function (_8) {
-      Sidebar = _8['default'];
-    }, function (_9) {}, function (_10) {}, function (_11) {}, function (_12) {}, function (_14) {}, function (_f) {}, function (_ac) {}, function (_a) {
+    }, function (_5) {}, function (_10) {
+      $ = _10.$;
+      HTML = _10.HTML;
+    }, function (_6) {}, function (_7) {}, function (_8) {}, function (_9) {}, function (_11) {}, function (_f) {}, function (_aa) {}, function (_a) {
       L = _a['default'];
-    }, function (_b) {}, function (_d) {}, function (_e) {}, function (_a9) {
-      App = _a9['default'];
+    }, function (_b) {}, function (_d) {}, function (_e) {}, function (_f2) {
+      DraggableValuePopup = _f2.DraggableValuePopup;
+    }, function (_e2) {
+      i18n = _e2.i18n;
+      DefaultMap = _e2.DefaultMap;
+      MELODIES_DCAT_CATALOG_URL = _e2.MELODIES_DCAT_CATALOG_URL;
+    }, function (_a7) {
+      App = _a7['default'];
+    }, function (_f3) {
+      Sidebar = _f3['default'];
     }],
     execute: function () {
       $('body').add(HTML('\n  <div id="snow1" class="snow"></div>\n  <div id="snow2" class="snow"></div>\n  <div id="snow3" class="snow"></div>\n'));document.getElementById('map').addEventListener('keypress', function (e) {
