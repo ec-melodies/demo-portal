@@ -18,7 +18,7 @@ System.config({
     "bootstrap-native": "npm:bootstrap.native@1.0.2",
     "c3": "npm:c3@0.4.11",
     "category-remapper": "github:guygriffiths/category-remapper-js@master",
-    "clean-css": "npm:clean-css@3.4.11",
+    "clean-css": "npm:clean-css@3.4.20",
     "core-js": "npm:core-js@1.2.6",
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
     "covjson-reader": "npm:covjson-reader@0.16.2",
@@ -221,7 +221,7 @@ System.config({
       "stream": "github:jspm/nodelibs-stream@0.1.0",
       "string_decoder": "github:jspm/nodelibs-string_decoder@0.1.0"
     },
-    "npm:clean-css@3.4.11": {
+    "npm:clean-css@3.4.20": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "commander": "npm:commander@2.8.1",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
