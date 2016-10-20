@@ -27,6 +27,7 @@ let sidebarHtml = (sidebarId, searchPaneId, workspacePaneId) => `
 .error-item {
   word-wrap: break-word;
 }
+</style>
 `
 
 export default class Sidebar {

@@ -32,7 +32,6 @@ System.config({
     "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.9",
     "minified": "github:timjansen/minified.js@2015.1.1",
     "qs-hash": "npm:qs-hash@0.0.0",
-    "sidebar-v2": "github:Turbo87/sidebar-v2@0.3.0",
     "traceur": "github:jmcriffey/bower-traceur@0.0.93",
     "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93",
     "wellknown": "npm:wellknown@0.5.0",
