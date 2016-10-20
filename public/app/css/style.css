@@ -17,9 +17,3 @@ html, body { height: 100%; margin: 0; }
   word-wrap: normal;
   white-space: pre;
 }
-
-/* in the generated js bundle the z-index is 23 but should be 2000 (see sidebar/leaflet-sidebar.css),
-   no idea where that is coming from, quick fix... */
-.sidebar {
-  z-index: 2000 !important;
-}
