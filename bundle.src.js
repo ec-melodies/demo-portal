@@ -2044,8 +2044,13 @@ $__System.registerDynamic("47", ["46"], true, function ($__require, exports, mod
   module.exports = $__require("46");
   return module.exports;
 });
-$__System.register("48", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("48", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
 (function() {
 var define = $__System.amdDefine;
 (function(root, factory) {
@@ -2778,8 +2783,13 @@ define("4d", ["4c"], function(main) {
 });
 
 })();
-$__System.register("4e", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("4e", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
 $__System.register('4f', ['50', '51'], function (_export) {
   'use strict';
 
@@ -3300,8 +3310,13 @@ $__System.register('53', ['54', '55'], function (_export) {
   };
 });
 
-$__System.register("56", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("56", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
 $__System.register('57', ['58', '59', '5b', '5c', '5d', '5a'], function (_export) {
   /**
    * @external {Parameter} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Parameter.md
@@ -7384,7 +7399,7 @@ $__System.register('6c', ['56', '70', '6f', '6d', '6e', '6a'], function (_export
             var isCollection = cov.coverages;
 
             var map = this.context.map;
-            var layer = dataLayer(cov, opts).on('add', function (e) {
+            var layer = dataLayer(cov, opts).on('afterAdd', function (e) {
               var covLayer = e.target;
 
               // This registers the layer with the sync manager.
@@ -7416,7 +7431,7 @@ $__System.register('6c', ['56', '70', '6f', '6d', '6e', '6a'], function (_export
               layer.paletteExtent = 'subset';
             });
 
-            // we do that outside of the above 'add' handler since we want to register only once,
+            // we do that outside of the above 'afterAdd' handler since we want to register only once,
             // not every time the layer is added to the map
             layer.on('click', function (_ref) {
               var coverage = _ref.coverage;
@@ -18006,8 +18021,13 @@ $__System.registerDynamic("78", ["77"], true, function ($__require, exports, mod
   module.exports = $__require("77");
   return module.exports;
 });
-$__System.register("79", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("79", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
 $__System.register('7a', ['55', '6e'], function (_export) {
   'use strict';
 
@@ -19614,7 +19634,7 @@ $__System.register('7f', ['80', '4a', '5d'], function (_export) {
 
           if (covLayer.on) {
             this._remove = function () {
-              return _this.removeFrom(_this._map);
+              return _this.remove();
             };
             this._update = function () {
               return _this._doUpdate(false);
@@ -19851,7 +19871,7 @@ $__System.register('82', ['80', '4a', '5d'], function (_export) {
 
           if (covLayer.on) {
             this._remove = function () {
-              return _this.removeFrom(_this._map);
+              return _this.remove();
             };
             this._update = function () {
               return _this._doUpdate(false);
@@ -20017,7 +20037,7 @@ $__System.register('83', ['80', '84', '4a'], function (_export) {
 
           if (covLayer.on) {
             this._remove = function () {
-              return _this.removeFrom(_this._map);
+              return _this.remove();
             };
             covLayer.on('remove', this._remove);
 
@@ -20462,8 +20482,8 @@ $__System.register('86', ['84', '85', '4a', '5d'], function (_export) {
       stringifyUnit = _d.stringifyUnit;
     }],
     execute: function () {
-      VerticalAxis = (function (_EventMixin) {
-        babelHelpers.inherits(VerticalAxis, _EventMixin);
+      VerticalAxis = (function (_L$Layer) {
+        babelHelpers.inherits(VerticalAxis, _L$Layer);
 
         /**
          * Creates a time axis control.
@@ -20496,7 +20516,7 @@ $__System.register('86', ['84', '85', '4a', '5d'], function (_export) {
 
           if (covLayer.on) {
             this._remove = function () {
-              return _this.removeFrom(_this._map);
+              return _this.remove();
             };
             covLayer.on('remove', this._remove);
 
@@ -20554,23 +20574,11 @@ $__System.register('86', ['84', '85', '4a', '5d'], function (_export) {
         }, {
           key: 'onRemove',
           value: function onRemove(map) {
-            this._dropdown.removeFrom(map);
+            this._dropdown.remove();
             if (this._covLayer.off) {
               this._covLayer.off('remove', this._remove);
               this._covLayer.off('axisChange', this._axisListener);
             }
-          }
-        }, {
-          key: 'addTo',
-          value: function addTo(map) {
-            map.addLayer(this);
-            return this;
-          }
-        }, {
-          key: 'removeFrom',
-          value: function removeFrom(map) {
-            this.onRemove(map);
-            return this;
           }
         }, {
           key: '_getVerticalIndex',
@@ -20595,7 +20603,7 @@ $__System.register('86', ['84', '85', '4a', '5d'], function (_export) {
           }
         }]);
         return VerticalAxis;
-      })(EventMixin(L.Class));
+      })(L.Layer);
 
       _export('default', VerticalAxis);
     }
@@ -20709,7 +20717,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
    * For Domain objects, a dummy parameter and range data is created.
    * 
    * Events:
-   * "add" - Layer is initialized and is about to be added to the map
+   * "afterAdd" - Layer is initialized and was added to the map
    * "remove" - Layer is removed from the map
    * "dataLoading" - Data loading has started
    * "dataLoad" - Data loading has finished (also in case of errors)
@@ -20725,16 +20733,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
   var enlargeExtentIfEqual, PaletteMixin, CoverageMixin, L, ndarray, indexOfNearest, isDomain, fromDomain, minMaxOfRange, getReferenceObject, isEllipsoidalCRS, Grid;
 
   function wrapLongitude(lon, range) {
-    return wrapNum(lon, range, true);
-  }
-
-  //stolen from https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
-  //doesn't exist in current release (0.7.3)
-  function wrapNum(x, range, includeMax) {
-    var max = range[1];
-    var min = range[0];
-    var d = max - min;
-    return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
+    return L.Util.wrapNum(lon, range, true);
   }
   return {
     setters: [function (_) {
@@ -20814,7 +20813,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
             }).then(function () {
               // used in controls/VerticalAxis.js
               var vertRef = getReferenceObject(_this.domain, 'z');
-              if (vertRef && vertRef.components.length === 1) {
+              if (vertRef && vertRef.coordinates.length === 1) {
                 var vertRefSys = vertRef.system;
                 if (vertRefSys.cs && (vertRefSys.cs.csAxes || vertRefSys.cs.axes)) {
                   _this.crsVerticalAxis = vertRefSys.cs.csAxes ? vertRefSys.cs.csAxes[0] : vertRefSys.cs.axes[0];
@@ -20825,7 +20824,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
             }).then(function () {
               _this.errored = false;
               babelHelpers.get(Object.getPrototypeOf(Grid.prototype), 'onAdd', _this).call(_this, map);
-              _this.fire('add');
+              _this.fire('afterAdd');
             })['catch'](function (e) {
               _this.errored = true;
               console.log(e);
@@ -20837,7 +20836,6 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
           value: function onRemove(map) {
             delete this._map;
             // TODO delete references to domain/range, caching logic should happen elsewhere
-            this.fire('remove');
             babelHelpers.get(Object.getPrototypeOf(Grid.prototype), 'onRemove', this).call(this, map);
           }
         }, {
@@ -21022,21 +21020,30 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
             return this.subsetRange.get((_subsetRange$get = {}, babelHelpers.defineProperty(_subsetRange$get, this._projY, iy), babelHelpers.defineProperty(_subsetRange$get, this._projX, ix), _subsetRange$get));
           }
         }, {
+          key: 'createTile',
+          value: function createTile(coords) {
+            var tile = L.DomUtil.create('canvas', 'leaflet-tile');
+
+            // setup tile width and height according to the options
+            var size = this.getTileSize();
+            tile.width = size.x;
+            tile.height = size.y;
+
+            this.drawTile(tile, coords);
+
+            return tile;
+          }
+        }, {
           key: 'drawTile',
-          value: function drawTile(canvas, tilePoint, zoom) {
+          value: function drawTile(canvas, coords) {
             if (this.errored) return;
 
             var ctx = canvas.getContext('2d');
-            var tileSize = this.options.tileSize;
+            var tileSize = this.getTileSize();
 
-            var imgData = ctx.getImageData(0, 0, tileSize, tileSize);
+            var imgData = ctx.getImageData(0, 0, tileSize.x, tileSize.y);
             // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
-            var rgba = ndarray(imgData.data, [tileSize, tileSize, 4]);
-
-            // window projection coordinates of top left tile pixel
-            var start = tilePoint.multiplyBy(tileSize);
-            var startX = start.x;
-            var startY = start.y;
+            var rgba = ndarray(imgData.data, [tileSize.y, tileSize.x, 4]);
 
             var _palette = this.palette;
             var red = _palette.red;
@@ -21059,19 +21066,19 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
             if (this._isDomainUsingEllipsoidalCRS()) {
               if (this._isRectilinearGeodeticMap()) {
                 // here we can apply heavy optimizations as the map CRS matches the domain CRS
-                this._drawGeodeticCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals);
+                this._drawGeodeticCRSWithRectilinearMapProjection(setPixel, coords, vals);
               } else {
                 // this is for any random map projection
                 // here we have to unproject each map pixel individually and find the matching domain index coordinates
-                this._drawGeodeticCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals);
+                this._drawGeodeticCRSWithAnyMapProjection(setPixel, coords, vals);
               }
             } else {
               // here we have to unproject each map pixel individually,
               // project it into domain projection coordinates, and find the domain index coordinates
               if (this._isRectilinearGeodeticMap()) {
-                this._drawProjectedCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals);
+                this._drawProjectedCRSWithRectilinearMapProjection(setPixel, coords, vals);
               } else {
-                this._drawProjectedCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals);
+                this._drawProjectedCRSWithAnyMapProjection(setPixel, coords, vals);
               }
             }
 
@@ -21146,13 +21153,18 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
            */
         }, {
           key: '_drawGeodeticCRSWithAnyMapProjection',
-          value: function _drawGeodeticCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals) {
+          value: function _drawGeodeticCRSWithAnyMapProjection(setPixel, coords, vals) {
             // usable for any map projection, but computationally more intensive
             // there are two hotspots in the loops: map.unproject and indexOfNearest
 
             // Note that this function is slightly more specialized and optimized than _drawProjectedCRSWithAnyMapProjection().
             // It targets the case when the domain is lat/lon, whereas _drawProjectedCRSWithAnyMapProjection() works
             // with any projected CRS in the grid domain.
+
+            var tileSize = this.getTileSize();
+            var startX = coords.x * tileSize.x;
+            var startY = coords.y * tileSize.y;
+            var zoom = coords.z;
 
             var map = this._map;
             var x = this.domain.axes.get('x').values;
@@ -21166,9 +21178,9 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
 
             var lonRange = [bbox[0], bbox[0] + 360];
 
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              for (var tileY = 0; tileY < tileSize; tileY++) {
-                var _map$unproject = map.unproject(L.point(startX + tileX, startY + tileY));
+            for (var tileX = 0; tileX < tileSize.x; tileX++) {
+              for (var tileY = 0; tileY < tileSize.y; tileY++) {
+                var _map$unproject = map.unproject(L.point(startX + tileX, startY + tileY), zoom);
 
                 var lat = _map$unproject.lat;
                 var lng = _map$unproject.lng;
@@ -21207,7 +21219,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
            */
         }, {
           key: '_drawProjectedCRSWithAnyMapProjection',
-          value: function _drawProjectedCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals) {
+          value: function _drawProjectedCRSWithAnyMapProjection(setPixel, coords, vals) {
             var map = this._map;
             var X = this.domain.axes.get(this._projX).values;
             var Y = this.domain.axes.get(this._projY).values;
@@ -21215,9 +21227,14 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
 
             var proj = this.projection;
 
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              for (var tileY = 0; tileY < tileSize; tileY++) {
-                var _map$unproject2 = map.unproject(L.point(startX + tileX, startY + tileY));
+            var tileSize = this.getTileSize();
+            var startX = coords.x * tileSize.x;
+            var startY = coords.y * tileSize.y;
+            var zoom = coords.z;
+
+            for (var tileX = 0; tileX < tileSize.x; tileX++) {
+              for (var tileY = 0; tileY < tileSize.y; tileY++) {
+                var _map$unproject2 = map.unproject(L.point(startX + tileX, startY + tileY), zoom);
 
                 var lat = _map$unproject2.lat;
                 var lng = _map$unproject2.lng;
@@ -21254,7 +21271,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
            */
         }, {
           key: '_drawProjectedCRSWithRectilinearMapProjection',
-          value: function _drawProjectedCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals) {
+          value: function _drawProjectedCRSWithRectilinearMapProjection(setPixel, coords, vals) {
             var map = this._map;
             var X = this.domain.axes.get(this._projX).values;
             var Y = this.domain.axes.get(this._projY).values;
@@ -21262,27 +21279,32 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
 
             var proj = this.projection;
 
+            var tileSize = this.getTileSize();
+            var startX = coords.x * tileSize.x;
+            var startY = coords.y * tileSize.y;
+            var zoom = coords.z;
+
             // since the map projection is a rectilinear lat/lon grid,
             // we only have to unproject the the first row and column to get the lat/lon coordinates of all tile pixels
-            var lons = new Float64Array(tileSize);
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              var _map$unproject3 = map.unproject(L.point(startX + tileX, startY));
+            var lons = new Float64Array(tileSize.x);
+            for (var tileX = 0; tileX < tileSize.x; tileX++) {
+              var _map$unproject3 = map.unproject(L.point(startX + tileX, startY), zoom);
 
               var lng = _map$unproject3.lng;
 
               lons[tileX] = lng;
             }
-            var lats = new Float64Array(tileSize);
-            for (var tileY = 0; tileY < tileSize; tileY++) {
-              var _map$unproject4 = map.unproject(L.point(startX, startY + tileY));
+            var lats = new Float64Array(tileSize.y);
+            for (var tileY = 0; tileY < tileSize.y; tileY++) {
+              var _map$unproject4 = map.unproject(L.point(startX, startY + tileY), zoom);
 
               var lat = _map$unproject4.lat;
 
               lats[tileY] = lat;
             }
 
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              for (var tileY = 0; tileY < tileSize; tileY++) {
+            for (var tileX = 0; tileX < tileSize.x; tileX++) {
+              for (var tileY = 0; tileY < tileSize.y; tileY++) {
                 var lat = lats[tileY];
                 var lon = lons[tileX];
 
@@ -21312,7 +21334,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
            */
         }, {
           key: '_drawGeodeticCRSWithRectilinearMapProjection',
-          value: function _drawGeodeticCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals) {
+          value: function _drawGeodeticCRSWithRectilinearMapProjection(setPixel, coords, vals) {
             // optimized version for map projections that are equal to a rectilinear geodetic grid
             // this can be used when lat and lon can be computed independently for a given pixel
 
@@ -21328,17 +21350,22 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
 
             var lonRange = [bbox[0], bbox[0] + 360];
 
-            var latCache = new Float64Array(tileSize);
-            var iLatCache = new Uint32Array(tileSize);
-            for (var tileY = 0; tileY < tileSize; tileY++) {
-              var lat = map.unproject(L.point(startX, startY + tileY)).lat;
+            var tileSize = this.getTileSize();
+            var startX = coords.x * tileSize.x;
+            var startY = coords.y * tileSize.y;
+            var zoom = coords.z;
+
+            var latCache = new Float64Array(tileSize.y);
+            var iLatCache = new Uint32Array(tileSize.y);
+            for (var tileY = 0; tileY < tileSize.y; tileY++) {
+              var lat = map.unproject(L.point(startX, startY + tileY), zoom).lat;
               latCache[tileY] = lat;
               // find the index of the closest latitude in the grid using simple binary search
               iLatCache[tileY] = indexOfNearest(y, lat);
             }
 
-            for (var tileX = 0; tileX < tileSize; tileX++) {
-              var lon = map.unproject(L.point(startX + tileX, startY)).lng;
+            for (var tileX = 0; tileX < tileSize.x; tileX++) {
+              var lon = map.unproject(L.point(startX + tileX, startY), zoom).lng;
               lon = wrapLongitude(lon, lonRange);
               if (lon < bbox[0] || lon > bbox[2]) {
                 continue;
@@ -21348,7 +21375,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
               // (as there is no discontinuity)
               var iLon = indexOfNearest(x, lon);
 
-              for (var tileY = 0; tileY < tileSize; tileY++) {
+              for (var tileY = 0; tileY < tileSize.y; tileY++) {
                 // get geographic coordinates of tile pixel
                 var _lat = latCache[tileY];
 
@@ -21400,7 +21427,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
             // we check getContainer() to prevent errors when trying to redraw when the layer has not
             // fully initialized yet
             if (this.getContainer()) {
-              L.TileLayer.Canvas.prototype.redraw.call(this);
+              L.GridLayer.prototype.redraw.call(this);
             }
           }
         }, {
@@ -21499,7 +21526,7 @@ $__System.register('88', ['92', '93', '94', '4a', '5b', '5d'], function (_export
           }
         }]);
         return Grid;
-      })(PaletteMixin(CoverageMixin(L.TileLayer.Canvas)));
+      })(PaletteMixin(CoverageMixin(L.GridLayer)));
 
       _export('default', Grid);
     }
@@ -21583,14 +21610,8 @@ $__System.register('89', ['92', '93', '94', '4a', '5d', '8a'], function (_export
               return _this.initializePalette();
             }).then(function () {
               _this._addTrajectoryLayers();
-              _this.fire('add');
+              _this.fire('afterAdd');
             });
-          }
-        }, {
-          key: 'onRemove',
-          value: function onRemove(map) {
-            this.fire('remove');
-            babelHelpers.get(Object.getPrototypeOf(Trajectory.prototype), 'onRemove', this).call(this, map);
           }
         }, {
           key: 'computePaletteExtent',
@@ -21643,8 +21664,8 @@ $__System.register('89', ['92', '93', '94', '4a', '5d', '8a'], function (_export
           key: 'getLatLngs',
           value: function getLatLngs() {
             var axis = this.domain.axes.get('composite');
-            var ix = axis.components.indexOf(this._projX);
-            var iy = axis.components.indexOf(this._projY);
+            var ix = axis.coordinates.indexOf(this._projX);
+            var iy = axis.coordinates.indexOf(this._projY);
             var coords = [];
             for (var i = 0; i < axis.values.length; i++) {
               var x = axis.values[i][ix];
@@ -21812,7 +21833,7 @@ $__System.register('8b', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], funct
               return _this.initializePalette();
             }).then(function () {
               _this._addMarker();
-              _this.fire('add');
+              _this.fire('afterAdd');
             });
           }
         }, {
@@ -21835,7 +21856,6 @@ $__System.register('8b', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], funct
         }, {
           key: 'onRemove',
           value: function onRemove() {
-            this.fire('remove');
             this._removeMarker();
           }
         }, {
@@ -21963,7 +21983,7 @@ $__System.register('8b', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], funct
           }
         }]);
         return PointSeries;
-      })(PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))));
+      })(PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))));
 
       _export('default', PointSeries);
     }
@@ -22041,7 +22061,7 @@ $__System.register('8f', ['84', '92', '93', '94', '4a', '5d'], function (_export
               _this._unproject();
               _this._addPolygons();
               _this._pointInPolygonPreprocess();
-              _this.fire('add');
+              _this.fire('afterAdd');
             });
           }
         }, {
@@ -22049,8 +22069,8 @@ $__System.register('8f', ['84', '92', '93', '94', '4a', '5d'], function (_export
           value: function _unproject() {
             var unproject = this.projection.unproject;
             var axis = this.domain.axes.get('composite');
-            var ix = axis.components.indexOf(this._projX);
-            var iy = axis.components.indexOf(this._projY);
+            var ix = axis.coordinates.indexOf(this._projX);
+            var iy = axis.coordinates.indexOf(this._projY);
 
             this._polygonsLonLat = axis.values.map(function (polygon) {
               return polygon.map(function (ring) {
@@ -22068,7 +22088,6 @@ $__System.register('8f', ['84', '92', '93', '94', '4a', '5d'], function (_export
         }, {
           key: 'onRemove',
           value: function onRemove(map) {
-            this.fire('remove');
             this._removePolygons();
           }
         }, {
@@ -22216,7 +22235,7 @@ $__System.register('8f', ['84', '92', '93', '94', '4a', '5d'], function (_export
           }
         }]);
         return MultiPolygon;
-      })(PaletteMixin(CoverageMixin(EventMixin(L.Class))));
+      })(PaletteMixin(CoverageMixin(L.Layer)));
 
       _export('default', MultiPolygon);
     }
@@ -22301,7 +22320,7 @@ $__System.register('90', ['84', '92', '93', '94', '4a', '5d', '8a'], function (_
               _this._unproject();
               _this._addPolygon();
               _this._pointInPolygonPreprocess();
-              _this.fire('add');
+              _this.fire('afterAdd');
             });
           }
         }, {
@@ -22309,8 +22328,8 @@ $__System.register('90', ['84', '92', '93', '94', '4a', '5d', '8a'], function (_
           value: function _unproject() {
             var unproject = this.projection.unproject;
             var axis = this.domain.axes.get('composite');
-            var ix = axis.components.indexOf(this._projX);
-            var iy = axis.components.indexOf(this._projY);
+            var ix = axis.coordinates.indexOf(this._projX);
+            var iy = axis.coordinates.indexOf(this._projY);
 
             this._polygonLonLat = axis.values[0].map(function (ring) {
               return ring.map(function (coords) {
@@ -22343,7 +22362,6 @@ $__System.register('90', ['84', '92', '93', '94', '4a', '5d', '8a'], function (_
         }, {
           key: 'onRemove',
           value: function onRemove() {
-            this.fire('remove');
             this._removePolygon();
           }
         }, {
@@ -22570,7 +22588,7 @@ $__System.register('90', ['84', '92', '93', '94', '4a', '5d', '8a'], function (_
           }
         }]);
         return PolygonSeries;
-      })(PaletteMixin(CoverageMixin(EventMixin(L.Class))));
+      })(PaletteMixin(CoverageMixin(L.Layer)));
 
       _export('default', PolygonSeries);
     }
@@ -23213,6 +23231,10 @@ $__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export
                 this._layerGroup.addLayer(layer);
                 this._layers.push(layer);
                 layer.load();
+                if (this._popupFn) {
+                  var popup = this._popupFn(layer.coverage);
+                  layer.bindPopup(popup);
+                }
               }
             } catch (err) {
               _didIteratorError3 = true;
@@ -23235,47 +23257,31 @@ $__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export
             map.removeLayer(this._layerGroup);
             this._layerGroup = L.layerGroup();
             this._layers = [];
-            this.fire('remove');
           }
         }, {
           key: 'bindPopupEach',
           value: function bindPopupEach(fn) {
-            var _this2 = this;
-
-            if (this._clickListenerPopup) {
-              this.off('click', this._clickListenerPopup);
-              this.off('remove', this._removeListenerPopup);
-            }
-            this._clickListenerPopup = function (e) {
-              var popup = fn(e.coverage);
-              _this2._map.openPopup(popup);
-              _this2._popup = popup;
-            };
-            this._removeListenerPopup = function () {
-              _this2._map.closePopup(_this2._popup);
-            };
-            this.on('click', this._clickListenerPopup);
-            this.on('remove', this._removeListenerPopup);
+            this._popupFn = fn;
           }
         }, {
           key: '_attachListeners',
           value: function _attachListeners(layer, cov) {
-            var _this3 = this;
+            var _this2 = this;
 
             layer.once('dataLoad', function () {
-              ++_this3._layerLoadCount;
-              _this3._fireIfOnAddDone();
+              ++_this2._layerLoadCount;
+              _this2._fireIfOnAddDone();
             }).once('error', function (e) {
-              _this3._layerErrors.push(e);
+              _this2._layerErrors.push(e);
             }).on('click', function (e) {
               e.coverage = cov;
-              _this3.fire('click', e);
+              _this2.fire('click', e);
             });
           }
         }, {
           key: '_fireIfOnAddDone',
           value: function _fireIfOnAddDone() {
-            var _this4 = this;
+            var _this3 = this;
 
             if (this._layerLoadCount === this._layers.length) {
               if (this._layerErrors.length > 0) {
@@ -23283,8 +23289,8 @@ $__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export
               } else {
                 this._initKdtree();
                 this.initializePalette().then(function () {
-                  _this4._layerGroup.addTo(_this4._map);
-                  _this4.fire('add');
+                  _this3._layerGroup.addTo(_this3._map);
+                  _this3.fire('afterAdd');
                 });
               }
             }
@@ -23334,7 +23340,7 @@ $__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export
         }, {
           key: 'computePaletteExtent',
           value: function computePaletteExtent(extent) {
-            var _this5 = this;
+            var _this4 = this;
 
             if (!this.param) {
               throw new Error('palette extent cannot be set when no parameter has been chosen');
@@ -23345,8 +23351,8 @@ $__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export
               layers = this._layers;
             } else if (extent === 'fov') {
               (function () {
-                var bounds = _this5._map.getBounds();
-                layers = _this5._layers.filter(function (layer) {
+                var bounds = _this4._map.getBounds();
+                layers = _this4._layers.filter(function (layer) {
                   return bounds.contains(layer.getLatLng());
                 });
               })();
@@ -23423,7 +23429,7 @@ $__System.register('8c', ['84', '92', '93', '96', '4a', '8a'], function (_export
           }
         }]);
         return PointCollection;
-      })(PaletteMixin(EventMixin(L.Class)));
+      })(PaletteMixin(L.Layer));
 
       _export('default', PointCollection);
     }
@@ -24055,13 +24061,12 @@ $__System.register('8a', ['84', '92', '93', '94', '95', '4a', '5d'], function (_
               return _this.initializePalette();
             }).then(function () {
               _this._addMarker();
-              _this.fire('add');
+              _this.fire('afterAdd');
             });
           }
         }, {
           key: 'onRemove',
           value: function onRemove() {
-            this.fire('remove');
             this._removeMarker();
           }
         }, {
@@ -24144,7 +24149,7 @@ $__System.register('8a', ['84', '92', '93', '94', '95', '4a', '5d'], function (_
           }
         }]);
         return Point;
-      })(PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))));
+      })(PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))));
 
       _export('default', Point);
     }
@@ -24226,7 +24231,7 @@ $__System.register('8d', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], funct
               return _this.initializePalette();
             }).then(function () {
               _this._addMarker();
-              _this.fire('add');
+              _this.fire('afterAdd');
             });
           }
         }, {
@@ -24247,7 +24252,6 @@ $__System.register('8d', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], funct
         }, {
           key: 'onRemove',
           value: function onRemove() {
-            this.fire('remove');
             this._removeMarker();
           }
         }, {
@@ -24357,7 +24361,7 @@ $__System.register('8d', ['84', '92', '93', '94', '95', '4a', '5d', '8a'], funct
           }
         }]);
         return VerticalProfile;
-      })(PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))));
+      })(PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))));
 
       _export('default', VerticalProfile);
     }
@@ -24758,143 +24762,45 @@ $__System.register('92', [], function (_export) {
 
 $__System.register('84', ['4a'], function (_export) {
   /* */
+  'use strict';
+
+  var L, Evented;
+
+  _export('default', EventMixin);
 
   /**
-   * Wraps Leaflet's L.Mixin.Events for use within class expressions.
+   * Wraps Leaflet's {@link L.Evented} for use within class expressions.
    * 
    * @see http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/
    * 
    * @param {class} base The base class.
-   * @return {class} The base class with EventMixin.
-   * 
-   * @private
+   * @return {class} The base class with Leaflet's {@link L.Evented}.
    */
-  'use strict';
-
-  var L;
-
-  _export('default', EventMixin);
 
   function EventMixin(base) {
-    return (function (_base) {
-      babelHelpers.inherits(_class, _base);
+    var clazz = (function (_base) {
+      babelHelpers.inherits(clazz, _base);
 
-      function _class() {
-        babelHelpers.classCallCheck(this, _class);
-        babelHelpers.get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
+      function clazz() {
+        babelHelpers.classCallCheck(this, clazz);
+        babelHelpers.get(Object.getPrototypeOf(clazz.prototype), 'constructor', this).apply(this, arguments);
       }
 
-      babelHelpers.createClass(_class, [{
-        key: 'on',
-        value: function on() {
-          var _L$Mixin$Events$on;
-
-          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-          }
-
-          return (_L$Mixin$Events$on = L.Mixin.Events.on).call.apply(_L$Mixin$Events$on, [this].concat(args));
-        }
-      }, {
-        key: 'off',
-        value: function off() {
-          var _L$Mixin$Events$off;
-
-          for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            args[_key2] = arguments[_key2];
-          }
-
-          return (_L$Mixin$Events$off = L.Mixin.Events.off).call.apply(_L$Mixin$Events$off, [this].concat(args));
-        }
-      }, {
-        key: 'once',
-        value: function once() {
-          var _L$Mixin$Events$once;
-
-          for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-            args[_key3] = arguments[_key3];
-          }
-
-          return (_L$Mixin$Events$once = L.Mixin.Events.once).call.apply(_L$Mixin$Events$once, [this].concat(args));
-        }
-      }, {
-        key: 'fire',
-        value: function fire() {
-          var _L$Mixin$Events$fire;
-
-          for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-            args[_key4] = arguments[_key4];
-          }
-
-          return (_L$Mixin$Events$fire = L.Mixin.Events.fire).call.apply(_L$Mixin$Events$fire, [this].concat(args));
-        }
-      }, {
-        key: 'hasEventListeners',
-        value: function hasEventListeners() {
-          var _L$Mixin$Events$hasEventListeners;
-
-          for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-            args[_key5] = arguments[_key5];
-          }
-
-          return (_L$Mixin$Events$hasEventListeners = L.Mixin.Events.hasEventListeners).call.apply(_L$Mixin$Events$hasEventListeners, [this].concat(args));
-        }
-
-        // aliases
-      }, {
-        key: 'addEventListener',
-        value: function addEventListener() {
-          var _L$Mixin$Events$addEventListener;
-
-          for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-            args[_key6] = arguments[_key6];
-          }
-
-          return (_L$Mixin$Events$addEventListener = L.Mixin.Events.addEventListener).call.apply(_L$Mixin$Events$addEventListener, [this].concat(args));
-        }
-      }, {
-        key: 'removeEventListener',
-        value: function removeEventListener() {
-          var _L$Mixin$Events$removeEventListener;
-
-          for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-            args[_key7] = arguments[_key7];
-          }
-
-          return (_L$Mixin$Events$removeEventListener = L.Mixin.Events.removeEventListener).call.apply(_L$Mixin$Events$removeEventListener, [this].concat(args));
-        }
-      }, {
-        key: 'addOneTimeEventListener',
-        value: function addOneTimeEventListener() {
-          var _L$Mixin$Events$addOneTimeEventListener;
-
-          for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-            args[_key8] = arguments[_key8];
-          }
-
-          return (_L$Mixin$Events$addOneTimeEventListener = L.Mixin.Events.addOneTimeEventListener).call.apply(_L$Mixin$Events$addOneTimeEventListener, [this].concat(args));
-        }
-      }, {
-        key: 'fireEvent',
-        value: function fireEvent() {
-          var _L$Mixin$Events$fireEvent;
-
-          for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-            args[_key9] = arguments[_key9];
-          }
-
-          return (_L$Mixin$Events$fireEvent = L.Mixin.Events.fireEvent).call.apply(_L$Mixin$Events$fireEvent, [this].concat(args));
-        }
-      }]);
-      return _class;
+      return clazz;
     })(base);
+    for (var key in Evented) {
+      clazz.prototype[key] = Evented[key];
+    }
+    return clazz;
   }
 
   return {
     setters: [function (_a) {
       L = _a['default'];
     }],
-    execute: function () {}
+    execute: function () {
+      Evented = L.Evented.prototype;
+    }
   };
 });
 
@@ -25446,7 +25352,7 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
    */
   'use strict';
 
-  var c3, L, getLanguageString, stringifyUnit, getReferenceObject, loadProjection, getHorizontalCRSComponents, VerticalProfilePlot;
+  var c3, L, getLanguageString, stringifyUnit, getReferenceObject, VerticalProfilePlot;
 
   function zip(a, b) {
     return a.map(function (e, i) {
@@ -25462,8 +25368,6 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
       getLanguageString = _d.getLanguageString;
       stringifyUnit = _d.stringifyUnit;
       getReferenceObject = _d.getReferenceObject;
-      loadProjection = _d.loadProjection;
-      getHorizontalCRSComponents = _d.getHorizontalCRSComponents;
     }],
     execute: function () {
       VerticalProfilePlot = (function (_L$Popup) {
@@ -25583,6 +25487,7 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
           value: function onAdd(map) {
             var _this2 = this;
 
+            babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'onAdd', this).call(this, map);
             map.fire('dataloading');
             var domainPromise = Promise.all(this._covs.map(function (cov) {
               return cov.loadDomain();
@@ -25598,19 +25503,9 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
 
               _this2._domains = domains;
               _this2._ranges = ranges;
-              var _getHorizontalCRSComponents = getHorizontalCRSComponents(domains[0]);
-
-              var _getHorizontalCRSComponents2 = babelHelpers.slicedToArray(_getHorizontalCRSComponents, 2);
-
-              _this2._projX = _getHorizontalCRSComponents2[0];
-              _this2._projY = _getHorizontalCRSComponents2[1];
-
-              return loadProjection(domains[0]);
-            }).then(function (proj) {
-              _this2.projection = proj;
               _this2._addPlotToPopup();
-              babelHelpers.get(Object.getPrototypeOf(VerticalProfilePlot.prototype), 'onAdd', _this2).call(_this2, map);
-              _this2.fire('add');
+              _this2.fire('dataLoad');
+              _this2.fire('afterAdd');
               map.fire('dataload');
             })['catch'](function (e) {
               console.error(e);
@@ -25623,19 +25518,11 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
           value: function _addPlotToPopup() {
             var _this3 = this;
 
-            if (!this.getLatLng()) {
-              // in case bindPopup is not used and the caller did not set a position
-              var x = this._domains[0].axes.get(this._projX).values[0];
-              var y = this._domains[0].axes.get(this._projY).values[0];
-              var latlng = this.projection.unproject({ x: x, y: y });
-              this.setLatLng(L.latLng(latlng));
-            }
-
             // display first parameter group
             var paramKeyGroup = this._paramKeyGroups[0];
             var plot = this._getPlotElement(paramKeyGroup);
 
-            var el = document.createElement('span');
+            var el = document.createElement('div');
 
             // display dropdown if multiple parameter groups
             if (this._paramKeyGroups.length > 1) {
@@ -25732,7 +25619,7 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
             var zUnit = '';
 
             var vertRef = getReferenceObject(refDomain, 'z');
-            if (vertRef && vertRef.components.length === 1) {
+            if (vertRef && vertRef.coordinates.length === 1) {
               var vertSrs = vertRef.system;
               if (vertSrs.cs && (vertSrs.cs.axes || vertSrs.cs.csAxes)) {
                 var ax = vertSrs.cs.axes ? vertSrs.cs.axes[0] : vertSrs.cs.csAxes[0];
@@ -25789,7 +25676,15 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
               columns.push(y);
             }
 
+            var width = 350;
+            var height = 300;
+
             var el = document.createElement('div');
+
+            // work-around, otherwise popup is too small
+            el.style.width = width + 'px';
+            el.style.height = height + 'px';
+
             c3.generate({
               bindto: el,
               data: {
@@ -25850,8 +25745,8 @@ $__System.register('98', ['72', '4a', '5d'], function (_export) {
                 rescale: true
               },
               size: {
-                height: 300,
-                width: 350
+                height: height,
+                width: width
               }
             });
 
@@ -36863,8 +36758,13 @@ $__System.registerDynamic("9a", ["99"], true, function ($__require, exports, mod
   module.exports = $__require("99");
   return module.exports;
 });
-$__System.register("70", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("70", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
 $__System.registerDynamic("9b", ["9a", "70"], false, function ($__require, $__exports, $__module) {
     var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, "c3", null);
 
@@ -45890,7 +45790,7 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
    */
   'use strict';
 
-  var c3, L, getLanguageString, stringifyUnit, loadProjection, getHorizontalCRSComponents, TimeSeriesPlot;
+  var c3, L, getLanguageString, stringifyUnit, TimeSeriesPlot;
 
   function zip(a, b) {
     return a.map(function (e, i) {
@@ -45905,8 +45805,6 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
     }, function (_d) {
       getLanguageString = _d.getLanguageString;
       stringifyUnit = _d.stringifyUnit;
-      loadProjection = _d.loadProjection;
-      getHorizontalCRSComponents = _d.getHorizontalCRSComponents;
     }],
     execute: function () {
       TimeSeriesPlot = (function (_L$Popup) {
@@ -46026,6 +45924,7 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
           value: function onAdd(map) {
             var _this2 = this;
 
+            babelHelpers.get(Object.getPrototypeOf(TimeSeriesPlot.prototype), 'onAdd', this).call(this, map);
             map.fire('dataloading');
             var domainPromise = Promise.all(this._covs.map(function (cov) {
               return cov.loadDomain();
@@ -46041,19 +45940,9 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
 
               _this2._domains = domains;
               _this2._ranges = ranges;
-              var _getHorizontalCRSComponents = getHorizontalCRSComponents(domains[0]);
-
-              var _getHorizontalCRSComponents2 = babelHelpers.slicedToArray(_getHorizontalCRSComponents, 2);
-
-              _this2._projX = _getHorizontalCRSComponents2[0];
-              _this2._projY = _getHorizontalCRSComponents2[1];
-
-              return loadProjection(domains[0]);
-            }).then(function (proj) {
-              _this2.projection = proj;
               _this2._addPlotToPopup();
-              babelHelpers.get(Object.getPrototypeOf(TimeSeriesPlot.prototype), 'onAdd', _this2).call(_this2, map);
-              _this2.fire('add');
+              _this2.fire('dataLoad');
+              _this2.fire('afterAdd');
               map.fire('dataload');
             })['catch'](function (e) {
               console.error(e);
@@ -46066,19 +45955,11 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
           value: function _addPlotToPopup() {
             var _this3 = this;
 
-            if (!this.getLatLng()) {
-              // in case bindPopup is not used and the caller did not set a position
-              var x = this._domains[0].axes.get(this._projX).values[0];
-              var y = this._domains[0].axes.get(this._projY).values[0];
-              var latlng = this.projection.unproject({ x: x, y: y });
-              this.setLatLng(L.latLng(latlng));
-            }
-
             // display first parameter group
             var paramKeyGroup = this._paramKeyGroups[0];
             var plot = this._getPlotElement(paramKeyGroup);
 
-            var el = document.createElement('span');
+            var el = document.createElement('div');
 
             // display dropdown if multiple parameter groups
             if (this._paramKeyGroups.length > 1) {
@@ -46214,7 +46095,14 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
               columns.push(y);
             }
 
+            var height = 300;
+
             var el = document.createElement('div');
+
+            // work-around, otherwise popup is too small
+            el.style.width = this.options.maxWidth + 'px';
+            el.style.height = height + 'px';
+
             c3.generate({
               bindto: el,
               data: {
@@ -46269,7 +46157,7 @@ $__System.register('9c', ['72', '4a', '5d'], function (_export) {
                 rescale: true
               },
               size: {
-                height: 300,
+                height: height,
                 width: this.options.maxWidth
               }
             });
@@ -49066,10 +48954,20 @@ $__System.register('a8', ['4a'], function (_export) {
     };
 });
 
-$__System.register("a9", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("a9", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
-$__System.register("aa", [], function() { return { setters: [], execute: function() {} } });
+  (function ($__global) {})(this);
 
+  return _retrieveGlobal();
+});
+$__System.registerDynamic("aa", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
+
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
 $__System.registerDynamic('ab', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
@@ -50014,213 +49912,7 @@ $__System.registerDynamic("b0", [], true, function ($__require, exports, module)
       GLOBAL = global;
   return module.exports;
 });
-$__System.registerDynamic('b1', [], true, function ($__require, exports, module) {
-    var define,
-        global = this || self,
-        GLOBAL = global;
-    // shim for using process in browser
-    var process = module.exports = {};
-
-    // cached from whatever global is present so that test runners that stub it
-    // don't break things.  But we need to wrap it in a try catch in case it is
-    // wrapped in strict mode code which doesn't define any globals.  It's inside a
-    // function because try/catches deoptimize in certain engines.
-
-    var cachedSetTimeout;
-    var cachedClearTimeout;
-
-    function defaultSetTimout() {
-        throw new Error('setTimeout has not been defined');
-    }
-    function defaultClearTimeout() {
-        throw new Error('clearTimeout has not been defined');
-    }
-    (function () {
-        try {
-            if (typeof setTimeout === 'function') {
-                cachedSetTimeout = setTimeout;
-            } else {
-                cachedSetTimeout = defaultSetTimout;
-            }
-        } catch (e) {
-            cachedSetTimeout = defaultSetTimout;
-        }
-        try {
-            if (typeof clearTimeout === 'function') {
-                cachedClearTimeout = clearTimeout;
-            } else {
-                cachedClearTimeout = defaultClearTimeout;
-            }
-        } catch (e) {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    })();
-    function runTimeout(fun) {
-        if (cachedSetTimeout === setTimeout) {
-            //normal enviroments in sane situations
-            return setTimeout(fun, 0);
-        }
-        // if setTimeout wasn't available but was latter defined
-        if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-            cachedSetTimeout = setTimeout;
-            return setTimeout(fun, 0);
-        }
-        try {
-            // when when somebody has screwed with setTimeout but no I.E. maddness
-            return cachedSetTimeout(fun, 0);
-        } catch (e) {
-            try {
-                // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-                return cachedSetTimeout.call(null, fun, 0);
-            } catch (e) {
-                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-                return cachedSetTimeout.call(this, fun, 0);
-            }
-        }
-    }
-    function runClearTimeout(marker) {
-        if (cachedClearTimeout === clearTimeout) {
-            //normal enviroments in sane situations
-            return clearTimeout(marker);
-        }
-        // if clearTimeout wasn't available but was latter defined
-        if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-            cachedClearTimeout = clearTimeout;
-            return clearTimeout(marker);
-        }
-        try {
-            // when when somebody has screwed with setTimeout but no I.E. maddness
-            return cachedClearTimeout(marker);
-        } catch (e) {
-            try {
-                // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-                return cachedClearTimeout.call(null, marker);
-            } catch (e) {
-                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-                // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-                return cachedClearTimeout.call(this, marker);
-            }
-        }
-    }
-    var queue = [];
-    var draining = false;
-    var currentQueue;
-    var queueIndex = -1;
-
-    function cleanUpNextTick() {
-        if (!draining || !currentQueue) {
-            return;
-        }
-        draining = false;
-        if (currentQueue.length) {
-            queue = currentQueue.concat(queue);
-        } else {
-            queueIndex = -1;
-        }
-        if (queue.length) {
-            drainQueue();
-        }
-    }
-
-    function drainQueue() {
-        if (draining) {
-            return;
-        }
-        var timeout = runTimeout(cleanUpNextTick);
-        draining = true;
-
-        var len = queue.length;
-        while (len) {
-            currentQueue = queue;
-            queue = [];
-            while (++queueIndex < len) {
-                if (currentQueue) {
-                    currentQueue[queueIndex].run();
-                }
-            }
-            queueIndex = -1;
-            len = queue.length;
-        }
-        currentQueue = null;
-        draining = false;
-        runClearTimeout(timeout);
-    }
-
-    process.nextTick = function (fun) {
-        var args = new Array(arguments.length - 1);
-        if (arguments.length > 1) {
-            for (var i = 1; i < arguments.length; i++) {
-                args[i - 1] = arguments[i];
-            }
-        }
-        queue.push(new Item(fun, args));
-        if (queue.length === 1 && !draining) {
-            runTimeout(drainQueue);
-        }
-    };
-
-    // v8 likes predictible objects
-    function Item(fun, array) {
-        this.fun = fun;
-        this.array = array;
-    }
-    Item.prototype.run = function () {
-        this.fun.apply(null, this.array);
-    };
-    process.title = 'browser';
-    process.browser = true;
-    process.env = {};
-    process.argv = [];
-    process.version = ''; // empty string to avoid regexp issues
-    process.versions = {};
-
-    function noop() {}
-
-    process.on = noop;
-    process.addListener = noop;
-    process.once = noop;
-    process.off = noop;
-    process.removeListener = noop;
-    process.removeAllListeners = noop;
-    process.emit = noop;
-
-    process.binding = function (name) {
-        throw new Error('process.binding is not supported');
-    };
-
-    process.cwd = function () {
-        return '/';
-    };
-    process.chdir = function (dir) {
-        throw new Error('process.chdir is not supported');
-    };
-    process.umask = function () {
-        return 0;
-    };
-    return module.exports;
-});
-$__System.registerDynamic("b2", ["b1"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("b1");
-  return module.exports;
-});
-$__System.registerDynamic('b3', ['b2'], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__System._nodeRequire ? process : $__require('b2');
-  return module.exports;
-});
-$__System.registerDynamic("3b", ["b3"], true, function ($__require, exports, module) {
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("b3");
-  return module.exports;
-});
-$__System.registerDynamic('b4', ['af', 'b0', '3b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('b1', ['af', 'b0', '3b'], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -55381,11 +55073,11 @@ $__System.registerDynamic('b4', ['af', 'b0', '3b'], true, function ($__require, 
   })($__require('3b'));
   return module.exports;
 });
-$__System.registerDynamic("64", ["b4"], true, function ($__require, exports, module) {
+$__System.registerDynamic("64", ["b1"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("b4");
+  module.exports = $__require("b1");
   return module.exports;
 });
 $__System.register('50', ['64', '6e'], function (_export) {
@@ -55658,7 +55350,7 @@ $__System.register('50', ['64', '6e'], function (_export) {
   };
 });
 
-$__System.register('b5', ['50', '54', '73', '4a', 'ac', 'ad', '6d', '6e'], function (_export) {
+$__System.register('b2', ['50', '54', '73', '4a', 'ac', 'ad', '6d', '6e'], function (_export) {
   'use strict';
 
   var loadDCATCatalog, $, HTML, Modal, L, parseWKT, Tab, PROCESS, i18n, sortByKey, MELODIES_DCAT_CATALOG_URL, TEMPLATES, html, paneHtml, SearchPane, MediaTypeLabels;
@@ -56348,7 +56040,7 @@ $__System.registerDynamic("73", [], true, function ($__require, exports, module)
 	});
 	return module.exports;
 });
-$__System.registerDynamic('b6', [], false, function ($__require, $__exports, $__module) {
+$__System.registerDynamic('b3', [], false, function ($__require, $__exports, $__module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
   (function ($__global) {
@@ -56735,14 +56427,14 @@ $__System.registerDynamic('b6', [], false, function ($__require, $__exports, $__
 
   return _retrieveGlobal();
 });
-$__System.registerDynamic("b7", ["b6"], true, function ($__require, exports, module) {
+$__System.registerDynamic("b4", ["b3"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("b6");
+  module.exports = $__require("b3");
   return module.exports;
 });
-$__System.register('b8', [], function (_export) {
+$__System.register('b5', [], function (_export) {
   /* */
   'use strict';
 
@@ -56811,7 +56503,7 @@ $__System.register('b8', [], function (_export) {
   };
 });
 
-$__System.register('b9', ['b8'], function (_export) {
+$__System.register('b6', ['b5'], function (_export) {
   /* */
 
   /**
@@ -56871,14 +56563,14 @@ $__System.register('b9', ['b8'], function (_export) {
   }
 
   return {
-    setters: [function (_b8) {
-      getLanguageString = _b8.getLanguageString;
+    setters: [function (_b5) {
+      getLanguageString = _b5.getLanguageString;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('ba', [], function (_export) {
+$__System.register('b7', [], function (_export) {
   /**
    * @external {Range} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Range.md
    */
@@ -57022,7 +56714,7 @@ $__System.register('ba', [], function (_export) {
   };
 });
 
-$__System.register("bb", [], function (_export) {
+$__System.register("b8", [], function (_export) {
   /**
    * Returns the category of the given parameter corresponding to the encoded integer value.
    *
@@ -57083,7 +56775,7 @@ $__System.register("bb", [], function (_export) {
   };
 });
 
-$__System.register('bc', ['bd', 'be', 'bf'], function (_export) {
+$__System.register('b9', ['ba', 'bb', 'bc'], function (_export) {
   /* */
 
   /**
@@ -57243,21 +56935,21 @@ $__System.register('bc', ['bd', 'be', 'bf'], function (_export) {
   }
 
   return {
-    setters: [function (_bd) {
-      shallowcopy = _bd.shallowcopy;
-    }, function (_be) {
-      COVJSON_DATATYPE_TUPLE = _be.COVJSON_DATATYPE_TUPLE;
-      COVERAGE = _be.COVERAGE;
-      DOMAIN = _be.DOMAIN;
-    }, function (_bf) {
-      getHorizontalCRSReferenceObject = _bf.getHorizontalCRSReferenceObject;
-      getProjection = _bf.getProjection;
+    setters: [function (_ba) {
+      shallowcopy = _ba.shallowcopy;
+    }, function (_bb) {
+      COVJSON_DATATYPE_TUPLE = _bb.COVJSON_DATATYPE_TUPLE;
+      COVERAGE = _bb.COVERAGE;
+      DOMAIN = _bb.DOMAIN;
+    }, function (_bc) {
+      getHorizontalCRSReferenceObject = _bc.getHorizontalCRSReferenceObject;
+      getProjection = _bc.getProjection;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c0', ['be', 'bf'], function (_export) {
+$__System.register('bd', ['bb', 'bc'], function (_export) {
   /* */
 
   /**
@@ -57372,13 +57064,13 @@ $__System.register('c0', ['be', 'bf'], function (_export) {
     }
   }
   return {
-    setters: [function (_be) {
-      COVERAGECOLLECTION = _be.COVERAGECOLLECTION;
-    }, function (_bf) {
-      asTime = _bf.asTime;
-      isISODateAxis = _bf.isISODateAxis;
-      isLongitudeAxis = _bf.isLongitudeAxis;
-      getLongitudeWrapper = _bf.getLongitudeWrapper;
+    setters: [function (_bb) {
+      COVERAGECOLLECTION = _bb.COVERAGECOLLECTION;
+    }, function (_bc) {
+      asTime = _bc.asTime;
+      isISODateAxis = _bc.isISODateAxis;
+      isLongitudeAxis = _bc.isLongitudeAxis;
+      getLongitudeWrapper = _bc.getLongitudeWrapper;
     }],
     execute: function () {
       CollectionQuery = (function () {
@@ -57509,120 +57201,120 @@ $__System.register('c0', ['be', 'bf'], function (_export) {
   };
 });
 
-$__System.register('c1', ['c2', 'be', 'b8', 'b9', 'ba', 'bb', 'c3', 'bf', 'c4', 'c5', 'bc', 'c6', 'c7', 'c0'], function (_export) {
+$__System.register('be', ['bf', 'bb', 'b5', 'b6', 'b7', 'b8', 'c0', 'bc', 'c1', 'c2', 'b9', 'c3', 'c4', 'bd'], function (_export) {
   /* */
   'use strict';
 
   return {
-    setters: [function (_c2) {
+    setters: [function (_bf) {
       var _exportObj = {};
 
-      for (var _key in _c2) {
-        if (_key !== 'default') _exportObj[_key] = _c2[_key];
+      for (var _key in _bf) {
+        if (_key !== 'default') _exportObj[_key] = _bf[_key];
       }
 
       _export(_exportObj);
-    }, function (_be) {
+    }, function (_bb) {
       var _exportObj2 = {};
 
-      for (var _key2 in _be) {
-        if (_key2 !== 'default') _exportObj2[_key2] = _be[_key2];
+      for (var _key2 in _bb) {
+        if (_key2 !== 'default') _exportObj2[_key2] = _bb[_key2];
       }
 
       _export(_exportObj2);
-    }, function (_b8) {
+    }, function (_b5) {
       var _exportObj3 = {};
 
-      for (var _key3 in _b8) {
-        if (_key3 !== 'default') _exportObj3[_key3] = _b8[_key3];
+      for (var _key3 in _b5) {
+        if (_key3 !== 'default') _exportObj3[_key3] = _b5[_key3];
       }
 
       _export(_exportObj3);
-    }, function (_b9) {
+    }, function (_b6) {
       var _exportObj4 = {};
 
-      for (var _key4 in _b9) {
-        if (_key4 !== 'default') _exportObj4[_key4] = _b9[_key4];
+      for (var _key4 in _b6) {
+        if (_key4 !== 'default') _exportObj4[_key4] = _b6[_key4];
       }
 
       _export(_exportObj4);
-    }, function (_ba) {
+    }, function (_b7) {
       var _exportObj5 = {};
 
-      for (var _key5 in _ba) {
-        if (_key5 !== 'default') _exportObj5[_key5] = _ba[_key5];
+      for (var _key5 in _b7) {
+        if (_key5 !== 'default') _exportObj5[_key5] = _b7[_key5];
       }
 
       _export(_exportObj5);
-    }, function (_bb) {
+    }, function (_b8) {
       var _exportObj6 = {};
 
-      for (var _key6 in _bb) {
-        if (_key6 !== 'default') _exportObj6[_key6] = _bb[_key6];
+      for (var _key6 in _b8) {
+        if (_key6 !== 'default') _exportObj6[_key6] = _b8[_key6];
       }
 
       _export(_exportObj6);
-    }, function (_c3) {
+    }, function (_c0) {
       var _exportObj7 = {};
 
-      for (var _key7 in _c3) {
-        if (_key7 !== 'default') _exportObj7[_key7] = _c3[_key7];
+      for (var _key7 in _c0) {
+        if (_key7 !== 'default') _exportObj7[_key7] = _c0[_key7];
       }
 
       _export(_exportObj7);
-    }, function (_bf) {
+    }, function (_bc) {
       var _exportObj8 = {};
 
-      for (var _key8 in _bf) {
-        if (_key8 !== 'default') _exportObj8[_key8] = _bf[_key8];
+      for (var _key8 in _bc) {
+        if (_key8 !== 'default') _exportObj8[_key8] = _bc[_key8];
       }
 
       _export(_exportObj8);
-    }, function (_c4) {
+    }, function (_c1) {
       var _exportObj9 = {};
 
-      for (var _key9 in _c4) {
-        if (_key9 !== 'default') _exportObj9[_key9] = _c4[_key9];
+      for (var _key9 in _c1) {
+        if (_key9 !== 'default') _exportObj9[_key9] = _c1[_key9];
       }
 
       _export(_exportObj9);
-    }, function (_c5) {
+    }, function (_c2) {
       var _exportObj10 = {};
 
-      for (var _key10 in _c5) {
-        if (_key10 !== 'default') _exportObj10[_key10] = _c5[_key10];
+      for (var _key10 in _c2) {
+        if (_key10 !== 'default') _exportObj10[_key10] = _c2[_key10];
       }
 
       _export(_exportObj10);
-    }, function (_bc) {
+    }, function (_b9) {
       var _exportObj11 = {};
 
-      for (var _key11 in _bc) {
-        if (_key11 !== 'default') _exportObj11[_key11] = _bc[_key11];
+      for (var _key11 in _b9) {
+        if (_key11 !== 'default') _exportObj11[_key11] = _b9[_key11];
       }
 
       _export(_exportObj11);
-    }, function (_c6) {
+    }, function (_c3) {
       var _exportObj12 = {};
 
-      for (var _key12 in _c6) {
-        if (_key12 !== 'default') _exportObj12[_key12] = _c6[_key12];
+      for (var _key12 in _c3) {
+        if (_key12 !== 'default') _exportObj12[_key12] = _c3[_key12];
       }
 
       _export(_exportObj12);
-    }, function (_c7) {
+    }, function (_c4) {
       var _exportObj13 = {};
 
-      for (var _key13 in _c7) {
-        if (_key13 !== 'default') _exportObj13[_key13] = _c7[_key13];
+      for (var _key13 in _c4) {
+        if (_key13 !== 'default') _exportObj13[_key13] = _c4[_key13];
       }
 
       _export(_exportObj13);
-    }, function (_c0) {
+    }, function (_bd) {
       var _exportObj14 = {};
 
-      for (var _key14 in _c0) {
-        if (_key14 !== 'default') _exportObj14[_key14] = _c0[_key14];
+      for (var _key14 in _bd) {
+        if (_key14 !== 'default') _exportObj14[_key14] = _bd[_key14];
       }
 
       _export(_exportObj14);
@@ -57631,7 +57323,7 @@ $__System.register('c1', ['c2', 'be', 'b8', 'b9', 'ba', 'bb', 'c3', 'bf', 'c4', 
   };
 });
 
-$__System.registerDynamic("c8", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("c5", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -57649,14 +57341,14 @@ $__System.registerDynamic("c8", [], true, function ($__require, exports, module)
   module.exports = iota;
   return module.exports;
 });
-$__System.registerDynamic("c9", ["c8"], true, function ($__require, exports, module) {
+$__System.registerDynamic("c6", ["c5"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("c8");
+  module.exports = $__require("c5");
   return module.exports;
 });
-$__System.registerDynamic('ca', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('c7', [], true, function ($__require, exports, module) {
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
@@ -57779,14 +57471,14 @@ $__System.registerDynamic('ca', [], true, function ($__require, exports, module)
 	})(typeof exports === 'undefined' ? this.base64js = {} : exports);
 	return module.exports;
 });
-$__System.registerDynamic("cb", ["ca"], true, function ($__require, exports, module) {
+$__System.registerDynamic("c8", ["c7"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("ca");
+  module.exports = $__require("c7");
   return module.exports;
 });
-$__System.registerDynamic("cc", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("c9", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -57877,14 +57569,14 @@ $__System.registerDynamic("cc", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("cd", ["cc"], true, function ($__require, exports, module) {
+$__System.registerDynamic("ca", ["c9"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("cc");
+  module.exports = $__require("c9");
   return module.exports;
 });
-$__System.registerDynamic('ce', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('cb', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -57896,14 +57588,14 @@ $__System.registerDynamic('ce', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("cf", ["ce"], true, function ($__require, exports, module) {
+$__System.registerDynamic("cc", ["cb"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("ce");
+  module.exports = $__require("cb");
   return module.exports;
 });
-$__System.registerDynamic('d0', ['cb', 'cd', 'cf'], true, function ($__require, exports, module) {
+$__System.registerDynamic('cd', ['c8', 'ca', 'cc'], true, function ($__require, exports, module) {
   /*!
    * The buffer module from node.js, for the browser.
    *
@@ -57917,9 +57609,9 @@ $__System.registerDynamic('d0', ['cb', 'cd', 'cf'], true, function ($__require, 
   var define,
       global = this || self,
       GLOBAL = global;
-  var base64 = $__require('cb');
-  var ieee754 = $__require('cd');
-  var isArray = $__require('cf');
+  var base64 = $__require('c8');
+  var ieee754 = $__require('ca');
+  var isArray = $__require('cc');
 
   exports.Buffer = Buffer;
   exports.SlowBuffer = SlowBuffer;
@@ -59422,29 +59114,29 @@ $__System.registerDynamic('d0', ['cb', 'cd', 'cf'], true, function ($__require, 
   }
   return module.exports;
 });
-$__System.registerDynamic("d1", ["d0"], true, function ($__require, exports, module) {
+$__System.registerDynamic("ce", ["cd"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d0");
+  module.exports = $__require("cd");
   return module.exports;
 });
-$__System.registerDynamic('d2', ['d1'], true, function ($__require, exports, module) {
+$__System.registerDynamic('cf', ['ce'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('d1');
+  module.exports = $__System._nodeRequire ? $__System._nodeRequire('buffer') : $__require('ce');
   return module.exports;
 });
-$__System.registerDynamic("d3", ["d2"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d0", ["cf"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d2");
+  module.exports = $__require("cf");
   return module.exports;
 });
-$__System.registerDynamic('d4', ['d3'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d1', ['d0'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -59459,23 +59151,23 @@ $__System.registerDynamic('d4', ['d3'], true, function ($__require, exports, mod
     function isSlowBuffer(obj) {
       return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0));
     }
-  })($__require('d3').Buffer);
+  })($__require('d0').Buffer);
   return module.exports;
 });
-$__System.registerDynamic("d5", ["d4"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d2", ["d1"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d4");
+  module.exports = $__require("d1");
   return module.exports;
 });
-$__System.registerDynamic("d6", ["c9", "d5"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d3", ["c6", "d2"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var iota = $__require("c9");
-  var isBuffer = $__require("d5");
+  var iota = $__require("c6");
+  var isBuffer = $__require("d2");
 
   var hasTypedArrays = typeof Float64Array !== "undefined";
 
@@ -59799,14 +59491,14 @@ b" + i + "*=d\
   module.exports = wrappedNDArrayCtor;
   return module.exports;
 });
-$__System.registerDynamic("5b", ["d6"], true, function ($__require, exports, module) {
+$__System.registerDynamic("5b", ["d3"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d6");
+  module.exports = $__require("d3");
   return module.exports;
 });
-$__System.register("bd", [], function (_export) {
+$__System.register("ba", [], function (_export) {
   /**
    * Shallow clone a given object.
    *
@@ -59837,7 +59529,7 @@ $__System.register("bd", [], function (_export) {
   };
 });
 
-$__System.registerDynamic('d7', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('d4', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
 
@@ -60284,20 +59976,20 @@ $__System.registerDynamic('d7', [], true, function ($__require, exports, module)
   })(typeof self !== 'undefined' ? self : this);
   return module.exports;
 });
-$__System.registerDynamic("d8", ["d7"], true, function ($__require, exports, module) {
+$__System.registerDynamic("d5", ["d4"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("d7");
+  module.exports = $__require("d4");
   return module.exports;
 });
-$__System.registerDynamic('d9', ['da', 'db'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d6', ['d7', 'd8'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var proj = $__require('da');
-  var transform = $__require('db');
+  var proj = $__require('d7');
+  var transform = $__require('d8');
   var wgs84 = proj('WGS84');
   function transformer(from, to, coords) {
     var transformedArray;
@@ -60356,12 +60048,12 @@ $__System.registerDynamic('d9', ['da', 'db'], true, function ($__require, export
   module.exports = proj4;
   return module.exports;
 });
-$__System.registerDynamic('dc', ['dd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d9', ['da'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var mgrs = $__require('dd');
+  var mgrs = $__require('da');
 
   function Point(x, y, z) {
     if (!(this instanceof Point)) {
@@ -60397,7 +60089,7 @@ $__System.registerDynamic('dc', ['dd'], true, function ($__require, exports, mod
   module.exports = Point;
   return module.exports;
 });
-$__System.registerDynamic("de", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("db", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60500,7 +60192,7 @@ $__System.registerDynamic("de", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('df', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('dc', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60556,7 +60248,7 @@ $__System.registerDynamic('df', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('e0', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('dd', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60574,14 +60266,14 @@ $__System.registerDynamic('e0', [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('e1', ['e0', 'e2', 'e3'], true, function ($__require, exports, module) {
+$__System.registerDynamic('de', ['dd', 'df', 'e0'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var globals = $__require('e0');
-  var parseProj = $__require('e2');
-  var wkt = $__require('e3');
+  var globals = $__require('dd');
+  var parseProj = $__require('df');
+  var wkt = $__require('e0');
   function defs(name) {
     var that = this;
     if (arguments.length === 2) {
@@ -60624,13 +60316,13 @@ $__System.registerDynamic('e1', ['e0', 'e2', 'e3'], true, function ($__require, 
   module.exports = defs;
   return module.exports;
 });
-$__System.registerDynamic('e3', ['e4'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e0', ['e1'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var D2R = 0.01745329251994329577;
-  var extend = $__require('e4');
+  var extend = $__require('e1');
   function mapit(obj, key, v) {
     obj[key] = v.map(function (aa) {
       var o = {};
@@ -60807,7 +60499,7 @@ $__System.registerDynamic('e3', ['e4'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic("e5", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e2", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60828,7 +60520,7 @@ $__System.registerDynamic("e5", [], true, function ($__require, exports, module)
 
   return module.exports;
 });
-$__System.registerDynamic('e6', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('e3', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -60837,14 +60529,14 @@ $__System.registerDynamic('e6', [], true, function ($__require, exports, module)
   exports['us-ft'] = { to_meter: 1200 / 3937 };
   return module.exports;
 });
-$__System.registerDynamic('e2', ['e5', 'e6'], true, function ($__require, exports, module) {
+$__System.registerDynamic('df', ['e2', 'e3'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var D2R = 0.01745329251994329577;
-  var PrimeMeridian = $__require('e5');
-  var units = $__require('e6');
+  var PrimeMeridian = $__require('e2');
+  var units = $__require('e3');
   module.exports = function (defData) {
     var self = {};
     var paramObj = {};
@@ -60972,14 +60664,14 @@ $__System.registerDynamic('e2', ['e5', 'e6'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic('e7', ['e1', 'e3', 'e2'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e4', ['de', 'e0', 'df'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var defs = $__require('e1');
-  var wkt = $__require('e3');
-  var projStr = $__require('e2');
+  var defs = $__require('de');
+  var wkt = $__require('e0');
+  var projStr = $__require('df');
   function testObj(code) {
     return typeof code === 'string';
   }
@@ -61011,19 +60703,19 @@ $__System.registerDynamic('e7', ['e1', 'e3', 'e2'], true, function ($__require, 
   module.exports = parse;
   return module.exports;
 });
-$__System.registerDynamic('e8', ['e9', 'ea', 'eb', 'ec'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e5', ['e6', 'e7', 'e8', 'e9'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var msfnz = $__require('e9');
+  var msfnz = $__require('e6');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
   var R2D = 57.29577951308232088;
-  var adjust_lon = $__require('ea');
+  var adjust_lon = $__require('e7');
   var FORTPI = Math.PI / 4;
-  var tsfnz = $__require('eb');
-  var phi2z = $__require('ec');
+  var tsfnz = $__require('e8');
+  var phi2z = $__require('e9');
   exports.init = function () {
     var con = this.b / this.a;
     this.es = 1 - con * con;
@@ -61095,7 +60787,7 @@ $__System.registerDynamic('e8', ['e9', 'ea', 'eb', 'ec'], true, function ($__req
   exports.names = ["Mercator", "Popular Visualisation Pseudo Mercator", "Mercator_1SP", "Mercator_Auxiliary_Sphere", "merc"];
   return module.exports;
 });
-$__System.registerDynamic("ed", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ea", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61112,12 +60804,12 @@ $__System.registerDynamic("ed", [], true, function ($__require, exports, module)
   exports.names = ["longlat", "identity"];
   return module.exports;
 });
-$__System.registerDynamic('ee', ['e8', 'ed'], true, function ($__require, exports, module) {
+$__System.registerDynamic('eb', ['e5', 'ea'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var projs = [$__require('e8'), $__require('ed')];
+  var projs = [$__require('e5'), $__require('ea')];
   var names = {};
   var projStore = [];
   function add(proj, i) {
@@ -61147,7 +60839,7 @@ $__System.registerDynamic('ee', ['e8', 'ed'], true, function ($__require, export
   };
   return module.exports;
 });
-$__System.registerDynamic("ef", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ec", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61234,7 +60926,7 @@ $__System.registerDynamic("ef", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("f0", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("ed", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61456,7 +61148,7 @@ $__System.registerDynamic("f0", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("e4", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e1", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61477,7 +61169,7 @@ $__System.registerDynamic("e4", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('f1', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('ee', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61869,15 +61561,15 @@ $__System.registerDynamic('f1', [], true, function ($__require, exports, module)
   module.exports = datum;
   return module.exports;
 });
-$__System.registerDynamic('f2', ['ef', 'f0', 'e4', 'f1'], true, function ($__require, exports, module) {
+$__System.registerDynamic('ef', ['ec', 'ed', 'e1', 'ee'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var Datum = $__require('ef');
-  var Ellipsoid = $__require('f0');
-  var extend = $__require('e4');
-  var datum = $__require('f1');
+  var Datum = $__require('ec');
+  var Ellipsoid = $__require('ed');
+  var extend = $__require('e1');
+  var datum = $__require('ee');
   var EPSLN = 1.0e-10;
   var SIXTH = 0.1666666666666666667;
   var RA4 = 0.04722222222222222222;
@@ -61926,15 +61618,15 @@ $__System.registerDynamic('f2', ['ef', 'f0', 'e4', 'f1'], true, function ($__req
   };
   return module.exports;
 });
-$__System.registerDynamic('da', ['e7', 'e4', 'ee', 'f2'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d7', ['e4', 'e1', 'eb', 'ef'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var parseCode = $__require('e7');
-  var extend = $__require('e4');
-  var projections = $__require('ee');
-  var deriveConstants = $__require('f2');
+  var parseCode = $__require('e4');
+  var extend = $__require('e1');
+  var projections = $__require('eb');
+  var deriveConstants = $__require('ef');
   function Projection(srsCode, callback) {
     if (!(this instanceof Projection)) {
       return new Projection(srsCode);
@@ -61965,7 +61657,7 @@ $__System.registerDynamic('da', ['e7', 'e4', 'ee', 'f2'], true, function ($__req
   module.exports = Projection;
   return module.exports;
 });
-$__System.registerDynamic("f3", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f0", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61985,7 +61677,7 @@ $__System.registerDynamic("f3", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('db', ['de', 'df', 'da', 'f3'], true, function ($__require, exports, module) {
+$__System.registerDynamic('d8', ['db', 'dc', 'd7', 'f0'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -61994,10 +61686,10 @@ $__System.registerDynamic('db', ['de', 'df', 'da', 'f3'], true, function ($__req
   var R2D = 57.29577951308232088;
   var PJD_3PARAM = 1;
   var PJD_7PARAM = 2;
-  var datum_transform = $__require('de');
-  var adjust_axis = $__require('df');
-  var proj = $__require('da');
-  var toPoint = $__require('f3');
+  var datum_transform = $__require('db');
+  var adjust_axis = $__require('dc');
+  var proj = $__require('d7');
+  var toPoint = $__require('f0');
   module.exports = function transform(source, dest, point) {
     var wgs84;
     if (Array.isArray(point)) {
@@ -62048,7 +61740,7 @@ $__System.registerDynamic('db', ['de', 'df', 'da', 'f3'], true, function ($__req
   };
   return module.exports;
 });
-$__System.registerDynamic('f4', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('f1', [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -62770,35 +62462,35 @@ $__System.registerDynamic('f4', [], true, function ($__require, exports, module)
   }
   return module.exports;
 });
-$__System.registerDynamic("dd", ["f4"], true, function ($__require, exports, module) {
+$__System.registerDynamic("da", ["f1"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("f4");
+  module.exports = $__require("f1");
   return module.exports;
 });
-$__System.registerDynamic("f5", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f2", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   module.exports = { "name": "proj4", "version": "2.3.15", "description": "Proj4js is a JavaScript library to transform point coordinates from one coordinate system to another, including datum transformations.", "main": "lib/index.js", "directories": { "test": "test", "doc": "docs" }, "scripts": { "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha test/test.js" }, "repository": { "type": "git", "url": "git://github.com/proj4js/proj4js.git" }, "author": "", "license": "MIT", "jam": { "main": "dist/proj4.js", "include": ["dist/proj4.js", "README.md", "AUTHORS", "LICENSE.md"] }, "devDependencies": { "grunt-cli": "~0.1.13", "grunt": "~0.4.2", "grunt-contrib-connect": "~0.6.0", "grunt-contrib-jshint": "~0.8.0", "chai": "~1.8.1", "mocha": "~1.17.1", "grunt-mocha-phantomjs": "~0.4.0", "browserify": "~12.0.1", "grunt-browserify": "~4.0.1", "grunt-contrib-uglify": "~0.11.1", "curl": "git://github.com/cujojs/curl.git", "istanbul": "~0.2.4", "tin": "~0.4.0" }, "dependencies": { "mgrs": "~0.0.2" } };
   return module.exports;
 });
-$__System.registerDynamic('f6', ['f7', 'f8', 'f9', 'fa', 'fb', 'ea', 'fc', 'fd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('f3', ['f4', 'f5', 'f6', 'f7', 'f8', 'e7', 'f9', 'fa'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var e0fn = $__require('f7');
-  var e1fn = $__require('f8');
-  var e2fn = $__require('f9');
-  var e3fn = $__require('fa');
-  var mlfn = $__require('fb');
-  var adjust_lon = $__require('ea');
+  var e0fn = $__require('f4');
+  var e1fn = $__require('f5');
+  var e2fn = $__require('f6');
+  var e3fn = $__require('f7');
+  var mlfn = $__require('f8');
+  var adjust_lon = $__require('e7');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var sign = $__require('fc');
-  var asinz = $__require('fd');
+  var sign = $__require('f9');
+  var asinz = $__require('fa');
   exports.init = function () {
     this.e0 = e0fn(this.es);
     this.e1 = e1fn(this.es);
@@ -62905,13 +62597,13 @@ $__System.registerDynamic('f6', ['f7', 'f8', 'f9', 'fa', 'fb', 'ea', 'fc', 'fd']
   exports.names = ["Transverse_Mercator", "Transverse Mercator", "tmerc"];
   return module.exports;
 });
-$__System.registerDynamic('fe', ['f6'], true, function ($__require, exports, module) {
+$__System.registerDynamic('fb', ['f3'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var D2R = 0.01745329251994329577;
-  var tmerc = $__require('f6');
+  var tmerc = $__require('f3');
   exports.dependsOn = 'tmerc';
   exports.init = function () {
     if (!this.zone) {
@@ -62929,7 +62621,7 @@ $__System.registerDynamic('fe', ['f6'], true, function ($__require, exports, mod
   exports.names = ["Universal Transverse Mercator System", "utm"];
   return module.exports;
 });
-$__System.registerDynamic("ff", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("fc", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -62939,13 +62631,13 @@ $__System.registerDynamic("ff", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("100", ["ff"], true, function ($__require, exports, module) {
+$__System.registerDynamic("fd", ["fc"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var FORTPI = Math.PI / 4;
-  var srat = $__require("ff");
+  var srat = $__require("fc");
   var HALF_PI = Math.PI / 2;
   var MAX_ITER = 20;
   exports.init = function () {
@@ -62987,13 +62679,13 @@ $__System.registerDynamic("100", ["ff"], true, function ($__require, exports, mo
   exports.names = ["gauss"];
   return module.exports;
 });
-$__System.registerDynamic('101', ['100', 'ea'], true, function ($__require, exports, module) {
+$__System.registerDynamic('fe', ['fd', 'e7'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var gauss = $__require('100');
-  var adjust_lon = $__require('ea');
+  var gauss = $__require('fd');
+  var adjust_lon = $__require('e7');
   exports.init = function () {
     gauss.init.apply(this);
     if (!this.rc) {
@@ -63045,18 +62737,18 @@ $__System.registerDynamic('101', ['100', 'ea'], true, function ($__require, expo
   exports.names = ["Stereographic_North_Pole", "Oblique_Stereographic", "Polar_Stereographic", "sterea", "Oblique Stereographic Alternative"];
   return module.exports;
 });
-$__System.registerDynamic('102', ['fc', 'e9', 'eb', 'ec', 'ea'], true, function ($__require, exports, module) {
+$__System.registerDynamic('ff', ['f9', 'e6', 'e8', 'e9', 'e7'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var sign = $__require('fc');
-  var msfnz = $__require('e9');
-  var tsfnz = $__require('eb');
-  var phi2z = $__require('ec');
-  var adjust_lon = $__require('ea');
+  var sign = $__require('f9');
+  var msfnz = $__require('e6');
+  var tsfnz = $__require('e8');
+  var phi2z = $__require('e9');
+  var adjust_lon = $__require('e7');
   exports.ssfn_ = function (phit, sinphi, eccen) {
     sinphi *= eccen;
     return Math.tan(0.5 * (HALF_PI + phit)) * Math.pow((1 - sinphi) / (1 + sinphi), 0.5 * eccen);
@@ -63184,7 +62876,7 @@ $__System.registerDynamic('102', ['fc', 'e9', 'eb', 'ec', 'ea'], true, function 
   exports.names = ["stere", "Stereographic_South_Pole", "Polar Stereographic (variant B)"];
   return module.exports;
 });
-$__System.registerDynamic("103", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("100", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63269,14 +62961,14 @@ $__System.registerDynamic("103", [], true, function ($__require, exports, module
   exports.names = ["somerc"];
   return module.exports;
 });
-$__System.registerDynamic('104', ['eb', 'ea', 'ec'], true, function ($__require, exports, module) {
+$__System.registerDynamic('101', ['e8', 'e7', 'e9'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var tsfnz = $__require('eb');
-  var adjust_lon = $__require('ea');
-  var phi2z = $__require('ec');
+  var tsfnz = $__require('e8');
+  var adjust_lon = $__require('e7');
+  var phi2z = $__require('e9');
   var HALF_PI = Math.PI / 2;
   var FORTPI = Math.PI / 4;
   var EPSLN = 1.0e-10;
@@ -63412,7 +63104,7 @@ $__System.registerDynamic('104', ['eb', 'ea', 'ec'], true, function ($__require,
   exports.names = ["Hotine_Oblique_Mercator", "Hotine Oblique Mercator", "Hotine_Oblique_Mercator_Azimuth_Natural_Origin", "Hotine_Oblique_Mercator_Azimuth_Center", "omerc"];
   return module.exports;
 });
-$__System.registerDynamic("eb", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e8", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63427,7 +63119,7 @@ $__System.registerDynamic("eb", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("ec", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e9", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63450,18 +63142,18 @@ $__System.registerDynamic("ec", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('105', ['e9', 'eb', 'fc', 'ea', 'ec'], true, function ($__require, exports, module) {
+$__System.registerDynamic('102', ['e6', 'e8', 'f9', 'e7', 'e9'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var EPSLN = 1.0e-10;
-  var msfnz = $__require('e9');
-  var tsfnz = $__require('eb');
+  var msfnz = $__require('e6');
+  var tsfnz = $__require('e8');
   var HALF_PI = Math.PI / 2;
-  var sign = $__require('fc');
-  var adjust_lon = $__require('ea');
-  var phi2z = $__require('ec');
+  var sign = $__require('f9');
+  var adjust_lon = $__require('e7');
+  var phi2z = $__require('e9');
   exports.init = function () {
     if (!this.lat2) {
       this.lat2 = this.lat1;
@@ -63556,12 +63248,12 @@ $__System.registerDynamic('105', ['e9', 'eb', 'fc', 'ea', 'ec'], true, function 
   exports.names = ["Lambert Tangential Conformal Conic Projection", "Lambert_Conformal_Conic", "Lambert_Conformal_Conic_2SP", "lcc"];
   return module.exports;
 });
-$__System.registerDynamic("106", ["ea"], true, function ($__require, exports, module) {
+$__System.registerDynamic("103", ["e7"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require("ea");
+  var adjust_lon = $__require("e7");
   exports.init = function () {
     this.a = 6377397.155;
     this.es = 0.006674372230614;
@@ -63648,20 +63340,20 @@ $__System.registerDynamic("106", ["ea"], true, function ($__require, exports, mo
   exports.names = ["Krovak", "krovak"];
   return module.exports;
 });
-$__System.registerDynamic('107', ['fb', 'f7', 'f8', 'f9', 'fa', '108', 'ea', '109', '10a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('104', ['f8', 'f4', 'f5', 'f6', 'f7', '105', 'e7', '106', '107'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var mlfn = $__require('fb');
-  var e0fn = $__require('f7');
-  var e1fn = $__require('f8');
-  var e2fn = $__require('f9');
-  var e3fn = $__require('fa');
-  var gN = $__require('108');
-  var adjust_lon = $__require('ea');
-  var adjust_lat = $__require('109');
-  var imlfn = $__require('10a');
+  var mlfn = $__require('f8');
+  var e0fn = $__require('f4');
+  var e1fn = $__require('f5');
+  var e2fn = $__require('f6');
+  var e3fn = $__require('f7');
+  var gN = $__require('105');
+  var adjust_lon = $__require('e7');
+  var adjust_lat = $__require('106');
+  var imlfn = $__require('107');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
   exports.init = function () {
@@ -63733,7 +63425,7 @@ $__System.registerDynamic('107', ['fb', 'f7', 'f8', 'f9', 'fa', '108', 'ea', '10
   exports.names = ["Cassini", "Cassini_Soldner", "cass"];
   return module.exports;
 });
-$__System.registerDynamic('10b', ['10c', 'ea'], true, function ($__require, exports, module) {
+$__System.registerDynamic('108', ['109', 'e7'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -63741,8 +63433,8 @@ $__System.registerDynamic('10b', ['10c', 'ea'], true, function ($__require, expo
   var HALF_PI = Math.PI / 2;
   var FORTPI = Math.PI / 4;
   var EPSLN = 1.0e-10;
-  var qsfnz = $__require('10c');
-  var adjust_lon = $__require('ea');
+  var qsfnz = $__require('109');
+  var adjust_lon = $__require('e7');
   exports.S_POLE = 1;
   exports.N_POLE = 2;
   exports.EQUIT = 3;
@@ -63988,16 +63680,16 @@ $__System.registerDynamic('10b', ['10c', 'ea'], true, function ($__require, expo
   exports.names = ["Lambert Azimuthal Equal Area", "Lambert_Azimuthal_Equal_Area", "laea"];
   return module.exports;
 });
-$__System.registerDynamic('10d', ['e9', '10c', 'ea', 'fd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10a', ['e6', '109', 'e7', 'fa'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var EPSLN = 1.0e-10;
-  var msfnz = $__require('e9');
-  var qsfnz = $__require('10c');
-  var adjust_lon = $__require('ea');
-  var asinz = $__require('fd');
+  var msfnz = $__require('e6');
+  var qsfnz = $__require('109');
+  var adjust_lon = $__require('e7');
+  var asinz = $__require('fa');
   exports.init = function () {
     if (Math.abs(this.lat1 + this.lat2) < EPSLN) {
       return;
@@ -64092,14 +63784,14 @@ $__System.registerDynamic('10d', ['e9', '10c', 'ea', 'fd'], true, function ($__r
   exports.names = ["Albers_Conic_Equal_Area", "Albers", "aea"];
   return module.exports;
 });
-$__System.registerDynamic('10e', ['ea', 'fd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10b', ['e7', 'fa'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ea');
+  var adjust_lon = $__require('e7');
   var EPSLN = 1.0e-10;
-  var asinz = $__require('fd');
+  var asinz = $__require('fa');
   exports.init = function () {
     this.sin_p14 = Math.sin(this.lat0);
     this.cos_p14 = Math.cos(this.lat0);
@@ -64159,7 +63851,7 @@ $__System.registerDynamic('10e', ['ea', 'fd'], true, function ($__require, expor
   exports.names = ["gnom"];
   return module.exports;
 });
-$__System.registerDynamic("10c", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("109", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64175,7 +63867,7 @@ $__System.registerDynamic("10c", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("10f", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("10c", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64213,15 +63905,15 @@ $__System.registerDynamic("10f", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic('110', ['ea', '10c', 'e9', '10f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10d', ['e7', '109', 'e6', '10c'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ea');
-  var qsfnz = $__require('10c');
-  var msfnz = $__require('e9');
-  var iqsfnz = $__require('10f');
+  var adjust_lon = $__require('e7');
+  var qsfnz = $__require('109');
+  var msfnz = $__require('e6');
+  var iqsfnz = $__require('10c');
   exports.init = function () {
     if (!this.sphere) {
       this.k0 = msfnz(this.e, Math.sin(this.lat_ts), Math.cos(this.lat_ts));
@@ -64262,13 +63954,13 @@ $__System.registerDynamic('110', ['ea', '10c', 'e9', '10f'], true, function ($__
   exports.names = ["cea"];
   return module.exports;
 });
-$__System.registerDynamic('111', ['ea', '109'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10e', ['e7', '106'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ea');
-  var adjust_lat = $__require('109');
+  var adjust_lon = $__require('e7');
+  var adjust_lat = $__require('106');
   exports.init = function () {
     this.x0 = this.x0 || 0;
     this.y0 = this.y0 || 0;
@@ -64297,20 +63989,20 @@ $__System.registerDynamic('111', ['ea', '109'], true, function ($__require, expo
   exports.names = ["Equirectangular", "Equidistant_Cylindrical", "eqc"];
   return module.exports;
 });
-$__System.registerDynamic('112', ['f7', 'f8', 'f9', 'fa', 'ea', '109', 'fb', '108'], true, function ($__require, exports, module) {
+$__System.registerDynamic('10f', ['f4', 'f5', 'f6', 'f7', 'e7', '106', 'f8', '105'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var e0fn = $__require('f7');
-  var e1fn = $__require('f8');
-  var e2fn = $__require('f9');
-  var e3fn = $__require('fa');
-  var adjust_lon = $__require('ea');
-  var adjust_lat = $__require('109');
-  var mlfn = $__require('fb');
+  var e0fn = $__require('f4');
+  var e1fn = $__require('f5');
+  var e2fn = $__require('f6');
+  var e3fn = $__require('f7');
+  var adjust_lon = $__require('e7');
+  var adjust_lat = $__require('106');
+  var mlfn = $__require('f8');
   var EPSLN = 1.0e-10;
-  var gN = $__require('108');
+  var gN = $__require('105');
   var MAX_ITER = 20;
   exports.init = function () {
     this.temp = this.b / this.a;
@@ -64410,7 +64102,7 @@ $__System.registerDynamic('112', ['f7', 'f8', 'f9', 'fa', 'ea', '109', 'fb', '10
   exports.names = ["Polyconic", "poly"];
   return module.exports;
 });
-$__System.registerDynamic("113", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("110", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64635,12 +64327,12 @@ $__System.registerDynamic("113", [], true, function ($__require, exports, module
   exports.names = ["New_Zealand_Map_Grid", "nzmg"];
   return module.exports;
 });
-$__System.registerDynamic("114", ["ea"], true, function ($__require, exports, module) {
+$__System.registerDynamic("111", ["e7"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require("ea");
+  var adjust_lon = $__require("e7");
   exports.init = function () {};
   exports.forward = function (p) {
     var lon = p.x;
@@ -64664,7 +64356,7 @@ $__System.registerDynamic("114", ["ea"], true, function ($__require, exports, mo
   exports.names = ["Miller_Cylindrical", "mill"];
   return module.exports;
 });
-$__System.registerDynamic("115", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("112", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64695,7 +64387,7 @@ $__System.registerDynamic("115", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("116", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("113", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64707,12 +64399,12 @@ $__System.registerDynamic("116", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic('117', ['116'], true, function ($__require, exports, module) {
+$__System.registerDynamic('114', ['113'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var pj_mlfn = $__require('116');
+  var pj_mlfn = $__require('113');
   var EPSLN = 1.0e-10;
   var MAX_ITER = 20;
   module.exports = function (arg, es, en) {
@@ -64731,20 +64423,20 @@ $__System.registerDynamic('117', ['116'], true, function ($__require, exports, m
   };
   return module.exports;
 });
-$__System.registerDynamic('118', ['ea', '109', '115', '116', '117', 'fd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('115', ['e7', '106', '112', '113', '114', 'fa'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ea');
-  var adjust_lat = $__require('109');
-  var pj_enfn = $__require('115');
+  var adjust_lon = $__require('e7');
+  var adjust_lat = $__require('106');
+  var pj_enfn = $__require('112');
   var MAX_ITER = 20;
-  var pj_mlfn = $__require('116');
-  var pj_inv_mlfn = $__require('117');
+  var pj_mlfn = $__require('113');
+  var pj_inv_mlfn = $__require('114');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var asinz = $__require('fd');
+  var asinz = $__require('fa');
   exports.init = function () {
     if (!this.sphere) {
       this.en = pj_enfn(this.es);
@@ -64820,12 +64512,12 @@ $__System.registerDynamic('118', ['ea', '109', '115', '116', '117', 'fd'], true,
   exports.names = ["Sinusoidal", "sinu"];
   return module.exports;
 });
-$__System.registerDynamic("119", ["ea"], true, function ($__require, exports, module) {
+$__System.registerDynamic("116", ["e7"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require("ea");
+  var adjust_lon = $__require("e7");
   var EPSLN = 1.0e-10;
   exports.init = function () {};
   exports.forward = function (p) {
@@ -64880,7 +64572,7 @@ $__System.registerDynamic("119", ["ea"], true, function ($__require, exports, mo
   exports.names = ["Mollweide", "moll"];
   return module.exports;
 });
-$__System.registerDynamic("e9", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("e6", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -64891,32 +64583,32 @@ $__System.registerDynamic("e9", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('109', ['fc'], true, function ($__require, exports, module) {
+$__System.registerDynamic('106', ['f9'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var HALF_PI = Math.PI / 2;
-  var sign = $__require('fc');
+  var sign = $__require('f9');
   module.exports = function (x) {
     return Math.abs(x) < HALF_PI ? x : x - sign(x) * Math.PI;
   };
   return module.exports;
 });
-$__System.registerDynamic('11a', ['f7', 'f8', 'f9', 'fa', 'e9', 'fb', 'ea', '109', '10a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('117', ['f4', 'f5', 'f6', 'f7', 'e6', 'f8', 'e7', '106', '107'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var e0fn = $__require('f7');
-  var e1fn = $__require('f8');
-  var e2fn = $__require('f9');
-  var e3fn = $__require('fa');
-  var msfnz = $__require('e9');
-  var mlfn = $__require('fb');
-  var adjust_lon = $__require('ea');
-  var adjust_lat = $__require('109');
-  var imlfn = $__require('10a');
+  var e0fn = $__require('f4');
+  var e1fn = $__require('f5');
+  var e2fn = $__require('f6');
+  var e3fn = $__require('f7');
+  var msfnz = $__require('e6');
+  var mlfn = $__require('f8');
+  var adjust_lon = $__require('e7');
+  var adjust_lat = $__require('106');
+  var imlfn = $__require('107');
   var EPSLN = 1.0e-10;
   exports.init = function () {
     if (Math.abs(this.lat1 + this.lat2) < EPSLN) {
@@ -64997,15 +64689,15 @@ $__System.registerDynamic('11a', ['f7', 'f8', 'f9', 'fa', 'e9', 'fb', 'ea', '109
   exports.names = ["Equidistant_Conic", "eqdc"];
   return module.exports;
 });
-$__System.registerDynamic('11b', ['ea', 'fd'], true, function ($__require, exports, module) {
+$__System.registerDynamic('118', ['e7', 'fa'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ea');
+  var adjust_lon = $__require('e7');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var asinz = $__require('fd');
+  var asinz = $__require('fa');
   exports.init = function () {
     this.R = this.a;
   };
@@ -65097,7 +64789,7 @@ $__System.registerDynamic('11b', ['ea', 'fd'], true, function ($__require, expor
   exports.names = ["Van_der_Grinten_I", "VanDerGrinten", "vandg"];
   return module.exports;
 });
-$__System.registerDynamic("fc", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f9", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65107,20 +64799,20 @@ $__System.registerDynamic("fc", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic('ea', ['fc'], true, function ($__require, exports, module) {
+$__System.registerDynamic('e7', ['f9'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   var TWO_PI = Math.PI * 2;
   var SPI = 3.14159265359;
-  var sign = $__require('fc');
+  var sign = $__require('f9');
   module.exports = function (x) {
     return Math.abs(x) <= SPI ? x : x - sign(x) * TWO_PI;
   };
   return module.exports;
 });
-$__System.registerDynamic("fb", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f8", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65130,7 +64822,7 @@ $__System.registerDynamic("fb", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("f7", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f4", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65140,7 +64832,7 @@ $__System.registerDynamic("f7", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("f8", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f5", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65150,7 +64842,7 @@ $__System.registerDynamic("f8", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("f9", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f6", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65160,7 +64852,7 @@ $__System.registerDynamic("f9", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("fa", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("f7", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65170,7 +64862,7 @@ $__System.registerDynamic("fa", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("108", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("105", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65181,7 +64873,7 @@ $__System.registerDynamic("108", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic("fd", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("fa", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65194,7 +64886,7 @@ $__System.registerDynamic("fd", [], true, function ($__require, exports, module)
   };
   return module.exports;
 });
-$__System.registerDynamic("10a", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("107", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -65217,22 +64909,22 @@ $__System.registerDynamic("10a", [], true, function ($__require, exports, module
   };
   return module.exports;
 });
-$__System.registerDynamic('11c', ['ea', 'fb', 'f7', 'f8', 'f9', 'fa', '108', 'fd', '10a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('119', ['e7', 'f8', 'f4', 'f5', 'f6', 'f7', '105', 'fa', '107'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var adjust_lon = $__require('ea');
+  var adjust_lon = $__require('e7');
   var HALF_PI = Math.PI / 2;
   var EPSLN = 1.0e-10;
-  var mlfn = $__require('fb');
-  var e0fn = $__require('f7');
-  var e1fn = $__require('f8');
-  var e2fn = $__require('f9');
-  var e3fn = $__require('fa');
-  var gN = $__require('108');
-  var asinz = $__require('fd');
-  var imlfn = $__require('10a');
+  var mlfn = $__require('f8');
+  var e0fn = $__require('f4');
+  var e1fn = $__require('f5');
+  var e2fn = $__require('f6');
+  var e3fn = $__require('f7');
+  var gN = $__require('105');
+  var asinz = $__require('fa');
+  var imlfn = $__require('107');
   exports.init = function () {
     this.sin_p12 = Math.sin(this.lat0);
     this.cos_p12 = Math.cos(this.lat0);
@@ -65383,12 +65075,12 @@ $__System.registerDynamic('11c', ['ea', 'fb', 'f7', 'f8', 'f9', 'fa', '108', 'fd
   exports.names = ["Azimuthal_Equidistant", "aeqd"];
   return module.exports;
 });
-$__System.registerDynamic('11d', ['f6', 'fe', '101', '102', '103', '104', '105', '106', '107', '10b', '10d', '10e', '110', '111', '112', '113', '114', '118', '119', '11a', '11b', '11c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11a', ['f3', 'fb', 'fe', 'ff', '100', '101', '102', '103', '104', '108', '10a', '10b', '10d', '10e', '10f', '110', '111', '115', '116', '117', '118', '119'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var projs = [$__require('f6'), $__require('fe'), $__require('101'), $__require('102'), $__require('103'), $__require('104'), $__require('105'), $__require('106'), $__require('107'), $__require('10b'), $__require('10d'), $__require('10e'), $__require('110'), $__require('111'), $__require('112'), $__require('113'), $__require('114'), $__require('118'), $__require('119'), $__require('11a'), $__require('11b'), $__require('11c')];
+  var projs = [$__require('f3'), $__require('fb'), $__require('fe'), $__require('ff'), $__require('100'), $__require('101'), $__require('102'), $__require('103'), $__require('104'), $__require('108'), $__require('10a'), $__require('10b'), $__require('10d'), $__require('10e'), $__require('10f'), $__require('110'), $__require('111'), $__require('115'), $__require('116'), $__require('117'), $__require('118'), $__require('119')];
   module.exports = function (proj4) {
     projs.forEach(function (proj) {
       proj4.Proj.projections.add(proj);
@@ -65396,33 +65088,33 @@ $__System.registerDynamic('11d', ['f6', 'fe', '101', '102', '103', '104', '105',
   };
   return module.exports;
 });
-$__System.registerDynamic('11e', ['d9', 'da', 'dc', 'f3', 'e1', 'db', 'dd', 'f5', '11d'], true, function ($__require, exports, module) {
+$__System.registerDynamic('11b', ['d6', 'd7', 'd9', 'f0', 'de', 'd8', 'da', 'f2', '11a'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
-  var proj4 = $__require('d9');
+  var proj4 = $__require('d6');
   proj4.defaultDatum = 'WGS84';
-  proj4.Proj = $__require('da');
+  proj4.Proj = $__require('d7');
   proj4.WGS84 = new proj4.Proj('WGS84');
-  proj4.Point = $__require('dc');
-  proj4.toPoint = $__require('f3');
-  proj4.defs = $__require('e1');
-  proj4.transform = $__require('db');
-  proj4.mgrs = $__require('dd');
-  proj4.version = $__require('f5').version;
-  $__require('11d')(proj4);
+  proj4.Point = $__require('d9');
+  proj4.toPoint = $__require('f0');
+  proj4.defs = $__require('de');
+  proj4.transform = $__require('d8');
+  proj4.mgrs = $__require('da');
+  proj4.version = $__require('f2').version;
+  $__require('11a')(proj4);
   module.exports = proj4;
   return module.exports;
 });
-$__System.registerDynamic("11f", ["11e"], true, function ($__require, exports, module) {
+$__System.registerDynamic("11c", ["11b"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("11e");
+  module.exports = $__require("11b");
   return module.exports;
 });
-$__System.register('120', ['d8', '11f'], function (_export) {
+$__System.register('11d', ['d5', '11c'], function (_export) {
   /* */
   'use strict';
 
@@ -65589,8 +65281,8 @@ $__System.register('120', ['d8', '11f'], function (_export) {
     };
   }
   return {
-    setters: [function (_d8) {}, function (_f) {
-      proj4 = _f['default'];
+    setters: [function (_d5) {}, function (_c) {
+      proj4 = _c['default'];
     }],
     execute: function () {
       ROOT_PREFIX = 'http://www.opengis.net/def/crs/';
@@ -65621,18 +65313,18 @@ $__System.register('120', ['d8', '11f'], function (_export) {
   };
 });
 
-$__System.register("121", ["120"], function (_export) {
+$__System.register("11e", ["11d"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_) {
+    setters: [function (_d) {
       var _exportObj = {};
 
-      for (var _key in _) {
-        if (_key !== "default") _exportObj[_key] = _[_key];
+      for (var _key in _d) {
+        if (_key !== "default") _exportObj[_key] = _d[_key];
       }
 
-      _exportObj["default"] = _["default"];
+      _exportObj["default"] = _d["default"];
 
       _export(_exportObj);
     }],
@@ -65640,7 +65332,7 @@ $__System.register("121", ["120"], function (_export) {
   };
 });
 
-$__System.register('bf', ['121', 'be'], function (_export) {
+$__System.register('bc', ['11e', 'bb'], function (_export) {
   /* */
   'use strict';
 
@@ -66139,11 +65831,11 @@ $__System.register('bf', ['121', 'be'], function (_export) {
   }
 
   return {
-    setters: [function (_) {
-      uriproj = _;
-    }, function (_be) {
-      COVJSON_DATATYPE_TUPLE = _be.COVJSON_DATATYPE_TUPLE;
-      COVJSON_DATATYPE_POLYGON = _be.COVJSON_DATATYPE_POLYGON;
+    setters: [function (_e) {
+      uriproj = _e;
+    }, function (_bb) {
+      COVJSON_DATATYPE_TUPLE = _bb.COVJSON_DATATYPE_TUPLE;
+      COVJSON_DATATYPE_POLYGON = _bb.COVJSON_DATATYPE_POLYGON;
     }],
     execute: function () {
       OPENGIS_CRS_PREFIX = 'http://www.opengis.net/def/crs/';
@@ -66166,7 +65858,7 @@ $__System.register('bf', ['121', 'be'], function (_export) {
   };
 });
 
-$__System.register('c4', ['be'], function (_export) {
+$__System.register('c1', ['bb'], function (_export) {
   /* */
 
   /**
@@ -66344,14 +66036,14 @@ $__System.register('c4', ['be'], function (_export) {
   }
 
   return {
-    setters: [function (_be) {
-      DOMAIN = _be.DOMAIN;
+    setters: [function (_bb) {
+      DOMAIN = _bb.DOMAIN;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c2', [], function (_export) {
+$__System.register('bf', [], function (_export) {
   /* */
   'use strict';
 
@@ -66477,7 +66169,7 @@ $__System.register('c2', [], function (_export) {
   };
 });
 
-$__System.register('c6', ['bf', 'c4', 'c2', 'be'], function (_export) {
+$__System.register('c3', ['bc', 'c1', 'bf', 'bb'], function (_export) {
   /* */
 
   /**
@@ -66777,25 +66469,25 @@ $__System.register('c6', ['bf', 'c4', 'c2', 'be'], function (_export) {
   }
 
   return {
-    setters: [function (_bf) {
-      isISODateAxis = _bf.isISODateAxis;
-      isLongitudeAxis = _bf.isLongitudeAxis;
-      getLongitudeWrapper = _bf.getLongitudeWrapper;
-      asTime = _bf.asTime;
-    }, function (_c4) {
-      normalizeIndexSubsetConstraints = _c4.normalizeIndexSubsetConstraints;
-      subsetDomainByIndex = _c4.subsetDomainByIndex;
-    }, function (_c2) {
-      indexOfNearest = _c2.indexOfNearest;
-      indicesOfNearest = _c2.indicesOfNearest;
-    }, function (_be) {
-      COVERAGE = _be.COVERAGE;
+    setters: [function (_bc) {
+      isISODateAxis = _bc.isISODateAxis;
+      isLongitudeAxis = _bc.isLongitudeAxis;
+      getLongitudeWrapper = _bc.getLongitudeWrapper;
+      asTime = _bc.asTime;
+    }, function (_c1) {
+      normalizeIndexSubsetConstraints = _c1.normalizeIndexSubsetConstraints;
+      subsetDomainByIndex = _c1.subsetDomainByIndex;
+    }, function (_bf) {
+      indexOfNearest = _bf.indexOfNearest;
+      indicesOfNearest = _bf.indicesOfNearest;
+    }, function (_bb) {
+      COVERAGE = _bb.COVERAGE;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c5', ['be', 'c3', 'c6'], function (_export) {
+$__System.register('c2', ['bb', 'c0', 'c3'], function (_export) {
   /* */
 
   /**
@@ -67092,21 +66784,21 @@ $__System.register('c5', ['be', 'c3', 'c6'], function (_export) {
   }
 
   return {
-    setters: [function (_be) {
-      COVERAGE = _be.COVERAGE;
-      DOMAIN = _be.DOMAIN;
+    setters: [function (_bb) {
+      COVERAGE = _bb.COVERAGE;
+      DOMAIN = _bb.DOMAIN;
+    }, function (_c0) {
+      checkDomain = _c0.checkDomain;
+      checkCoverage = _c0.checkCoverage;
     }, function (_c3) {
-      checkDomain = _c3.checkDomain;
-      checkCoverage = _c3.checkCoverage;
-    }, function (_c6) {
-      subsetByIndex = _c6.subsetByIndex;
-      subsetByValue = _c6.subsetByValue;
+      subsetByIndex = _c3.subsetByIndex;
+      subsetByValue = _c3.subsetByValue;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('c7', ['be', 'c3', 'bd', 'c5'], function (_export) {
+$__System.register('c4', ['bb', 'c0', 'ba', 'c2'], function (_export) {
   /* */
 
   /**
@@ -67698,21 +67390,21 @@ $__System.register('c7', ['be', 'c3', 'bd', 'c5'], function (_export) {
   }
 
   return {
-    setters: [function (_be) {
-      COVERAGE = _be.COVERAGE;
-      DOMAIN = _be.DOMAIN;
-    }, function (_c3) {
-      checkCoverage = _c3.checkCoverage;
-    }, function (_bd) {
-      shallowcopy = _bd.shallowcopy;
-    }, function (_c5) {
-      addLoadRangesFunction = _c5.addLoadRangesFunction;
+    setters: [function (_bb) {
+      COVERAGE = _bb.COVERAGE;
+      DOMAIN = _bb.DOMAIN;
+    }, function (_c0) {
+      checkCoverage = _c0.checkCoverage;
+    }, function (_ba) {
+      shallowcopy = _ba.shallowcopy;
+    }, function (_c2) {
+      addLoadRangesFunction = _c2.addLoadRangesFunction;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('be', [], function (_export) {
+$__System.register('bb', [], function (_export) {
   /* */
   'use strict';
 
@@ -67744,7 +67436,7 @@ $__System.register('be', [], function (_export) {
   };
 });
 
-$__System.register('c3', ['be'], function (_export) {
+$__System.register('c0', ['bb'], function (_export) {
   /* */
   'use strict';
 
@@ -67779,15 +67471,15 @@ $__System.register('c3', ['be'], function (_export) {
   }
 
   return {
-    setters: [function (_be) {
-      COVERAGE = _be.COVERAGE;
-      DOMAIN = _be.DOMAIN;
+    setters: [function (_bb) {
+      COVERAGE = _bb.COVERAGE;
+      DOMAIN = _bb.DOMAIN;
     }],
     execute: function () {}
   };
 });
 
-$__System.registerDynamic("122", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("11f", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -68799,14 +68491,14 @@ $__System.registerDynamic("122", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("123", ["122"], true, function ($__require, exports, module) {
+$__System.registerDynamic("120", ["11f"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("122");
+  module.exports = $__require("11f");
   return module.exports;
 });
-$__System.registerDynamic("124", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("121", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -68969,14 +68661,14 @@ $__System.registerDynamic("124", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("125", ["124"], true, function ($__require, exports, module) {
+$__System.registerDynamic("122", ["121"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("124");
+  module.exports = $__require("121");
   return module.exports;
 });
-$__System.registerDynamic("126", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("123", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69016,14 +68708,14 @@ $__System.registerDynamic("126", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("127", ["126"], true, function ($__require, exports, module) {
+$__System.registerDynamic("124", ["123"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("126");
+  module.exports = $__require("123");
   return module.exports;
 });
-$__System.registerDynamic("128", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("125", [], true, function ($__require, exports, module) {
 	/* */
 	"use strict";
 
@@ -69047,22 +68739,22 @@ $__System.registerDynamic("128", [], true, function ($__require, exports, module
 	}
 	return module.exports;
 });
-$__System.registerDynamic("129", ["128"], true, function ($__require, exports, module) {
+$__System.registerDynamic("126", ["125"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("128");
+  module.exports = $__require("125");
   return module.exports;
 });
-$__System.registerDynamic("12a", ["127", "129"], true, function ($__require, exports, module) {
+$__System.registerDynamic("127", ["124", "126"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var twoProduct = $__require("127");
-  var twoSum = $__require("129");
+  var twoProduct = $__require("124");
+  var twoSum = $__require("126");
 
   module.exports = scaleLinearExpansion;
 
@@ -69111,14 +68803,14 @@ $__System.registerDynamic("12a", ["127", "129"], true, function ($__require, exp
   }
   return module.exports;
 });
-$__System.registerDynamic("12b", ["12a"], true, function ($__require, exports, module) {
+$__System.registerDynamic("128", ["127"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("12a");
+  module.exports = $__require("127");
   return module.exports;
 });
-$__System.registerDynamic("12c", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("129", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69281,24 +68973,24 @@ $__System.registerDynamic("12c", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("12d", ["12c"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12a", ["129"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("12c");
+  module.exports = $__require("129");
   return module.exports;
 });
-$__System.registerDynamic("12e", ["127", "125", "12b", "12d"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12b", ["124", "122", "128", "12a"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var twoProduct = $__require("127");
-  var robustSum = $__require("125");
-  var robustScale = $__require("12b");
-  var robustSubtract = $__require("12d");
+  var twoProduct = $__require("124");
+  var robustSum = $__require("122");
+  var robustScale = $__require("128");
+  var robustSubtract = $__require("12a");
 
   var NUM_EXPAND = 5;
 
@@ -69477,14 +69169,14 @@ return d[d.length-1];};return ", funcName].join("");
   generateOrientationProc();
   return module.exports;
 });
-$__System.registerDynamic("12f", ["12e"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12c", ["12b"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("12e");
+  module.exports = $__require("12b");
   return module.exports;
 });
-$__System.registerDynamic("130", ["12f"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12d", ["12c"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69493,7 +69185,7 @@ $__System.registerDynamic("130", ["12f"], true, function ($__require, exports, m
       GLOBAL = global;
   module.exports = orderSegments;
 
-  var orient = $__require("12f");
+  var orient = $__require("12c");
 
   function horizontalOrder(a, b) {
     var bl, br;
@@ -69586,7 +69278,7 @@ $__System.registerDynamic("130", ["12f"], true, function ($__require, exports, m
   }
   return module.exports;
 });
-$__System.registerDynamic('131', ['132', '123', '12f', '130'], true, function ($__require, exports, module) {
+$__System.registerDynamic('12e', ['12f', '120', '12c', '12d'], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -69594,10 +69286,10 @@ $__System.registerDynamic('131', ['132', '123', '12f', '130'], true, function ($
       global = this || self,
       GLOBAL = global;
   module.exports = createSlabDecomposition;
-  var bounds = $__require('132');
-  var createRBTree = $__require('123');
-  var orient = $__require('12f');
-  var orderSegments = $__require('130');
+  var bounds = $__require('12f');
+  var createRBTree = $__require('120');
+  var orient = $__require('12c');
+  var orderSegments = $__require('12d');
   function SlabDecomposition(slabs, coordinates, horizontal) {
     this.slabs = slabs;
     this.coordinates = coordinates;
@@ -69795,21 +69487,21 @@ $__System.registerDynamic('131', ['132', '123', '12f', '130'], true, function ($
   }
   return module.exports;
 });
-$__System.registerDynamic("133", ["131"], true, function ($__require, exports, module) {
+$__System.registerDynamic("130", ["12e"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("131");
+  module.exports = $__require("12e");
   return module.exports;
 });
-$__System.registerDynamic("134", ["132"], true, function ($__require, exports, module) {
+$__System.registerDynamic("131", ["12f"], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var bounds = $__require("132");
+  var bounds = $__require("12f");
 
   var NOT_FOUND = 0;
   var SUCCESS = 1;
@@ -70188,14 +69880,14 @@ $__System.registerDynamic("134", ["132"], true, function ($__require, exports, m
   }
   return module.exports;
 });
-$__System.registerDynamic("135", ["134"], true, function ($__require, exports, module) {
+$__System.registerDynamic("132", ["131"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("134");
+  module.exports = $__require("131");
   return module.exports;
 });
-$__System.registerDynamic("136", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("133", [], true, function ($__require, exports, module) {
   /* */
   "use strict";
 
@@ -70254,24 +69946,24 @@ return dispatchBsearch", suffix].join(""));
   };
   return module.exports;
 });
-$__System.registerDynamic("132", ["136"], true, function ($__require, exports, module) {
+$__System.registerDynamic("12f", ["133"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("136");
+  module.exports = $__require("133");
   return module.exports;
 });
-$__System.registerDynamic('137', ['12f', '133', '135', '132'], true, function ($__require, exports, module) {
+$__System.registerDynamic('134', ['12c', '130', '132', '12f'], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
   /* */
   module.exports = preprocessPolygon;
 
-  var orient = $__require('12f')[3];
-  var makeSlabs = $__require('133');
-  var makeIntervalTree = $__require('135');
-  var bsearch = $__require('132');
+  var orient = $__require('12c')[3];
+  var makeSlabs = $__require('130');
+  var makeIntervalTree = $__require('132');
+  var bsearch = $__require('12f');
 
   function visitInterval() {
     return true;
@@ -70417,14 +70109,14 @@ $__System.registerDynamic('137', ['12f', '133', '135', '132'], true, function ($
   }
   return module.exports;
 });
-$__System.registerDynamic("138", ["137"], true, function ($__require, exports, module) {
+$__System.registerDynamic("135", ["134"], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require("137");
+  module.exports = $__require("134");
   return module.exports;
 });
-$__System.registerDynamic("139", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("136", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -70510,7 +70202,7 @@ $__System.registerDynamic("139", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.registerDynamic("13a", [], true, function ($__require, exports, module) {
+$__System.registerDynamic("137", [], true, function ($__require, exports, module) {
   var define,
       global = this || self,
       GLOBAL = global;
@@ -70553,7 +70245,7 @@ $__System.registerDynamic("13a", [], true, function ($__require, exports, module
   }
   return module.exports;
 });
-$__System.register('13b', ['138', '139', '13a'], function (_export) {
+$__System.register('138', ['135', '136', '137'], function (_export) {
   /* */
 
   /**
@@ -70611,14 +70303,14 @@ $__System.register('13b', ['138', '139', '13a'], function (_export) {
       processPolygon = _['default'];
     }, function (_2) {
       ringAreaSpherical = _2.ringArea;
-    }, function (_a) {
-      ringAreaCartesian = _a.ringArea;
+    }, function (_3) {
+      ringAreaCartesian = _3.ringArea;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('13c', ['5b', 'c7', 'c3', '13b'], function (_export) {
+$__System.register('139', ['138', '5b', 'c4', 'c0'], function (_export) {
   /* */
 
   /**
@@ -70633,7 +70325,7 @@ $__System.register('13c', ['5b', 'c7', 'c3', '13b'], function (_export) {
    */
   'use strict';
 
-  var ndarray, mapRange, checkCoverage, ensureClockwisePolygon, getPointInPolygonsFn;
+  var ensureClockwisePolygon, getPointInPolygonsFn, ndarray, mapRange, checkCoverage;
 
   _export('maskByPolygon', maskByPolygon);
 
@@ -70712,47 +70404,48 @@ $__System.register('13c', ['5b', 'c7', 'c3', '13b'], function (_export) {
   }
 
   return {
-    setters: [function (_b) {
+    setters: [function (_) {
+      ensureClockwisePolygon = _.ensureClockwisePolygon;
+      getPointInPolygonsFn = _.getPointInPolygonsFn;
+    }, function (_b) {
       ndarray = _b['default'];
-    }, function (_c7) {
-      mapRange = _c7.mapRange;
-    }, function (_c3) {
-      checkCoverage = _c3.checkCoverage;
-    }, function (_b2) {
-      ensureClockwisePolygon = _b2.ensureClockwisePolygon;
-      getPointInPolygonsFn = _b2.getPointInPolygonsFn;
+    }, function (_c4) {
+      mapRange = _c4.mapRange;
+    }, function (_c0) {
+      checkCoverage = _c0.checkCoverage;
     }],
     execute: function () {}
   };
 });
 
-$__System.register('13d', ['c1', '13b', '13c'], function (_export) {
+$__System.register('13a', ['138', '139', 'be'], function (_export) {
   /* */
-  'use strict';
 
   // this pulls in bigger external dependencies
+  'use strict';
+
   return {
-    setters: [function (_c1) {
+    setters: [function (_) {
       var _exportObj = {};
 
-      for (var _key in _c1) {
-        if (_key !== 'default') _exportObj[_key] = _c1[_key];
+      for (var _key2 in _) {
+        if (_key2 !== 'default') _exportObj[_key2] = _[_key2];
       }
 
       _export(_exportObj);
-    }, function (_b) {
+    }, function (_2) {
       var _exportObj2 = {};
 
-      for (var _key2 in _b) {
-        if (_key2 !== 'default') _exportObj2[_key2] = _b[_key2];
+      for (var _key3 in _2) {
+        if (_key3 !== 'default') _exportObj2[_key3] = _2[_key3];
       }
 
       _export(_exportObj2);
-    }, function (_c) {
+    }, function (_be) {
       var _exportObj3 = {};
 
-      for (var _key3 in _c) {
-        if (_key3 !== 'default') _exportObj3[_key3] = _c[_key3];
+      for (var _key in _be) {
+        if (_key !== 'default') _exportObj3[_key] = _be[_key];
       }
 
       _export(_exportObj3);
@@ -70761,18 +70454,18 @@ $__System.register('13d', ['c1', '13b', '13c'], function (_export) {
   };
 });
 
-$__System.register("5d", ["13d"], function (_export) {
+$__System.register("5d", ["13a"], function (_export) {
   "use strict";
 
   return {
-    setters: [function (_d) {
+    setters: [function (_a) {
       var _exportObj = {};
 
-      for (var _key in _d) {
-        if (_key !== "default") _exportObj[_key] = _d[_key];
+      for (var _key in _a) {
+        if (_key !== "default") _exportObj[_key] = _a[_key];
       }
 
-      _exportObj["default"] = _d["default"];
+      _exportObj["default"] = _a["default"];
 
       _export(_exportObj);
     }],
@@ -70780,7 +70473,7 @@ $__System.register("5d", ["13d"], function (_export) {
   };
 });
 
-$__System.register('6e', ['b7', '5d'], function (_export) {
+$__System.register('6e', ['b4', '5d'], function (_export) {
   'use strict';
 
   var MELODIES_DCAT_CATALOG_URL, DefaultMap;
@@ -70834,7 +70527,7 @@ $__System.register('6e', ['b7', '5d'], function (_export) {
   }
 
   return {
-    setters: [function (_b7) {}, function (_d) {
+    setters: [function (_b4) {}, function (_d) {
       var _exportObj2 = {};
       _exportObj2['i18n'] = _d.getLanguageString;
 
@@ -71035,7 +70728,7 @@ $__System.register('6d', ['51'], function (_export) {
   };
 });
 
-$__System.register('13e', ['51', '54', '73', '6e', '6d'], function (_export) {
+$__System.register('13b', ['51', '54', '73', '6e', '6d'], function (_export) {
   'use strict';
 
   var Eventable, $, $$, HTML, Modal, i18n, EXTERNAL_LINK, paneHtml, bodyHtml, TEMPLATES, css, WorkspacePane;
@@ -71474,7 +71167,7 @@ $__System.register('13e', ['51', '54', '73', '6e', '6d'], function (_export) {
   };
 });
 
-$__System.register('13f', ['54', '4a', 'a8', 'a9', 'aa', 'b5', '13e'], function (_export) {
+$__System.register('13c', ['54', '4a', 'a8', 'a9', 'aa', 'b2', '13b'], function (_export) {
   'use strict';
 
   var $, HTML, L, SearchPane, WorkspacePane, sidebarHtml, Sidebar;
@@ -71484,10 +71177,10 @@ $__System.register('13f', ['54', '4a', 'a8', 'a9', 'aa', 'b5', '13e'], function 
       HTML = _.HTML;
     }, function (_a) {
       L = _a['default'];
-    }, function (_a8) {}, function (_a9) {}, function (_aa) {}, function (_b5) {
-      SearchPane = _b5['default'];
-    }, function (_e) {
-      WorkspacePane = _e['default'];
+    }, function (_a8) {}, function (_a9) {}, function (_aa) {}, function (_b2) {
+      SearchPane = _b2['default'];
+    }, function (_b) {
+      WorkspacePane = _b['default'];
     }],
     execute: function () {
       sidebarHtml = function sidebarHtml(sidebarId, searchPaneId, workspacePaneId) {
@@ -71542,9 +71235,14 @@ $__System.register('13f', ['54', '4a', 'a8', 'a9', 'aa', 'b5', '13e'], function 
   };
 });
 
-$__System.register("140", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("13d", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
-$__System.register('141', ['4a'], function (_export) {
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
+$__System.register('13e', ['4a'], function (_export) {
 
   // https://github.com/davicustodio/Leaflet.StyledLayerControl/blob/7a3268d446d755f59bcd845cf873444d01ce1774/src/styledLayerControl.js
   // + some patches to make it 'use strict' compatible
@@ -71945,6519 +71643,7585 @@ $__System.register('141', ['4a'], function (_export) {
   };
 });
 
-$__System.register("142", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("13f", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
-(function() {
-var define = $__System.amdDefine;
-(function(window, document, undefined) {
-  var oldL = window.L,
-      L = {};
-  L.version = '0.7.7';
-  if (typeof module === 'object' && typeof module.exports === 'object') {
-    module.exports = L;
-  } else if (typeof define === 'function' && define.amd) {
-    define("143", [], L);
-  }
-  L.noConflict = function() {
-    window.L = oldL;
-    return this;
-  };
-  window.L = L;
-  L.Util = {
-    extend: function(dest) {
-      var sources = Array.prototype.slice.call(arguments, 1),
-          i,
-          j,
-          len,
-          src;
-      for (j = 0, len = sources.length; j < len; j++) {
-        src = sources[j] || {};
-        for (i in src) {
-          if (src.hasOwnProperty(i)) {
-            dest[i] = src[i];
-          }
-        }
-      }
-      return dest;
-    },
-    bind: function(fn, obj) {
-      var args = arguments.length > 2 ? Array.prototype.slice.call(arguments, 2) : null;
-      return function() {
-        return fn.apply(obj, args || arguments);
-      };
-    },
-    stamp: (function() {
-      var lastId = 0,
-          key = '_leaflet_id';
-      return function(obj) {
-        obj[key] = obj[key] || ++lastId;
-        return obj[key];
-      };
-    }()),
-    invokeEach: function(obj, method, context) {
-      var i,
-          args;
-      if (typeof obj === 'object') {
-        args = Array.prototype.slice.call(arguments, 3);
-        for (i in obj) {
-          method.apply(context, [i, obj[i]].concat(args));
-        }
-        return true;
-      }
-      return false;
-    },
-    limitExecByInterval: function(fn, time, context) {
-      var lock,
-          execOnUnlock;
-      return function wrapperFn() {
-        var args = arguments;
-        if (lock) {
-          execOnUnlock = true;
-          return;
-        }
-        lock = true;
-        setTimeout(function() {
-          lock = false;
-          if (execOnUnlock) {
-            wrapperFn.apply(context, args);
-            execOnUnlock = false;
-          }
-        }, time);
-        fn.apply(context, args);
-      };
-    },
-    falseFn: function() {
-      return false;
-    },
-    formatNum: function(num, digits) {
-      var pow = Math.pow(10, digits || 5);
-      return Math.round(num * pow) / pow;
-    },
-    trim: function(str) {
-      return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
-    },
-    splitWords: function(str) {
-      return L.Util.trim(str).split(/\s+/);
-    },
-    setOptions: function(obj, options) {
-      obj.options = L.extend({}, obj.options, options);
-      return obj.options;
-    },
-    getParamString: function(obj, existingUrl, uppercase) {
-      var params = [];
-      for (var i in obj) {
-        params.push(encodeURIComponent(uppercase ? i.toUpperCase() : i) + '=' + encodeURIComponent(obj[i]));
-      }
-      return ((!existingUrl || existingUrl.indexOf('?') === -1) ? '?' : '&') + params.join('&');
-    },
-    template: function(str, data) {
-      return str.replace(/\{ *([\w_]+) *\}/g, function(str, key) {
-        var value = data[key];
-        if (value === undefined) {
-          throw new Error('No value provided for variable ' + str);
-        } else if (typeof value === 'function') {
-          value = value(data);
-        }
-        return value;
-      });
-    },
-    isArray: Array.isArray || function(obj) {
-      return (Object.prototype.toString.call(obj) === '[object Array]');
-    },
-    emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
-  };
-  (function() {
-    function getPrefixed(name) {
-      var i,
-          fn,
-          prefixes = ['webkit', 'moz', 'o', 'ms'];
-      for (i = 0; i < prefixes.length && !fn; i++) {
-        fn = window[prefixes[i] + name];
-      }
-      return fn;
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
+$__System.registerDynamic('140', [], true, function ($__require, exports, module) {
+    var define,
+        global = this || self,
+        GLOBAL = global;
+    // shim for using process in browser
+    var process = module.exports = {};
+
+    // cached from whatever global is present so that test runners that stub it
+    // don't break things.  But we need to wrap it in a try catch in case it is
+    // wrapped in strict mode code which doesn't define any globals.  It's inside a
+    // function because try/catches deoptimize in certain engines.
+
+    var cachedSetTimeout;
+    var cachedClearTimeout;
+
+    function defaultSetTimout() {
+        throw new Error('setTimeout has not been defined');
     }
-    var lastTime = 0;
-    function timeoutDefer(fn) {
-      var time = +new Date(),
-          timeToCall = Math.max(0, 16 - (time - lastTime));
-      lastTime = time + timeToCall;
-      return window.setTimeout(fn, timeToCall);
+    function defaultClearTimeout() {
+        throw new Error('clearTimeout has not been defined');
     }
-    var requestFn = window.requestAnimationFrame || getPrefixed('RequestAnimationFrame') || timeoutDefer;
-    var cancelFn = window.cancelAnimationFrame || getPrefixed('CancelAnimationFrame') || getPrefixed('CancelRequestAnimationFrame') || function(id) {
-      window.clearTimeout(id);
-    };
-    L.Util.requestAnimFrame = function(fn, context, immediate, element) {
-      fn = L.bind(fn, context);
-      if (immediate && requestFn === timeoutDefer) {
-        fn();
-      } else {
-        return requestFn.call(window, fn, element);
-      }
-    };
-    L.Util.cancelAnimFrame = function(id) {
-      if (id) {
-        cancelFn.call(window, id);
-      }
-    };
-  }());
-  L.extend = L.Util.extend;
-  L.bind = L.Util.bind;
-  L.stamp = L.Util.stamp;
-  L.setOptions = L.Util.setOptions;
-  L.Class = function() {};
-  L.Class.extend = function(props) {
-    var NewClass = function() {
-      if (this.initialize) {
-        this.initialize.apply(this, arguments);
-      }
-      if (this._initHooks) {
-        this.callInitHooks();
-      }
-    };
-    var F = function() {};
-    F.prototype = this.prototype;
-    var proto = new F();
-    proto.constructor = NewClass;
-    NewClass.prototype = proto;
-    for (var i in this) {
-      if (this.hasOwnProperty(i) && i !== 'prototype') {
-        NewClass[i] = this[i];
-      }
-    }
-    if (props.statics) {
-      L.extend(NewClass, props.statics);
-      delete props.statics;
-    }
-    if (props.includes) {
-      L.Util.extend.apply(null, [proto].concat(props.includes));
-      delete props.includes;
-    }
-    if (props.options && proto.options) {
-      props.options = L.extend({}, proto.options, props.options);
-    }
-    L.extend(proto, props);
-    proto._initHooks = [];
-    var parent = this;
-    NewClass.__super__ = parent.prototype;
-    proto.callInitHooks = function() {
-      if (this._initHooksCalled) {
-        return;
-      }
-      if (parent.prototype.callInitHooks) {
-        parent.prototype.callInitHooks.call(this);
-      }
-      this._initHooksCalled = true;
-      for (var i = 0,
-          len = proto._initHooks.length; i < len; i++) {
-        proto._initHooks[i].call(this);
-      }
-    };
-    return NewClass;
-  };
-  L.Class.include = function(props) {
-    L.extend(this.prototype, props);
-  };
-  L.Class.mergeOptions = function(options) {
-    L.extend(this.prototype.options, options);
-  };
-  L.Class.addInitHook = function(fn) {
-    var args = Array.prototype.slice.call(arguments, 1);
-    var init = typeof fn === 'function' ? fn : function() {
-      this[fn].apply(this, args);
-    };
-    this.prototype._initHooks = this.prototype._initHooks || [];
-    this.prototype._initHooks.push(init);
-  };
-  var eventsKey = '_leaflet_events';
-  L.Mixin = {};
-  L.Mixin.Events = {
-    addEventListener: function(types, fn, context) {
-      if (L.Util.invokeEach(types, this.addEventListener, this, fn, context)) {
-        return this;
-      }
-      var events = this[eventsKey] = this[eventsKey] || {},
-          contextId = context && context !== this && L.stamp(context),
-          i,
-          len,
-          event,
-          type,
-          indexKey,
-          indexLenKey,
-          typeIndex;
-      types = L.Util.splitWords(types);
-      for (i = 0, len = types.length; i < len; i++) {
-        event = {
-          action: fn,
-          context: context || this
-        };
-        type = types[i];
-        if (contextId) {
-          indexKey = type + '_idx';
-          indexLenKey = indexKey + '_len';
-          typeIndex = events[indexKey] = events[indexKey] || {};
-          if (!typeIndex[contextId]) {
-            typeIndex[contextId] = [];
-            events[indexLenKey] = (events[indexLenKey] || 0) + 1;
-          }
-          typeIndex[contextId].push(event);
-        } else {
-          events[type] = events[type] || [];
-          events[type].push(event);
-        }
-      }
-      return this;
-    },
-    hasEventListeners: function(type) {
-      var events = this[eventsKey];
-      return !!events && ((type in events && events[type].length > 0) || (type + '_idx' in events && events[type + '_idx_len'] > 0));
-    },
-    removeEventListener: function(types, fn, context) {
-      if (!this[eventsKey]) {
-        return this;
-      }
-      if (!types) {
-        return this.clearAllEventListeners();
-      }
-      if (L.Util.invokeEach(types, this.removeEventListener, this, fn, context)) {
-        return this;
-      }
-      var events = this[eventsKey],
-          contextId = context && context !== this && L.stamp(context),
-          i,
-          len,
-          type,
-          listeners,
-          j,
-          indexKey,
-          indexLenKey,
-          typeIndex,
-          removed;
-      types = L.Util.splitWords(types);
-      for (i = 0, len = types.length; i < len; i++) {
-        type = types[i];
-        indexKey = type + '_idx';
-        indexLenKey = indexKey + '_len';
-        typeIndex = events[indexKey];
-        if (!fn) {
-          delete events[type];
-          delete events[indexKey];
-          delete events[indexLenKey];
-        } else {
-          listeners = contextId && typeIndex ? typeIndex[contextId] : events[type];
-          if (listeners) {
-            for (j = listeners.length - 1; j >= 0; j--) {
-              if ((listeners[j].action === fn) && (!context || (listeners[j].context === context))) {
-                removed = listeners.splice(j, 1);
-                removed[0].action = L.Util.falseFn;
-              }
-            }
-            if (context && typeIndex && (listeners.length === 0)) {
-              delete typeIndex[contextId];
-              events[indexLenKey]--;
-            }
-          }
-        }
-      }
-      return this;
-    },
-    clearAllEventListeners: function() {
-      delete this[eventsKey];
-      return this;
-    },
-    fireEvent: function(type, data) {
-      if (!this.hasEventListeners(type)) {
-        return this;
-      }
-      var event = L.Util.extend({}, data, {
-        type: type,
-        target: this
-      });
-      var events = this[eventsKey],
-          listeners,
-          i,
-          len,
-          typeIndex,
-          contextId;
-      if (events[type]) {
-        listeners = events[type].slice();
-        for (i = 0, len = listeners.length; i < len; i++) {
-          listeners[i].action.call(listeners[i].context, event);
-        }
-      }
-      typeIndex = events[type + '_idx'];
-      for (contextId in typeIndex) {
-        listeners = typeIndex[contextId].slice();
-        if (listeners) {
-          for (i = 0, len = listeners.length; i < len; i++) {
-            listeners[i].action.call(listeners[i].context, event);
-          }
-        }
-      }
-      return this;
-    },
-    addOneTimeEventListener: function(types, fn, context) {
-      if (L.Util.invokeEach(types, this.addOneTimeEventListener, this, fn, context)) {
-        return this;
-      }
-      var handler = L.bind(function() {
-        this.removeEventListener(types, fn, context).removeEventListener(types, handler, context);
-      }, this);
-      return this.addEventListener(types, fn, context).addEventListener(types, handler, context);
-    }
-  };
-  L.Mixin.Events.on = L.Mixin.Events.addEventListener;
-  L.Mixin.Events.off = L.Mixin.Events.removeEventListener;
-  L.Mixin.Events.once = L.Mixin.Events.addOneTimeEventListener;
-  L.Mixin.Events.fire = L.Mixin.Events.fireEvent;
-  (function() {
-    var ie = 'ActiveXObject' in window,
-        ielt9 = ie && !document.addEventListener,
-        ua = navigator.userAgent.toLowerCase(),
-        webkit = ua.indexOf('webkit') !== -1,
-        chrome = ua.indexOf('chrome') !== -1,
-        phantomjs = ua.indexOf('phantom') !== -1,
-        android = ua.indexOf('android') !== -1,
-        android23 = ua.search('android [23]') !== -1,
-        gecko = ua.indexOf('gecko') !== -1,
-        mobile = typeof orientation !== undefined + '',
-        msPointer = !window.PointerEvent && window.MSPointerEvent,
-        pointer = (window.PointerEvent && window.navigator.pointerEnabled) || msPointer,
-        retina = ('devicePixelRatio' in window && window.devicePixelRatio > 1) || ('matchMedia' in window && window.matchMedia('(min-resolution:144dpi)') && window.matchMedia('(min-resolution:144dpi)').matches),
-        doc = document.documentElement,
-        ie3d = ie && ('transition' in doc.style),
-        webkit3d = ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !android23,
-        gecko3d = 'MozPerspective' in doc.style,
-        opera3d = 'OTransition' in doc.style,
-        any3d = !window.L_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d) && !phantomjs;
-    var touch = !window.L_NO_TOUCH && !phantomjs && (pointer || 'ontouchstart' in window || (window.DocumentTouch && document instanceof window.DocumentTouch));
-    L.Browser = {
-      ie: ie,
-      ielt9: ielt9,
-      webkit: webkit,
-      gecko: gecko && !webkit && !window.opera && !ie,
-      android: android,
-      android23: android23,
-      chrome: chrome,
-      ie3d: ie3d,
-      webkit3d: webkit3d,
-      gecko3d: gecko3d,
-      opera3d: opera3d,
-      any3d: any3d,
-      mobile: mobile,
-      mobileWebkit: mobile && webkit,
-      mobileWebkit3d: mobile && webkit3d,
-      mobileOpera: mobile && window.opera,
-      touch: touch,
-      msPointer: msPointer,
-      pointer: pointer,
-      retina: retina
-    };
-  }());
-  L.Point = function(x, y, round) {
-    this.x = (round ? Math.round(x) : x);
-    this.y = (round ? Math.round(y) : y);
-  };
-  L.Point.prototype = {
-    clone: function() {
-      return new L.Point(this.x, this.y);
-    },
-    add: function(point) {
-      return this.clone()._add(L.point(point));
-    },
-    _add: function(point) {
-      this.x += point.x;
-      this.y += point.y;
-      return this;
-    },
-    subtract: function(point) {
-      return this.clone()._subtract(L.point(point));
-    },
-    _subtract: function(point) {
-      this.x -= point.x;
-      this.y -= point.y;
-      return this;
-    },
-    divideBy: function(num) {
-      return this.clone()._divideBy(num);
-    },
-    _divideBy: function(num) {
-      this.x /= num;
-      this.y /= num;
-      return this;
-    },
-    multiplyBy: function(num) {
-      return this.clone()._multiplyBy(num);
-    },
-    _multiplyBy: function(num) {
-      this.x *= num;
-      this.y *= num;
-      return this;
-    },
-    round: function() {
-      return this.clone()._round();
-    },
-    _round: function() {
-      this.x = Math.round(this.x);
-      this.y = Math.round(this.y);
-      return this;
-    },
-    floor: function() {
-      return this.clone()._floor();
-    },
-    _floor: function() {
-      this.x = Math.floor(this.x);
-      this.y = Math.floor(this.y);
-      return this;
-    },
-    distanceTo: function(point) {
-      point = L.point(point);
-      var x = point.x - this.x,
-          y = point.y - this.y;
-      return Math.sqrt(x * x + y * y);
-    },
-    equals: function(point) {
-      point = L.point(point);
-      return point.x === this.x && point.y === this.y;
-    },
-    contains: function(point) {
-      point = L.point(point);
-      return Math.abs(point.x) <= Math.abs(this.x) && Math.abs(point.y) <= Math.abs(this.y);
-    },
-    toString: function() {
-      return 'Point(' + L.Util.formatNum(this.x) + ', ' + L.Util.formatNum(this.y) + ')';
-    }
-  };
-  L.point = function(x, y, round) {
-    if (x instanceof L.Point) {
-      return x;
-    }
-    if (L.Util.isArray(x)) {
-      return new L.Point(x[0], x[1]);
-    }
-    if (x === undefined || x === null) {
-      return x;
-    }
-    return new L.Point(x, y, round);
-  };
-  L.Bounds = function(a, b) {
-    if (!a) {
-      return;
-    }
-    var points = b ? [a, b] : a;
-    for (var i = 0,
-        len = points.length; i < len; i++) {
-      this.extend(points[i]);
-    }
-  };
-  L.Bounds.prototype = {
-    extend: function(point) {
-      point = L.point(point);
-      if (!this.min && !this.max) {
-        this.min = point.clone();
-        this.max = point.clone();
-      } else {
-        this.min.x = Math.min(point.x, this.min.x);
-        this.max.x = Math.max(point.x, this.max.x);
-        this.min.y = Math.min(point.y, this.min.y);
-        this.max.y = Math.max(point.y, this.max.y);
-      }
-      return this;
-    },
-    getCenter: function(round) {
-      return new L.Point((this.min.x + this.max.x) / 2, (this.min.y + this.max.y) / 2, round);
-    },
-    getBottomLeft: function() {
-      return new L.Point(this.min.x, this.max.y);
-    },
-    getTopRight: function() {
-      return new L.Point(this.max.x, this.min.y);
-    },
-    getSize: function() {
-      return this.max.subtract(this.min);
-    },
-    contains: function(obj) {
-      var min,
-          max;
-      if (typeof obj[0] === 'number' || obj instanceof L.Point) {
-        obj = L.point(obj);
-      } else {
-        obj = L.bounds(obj);
-      }
-      if (obj instanceof L.Bounds) {
-        min = obj.min;
-        max = obj.max;
-      } else {
-        min = max = obj;
-      }
-      return (min.x >= this.min.x) && (max.x <= this.max.x) && (min.y >= this.min.y) && (max.y <= this.max.y);
-    },
-    intersects: function(bounds) {
-      bounds = L.bounds(bounds);
-      var min = this.min,
-          max = this.max,
-          min2 = bounds.min,
-          max2 = bounds.max,
-          xIntersects = (max2.x >= min.x) && (min2.x <= max.x),
-          yIntersects = (max2.y >= min.y) && (min2.y <= max.y);
-      return xIntersects && yIntersects;
-    },
-    isValid: function() {
-      return !!(this.min && this.max);
-    }
-  };
-  L.bounds = function(a, b) {
-    if (!a || a instanceof L.Bounds) {
-      return a;
-    }
-    return new L.Bounds(a, b);
-  };
-  L.Transformation = function(a, b, c, d) {
-    this._a = a;
-    this._b = b;
-    this._c = c;
-    this._d = d;
-  };
-  L.Transformation.prototype = {
-    transform: function(point, scale) {
-      return this._transform(point.clone(), scale);
-    },
-    _transform: function(point, scale) {
-      scale = scale || 1;
-      point.x = scale * (this._a * point.x + this._b);
-      point.y = scale * (this._c * point.y + this._d);
-      return point;
-    },
-    untransform: function(point, scale) {
-      scale = scale || 1;
-      return new L.Point((point.x / scale - this._b) / this._a, (point.y / scale - this._d) / this._c);
-    }
-  };
-  L.DomUtil = {
-    get: function(id) {
-      return (typeof id === 'string' ? document.getElementById(id) : id);
-    },
-    getStyle: function(el, style) {
-      var value = el.style[style];
-      if (!value && el.currentStyle) {
-        value = el.currentStyle[style];
-      }
-      if ((!value || value === 'auto') && document.defaultView) {
-        var css = document.defaultView.getComputedStyle(el, null);
-        value = css ? css[style] : null;
-      }
-      return value === 'auto' ? null : value;
-    },
-    getViewportOffset: function(element) {
-      var top = 0,
-          left = 0,
-          el = element,
-          docBody = document.body,
-          docEl = document.documentElement,
-          pos;
-      do {
-        top += el.offsetTop || 0;
-        left += el.offsetLeft || 0;
-        top += parseInt(L.DomUtil.getStyle(el, 'borderTopWidth'), 10) || 0;
-        left += parseInt(L.DomUtil.getStyle(el, 'borderLeftWidth'), 10) || 0;
-        pos = L.DomUtil.getStyle(el, 'position');
-        if (el.offsetParent === docBody && pos === 'absolute') {
-          break;
-        }
-        if (pos === 'fixed') {
-          top += docBody.scrollTop || docEl.scrollTop || 0;
-          left += docBody.scrollLeft || docEl.scrollLeft || 0;
-          break;
-        }
-        if (pos === 'relative' && !el.offsetLeft) {
-          var width = L.DomUtil.getStyle(el, 'width'),
-              maxWidth = L.DomUtil.getStyle(el, 'max-width'),
-              r = el.getBoundingClientRect();
-          if (width !== 'none' || maxWidth !== 'none') {
-            left += r.left + el.clientLeft;
-          }
-          top += r.top + (docBody.scrollTop || docEl.scrollTop || 0);
-          break;
-        }
-        el = el.offsetParent;
-      } while (el);
-      el = element;
-      do {
-        if (el === docBody) {
-          break;
-        }
-        top -= el.scrollTop || 0;
-        left -= el.scrollLeft || 0;
-        el = el.parentNode;
-      } while (el);
-      return new L.Point(left, top);
-    },
-    documentIsLtr: function() {
-      if (!L.DomUtil._docIsLtrCached) {
-        L.DomUtil._docIsLtrCached = true;
-        L.DomUtil._docIsLtr = L.DomUtil.getStyle(document.body, 'direction') === 'ltr';
-      }
-      return L.DomUtil._docIsLtr;
-    },
-    create: function(tagName, className, container) {
-      var el = document.createElement(tagName);
-      el.className = className;
-      if (container) {
-        container.appendChild(el);
-      }
-      return el;
-    },
-    hasClass: function(el, name) {
-      if (el.classList !== undefined) {
-        return el.classList.contains(name);
-      }
-      var className = L.DomUtil._getClass(el);
-      return className.length > 0 && new RegExp('(^|\\s)' + name + '(\\s|$)').test(className);
-    },
-    addClass: function(el, name) {
-      if (el.classList !== undefined) {
-        var classes = L.Util.splitWords(name);
-        for (var i = 0,
-            len = classes.length; i < len; i++) {
-          el.classList.add(classes[i]);
-        }
-      } else if (!L.DomUtil.hasClass(el, name)) {
-        var className = L.DomUtil._getClass(el);
-        L.DomUtil._setClass(el, (className ? className + ' ' : '') + name);
-      }
-    },
-    removeClass: function(el, name) {
-      if (el.classList !== undefined) {
-        el.classList.remove(name);
-      } else {
-        L.DomUtil._setClass(el, L.Util.trim((' ' + L.DomUtil._getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
-      }
-    },
-    _setClass: function(el, name) {
-      if (el.className.baseVal === undefined) {
-        el.className = name;
-      } else {
-        el.className.baseVal = name;
-      }
-    },
-    _getClass: function(el) {
-      return el.className.baseVal === undefined ? el.className : el.className.baseVal;
-    },
-    setOpacity: function(el, value) {
-      if ('opacity' in el.style) {
-        el.style.opacity = value;
-      } else if ('filter' in el.style) {
-        var filter = false,
-            filterName = 'DXImageTransform.Microsoft.Alpha';
+    (function () {
         try {
-          filter = el.filters.item(filterName);
+            if (typeof setTimeout === 'function') {
+                cachedSetTimeout = setTimeout;
+            } else {
+                cachedSetTimeout = defaultSetTimout;
+            }
         } catch (e) {
-          if (value === 1) {
+            cachedSetTimeout = defaultSetTimout;
+        }
+        try {
+            if (typeof clearTimeout === 'function') {
+                cachedClearTimeout = clearTimeout;
+            } else {
+                cachedClearTimeout = defaultClearTimeout;
+            }
+        } catch (e) {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    })();
+    function runTimeout(fun) {
+        if (cachedSetTimeout === setTimeout) {
+            //normal enviroments in sane situations
+            return setTimeout(fun, 0);
+        }
+        // if setTimeout wasn't available but was latter defined
+        if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+            cachedSetTimeout = setTimeout;
+            return setTimeout(fun, 0);
+        }
+        try {
+            // when when somebody has screwed with setTimeout but no I.E. maddness
+            return cachedSetTimeout(fun, 0);
+        } catch (e) {
+            try {
+                // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+                return cachedSetTimeout.call(null, fun, 0);
+            } catch (e) {
+                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+                return cachedSetTimeout.call(this, fun, 0);
+            }
+        }
+    }
+    function runClearTimeout(marker) {
+        if (cachedClearTimeout === clearTimeout) {
+            //normal enviroments in sane situations
+            return clearTimeout(marker);
+        }
+        // if clearTimeout wasn't available but was latter defined
+        if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+            cachedClearTimeout = clearTimeout;
+            return clearTimeout(marker);
+        }
+        try {
+            // when when somebody has screwed with setTimeout but no I.E. maddness
+            return cachedClearTimeout(marker);
+        } catch (e) {
+            try {
+                // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+                return cachedClearTimeout.call(null, marker);
+            } catch (e) {
+                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+                // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+                return cachedClearTimeout.call(this, marker);
+            }
+        }
+    }
+    var queue = [];
+    var draining = false;
+    var currentQueue;
+    var queueIndex = -1;
+
+    function cleanUpNextTick() {
+        if (!draining || !currentQueue) {
+            return;
+        }
+        draining = false;
+        if (currentQueue.length) {
+            queue = currentQueue.concat(queue);
+        } else {
+            queueIndex = -1;
+        }
+        if (queue.length) {
+            drainQueue();
+        }
+    }
+
+    function drainQueue() {
+        if (draining) {
+            return;
+        }
+        var timeout = runTimeout(cleanUpNextTick);
+        draining = true;
+
+        var len = queue.length;
+        while (len) {
+            currentQueue = queue;
+            queue = [];
+            while (++queueIndex < len) {
+                if (currentQueue) {
+                    currentQueue[queueIndex].run();
+                }
+            }
+            queueIndex = -1;
+            len = queue.length;
+        }
+        currentQueue = null;
+        draining = false;
+        runClearTimeout(timeout);
+    }
+
+    process.nextTick = function (fun) {
+        var args = new Array(arguments.length - 1);
+        if (arguments.length > 1) {
+            for (var i = 1; i < arguments.length; i++) {
+                args[i - 1] = arguments[i];
+            }
+        }
+        queue.push(new Item(fun, args));
+        if (queue.length === 1 && !draining) {
+            runTimeout(drainQueue);
+        }
+    };
+
+    // v8 likes predictible objects
+    function Item(fun, array) {
+        this.fun = fun;
+        this.array = array;
+    }
+    Item.prototype.run = function () {
+        this.fun.apply(null, this.array);
+    };
+    process.title = 'browser';
+    process.browser = true;
+    process.env = {};
+    process.argv = [];
+    process.version = ''; // empty string to avoid regexp issues
+    process.versions = {};
+
+    function noop() {}
+
+    process.on = noop;
+    process.addListener = noop;
+    process.once = noop;
+    process.off = noop;
+    process.removeListener = noop;
+    process.removeAllListeners = noop;
+    process.emit = noop;
+
+    process.binding = function (name) {
+        throw new Error('process.binding is not supported');
+    };
+
+    process.cwd = function () {
+        return '/';
+    };
+    process.chdir = function (dir) {
+        throw new Error('process.chdir is not supported');
+    };
+    process.umask = function () {
+        return 0;
+    };
+    return module.exports;
+});
+$__System.registerDynamic("141", ["140"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("140");
+  return module.exports;
+});
+$__System.registerDynamic('142', ['141'], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__System._nodeRequire ? process : $__require('141');
+  return module.exports;
+});
+$__System.registerDynamic("3b", ["142"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("142");
+  return module.exports;
+});
+$__System.registerDynamic("143", ["3b"], true, function ($__require, exports, module) {
+  /* */
+  "format cjs";
+
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  (function (process) {
+    (function (window, document, undefined) {
+      var L = { version: "1.0.1" };
+      function expose() {
+        var oldL = window.L;
+        L.noConflict = function () {
+          window.L = oldL;
+          return this;
+        };
+        window.L = L;
+      }
+      if (typeof module === 'object' && typeof module.exports === 'object') {
+        module.exports = L;
+      } else if (typeof define === 'function' && define.amd) {
+        define(L);
+      }
+      if (typeof window !== 'undefined') {
+        expose();
+      }
+      L.Util = {
+        extend: function (dest) {
+          var i, j, len, src;
+          for (j = 1, len = arguments.length; j < len; j++) {
+            src = arguments[j];
+            for (i in src) {
+              dest[i] = src[i];
+            }
+          }
+          return dest;
+        },
+        create: Object.create || function () {
+          function F() {}
+          return function (proto) {
+            F.prototype = proto;
+            return new F();
+          };
+        }(),
+        bind: function (fn, obj) {
+          var slice = Array.prototype.slice;
+          if (fn.bind) {
+            return fn.bind.apply(fn, slice.call(arguments, 1));
+          }
+          var args = slice.call(arguments, 2);
+          return function () {
+            return fn.apply(obj, args.length ? args.concat(slice.call(arguments)) : arguments);
+          };
+        },
+        stamp: function (obj) {
+          obj._leaflet_id = obj._leaflet_id || ++L.Util.lastId;
+          return obj._leaflet_id;
+        },
+        lastId: 0,
+        throttle: function (fn, time, context) {
+          var lock, args, wrapperFn, later;
+          later = function () {
+            lock = false;
+            if (args) {
+              wrapperFn.apply(context, args);
+              args = false;
+            }
+          };
+          wrapperFn = function () {
+            if (lock) {
+              args = arguments;
+            } else {
+              fn.apply(context, arguments);
+              setTimeout(later, time);
+              lock = true;
+            }
+          };
+          return wrapperFn;
+        },
+        wrapNum: function (x, range, includeMax) {
+          var max = range[1],
+              min = range[0],
+              d = max - min;
+          return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
+        },
+        falseFn: function () {
+          return false;
+        },
+        formatNum: function (num, digits) {
+          var pow = Math.pow(10, digits || 5);
+          return Math.round(num * pow) / pow;
+        },
+        trim: function (str) {
+          return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+        },
+        splitWords: function (str) {
+          return L.Util.trim(str).split(/\s+/);
+        },
+        setOptions: function (obj, options) {
+          if (!obj.hasOwnProperty('options')) {
+            obj.options = obj.options ? L.Util.create(obj.options) : {};
+          }
+          for (var i in options) {
+            obj.options[i] = options[i];
+          }
+          return obj.options;
+        },
+        getParamString: function (obj, existingUrl, uppercase) {
+          var params = [];
+          for (var i in obj) {
+            params.push(encodeURIComponent(uppercase ? i.toUpperCase() : i) + '=' + encodeURIComponent(obj[i]));
+          }
+          return (!existingUrl || existingUrl.indexOf('?') === -1 ? '?' : '&') + params.join('&');
+        },
+        template: function (str, data) {
+          return str.replace(L.Util.templateRe, function (str, key) {
+            var value = data[key];
+            if (value === undefined) {
+              throw new Error('No value provided for variable ' + str);
+            } else if (typeof value === 'function') {
+              value = value(data);
+            }
+            return value;
+          });
+        },
+        templateRe: /\{ *([\w_\-]+) *\}/g,
+        isArray: Array.isArray || function (obj) {
+          return Object.prototype.toString.call(obj) === '[object Array]';
+        },
+        indexOf: function (array, el) {
+          for (var i = 0; i < array.length; i++) {
+            if (array[i] === el) {
+              return i;
+            }
+          }
+          return -1;
+        },
+        emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+      };
+      (function () {
+        function getPrefixed(name) {
+          return window['webkit' + name] || window['moz' + name] || window['ms' + name];
+        }
+        var lastTime = 0;
+        function timeoutDefer(fn) {
+          var time = +new Date(),
+              timeToCall = Math.max(0, 16 - (time - lastTime));
+          lastTime = time + timeToCall;
+          return window.setTimeout(fn, timeToCall);
+        }
+        var requestFn = window.requestAnimationFrame || getPrefixed('RequestAnimationFrame') || timeoutDefer,
+            cancelFn = window.cancelAnimationFrame || getPrefixed('CancelAnimationFrame') || getPrefixed('CancelRequestAnimationFrame') || function (id) {
+          window.clearTimeout(id);
+        };
+        L.Util.requestAnimFrame = function (fn, context, immediate) {
+          if (immediate && requestFn === timeoutDefer) {
+            fn.call(context);
+          } else {
+            return requestFn.call(window, L.bind(fn, context));
+          }
+        };
+        L.Util.cancelAnimFrame = function (id) {
+          if (id) {
+            cancelFn.call(window, id);
+          }
+        };
+      })();
+      L.extend = L.Util.extend;
+      L.bind = L.Util.bind;
+      L.stamp = L.Util.stamp;
+      L.setOptions = L.Util.setOptions;
+      L.Class = function () {};
+      L.Class.extend = function (props) {
+        var NewClass = function () {
+          if (this.initialize) {
+            this.initialize.apply(this, arguments);
+          }
+          this.callInitHooks();
+        };
+        var parentProto = NewClass.__super__ = this.prototype;
+        var proto = L.Util.create(parentProto);
+        proto.constructor = NewClass;
+        NewClass.prototype = proto;
+        for (var i in this) {
+          if (this.hasOwnProperty(i) && i !== 'prototype') {
+            NewClass[i] = this[i];
+          }
+        }
+        if (props.statics) {
+          L.extend(NewClass, props.statics);
+          delete props.statics;
+        }
+        if (props.includes) {
+          L.Util.extend.apply(null, [proto].concat(props.includes));
+          delete props.includes;
+        }
+        if (proto.options) {
+          props.options = L.Util.extend(L.Util.create(proto.options), props.options);
+        }
+        L.extend(proto, props);
+        proto._initHooks = [];
+        proto.callInitHooks = function () {
+          if (this._initHooksCalled) {
             return;
           }
-        }
-        value = Math.round(value * 100);
-        if (filter) {
-          filter.Enabled = (value !== 100);
-          filter.Opacity = value;
-        } else {
-          el.style.filter += ' progid:' + filterName + '(opacity=' + value + ')';
-        }
-      }
-    },
-    testProp: function(props) {
-      var style = document.documentElement.style;
-      for (var i = 0; i < props.length; i++) {
-        if (props[i] in style) {
-          return props[i];
-        }
-      }
-      return false;
-    },
-    getTranslateString: function(point) {
-      var is3d = L.Browser.webkit3d,
-          open = 'translate' + (is3d ? '3d' : '') + '(',
-          close = (is3d ? ',0' : '') + ')';
-      return open + point.x + 'px,' + point.y + 'px' + close;
-    },
-    getScaleString: function(scale, origin) {
-      var preTranslateStr = L.DomUtil.getTranslateString(origin.add(origin.multiplyBy(-1 * scale))),
-          scaleStr = ' scale(' + scale + ') ';
-      return preTranslateStr + scaleStr;
-    },
-    setPosition: function(el, point, disable3D) {
-      el._leaflet_pos = point;
-      if (!disable3D && L.Browser.any3d) {
-        el.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(point);
-      } else {
-        el.style.left = point.x + 'px';
-        el.style.top = point.y + 'px';
-      }
-    },
-    getPosition: function(el) {
-      return el._leaflet_pos;
-    }
-  };
-  L.DomUtil.TRANSFORM = L.DomUtil.testProp(['transform', 'WebkitTransform', 'OTransform', 'MozTransform', 'msTransform']);
-  L.DomUtil.TRANSITION = L.DomUtil.testProp(['webkitTransition', 'transition', 'OTransition', 'MozTransition', 'msTransition']);
-  L.DomUtil.TRANSITION_END = L.DomUtil.TRANSITION === 'webkitTransition' || L.DomUtil.TRANSITION === 'OTransition' ? L.DomUtil.TRANSITION + 'End' : 'transitionend';
-  (function() {
-    if ('onselectstart' in document) {
-      L.extend(L.DomUtil, {
-        disableTextSelection: function() {
-          L.DomEvent.on(window, 'selectstart', L.DomEvent.preventDefault);
-        },
-        enableTextSelection: function() {
-          L.DomEvent.off(window, 'selectstart', L.DomEvent.preventDefault);
-        }
-      });
-    } else {
-      var userSelectProperty = L.DomUtil.testProp(['userSelect', 'WebkitUserSelect', 'OUserSelect', 'MozUserSelect', 'msUserSelect']);
-      L.extend(L.DomUtil, {
-        disableTextSelection: function() {
-          if (userSelectProperty) {
-            var style = document.documentElement.style;
-            this._userSelect = style[userSelectProperty];
-            style[userSelectProperty] = 'none';
+          if (parentProto.callInitHooks) {
+            parentProto.callInitHooks.call(this);
           }
-        },
-        enableTextSelection: function() {
-          if (userSelectProperty) {
-            document.documentElement.style[userSelectProperty] = this._userSelect;
-            delete this._userSelect;
+          this._initHooksCalled = true;
+          for (var i = 0, len = proto._initHooks.length; i < len; i++) {
+            proto._initHooks[i].call(this);
           }
-        }
-      });
-    }
-    L.extend(L.DomUtil, {
-      disableImageDrag: function() {
-        L.DomEvent.on(window, 'dragstart', L.DomEvent.preventDefault);
-      },
-      enableImageDrag: function() {
-        L.DomEvent.off(window, 'dragstart', L.DomEvent.preventDefault);
-      }
-    });
-  })();
-  L.LatLng = function(lat, lng, alt) {
-    lat = parseFloat(lat);
-    lng = parseFloat(lng);
-    if (isNaN(lat) || isNaN(lng)) {
-      throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')');
-    }
-    this.lat = lat;
-    this.lng = lng;
-    if (alt !== undefined) {
-      this.alt = parseFloat(alt);
-    }
-  };
-  L.extend(L.LatLng, {
-    DEG_TO_RAD: Math.PI / 180,
-    RAD_TO_DEG: 180 / Math.PI,
-    MAX_MARGIN: 1.0E-9
-  });
-  L.LatLng.prototype = {
-    equals: function(obj) {
-      if (!obj) {
-        return false;
-      }
-      obj = L.latLng(obj);
-      var margin = Math.max(Math.abs(this.lat - obj.lat), Math.abs(this.lng - obj.lng));
-      return margin <= L.LatLng.MAX_MARGIN;
-    },
-    toString: function(precision) {
-      return 'LatLng(' + L.Util.formatNum(this.lat, precision) + ', ' + L.Util.formatNum(this.lng, precision) + ')';
-    },
-    distanceTo: function(other) {
-      other = L.latLng(other);
-      var R = 6378137,
-          d2r = L.LatLng.DEG_TO_RAD,
-          dLat = (other.lat - this.lat) * d2r,
-          dLon = (other.lng - this.lng) * d2r,
-          lat1 = this.lat * d2r,
-          lat2 = other.lat * d2r,
-          sin1 = Math.sin(dLat / 2),
-          sin2 = Math.sin(dLon / 2);
-      var a = sin1 * sin1 + sin2 * sin2 * Math.cos(lat1) * Math.cos(lat2);
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    },
-    wrap: function(a, b) {
-      var lng = this.lng;
-      a = a || -180;
-      b = b || 180;
-      lng = (lng + b) % (b - a) + (lng < a || lng === b ? b : a);
-      return new L.LatLng(this.lat, lng);
-    }
-  };
-  L.latLng = function(a, b) {
-    if (a instanceof L.LatLng) {
-      return a;
-    }
-    if (L.Util.isArray(a)) {
-      if (typeof a[0] === 'number' || typeof a[0] === 'string') {
-        return new L.LatLng(a[0], a[1], a[2]);
-      } else {
-        return null;
-      }
-    }
-    if (a === undefined || a === null) {
-      return a;
-    }
-    if (typeof a === 'object' && 'lat' in a) {
-      return new L.LatLng(a.lat, 'lng' in a ? a.lng : a.lon);
-    }
-    if (b === undefined) {
-      return null;
-    }
-    return new L.LatLng(a, b);
-  };
-  L.LatLngBounds = function(southWest, northEast) {
-    if (!southWest) {
-      return;
-    }
-    var latlngs = northEast ? [southWest, northEast] : southWest;
-    for (var i = 0,
-        len = latlngs.length; i < len; i++) {
-      this.extend(latlngs[i]);
-    }
-  };
-  L.LatLngBounds.prototype = {
-    extend: function(obj) {
-      if (!obj) {
-        return this;
-      }
-      var latLng = L.latLng(obj);
-      if (latLng !== null) {
-        obj = latLng;
-      } else {
-        obj = L.latLngBounds(obj);
-      }
-      if (obj instanceof L.LatLng) {
-        if (!this._southWest && !this._northEast) {
-          this._southWest = new L.LatLng(obj.lat, obj.lng);
-          this._northEast = new L.LatLng(obj.lat, obj.lng);
-        } else {
-          this._southWest.lat = Math.min(obj.lat, this._southWest.lat);
-          this._southWest.lng = Math.min(obj.lng, this._southWest.lng);
-          this._northEast.lat = Math.max(obj.lat, this._northEast.lat);
-          this._northEast.lng = Math.max(obj.lng, this._northEast.lng);
-        }
-      } else if (obj instanceof L.LatLngBounds) {
-        this.extend(obj._southWest);
-        this.extend(obj._northEast);
-      }
-      return this;
-    },
-    pad: function(bufferRatio) {
-      var sw = this._southWest,
-          ne = this._northEast,
-          heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
-          widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
-      return new L.LatLngBounds(new L.LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer), new L.LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
-    },
-    getCenter: function() {
-      return new L.LatLng((this._southWest.lat + this._northEast.lat) / 2, (this._southWest.lng + this._northEast.lng) / 2);
-    },
-    getSouthWest: function() {
-      return this._southWest;
-    },
-    getNorthEast: function() {
-      return this._northEast;
-    },
-    getNorthWest: function() {
-      return new L.LatLng(this.getNorth(), this.getWest());
-    },
-    getSouthEast: function() {
-      return new L.LatLng(this.getSouth(), this.getEast());
-    },
-    getWest: function() {
-      return this._southWest.lng;
-    },
-    getSouth: function() {
-      return this._southWest.lat;
-    },
-    getEast: function() {
-      return this._northEast.lng;
-    },
-    getNorth: function() {
-      return this._northEast.lat;
-    },
-    contains: function(obj) {
-      if (typeof obj[0] === 'number' || obj instanceof L.LatLng) {
-        obj = L.latLng(obj);
-      } else {
-        obj = L.latLngBounds(obj);
-      }
-      var sw = this._southWest,
-          ne = this._northEast,
-          sw2,
-          ne2;
-      if (obj instanceof L.LatLngBounds) {
-        sw2 = obj.getSouthWest();
-        ne2 = obj.getNorthEast();
-      } else {
-        sw2 = ne2 = obj;
-      }
-      return (sw2.lat >= sw.lat) && (ne2.lat <= ne.lat) && (sw2.lng >= sw.lng) && (ne2.lng <= ne.lng);
-    },
-    intersects: function(bounds) {
-      bounds = L.latLngBounds(bounds);
-      var sw = this._southWest,
-          ne = this._northEast,
-          sw2 = bounds.getSouthWest(),
-          ne2 = bounds.getNorthEast(),
-          latIntersects = (ne2.lat >= sw.lat) && (sw2.lat <= ne.lat),
-          lngIntersects = (ne2.lng >= sw.lng) && (sw2.lng <= ne.lng);
-      return latIntersects && lngIntersects;
-    },
-    toBBoxString: function() {
-      return [this.getWest(), this.getSouth(), this.getEast(), this.getNorth()].join(',');
-    },
-    equals: function(bounds) {
-      if (!bounds) {
-        return false;
-      }
-      bounds = L.latLngBounds(bounds);
-      return this._southWest.equals(bounds.getSouthWest()) && this._northEast.equals(bounds.getNorthEast());
-    },
-    isValid: function() {
-      return !!(this._southWest && this._northEast);
-    }
-  };
-  L.latLngBounds = function(a, b) {
-    if (!a || a instanceof L.LatLngBounds) {
-      return a;
-    }
-    return new L.LatLngBounds(a, b);
-  };
-  L.Projection = {};
-  L.Projection.SphericalMercator = {
-    MAX_LATITUDE: 85.0511287798,
-    project: function(latlng) {
-      var d = L.LatLng.DEG_TO_RAD,
-          max = this.MAX_LATITUDE,
-          lat = Math.max(Math.min(max, latlng.lat), -max),
-          x = latlng.lng * d,
-          y = lat * d;
-      y = Math.log(Math.tan((Math.PI / 4) + (y / 2)));
-      return new L.Point(x, y);
-    },
-    unproject: function(point) {
-      var d = L.LatLng.RAD_TO_DEG,
-          lng = point.x * d,
-          lat = (2 * Math.atan(Math.exp(point.y)) - (Math.PI / 2)) * d;
-      return new L.LatLng(lat, lng);
-    }
-  };
-  L.Projection.LonLat = {
-    project: function(latlng) {
-      return new L.Point(latlng.lng, latlng.lat);
-    },
-    unproject: function(point) {
-      return new L.LatLng(point.y, point.x);
-    }
-  };
-  L.CRS = {
-    latLngToPoint: function(latlng, zoom) {
-      var projectedPoint = this.projection.project(latlng),
-          scale = this.scale(zoom);
-      return this.transformation._transform(projectedPoint, scale);
-    },
-    pointToLatLng: function(point, zoom) {
-      var scale = this.scale(zoom),
-          untransformedPoint = this.transformation.untransform(point, scale);
-      return this.projection.unproject(untransformedPoint);
-    },
-    project: function(latlng) {
-      return this.projection.project(latlng);
-    },
-    scale: function(zoom) {
-      return 256 * Math.pow(2, zoom);
-    },
-    getSize: function(zoom) {
-      var s = this.scale(zoom);
-      return L.point(s, s);
-    }
-  };
-  L.CRS.Simple = L.extend({}, L.CRS, {
-    projection: L.Projection.LonLat,
-    transformation: new L.Transformation(1, 0, -1, 0),
-    scale: function(zoom) {
-      return Math.pow(2, zoom);
-    }
-  });
-  L.CRS.EPSG3857 = L.extend({}, L.CRS, {
-    code: 'EPSG:3857',
-    projection: L.Projection.SphericalMercator,
-    transformation: new L.Transformation(0.5 / Math.PI, 0.5, -0.5 / Math.PI, 0.5),
-    project: function(latlng) {
-      var projectedPoint = this.projection.project(latlng),
-          earthRadius = 6378137;
-      return projectedPoint.multiplyBy(earthRadius);
-    }
-  });
-  L.CRS.EPSG900913 = L.extend({}, L.CRS.EPSG3857, {code: 'EPSG:900913'});
-  L.CRS.EPSG4326 = L.extend({}, L.CRS, {
-    code: 'EPSG:4326',
-    projection: L.Projection.LonLat,
-    transformation: new L.Transformation(1 / 360, 0.5, -1 / 360, 0.5)
-  });
-  L.Map = L.Class.extend({
-    includes: L.Mixin.Events,
-    options: {
-      crs: L.CRS.EPSG3857,
-      fadeAnimation: L.DomUtil.TRANSITION && !L.Browser.android23,
-      trackResize: true,
-      markerZoomAnimation: L.DomUtil.TRANSITION && L.Browser.any3d
-    },
-    initialize: function(id, options) {
-      options = L.setOptions(this, options);
-      this._initContainer(id);
-      this._initLayout();
-      this._onResize = L.bind(this._onResize, this);
-      this._initEvents();
-      if (options.maxBounds) {
-        this.setMaxBounds(options.maxBounds);
-      }
-      if (options.center && options.zoom !== undefined) {
-        this.setView(L.latLng(options.center), options.zoom, {reset: true});
-      }
-      this._handlers = [];
-      this._layers = {};
-      this._zoomBoundLayers = {};
-      this._tileLayersNum = 0;
-      this.callInitHooks();
-      this._addLayers(options.layers);
-    },
-    setView: function(center, zoom) {
-      zoom = zoom === undefined ? this.getZoom() : zoom;
-      this._resetView(L.latLng(center), this._limitZoom(zoom));
-      return this;
-    },
-    setZoom: function(zoom, options) {
-      if (!this._loaded) {
-        this._zoom = this._limitZoom(zoom);
-        return this;
-      }
-      return this.setView(this.getCenter(), zoom, {zoom: options});
-    },
-    zoomIn: function(delta, options) {
-      return this.setZoom(this._zoom + (delta || 1), options);
-    },
-    zoomOut: function(delta, options) {
-      return this.setZoom(this._zoom - (delta || 1), options);
-    },
-    setZoomAround: function(latlng, zoom, options) {
-      var scale = this.getZoomScale(zoom),
-          viewHalf = this.getSize().divideBy(2),
-          containerPoint = latlng instanceof L.Point ? latlng : this.latLngToContainerPoint(latlng),
-          centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
-          newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
-      return this.setView(newCenter, zoom, {zoom: options});
-    },
-    fitBounds: function(bounds, options) {
-      options = options || {};
-      bounds = bounds.getBounds ? bounds.getBounds() : L.latLngBounds(bounds);
-      var paddingTL = L.point(options.paddingTopLeft || options.padding || [0, 0]),
-          paddingBR = L.point(options.paddingBottomRight || options.padding || [0, 0]),
-          zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
-      zoom = (options.maxZoom) ? Math.min(options.maxZoom, zoom) : zoom;
-      var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
-          swPoint = this.project(bounds.getSouthWest(), zoom),
-          nePoint = this.project(bounds.getNorthEast(), zoom),
-          center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
-      return this.setView(center, zoom, options);
-    },
-    fitWorld: function(options) {
-      return this.fitBounds([[-90, -180], [90, 180]], options);
-    },
-    panTo: function(center, options) {
-      return this.setView(center, this._zoom, {pan: options});
-    },
-    panBy: function(offset) {
-      this.fire('movestart');
-      this._rawPanBy(L.point(offset));
-      this.fire('move');
-      return this.fire('moveend');
-    },
-    setMaxBounds: function(bounds) {
-      bounds = L.latLngBounds(bounds);
-      this.options.maxBounds = bounds;
-      if (!bounds) {
-        return this.off('moveend', this._panInsideMaxBounds, this);
-      }
-      if (this._loaded) {
-        this._panInsideMaxBounds();
-      }
-      return this.on('moveend', this._panInsideMaxBounds, this);
-    },
-    panInsideBounds: function(bounds, options) {
-      var center = this.getCenter(),
-          newCenter = this._limitCenter(center, this._zoom, bounds);
-      if (center.equals(newCenter)) {
-        return this;
-      }
-      return this.panTo(newCenter, options);
-    },
-    addLayer: function(layer) {
-      var id = L.stamp(layer);
-      if (this._layers[id]) {
-        return this;
-      }
-      this._layers[id] = layer;
-      if (layer.options && (!isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom))) {
-        this._zoomBoundLayers[id] = layer;
-        this._updateZoomLevels();
-      }
-      if (this.options.zoomAnimation && L.TileLayer && (layer instanceof L.TileLayer)) {
-        this._tileLayersNum++;
-        this._tileLayersToLoad++;
-        layer.on('load', this._onTileLayerLoad, this);
-      }
-      if (this._loaded) {
-        this._layerAdd(layer);
-      }
-      return this;
-    },
-    removeLayer: function(layer) {
-      var id = L.stamp(layer);
-      if (!this._layers[id]) {
-        return this;
-      }
-      if (this._loaded) {
-        layer.onRemove(this);
-      }
-      delete this._layers[id];
-      if (this._loaded) {
-        this.fire('layerremove', {layer: layer});
-      }
-      if (this._zoomBoundLayers[id]) {
-        delete this._zoomBoundLayers[id];
-        this._updateZoomLevels();
-      }
-      if (this.options.zoomAnimation && L.TileLayer && (layer instanceof L.TileLayer)) {
-        this._tileLayersNum--;
-        this._tileLayersToLoad--;
-        layer.off('load', this._onTileLayerLoad, this);
-      }
-      return this;
-    },
-    hasLayer: function(layer) {
-      if (!layer) {
-        return false;
-      }
-      return (L.stamp(layer) in this._layers);
-    },
-    eachLayer: function(method, context) {
-      for (var i in this._layers) {
-        method.call(context, this._layers[i]);
-      }
-      return this;
-    },
-    invalidateSize: function(options) {
-      if (!this._loaded) {
-        return this;
-      }
-      options = L.extend({
-        animate: false,
-        pan: true
-      }, options === true ? {animate: true} : options);
-      var oldSize = this.getSize();
-      this._sizeChanged = true;
-      this._initialCenter = null;
-      var newSize = this.getSize(),
-          oldCenter = oldSize.divideBy(2).round(),
-          newCenter = newSize.divideBy(2).round(),
-          offset = oldCenter.subtract(newCenter);
-      if (!offset.x && !offset.y) {
-        return this;
-      }
-      if (options.animate && options.pan) {
-        this.panBy(offset);
-      } else {
-        if (options.pan) {
-          this._rawPanBy(offset);
-        }
-        this.fire('move');
-        if (options.debounceMoveend) {
-          clearTimeout(this._sizeTimer);
-          this._sizeTimer = setTimeout(L.bind(this.fire, this, 'moveend'), 200);
-        } else {
-          this.fire('moveend');
-        }
-      }
-      return this.fire('resize', {
-        oldSize: oldSize,
-        newSize: newSize
-      });
-    },
-    addHandler: function(name, HandlerClass) {
-      if (!HandlerClass) {
-        return this;
-      }
-      var handler = this[name] = new HandlerClass(this);
-      this._handlers.push(handler);
-      if (this.options[name]) {
-        handler.enable();
-      }
-      return this;
-    },
-    remove: function() {
-      if (this._loaded) {
-        this.fire('unload');
-      }
-      this._initEvents('off');
-      try {
-        delete this._container._leaflet;
-      } catch (e) {
-        this._container._leaflet = undefined;
-      }
-      this._clearPanes();
-      if (this._clearControlPos) {
-        this._clearControlPos();
-      }
-      this._clearHandlers();
-      return this;
-    },
-    getCenter: function() {
-      this._checkIfLoaded();
-      if (this._initialCenter && !this._moved()) {
-        return this._initialCenter;
-      }
-      return this.layerPointToLatLng(this._getCenterLayerPoint());
-    },
-    getZoom: function() {
-      return this._zoom;
-    },
-    getBounds: function() {
-      var bounds = this.getPixelBounds(),
-          sw = this.unproject(bounds.getBottomLeft()),
-          ne = this.unproject(bounds.getTopRight());
-      return new L.LatLngBounds(sw, ne);
-    },
-    getMinZoom: function() {
-      return this.options.minZoom === undefined ? (this._layersMinZoom === undefined ? 0 : this._layersMinZoom) : this.options.minZoom;
-    },
-    getMaxZoom: function() {
-      return this.options.maxZoom === undefined ? (this._layersMaxZoom === undefined ? Infinity : this._layersMaxZoom) : this.options.maxZoom;
-    },
-    getBoundsZoom: function(bounds, inside, padding) {
-      bounds = L.latLngBounds(bounds);
-      var zoom = this.getMinZoom() - (inside ? 1 : 0),
-          maxZoom = this.getMaxZoom(),
-          size = this.getSize(),
-          nw = bounds.getNorthWest(),
-          se = bounds.getSouthEast(),
-          zoomNotFound = true,
-          boundsSize;
-      padding = L.point(padding || [0, 0]);
-      do {
-        zoom++;
-        boundsSize = this.project(se, zoom).subtract(this.project(nw, zoom)).add(padding);
-        zoomNotFound = !inside ? size.contains(boundsSize) : boundsSize.x < size.x || boundsSize.y < size.y;
-      } while (zoomNotFound && zoom <= maxZoom);
-      if (zoomNotFound && inside) {
-        return null;
-      }
-      return inside ? zoom : zoom - 1;
-    },
-    getSize: function() {
-      if (!this._size || this._sizeChanged) {
-        this._size = new L.Point(this._container.clientWidth, this._container.clientHeight);
-        this._sizeChanged = false;
-      }
-      return this._size.clone();
-    },
-    getPixelBounds: function() {
-      var topLeftPoint = this._getTopLeftPoint();
-      return new L.Bounds(topLeftPoint, topLeftPoint.add(this.getSize()));
-    },
-    getPixelOrigin: function() {
-      this._checkIfLoaded();
-      return this._initialTopLeftPoint;
-    },
-    getPanes: function() {
-      return this._panes;
-    },
-    getContainer: function() {
-      return this._container;
-    },
-    getZoomScale: function(toZoom) {
-      var crs = this.options.crs;
-      return crs.scale(toZoom) / crs.scale(this._zoom);
-    },
-    getScaleZoom: function(scale) {
-      return this._zoom + (Math.log(scale) / Math.LN2);
-    },
-    project: function(latlng, zoom) {
-      zoom = zoom === undefined ? this._zoom : zoom;
-      return this.options.crs.latLngToPoint(L.latLng(latlng), zoom);
-    },
-    unproject: function(point, zoom) {
-      zoom = zoom === undefined ? this._zoom : zoom;
-      return this.options.crs.pointToLatLng(L.point(point), zoom);
-    },
-    layerPointToLatLng: function(point) {
-      var projectedPoint = L.point(point).add(this.getPixelOrigin());
-      return this.unproject(projectedPoint);
-    },
-    latLngToLayerPoint: function(latlng) {
-      var projectedPoint = this.project(L.latLng(latlng))._round();
-      return projectedPoint._subtract(this.getPixelOrigin());
-    },
-    containerPointToLayerPoint: function(point) {
-      return L.point(point).subtract(this._getMapPanePos());
-    },
-    layerPointToContainerPoint: function(point) {
-      return L.point(point).add(this._getMapPanePos());
-    },
-    containerPointToLatLng: function(point) {
-      var layerPoint = this.containerPointToLayerPoint(L.point(point));
-      return this.layerPointToLatLng(layerPoint);
-    },
-    latLngToContainerPoint: function(latlng) {
-      return this.layerPointToContainerPoint(this.latLngToLayerPoint(L.latLng(latlng)));
-    },
-    mouseEventToContainerPoint: function(e) {
-      return L.DomEvent.getMousePosition(e, this._container);
-    },
-    mouseEventToLayerPoint: function(e) {
-      return this.containerPointToLayerPoint(this.mouseEventToContainerPoint(e));
-    },
-    mouseEventToLatLng: function(e) {
-      return this.layerPointToLatLng(this.mouseEventToLayerPoint(e));
-    },
-    _initContainer: function(id) {
-      var container = this._container = L.DomUtil.get(id);
-      if (!container) {
-        throw new Error('Map container not found.');
-      } else if (container._leaflet) {
-        throw new Error('Map container is already initialized.');
-      }
-      container._leaflet = true;
-    },
-    _initLayout: function() {
-      var container = this._container;
-      L.DomUtil.addClass(container, 'leaflet-container' + (L.Browser.touch ? ' leaflet-touch' : '') + (L.Browser.retina ? ' leaflet-retina' : '') + (L.Browser.ielt9 ? ' leaflet-oldie' : '') + (this.options.fadeAnimation ? ' leaflet-fade-anim' : ''));
-      var position = L.DomUtil.getStyle(container, 'position');
-      if (position !== 'absolute' && position !== 'relative' && position !== 'fixed') {
-        container.style.position = 'relative';
-      }
-      this._initPanes();
-      if (this._initControlPos) {
-        this._initControlPos();
-      }
-    },
-    _initPanes: function() {
-      var panes = this._panes = {};
-      this._mapPane = panes.mapPane = this._createPane('leaflet-map-pane', this._container);
-      this._tilePane = panes.tilePane = this._createPane('leaflet-tile-pane', this._mapPane);
-      panes.objectsPane = this._createPane('leaflet-objects-pane', this._mapPane);
-      panes.shadowPane = this._createPane('leaflet-shadow-pane');
-      panes.overlayPane = this._createPane('leaflet-overlay-pane');
-      panes.markerPane = this._createPane('leaflet-marker-pane');
-      panes.popupPane = this._createPane('leaflet-popup-pane');
-      var zoomHide = ' leaflet-zoom-hide';
-      if (!this.options.markerZoomAnimation) {
-        L.DomUtil.addClass(panes.markerPane, zoomHide);
-        L.DomUtil.addClass(panes.shadowPane, zoomHide);
-        L.DomUtil.addClass(panes.popupPane, zoomHide);
-      }
-    },
-    _createPane: function(className, container) {
-      return L.DomUtil.create('div', className, container || this._panes.objectsPane);
-    },
-    _clearPanes: function() {
-      this._container.removeChild(this._mapPane);
-    },
-    _addLayers: function(layers) {
-      layers = layers ? (L.Util.isArray(layers) ? layers : [layers]) : [];
-      for (var i = 0,
-          len = layers.length; i < len; i++) {
-        this.addLayer(layers[i]);
-      }
-    },
-    _resetView: function(center, zoom, preserveMapOffset, afterZoomAnim) {
-      var zoomChanged = (this._zoom !== zoom);
-      if (!afterZoomAnim) {
-        this.fire('movestart');
-        if (zoomChanged) {
-          this.fire('zoomstart');
-        }
-      }
-      this._zoom = zoom;
-      this._initialCenter = center;
-      this._initialTopLeftPoint = this._getNewTopLeftPoint(center);
-      if (!preserveMapOffset) {
-        L.DomUtil.setPosition(this._mapPane, new L.Point(0, 0));
-      } else {
-        this._initialTopLeftPoint._add(this._getMapPanePos());
-      }
-      this._tileLayersToLoad = this._tileLayersNum;
-      var loading = !this._loaded;
-      this._loaded = true;
-      this.fire('viewreset', {hard: !preserveMapOffset});
-      if (loading) {
-        this.fire('load');
-        this.eachLayer(this._layerAdd, this);
-      }
-      this.fire('move');
-      if (zoomChanged || afterZoomAnim) {
-        this.fire('zoomend');
-      }
-      this.fire('moveend', {hard: !preserveMapOffset});
-    },
-    _rawPanBy: function(offset) {
-      L.DomUtil.setPosition(this._mapPane, this._getMapPanePos().subtract(offset));
-    },
-    _getZoomSpan: function() {
-      return this.getMaxZoom() - this.getMinZoom();
-    },
-    _updateZoomLevels: function() {
-      var i,
-          minZoom = Infinity,
-          maxZoom = -Infinity,
-          oldZoomSpan = this._getZoomSpan();
-      for (i in this._zoomBoundLayers) {
-        var layer = this._zoomBoundLayers[i];
-        if (!isNaN(layer.options.minZoom)) {
-          minZoom = Math.min(minZoom, layer.options.minZoom);
-        }
-        if (!isNaN(layer.options.maxZoom)) {
-          maxZoom = Math.max(maxZoom, layer.options.maxZoom);
-        }
-      }
-      if (i === undefined) {
-        this._layersMaxZoom = this._layersMinZoom = undefined;
-      } else {
-        this._layersMaxZoom = maxZoom;
-        this._layersMinZoom = minZoom;
-      }
-      if (oldZoomSpan !== this._getZoomSpan()) {
-        this.fire('zoomlevelschange');
-      }
-    },
-    _panInsideMaxBounds: function() {
-      this.panInsideBounds(this.options.maxBounds);
-    },
-    _checkIfLoaded: function() {
-      if (!this._loaded) {
-        throw new Error('Set map center and zoom first.');
-      }
-    },
-    _initEvents: function(onOff) {
-      if (!L.DomEvent) {
-        return;
-      }
-      onOff = onOff || 'on';
-      L.DomEvent[onOff](this._container, 'click', this._onMouseClick, this);
-      var events = ['dblclick', 'mousedown', 'mouseup', 'mouseenter', 'mouseleave', 'mousemove', 'contextmenu'],
-          i,
-          len;
-      for (i = 0, len = events.length; i < len; i++) {
-        L.DomEvent[onOff](this._container, events[i], this._fireMouseEvent, this);
-      }
-      if (this.options.trackResize) {
-        L.DomEvent[onOff](window, 'resize', this._onResize, this);
-      }
-    },
-    _onResize: function() {
-      L.Util.cancelAnimFrame(this._resizeRequest);
-      this._resizeRequest = L.Util.requestAnimFrame(function() {
-        this.invalidateSize({debounceMoveend: true});
-      }, this, false, this._container);
-    },
-    _onMouseClick: function(e) {
-      if (!this._loaded || (!e._simulated && ((this.dragging && this.dragging.moved()) || (this.boxZoom && this.boxZoom.moved()))) || L.DomEvent._skipped(e)) {
-        return;
-      }
-      this.fire('preclick');
-      this._fireMouseEvent(e);
-    },
-    _fireMouseEvent: function(e) {
-      if (!this._loaded || L.DomEvent._skipped(e)) {
-        return;
-      }
-      var type = e.type;
-      type = (type === 'mouseenter' ? 'mouseover' : (type === 'mouseleave' ? 'mouseout' : type));
-      if (!this.hasEventListeners(type)) {
-        return;
-      }
-      if (type === 'contextmenu') {
-        L.DomEvent.preventDefault(e);
-      }
-      var containerPoint = this.mouseEventToContainerPoint(e),
-          layerPoint = this.containerPointToLayerPoint(containerPoint),
-          latlng = this.layerPointToLatLng(layerPoint);
-      this.fire(type, {
-        latlng: latlng,
-        layerPoint: layerPoint,
-        containerPoint: containerPoint,
-        originalEvent: e
-      });
-    },
-    _onTileLayerLoad: function() {
-      this._tileLayersToLoad--;
-      if (this._tileLayersNum && !this._tileLayersToLoad) {
-        this.fire('tilelayersload');
-      }
-    },
-    _clearHandlers: function() {
-      for (var i = 0,
-          len = this._handlers.length; i < len; i++) {
-        this._handlers[i].disable();
-      }
-    },
-    whenReady: function(callback, context) {
-      if (this._loaded) {
-        callback.call(context || this, this);
-      } else {
-        this.on('load', callback, context);
-      }
-      return this;
-    },
-    _layerAdd: function(layer) {
-      layer.onAdd(this);
-      this.fire('layeradd', {layer: layer});
-    },
-    _getMapPanePos: function() {
-      return L.DomUtil.getPosition(this._mapPane);
-    },
-    _moved: function() {
-      var pos = this._getMapPanePos();
-      return pos && !pos.equals([0, 0]);
-    },
-    _getTopLeftPoint: function() {
-      return this.getPixelOrigin().subtract(this._getMapPanePos());
-    },
-    _getNewTopLeftPoint: function(center, zoom) {
-      var viewHalf = this.getSize()._divideBy(2);
-      return this.project(center, zoom)._subtract(viewHalf)._round();
-    },
-    _latLngToNewLayerPoint: function(latlng, newZoom, newCenter) {
-      var topLeft = this._getNewTopLeftPoint(newCenter, newZoom).add(this._getMapPanePos());
-      return this.project(latlng, newZoom)._subtract(topLeft);
-    },
-    _getCenterLayerPoint: function() {
-      return this.containerPointToLayerPoint(this.getSize()._divideBy(2));
-    },
-    _getCenterOffset: function(latlng) {
-      return this.latLngToLayerPoint(latlng).subtract(this._getCenterLayerPoint());
-    },
-    _limitCenter: function(center, zoom, bounds) {
-      if (!bounds) {
-        return center;
-      }
-      var centerPoint = this.project(center, zoom),
-          viewHalf = this.getSize().divideBy(2),
-          viewBounds = new L.Bounds(centerPoint.subtract(viewHalf), centerPoint.add(viewHalf)),
-          offset = this._getBoundsOffset(viewBounds, bounds, zoom);
-      return this.unproject(centerPoint.add(offset), zoom);
-    },
-    _limitOffset: function(offset, bounds) {
-      if (!bounds) {
-        return offset;
-      }
-      var viewBounds = this.getPixelBounds(),
-          newBounds = new L.Bounds(viewBounds.min.add(offset), viewBounds.max.add(offset));
-      return offset.add(this._getBoundsOffset(newBounds, bounds));
-    },
-    _getBoundsOffset: function(pxBounds, maxBounds, zoom) {
-      var nwOffset = this.project(maxBounds.getNorthWest(), zoom).subtract(pxBounds.min),
-          seOffset = this.project(maxBounds.getSouthEast(), zoom).subtract(pxBounds.max),
-          dx = this._rebound(nwOffset.x, -seOffset.x),
-          dy = this._rebound(nwOffset.y, -seOffset.y);
-      return new L.Point(dx, dy);
-    },
-    _rebound: function(left, right) {
-      return left + right > 0 ? Math.round(left - right) / 2 : Math.max(0, Math.ceil(left)) - Math.max(0, Math.floor(right));
-    },
-    _limitZoom: function(zoom) {
-      var min = this.getMinZoom(),
-          max = this.getMaxZoom();
-      return Math.max(min, Math.min(max, zoom));
-    }
-  });
-  L.map = function(id, options) {
-    return new L.Map(id, options);
-  };
-  L.Projection.Mercator = {
-    MAX_LATITUDE: 85.0840591556,
-    R_MINOR: 6356752.314245179,
-    R_MAJOR: 6378137,
-    project: function(latlng) {
-      var d = L.LatLng.DEG_TO_RAD,
-          max = this.MAX_LATITUDE,
-          lat = Math.max(Math.min(max, latlng.lat), -max),
-          r = this.R_MAJOR,
-          r2 = this.R_MINOR,
-          x = latlng.lng * d * r,
-          y = lat * d,
-          tmp = r2 / r,
-          eccent = Math.sqrt(1.0 - tmp * tmp),
-          con = eccent * Math.sin(y);
-      con = Math.pow((1 - con) / (1 + con), eccent * 0.5);
-      var ts = Math.tan(0.5 * ((Math.PI * 0.5) - y)) / con;
-      y = -r * Math.log(ts);
-      return new L.Point(x, y);
-    },
-    unproject: function(point) {
-      var d = L.LatLng.RAD_TO_DEG,
-          r = this.R_MAJOR,
-          r2 = this.R_MINOR,
-          lng = point.x * d / r,
-          tmp = r2 / r,
-          eccent = Math.sqrt(1 - (tmp * tmp)),
-          ts = Math.exp(-point.y / r),
-          phi = (Math.PI / 2) - 2 * Math.atan(ts),
-          numIter = 15,
-          tol = 1e-7,
-          i = numIter,
-          dphi = 0.1,
-          con;
-      while ((Math.abs(dphi) > tol) && (--i > 0)) {
-        con = eccent * Math.sin(phi);
-        dphi = (Math.PI / 2) - 2 * Math.atan(ts * Math.pow((1.0 - con) / (1.0 + con), 0.5 * eccent)) - phi;
-        phi += dphi;
-      }
-      return new L.LatLng(phi * d, lng);
-    }
-  };
-  L.CRS.EPSG3395 = L.extend({}, L.CRS, {
-    code: 'EPSG:3395',
-    projection: L.Projection.Mercator,
-    transformation: (function() {
-      var m = L.Projection.Mercator,
-          r = m.R_MAJOR,
-          scale = 0.5 / (Math.PI * r);
-      return new L.Transformation(scale, 0.5, -scale, 0.5);
-    }())
-  });
-  L.TileLayer = L.Class.extend({
-    includes: L.Mixin.Events,
-    options: {
-      minZoom: 0,
-      maxZoom: 18,
-      tileSize: 256,
-      subdomains: 'abc',
-      errorTileUrl: '',
-      attribution: '',
-      zoomOffset: 0,
-      opacity: 1,
-      unloadInvisibleTiles: L.Browser.mobile,
-      updateWhenIdle: L.Browser.mobile
-    },
-    initialize: function(url, options) {
-      options = L.setOptions(this, options);
-      if (options.detectRetina && L.Browser.retina && options.maxZoom > 0) {
-        options.tileSize = Math.floor(options.tileSize / 2);
-        options.zoomOffset++;
-        if (options.minZoom > 0) {
-          options.minZoom--;
-        }
-        this.options.maxZoom--;
-      }
-      if (options.bounds) {
-        options.bounds = L.latLngBounds(options.bounds);
-      }
-      this._url = url;
-      var subdomains = this.options.subdomains;
-      if (typeof subdomains === 'string') {
-        this.options.subdomains = subdomains.split('');
-      }
-    },
-    onAdd: function(map) {
-      this._map = map;
-      this._animated = map._zoomAnimated;
-      this._initContainer();
-      map.on({
-        'viewreset': this._reset,
-        'moveend': this._update
-      }, this);
-      if (this._animated) {
-        map.on({
-          'zoomanim': this._animateZoom,
-          'zoomend': this._endZoomAnim
-        }, this);
-      }
-      if (!this.options.updateWhenIdle) {
-        this._limitedUpdate = L.Util.limitExecByInterval(this._update, 150, this);
-        map.on('move', this._limitedUpdate, this);
-      }
-      this._reset();
-      this._update();
-    },
-    addTo: function(map) {
-      map.addLayer(this);
-      return this;
-    },
-    onRemove: function(map) {
-      this._container.parentNode.removeChild(this._container);
-      map.off({
-        'viewreset': this._reset,
-        'moveend': this._update
-      }, this);
-      if (this._animated) {
-        map.off({
-          'zoomanim': this._animateZoom,
-          'zoomend': this._endZoomAnim
-        }, this);
-      }
-      if (!this.options.updateWhenIdle) {
-        map.off('move', this._limitedUpdate, this);
-      }
-      this._container = null;
-      this._map = null;
-    },
-    bringToFront: function() {
-      var pane = this._map._panes.tilePane;
-      if (this._container) {
-        pane.appendChild(this._container);
-        this._setAutoZIndex(pane, Math.max);
-      }
-      return this;
-    },
-    bringToBack: function() {
-      var pane = this._map._panes.tilePane;
-      if (this._container) {
-        pane.insertBefore(this._container, pane.firstChild);
-        this._setAutoZIndex(pane, Math.min);
-      }
-      return this;
-    },
-    getAttribution: function() {
-      return this.options.attribution;
-    },
-    getContainer: function() {
-      return this._container;
-    },
-    setOpacity: function(opacity) {
-      this.options.opacity = opacity;
-      if (this._map) {
-        this._updateOpacity();
-      }
-      return this;
-    },
-    setZIndex: function(zIndex) {
-      this.options.zIndex = zIndex;
-      this._updateZIndex();
-      return this;
-    },
-    setUrl: function(url, noRedraw) {
-      this._url = url;
-      if (!noRedraw) {
-        this.redraw();
-      }
-      return this;
-    },
-    redraw: function() {
-      if (this._map) {
-        this._reset({hard: true});
-        this._update();
-      }
-      return this;
-    },
-    _updateZIndex: function() {
-      if (this._container && this.options.zIndex !== undefined) {
-        this._container.style.zIndex = this.options.zIndex;
-      }
-    },
-    _setAutoZIndex: function(pane, compare) {
-      var layers = pane.children,
-          edgeZIndex = -compare(Infinity, -Infinity),
-          zIndex,
-          i,
-          len;
-      for (i = 0, len = layers.length; i < len; i++) {
-        if (layers[i] !== this._container) {
-          zIndex = parseInt(layers[i].style.zIndex, 10);
-          if (!isNaN(zIndex)) {
-            edgeZIndex = compare(edgeZIndex, zIndex);
-          }
-        }
-      }
-      this.options.zIndex = this._container.style.zIndex = (isFinite(edgeZIndex) ? edgeZIndex : 0) + compare(1, -1);
-    },
-    _updateOpacity: function() {
-      var i,
-          tiles = this._tiles;
-      if (L.Browser.ielt9) {
-        for (i in tiles) {
-          L.DomUtil.setOpacity(tiles[i], this.options.opacity);
-        }
-      } else {
-        L.DomUtil.setOpacity(this._container, this.options.opacity);
-      }
-    },
-    _initContainer: function() {
-      var tilePane = this._map._panes.tilePane;
-      if (!this._container) {
-        this._container = L.DomUtil.create('div', 'leaflet-layer');
-        this._updateZIndex();
-        if (this._animated) {
-          var className = 'leaflet-tile-container';
-          this._bgBuffer = L.DomUtil.create('div', className, this._container);
-          this._tileContainer = L.DomUtil.create('div', className, this._container);
-        } else {
-          this._tileContainer = this._container;
-        }
-        tilePane.appendChild(this._container);
-        if (this.options.opacity < 1) {
-          this._updateOpacity();
-        }
-      }
-    },
-    _reset: function(e) {
-      for (var key in this._tiles) {
-        this.fire('tileunload', {tile: this._tiles[key]});
-      }
-      this._tiles = {};
-      this._tilesToLoad = 0;
-      if (this.options.reuseTiles) {
-        this._unusedTiles = [];
-      }
-      this._tileContainer.innerHTML = '';
-      if (this._animated && e && e.hard) {
-        this._clearBgBuffer();
-      }
-      this._initContainer();
-    },
-    _getTileSize: function() {
-      var map = this._map,
-          zoom = map.getZoom() + this.options.zoomOffset,
-          zoomN = this.options.maxNativeZoom,
-          tileSize = this.options.tileSize;
-      if (zoomN && zoom > zoomN) {
-        tileSize = Math.round(map.getZoomScale(zoom) / map.getZoomScale(zoomN) * tileSize);
-      }
-      return tileSize;
-    },
-    _update: function() {
-      if (!this._map) {
-        return;
-      }
-      var map = this._map,
-          bounds = map.getPixelBounds(),
-          zoom = map.getZoom(),
-          tileSize = this._getTileSize();
-      if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
-        return;
-      }
-      var tileBounds = L.bounds(bounds.min.divideBy(tileSize)._floor(), bounds.max.divideBy(tileSize)._floor());
-      this._addTilesFromCenterOut(tileBounds);
-      if (this.options.unloadInvisibleTiles || this.options.reuseTiles) {
-        this._removeOtherTiles(tileBounds);
-      }
-    },
-    _addTilesFromCenterOut: function(bounds) {
-      var queue = [],
-          center = bounds.getCenter();
-      var j,
-          i,
-          point;
-      for (j = bounds.min.y; j <= bounds.max.y; j++) {
-        for (i = bounds.min.x; i <= bounds.max.x; i++) {
-          point = new L.Point(i, j);
-          if (this._tileShouldBeLoaded(point)) {
-            queue.push(point);
-          }
-        }
-      }
-      var tilesToLoad = queue.length;
-      if (tilesToLoad === 0) {
-        return;
-      }
-      queue.sort(function(a, b) {
-        return a.distanceTo(center) - b.distanceTo(center);
-      });
-      var fragment = document.createDocumentFragment();
-      if (!this._tilesToLoad) {
-        this.fire('loading');
-      }
-      this._tilesToLoad += tilesToLoad;
-      for (i = 0; i < tilesToLoad; i++) {
-        this._addTile(queue[i], fragment);
-      }
-      this._tileContainer.appendChild(fragment);
-    },
-    _tileShouldBeLoaded: function(tilePoint) {
-      if ((tilePoint.x + ':' + tilePoint.y) in this._tiles) {
-        return false;
-      }
-      var options = this.options;
-      if (!options.continuousWorld) {
-        var limit = this._getWrapTileNum();
-        if ((options.noWrap && (tilePoint.x < 0 || tilePoint.x >= limit.x)) || tilePoint.y < 0 || tilePoint.y >= limit.y) {
-          return false;
-        }
-      }
-      if (options.bounds) {
-        var tileSize = this._getTileSize(),
-            nwPoint = tilePoint.multiplyBy(tileSize),
-            sePoint = nwPoint.add([tileSize, tileSize]),
-            nw = this._map.unproject(nwPoint),
-            se = this._map.unproject(sePoint);
-        if (!options.continuousWorld && !options.noWrap) {
-          nw = nw.wrap();
-          se = se.wrap();
-        }
-        if (!options.bounds.intersects([nw, se])) {
-          return false;
-        }
-      }
-      return true;
-    },
-    _removeOtherTiles: function(bounds) {
-      var kArr,
-          x,
-          y,
-          key;
-      for (key in this._tiles) {
-        kArr = key.split(':');
-        x = parseInt(kArr[0], 10);
-        y = parseInt(kArr[1], 10);
-        if (x < bounds.min.x || x > bounds.max.x || y < bounds.min.y || y > bounds.max.y) {
-          this._removeTile(key);
-        }
-      }
-    },
-    _removeTile: function(key) {
-      var tile = this._tiles[key];
-      this.fire('tileunload', {
-        tile: tile,
-        url: tile.src
-      });
-      if (this.options.reuseTiles) {
-        L.DomUtil.removeClass(tile, 'leaflet-tile-loaded');
-        this._unusedTiles.push(tile);
-      } else if (tile.parentNode === this._tileContainer) {
-        this._tileContainer.removeChild(tile);
-      }
-      if (!L.Browser.android) {
-        tile.onload = null;
-        tile.src = L.Util.emptyImageUrl;
-      }
-      delete this._tiles[key];
-    },
-    _addTile: function(tilePoint, container) {
-      var tilePos = this._getTilePos(tilePoint);
-      var tile = this._getTile();
-      L.DomUtil.setPosition(tile, tilePos, L.Browser.chrome);
-      this._tiles[tilePoint.x + ':' + tilePoint.y] = tile;
-      this._loadTile(tile, tilePoint);
-      if (tile.parentNode !== this._tileContainer) {
-        container.appendChild(tile);
-      }
-    },
-    _getZoomForUrl: function() {
-      var options = this.options,
-          zoom = this._map.getZoom();
-      if (options.zoomReverse) {
-        zoom = options.maxZoom - zoom;
-      }
-      zoom += options.zoomOffset;
-      return options.maxNativeZoom ? Math.min(zoom, options.maxNativeZoom) : zoom;
-    },
-    _getTilePos: function(tilePoint) {
-      var origin = this._map.getPixelOrigin(),
-          tileSize = this._getTileSize();
-      return tilePoint.multiplyBy(tileSize).subtract(origin);
-    },
-    getTileUrl: function(tilePoint) {
-      return L.Util.template(this._url, L.extend({
-        s: this._getSubdomain(tilePoint),
-        z: tilePoint.z,
-        x: tilePoint.x,
-        y: tilePoint.y
-      }, this.options));
-    },
-    _getWrapTileNum: function() {
-      var crs = this._map.options.crs,
-          size = crs.getSize(this._map.getZoom());
-      return size.divideBy(this._getTileSize())._floor();
-    },
-    _adjustTilePoint: function(tilePoint) {
-      var limit = this._getWrapTileNum();
-      if (!this.options.continuousWorld && !this.options.noWrap) {
-        tilePoint.x = ((tilePoint.x % limit.x) + limit.x) % limit.x;
-      }
-      if (this.options.tms) {
-        tilePoint.y = limit.y - tilePoint.y - 1;
-      }
-      tilePoint.z = this._getZoomForUrl();
-    },
-    _getSubdomain: function(tilePoint) {
-      var index = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
-      return this.options.subdomains[index];
-    },
-    _getTile: function() {
-      if (this.options.reuseTiles && this._unusedTiles.length > 0) {
-        var tile = this._unusedTiles.pop();
-        this._resetTile(tile);
-        return tile;
-      }
-      return this._createTile();
-    },
-    _resetTile: function() {},
-    _createTile: function() {
-      var tile = L.DomUtil.create('img', 'leaflet-tile');
-      tile.style.width = tile.style.height = this._getTileSize() + 'px';
-      tile.galleryimg = 'no';
-      tile.onselectstart = tile.onmousemove = L.Util.falseFn;
-      if (L.Browser.ielt9 && this.options.opacity !== undefined) {
-        L.DomUtil.setOpacity(tile, this.options.opacity);
-      }
-      if (L.Browser.mobileWebkit3d) {
-        tile.style.WebkitBackfaceVisibility = 'hidden';
-      }
-      return tile;
-    },
-    _loadTile: function(tile, tilePoint) {
-      tile._layer = this;
-      tile.onload = this._tileOnLoad;
-      tile.onerror = this._tileOnError;
-      this._adjustTilePoint(tilePoint);
-      tile.src = this.getTileUrl(tilePoint);
-      this.fire('tileloadstart', {
-        tile: tile,
-        url: tile.src
-      });
-    },
-    _tileLoaded: function() {
-      this._tilesToLoad--;
-      if (this._animated) {
-        L.DomUtil.addClass(this._tileContainer, 'leaflet-zoom-animated');
-      }
-      if (!this._tilesToLoad) {
-        this.fire('load');
-        if (this._animated) {
-          clearTimeout(this._clearBgBufferTimer);
-          this._clearBgBufferTimer = setTimeout(L.bind(this._clearBgBuffer, this), 500);
-        }
-      }
-    },
-    _tileOnLoad: function() {
-      var layer = this._layer;
-      if (this.src !== L.Util.emptyImageUrl) {
-        L.DomUtil.addClass(this, 'leaflet-tile-loaded');
-        layer.fire('tileload', {
-          tile: this,
-          url: this.src
-        });
-      }
-      layer._tileLoaded();
-    },
-    _tileOnError: function() {
-      var layer = this._layer;
-      layer.fire('tileerror', {
-        tile: this,
-        url: this.src
-      });
-      var newUrl = layer.options.errorTileUrl;
-      if (newUrl) {
-        this.src = newUrl;
-      }
-      layer._tileLoaded();
-    }
-  });
-  L.tileLayer = function(url, options) {
-    return new L.TileLayer(url, options);
-  };
-  L.TileLayer.WMS = L.TileLayer.extend({
-    defaultWmsParams: {
-      service: 'WMS',
-      request: 'GetMap',
-      version: '1.1.1',
-      layers: '',
-      styles: '',
-      format: 'image/jpeg',
-      transparent: false
-    },
-    initialize: function(url, options) {
-      this._url = url;
-      var wmsParams = L.extend({}, this.defaultWmsParams),
-          tileSize = options.tileSize || this.options.tileSize;
-      if (options.detectRetina && L.Browser.retina) {
-        wmsParams.width = wmsParams.height = tileSize * 2;
-      } else {
-        wmsParams.width = wmsParams.height = tileSize;
-      }
-      for (var i in options) {
-        if (!this.options.hasOwnProperty(i) && i !== 'crs') {
-          wmsParams[i] = options[i];
-        }
-      }
-      this.wmsParams = wmsParams;
-      L.setOptions(this, options);
-    },
-    onAdd: function(map) {
-      this._crs = this.options.crs || map.options.crs;
-      this._wmsVersion = parseFloat(this.wmsParams.version);
-      var projectionKey = this._wmsVersion >= 1.3 ? 'crs' : 'srs';
-      this.wmsParams[projectionKey] = this._crs.code;
-      L.TileLayer.prototype.onAdd.call(this, map);
-    },
-    getTileUrl: function(tilePoint) {
-      var map = this._map,
-          tileSize = this.options.tileSize,
-          nwPoint = tilePoint.multiplyBy(tileSize),
-          sePoint = nwPoint.add([tileSize, tileSize]),
-          nw = this._crs.project(map.unproject(nwPoint, tilePoint.z)),
-          se = this._crs.project(map.unproject(sePoint, tilePoint.z)),
-          bbox = this._wmsVersion >= 1.3 && this._crs === L.CRS.EPSG4326 ? [se.y, nw.x, nw.y, se.x].join(',') : [nw.x, se.y, se.x, nw.y].join(','),
-          url = L.Util.template(this._url, {s: this._getSubdomain(tilePoint)});
-      return url + L.Util.getParamString(this.wmsParams, url, true) + '&BBOX=' + bbox;
-    },
-    setParams: function(params, noRedraw) {
-      L.extend(this.wmsParams, params);
-      if (!noRedraw) {
-        this.redraw();
-      }
-      return this;
-    }
-  });
-  L.tileLayer.wms = function(url, options) {
-    return new L.TileLayer.WMS(url, options);
-  };
-  L.TileLayer.Canvas = L.TileLayer.extend({
-    options: {async: false},
-    initialize: function(options) {
-      L.setOptions(this, options);
-    },
-    redraw: function() {
-      if (this._map) {
-        this._reset({hard: true});
-        this._update();
-      }
-      for (var i in this._tiles) {
-        this._redrawTile(this._tiles[i]);
-      }
-      return this;
-    },
-    _redrawTile: function(tile) {
-      this.drawTile(tile, tile._tilePoint, this._map._zoom);
-    },
-    _createTile: function() {
-      var tile = L.DomUtil.create('canvas', 'leaflet-tile');
-      tile.width = tile.height = this.options.tileSize;
-      tile.onselectstart = tile.onmousemove = L.Util.falseFn;
-      return tile;
-    },
-    _loadTile: function(tile, tilePoint) {
-      tile._layer = this;
-      tile._tilePoint = tilePoint;
-      this._redrawTile(tile);
-      if (!this.options.async) {
-        this.tileDrawn(tile);
-      }
-    },
-    drawTile: function() {},
-    tileDrawn: function(tile) {
-      this._tileOnLoad.call(tile);
-    }
-  });
-  L.tileLayer.canvas = function(options) {
-    return new L.TileLayer.Canvas(options);
-  };
-  L.ImageOverlay = L.Class.extend({
-    includes: L.Mixin.Events,
-    options: {opacity: 1},
-    initialize: function(url, bounds, options) {
-      this._url = url;
-      this._bounds = L.latLngBounds(bounds);
-      L.setOptions(this, options);
-    },
-    onAdd: function(map) {
-      this._map = map;
-      if (!this._image) {
-        this._initImage();
-      }
-      map._panes.overlayPane.appendChild(this._image);
-      map.on('viewreset', this._reset, this);
-      if (map.options.zoomAnimation && L.Browser.any3d) {
-        map.on('zoomanim', this._animateZoom, this);
-      }
-      this._reset();
-    },
-    onRemove: function(map) {
-      map.getPanes().overlayPane.removeChild(this._image);
-      map.off('viewreset', this._reset, this);
-      if (map.options.zoomAnimation) {
-        map.off('zoomanim', this._animateZoom, this);
-      }
-    },
-    addTo: function(map) {
-      map.addLayer(this);
-      return this;
-    },
-    setOpacity: function(opacity) {
-      this.options.opacity = opacity;
-      this._updateOpacity();
-      return this;
-    },
-    bringToFront: function() {
-      if (this._image) {
-        this._map._panes.overlayPane.appendChild(this._image);
-      }
-      return this;
-    },
-    bringToBack: function() {
-      var pane = this._map._panes.overlayPane;
-      if (this._image) {
-        pane.insertBefore(this._image, pane.firstChild);
-      }
-      return this;
-    },
-    setUrl: function(url) {
-      this._url = url;
-      this._image.src = this._url;
-    },
-    getAttribution: function() {
-      return this.options.attribution;
-    },
-    _initImage: function() {
-      this._image = L.DomUtil.create('img', 'leaflet-image-layer');
-      if (this._map.options.zoomAnimation && L.Browser.any3d) {
-        L.DomUtil.addClass(this._image, 'leaflet-zoom-animated');
-      } else {
-        L.DomUtil.addClass(this._image, 'leaflet-zoom-hide');
-      }
-      this._updateOpacity();
-      L.extend(this._image, {
-        galleryimg: 'no',
-        onselectstart: L.Util.falseFn,
-        onmousemove: L.Util.falseFn,
-        onload: L.bind(this._onImageLoad, this),
-        src: this._url
-      });
-    },
-    _animateZoom: function(e) {
-      var map = this._map,
-          image = this._image,
-          scale = map.getZoomScale(e.zoom),
-          nw = this._bounds.getNorthWest(),
-          se = this._bounds.getSouthEast(),
-          topLeft = map._latLngToNewLayerPoint(nw, e.zoom, e.center),
-          size = map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft),
-          origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
-      image.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(origin) + ' scale(' + scale + ') ';
-    },
-    _reset: function() {
-      var image = this._image,
-          topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-          size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
-      L.DomUtil.setPosition(image, topLeft);
-      image.style.width = size.x + 'px';
-      image.style.height = size.y + 'px';
-    },
-    _onImageLoad: function() {
-      this.fire('load');
-    },
-    _updateOpacity: function() {
-      L.DomUtil.setOpacity(this._image, this.options.opacity);
-    }
-  });
-  L.imageOverlay = function(url, bounds, options) {
-    return new L.ImageOverlay(url, bounds, options);
-  };
-  L.Icon = L.Class.extend({
-    options: {className: ''},
-    initialize: function(options) {
-      L.setOptions(this, options);
-    },
-    createIcon: function(oldIcon) {
-      return this._createIcon('icon', oldIcon);
-    },
-    createShadow: function(oldIcon) {
-      return this._createIcon('shadow', oldIcon);
-    },
-    _createIcon: function(name, oldIcon) {
-      var src = this._getIconUrl(name);
-      if (!src) {
-        if (name === 'icon') {
-          throw new Error('iconUrl not set in Icon options (see the docs).');
-        }
-        return null;
-      }
-      var img;
-      if (!oldIcon || oldIcon.tagName !== 'IMG') {
-        img = this._createImg(src);
-      } else {
-        img = this._createImg(src, oldIcon);
-      }
-      this._setIconStyles(img, name);
-      return img;
-    },
-    _setIconStyles: function(img, name) {
-      var options = this.options,
-          size = L.point(options[name + 'Size']),
-          anchor;
-      if (name === 'shadow') {
-        anchor = L.point(options.shadowAnchor || options.iconAnchor);
-      } else {
-        anchor = L.point(options.iconAnchor);
-      }
-      if (!anchor && size) {
-        anchor = size.divideBy(2, true);
-      }
-      img.className = 'leaflet-marker-' + name + ' ' + options.className;
-      if (anchor) {
-        img.style.marginLeft = (-anchor.x) + 'px';
-        img.style.marginTop = (-anchor.y) + 'px';
-      }
-      if (size) {
-        img.style.width = size.x + 'px';
-        img.style.height = size.y + 'px';
-      }
-    },
-    _createImg: function(src, el) {
-      el = el || document.createElement('img');
-      el.src = src;
-      return el;
-    },
-    _getIconUrl: function(name) {
-      if (L.Browser.retina && this.options[name + 'RetinaUrl']) {
-        return this.options[name + 'RetinaUrl'];
-      }
-      return this.options[name + 'Url'];
-    }
-  });
-  L.icon = function(options) {
-    return new L.Icon(options);
-  };
-  L.Icon.Default = L.Icon.extend({
-    options: {
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    },
-    _getIconUrl: function(name) {
-      var key = name + 'Url';
-      if (this.options[key]) {
-        return this.options[key];
-      }
-      if (L.Browser.retina && name === 'icon') {
-        name += '-2x';
-      }
-      var path = L.Icon.Default.imagePath;
-      if (!path) {
-        throw new Error('Couldn\'t autodetect L.Icon.Default.imagePath, set it manually.');
-      }
-      return path + '/marker-' + name + '.png';
-    }
-  });
-  L.Icon.Default.imagePath = (function() {
-    var scripts = document.getElementsByTagName('script'),
-        leafletRe = /[\/^]leaflet[\-\._]?([\w\-\._]*)\.js\??/;
-    var i,
-        len,
-        src,
-        matches,
-        path;
-    for (i = 0, len = scripts.length; i < len; i++) {
-      src = scripts[i].src;
-      matches = src.match(leafletRe);
-      if (matches) {
-        path = src.split(leafletRe)[0];
-        return (path ? path + '/' : '') + 'images';
-      }
-    }
-  }());
-  L.Marker = L.Class.extend({
-    includes: L.Mixin.Events,
-    options: {
-      icon: new L.Icon.Default(),
-      title: '',
-      alt: '',
-      clickable: true,
-      draggable: false,
-      keyboard: true,
-      zIndexOffset: 0,
-      opacity: 1,
-      riseOnHover: false,
-      riseOffset: 250
-    },
-    initialize: function(latlng, options) {
-      L.setOptions(this, options);
-      this._latlng = L.latLng(latlng);
-    },
-    onAdd: function(map) {
-      this._map = map;
-      map.on('viewreset', this.update, this);
-      this._initIcon();
-      this.update();
-      this.fire('add');
-      if (map.options.zoomAnimation && map.options.markerZoomAnimation) {
-        map.on('zoomanim', this._animateZoom, this);
-      }
-    },
-    addTo: function(map) {
-      map.addLayer(this);
-      return this;
-    },
-    onRemove: function(map) {
-      if (this.dragging) {
-        this.dragging.disable();
-      }
-      this._removeIcon();
-      this._removeShadow();
-      this.fire('remove');
-      map.off({
-        'viewreset': this.update,
-        'zoomanim': this._animateZoom
-      }, this);
-      this._map = null;
-    },
-    getLatLng: function() {
-      return this._latlng;
-    },
-    setLatLng: function(latlng) {
-      this._latlng = L.latLng(latlng);
-      this.update();
-      return this.fire('move', {latlng: this._latlng});
-    },
-    setZIndexOffset: function(offset) {
-      this.options.zIndexOffset = offset;
-      this.update();
-      return this;
-    },
-    setIcon: function(icon) {
-      this.options.icon = icon;
-      if (this._map) {
-        this._initIcon();
-        this.update();
-      }
-      if (this._popup) {
-        this.bindPopup(this._popup);
-      }
-      return this;
-    },
-    update: function() {
-      if (this._icon) {
-        this._setPos(this._map.latLngToLayerPoint(this._latlng).round());
-      }
-      return this;
-    },
-    _initIcon: function() {
-      var options = this.options,
-          map = this._map,
-          animation = (map.options.zoomAnimation && map.options.markerZoomAnimation),
-          classToAdd = animation ? 'leaflet-zoom-animated' : 'leaflet-zoom-hide';
-      var icon = options.icon.createIcon(this._icon),
-          addIcon = false;
-      if (icon !== this._icon) {
-        if (this._icon) {
-          this._removeIcon();
-        }
-        addIcon = true;
-        if (options.title) {
-          icon.title = options.title;
-        }
-        if (options.alt) {
-          icon.alt = options.alt;
-        }
-      }
-      L.DomUtil.addClass(icon, classToAdd);
-      if (options.keyboard) {
-        icon.tabIndex = '0';
-      }
-      this._icon = icon;
-      this._initInteraction();
-      if (options.riseOnHover) {
-        L.DomEvent.on(icon, 'mouseover', this._bringToFront, this).on(icon, 'mouseout', this._resetZIndex, this);
-      }
-      var newShadow = options.icon.createShadow(this._shadow),
-          addShadow = false;
-      if (newShadow !== this._shadow) {
-        this._removeShadow();
-        addShadow = true;
-      }
-      if (newShadow) {
-        L.DomUtil.addClass(newShadow, classToAdd);
-      }
-      this._shadow = newShadow;
-      if (options.opacity < 1) {
-        this._updateOpacity();
-      }
-      var panes = this._map._panes;
-      if (addIcon) {
-        panes.markerPane.appendChild(this._icon);
-      }
-      if (newShadow && addShadow) {
-        panes.shadowPane.appendChild(this._shadow);
-      }
-    },
-    _removeIcon: function() {
-      if (this.options.riseOnHover) {
-        L.DomEvent.off(this._icon, 'mouseover', this._bringToFront).off(this._icon, 'mouseout', this._resetZIndex);
-      }
-      this._map._panes.markerPane.removeChild(this._icon);
-      this._icon = null;
-    },
-    _removeShadow: function() {
-      if (this._shadow) {
-        this._map._panes.shadowPane.removeChild(this._shadow);
-      }
-      this._shadow = null;
-    },
-    _setPos: function(pos) {
-      L.DomUtil.setPosition(this._icon, pos);
-      if (this._shadow) {
-        L.DomUtil.setPosition(this._shadow, pos);
-      }
-      this._zIndex = pos.y + this.options.zIndexOffset;
-      this._resetZIndex();
-    },
-    _updateZIndex: function(offset) {
-      this._icon.style.zIndex = this._zIndex + offset;
-    },
-    _animateZoom: function(opt) {
-      var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
-      this._setPos(pos);
-    },
-    _initInteraction: function() {
-      if (!this.options.clickable) {
-        return;
-      }
-      var icon = this._icon,
-          events = ['dblclick', 'mousedown', 'mouseover', 'mouseout', 'contextmenu'];
-      L.DomUtil.addClass(icon, 'leaflet-clickable');
-      L.DomEvent.on(icon, 'click', this._onMouseClick, this);
-      L.DomEvent.on(icon, 'keypress', this._onKeyPress, this);
-      for (var i = 0; i < events.length; i++) {
-        L.DomEvent.on(icon, events[i], this._fireMouseEvent, this);
-      }
-      if (L.Handler.MarkerDrag) {
-        this.dragging = new L.Handler.MarkerDrag(this);
-        if (this.options.draggable) {
-          this.dragging.enable();
-        }
-      }
-    },
-    _onMouseClick: function(e) {
-      var wasDragged = this.dragging && this.dragging.moved();
-      if (this.hasEventListeners(e.type) || wasDragged) {
-        L.DomEvent.stopPropagation(e);
-      }
-      if (wasDragged) {
-        return;
-      }
-      if ((!this.dragging || !this.dragging._enabled) && this._map.dragging && this._map.dragging.moved()) {
-        return;
-      }
-      this.fire(e.type, {
-        originalEvent: e,
-        latlng: this._latlng
-      });
-    },
-    _onKeyPress: function(e) {
-      if (e.keyCode === 13) {
-        this.fire('click', {
-          originalEvent: e,
-          latlng: this._latlng
-        });
-      }
-    },
-    _fireMouseEvent: function(e) {
-      this.fire(e.type, {
-        originalEvent: e,
-        latlng: this._latlng
-      });
-      if (e.type === 'contextmenu' && this.hasEventListeners(e.type)) {
-        L.DomEvent.preventDefault(e);
-      }
-      if (e.type !== 'mousedown') {
-        L.DomEvent.stopPropagation(e);
-      } else {
-        L.DomEvent.preventDefault(e);
-      }
-    },
-    setOpacity: function(opacity) {
-      this.options.opacity = opacity;
-      if (this._map) {
-        this._updateOpacity();
-      }
-      return this;
-    },
-    _updateOpacity: function() {
-      L.DomUtil.setOpacity(this._icon, this.options.opacity);
-      if (this._shadow) {
-        L.DomUtil.setOpacity(this._shadow, this.options.opacity);
-      }
-    },
-    _bringToFront: function() {
-      this._updateZIndex(this.options.riseOffset);
-    },
-    _resetZIndex: function() {
-      this._updateZIndex(0);
-    }
-  });
-  L.marker = function(latlng, options) {
-    return new L.Marker(latlng, options);
-  };
-  L.DivIcon = L.Icon.extend({
-    options: {
-      iconSize: [12, 12],
-      className: 'leaflet-div-icon',
-      html: false
-    },
-    createIcon: function(oldIcon) {
-      var div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : document.createElement('div'),
-          options = this.options;
-      if (options.html !== false) {
-        div.innerHTML = options.html;
-      } else {
-        div.innerHTML = '';
-      }
-      if (options.bgPos) {
-        div.style.backgroundPosition = (-options.bgPos.x) + 'px ' + (-options.bgPos.y) + 'px';
-      }
-      this._setIconStyles(div, 'icon');
-      return div;
-    },
-    createShadow: function() {
-      return null;
-    }
-  });
-  L.divIcon = function(options) {
-    return new L.DivIcon(options);
-  };
-  L.Map.mergeOptions({closePopupOnClick: true});
-  L.Popup = L.Class.extend({
-    includes: L.Mixin.Events,
-    options: {
-      minWidth: 50,
-      maxWidth: 300,
-      autoPan: true,
-      closeButton: true,
-      offset: [0, 7],
-      autoPanPadding: [5, 5],
-      keepInView: false,
-      className: '',
-      zoomAnimation: true
-    },
-    initialize: function(options, source) {
-      L.setOptions(this, options);
-      this._source = source;
-      this._animated = L.Browser.any3d && this.options.zoomAnimation;
-      this._isOpen = false;
-    },
-    onAdd: function(map) {
-      this._map = map;
-      if (!this._container) {
-        this._initLayout();
-      }
-      var animFade = map.options.fadeAnimation;
-      if (animFade) {
-        L.DomUtil.setOpacity(this._container, 0);
-      }
-      map._panes.popupPane.appendChild(this._container);
-      map.on(this._getEvents(), this);
-      this.update();
-      if (animFade) {
-        L.DomUtil.setOpacity(this._container, 1);
-      }
-      this.fire('open');
-      map.fire('popupopen', {popup: this});
-      if (this._source) {
-        this._source.fire('popupopen', {popup: this});
-      }
-    },
-    addTo: function(map) {
-      map.addLayer(this);
-      return this;
-    },
-    openOn: function(map) {
-      map.openPopup(this);
-      return this;
-    },
-    onRemove: function(map) {
-      map._panes.popupPane.removeChild(this._container);
-      L.Util.falseFn(this._container.offsetWidth);
-      map.off(this._getEvents(), this);
-      if (map.options.fadeAnimation) {
-        L.DomUtil.setOpacity(this._container, 0);
-      }
-      this._map = null;
-      this.fire('close');
-      map.fire('popupclose', {popup: this});
-      if (this._source) {
-        this._source.fire('popupclose', {popup: this});
-      }
-    },
-    getLatLng: function() {
-      return this._latlng;
-    },
-    setLatLng: function(latlng) {
-      this._latlng = L.latLng(latlng);
-      if (this._map) {
-        this._updatePosition();
-        this._adjustPan();
-      }
-      return this;
-    },
-    getContent: function() {
-      return this._content;
-    },
-    setContent: function(content) {
-      this._content = content;
-      this.update();
-      return this;
-    },
-    update: function() {
-      if (!this._map) {
-        return;
-      }
-      this._container.style.visibility = 'hidden';
-      this._updateContent();
-      this._updateLayout();
-      this._updatePosition();
-      this._container.style.visibility = '';
-      this._adjustPan();
-    },
-    _getEvents: function() {
-      var events = {viewreset: this._updatePosition};
-      if (this._animated) {
-        events.zoomanim = this._zoomAnimation;
-      }
-      if ('closeOnClick' in this.options ? this.options.closeOnClick : this._map.options.closePopupOnClick) {
-        events.preclick = this._close;
-      }
-      if (this.options.keepInView) {
-        events.moveend = this._adjustPan;
-      }
-      return events;
-    },
-    _close: function() {
-      if (this._map) {
-        this._map.closePopup(this);
-      }
-    },
-    _initLayout: function() {
-      var prefix = 'leaflet-popup',
-          containerClass = prefix + ' ' + this.options.className + ' leaflet-zoom-' + (this._animated ? 'animated' : 'hide'),
-          container = this._container = L.DomUtil.create('div', containerClass),
-          closeButton;
-      if (this.options.closeButton) {
-        closeButton = this._closeButton = L.DomUtil.create('a', prefix + '-close-button', container);
-        closeButton.href = '#close';
-        closeButton.innerHTML = '&#215;';
-        L.DomEvent.disableClickPropagation(closeButton);
-        L.DomEvent.on(closeButton, 'click', this._onCloseButtonClick, this);
-      }
-      var wrapper = this._wrapper = L.DomUtil.create('div', prefix + '-content-wrapper', container);
-      L.DomEvent.disableClickPropagation(wrapper);
-      this._contentNode = L.DomUtil.create('div', prefix + '-content', wrapper);
-      L.DomEvent.disableScrollPropagation(this._contentNode);
-      L.DomEvent.on(wrapper, 'contextmenu', L.DomEvent.stopPropagation);
-      this._tipContainer = L.DomUtil.create('div', prefix + '-tip-container', container);
-      this._tip = L.DomUtil.create('div', prefix + '-tip', this._tipContainer);
-    },
-    _updateContent: function() {
-      if (!this._content) {
-        return;
-      }
-      if (typeof this._content === 'string') {
-        this._contentNode.innerHTML = this._content;
-      } else {
-        while (this._contentNode.hasChildNodes()) {
-          this._contentNode.removeChild(this._contentNode.firstChild);
-        }
-        this._contentNode.appendChild(this._content);
-      }
-      this.fire('contentupdate');
-    },
-    _updateLayout: function() {
-      var container = this._contentNode,
-          style = container.style;
-      style.width = '';
-      style.whiteSpace = 'nowrap';
-      var width = container.offsetWidth;
-      width = Math.min(width, this.options.maxWidth);
-      width = Math.max(width, this.options.minWidth);
-      style.width = (width + 1) + 'px';
-      style.whiteSpace = '';
-      style.height = '';
-      var height = container.offsetHeight,
-          maxHeight = this.options.maxHeight,
-          scrolledClass = 'leaflet-popup-scrolled';
-      if (maxHeight && height > maxHeight) {
-        style.height = maxHeight + 'px';
-        L.DomUtil.addClass(container, scrolledClass);
-      } else {
-        L.DomUtil.removeClass(container, scrolledClass);
-      }
-      this._containerWidth = this._container.offsetWidth;
-    },
-    _updatePosition: function() {
-      if (!this._map) {
-        return;
-      }
-      var pos = this._map.latLngToLayerPoint(this._latlng),
-          animated = this._animated,
-          offset = L.point(this.options.offset);
-      if (animated) {
-        L.DomUtil.setPosition(this._container, pos);
-      }
-      this._containerBottom = -offset.y - (animated ? 0 : pos.y);
-      this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x + (animated ? 0 : pos.x);
-      this._container.style.bottom = this._containerBottom + 'px';
-      this._container.style.left = this._containerLeft + 'px';
-    },
-    _zoomAnimation: function(opt) {
-      var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center);
-      L.DomUtil.setPosition(this._container, pos);
-    },
-    _adjustPan: function() {
-      if (!this.options.autoPan) {
-        return;
-      }
-      var map = this._map,
-          containerHeight = this._container.offsetHeight,
-          containerWidth = this._containerWidth,
-          layerPos = new L.Point(this._containerLeft, -containerHeight - this._containerBottom);
-      if (this._animated) {
-        layerPos._add(L.DomUtil.getPosition(this._container));
-      }
-      var containerPos = map.layerPointToContainerPoint(layerPos),
-          padding = L.point(this.options.autoPanPadding),
-          paddingTL = L.point(this.options.autoPanPaddingTopLeft || padding),
-          paddingBR = L.point(this.options.autoPanPaddingBottomRight || padding),
-          size = map.getSize(),
-          dx = 0,
-          dy = 0;
-      if (containerPos.x + containerWidth + paddingBR.x > size.x) {
-        dx = containerPos.x + containerWidth - size.x + paddingBR.x;
-      }
-      if (containerPos.x - dx - paddingTL.x < 0) {
-        dx = containerPos.x - paddingTL.x;
-      }
-      if (containerPos.y + containerHeight + paddingBR.y > size.y) {
-        dy = containerPos.y + containerHeight - size.y + paddingBR.y;
-      }
-      if (containerPos.y - dy - paddingTL.y < 0) {
-        dy = containerPos.y - paddingTL.y;
-      }
-      if (dx || dy) {
-        map.fire('autopanstart').panBy([dx, dy]);
-      }
-    },
-    _onCloseButtonClick: function(e) {
-      this._close();
-      L.DomEvent.stop(e);
-    }
-  });
-  L.popup = function(options, source) {
-    return new L.Popup(options, source);
-  };
-  L.Map.include({
-    openPopup: function(popup, latlng, options) {
-      this.closePopup();
-      if (!(popup instanceof L.Popup)) {
-        var content = popup;
-        popup = new L.Popup(options).setLatLng(latlng).setContent(content);
-      }
-      popup._isOpen = true;
-      this._popup = popup;
-      return this.addLayer(popup);
-    },
-    closePopup: function(popup) {
-      if (!popup || popup === this._popup) {
-        popup = this._popup;
-        this._popup = null;
-      }
-      if (popup) {
-        this.removeLayer(popup);
-        popup._isOpen = false;
-      }
-      return this;
-    }
-  });
-  L.Marker.include({
-    openPopup: function() {
-      if (this._popup && this._map && !this._map.hasLayer(this._popup)) {
-        this._popup.setLatLng(this._latlng);
-        this._map.openPopup(this._popup);
-      }
-      return this;
-    },
-    closePopup: function() {
-      if (this._popup) {
-        this._popup._close();
-      }
-      return this;
-    },
-    togglePopup: function() {
-      if (this._popup) {
-        if (this._popup._isOpen) {
-          this.closePopup();
-        } else {
-          this.openPopup();
-        }
-      }
-      return this;
-    },
-    bindPopup: function(content, options) {
-      var anchor = L.point(this.options.icon.options.popupAnchor || [0, 0]);
-      anchor = anchor.add(L.Popup.prototype.options.offset);
-      if (options && options.offset) {
-        anchor = anchor.add(options.offset);
-      }
-      options = L.extend({offset: anchor}, options);
-      if (!this._popupHandlersAdded) {
-        this.on('click', this.togglePopup, this).on('remove', this.closePopup, this).on('move', this._movePopup, this);
-        this._popupHandlersAdded = true;
-      }
-      if (content instanceof L.Popup) {
-        L.setOptions(content, options);
-        this._popup = content;
-        content._source = this;
-      } else {
-        this._popup = new L.Popup(options, this).setContent(content);
-      }
-      return this;
-    },
-    setPopupContent: function(content) {
-      if (this._popup) {
-        this._popup.setContent(content);
-      }
-      return this;
-    },
-    unbindPopup: function() {
-      if (this._popup) {
-        this._popup = null;
-        this.off('click', this.togglePopup, this).off('remove', this.closePopup, this).off('move', this._movePopup, this);
-        this._popupHandlersAdded = false;
-      }
-      return this;
-    },
-    getPopup: function() {
-      return this._popup;
-    },
-    _movePopup: function(e) {
-      this._popup.setLatLng(e.latlng);
-    }
-  });
-  L.LayerGroup = L.Class.extend({
-    initialize: function(layers) {
-      this._layers = {};
-      var i,
-          len;
-      if (layers) {
-        for (i = 0, len = layers.length; i < len; i++) {
-          this.addLayer(layers[i]);
-        }
-      }
-    },
-    addLayer: function(layer) {
-      var id = this.getLayerId(layer);
-      this._layers[id] = layer;
-      if (this._map) {
-        this._map.addLayer(layer);
-      }
-      return this;
-    },
-    removeLayer: function(layer) {
-      var id = layer in this._layers ? layer : this.getLayerId(layer);
-      if (this._map && this._layers[id]) {
-        this._map.removeLayer(this._layers[id]);
-      }
-      delete this._layers[id];
-      return this;
-    },
-    hasLayer: function(layer) {
-      if (!layer) {
-        return false;
-      }
-      return (layer in this._layers || this.getLayerId(layer) in this._layers);
-    },
-    clearLayers: function() {
-      this.eachLayer(this.removeLayer, this);
-      return this;
-    },
-    invoke: function(methodName) {
-      var args = Array.prototype.slice.call(arguments, 1),
-          i,
-          layer;
-      for (i in this._layers) {
-        layer = this._layers[i];
-        if (layer[methodName]) {
-          layer[methodName].apply(layer, args);
-        }
-      }
-      return this;
-    },
-    onAdd: function(map) {
-      this._map = map;
-      this.eachLayer(map.addLayer, map);
-    },
-    onRemove: function(map) {
-      this.eachLayer(map.removeLayer, map);
-      this._map = null;
-    },
-    addTo: function(map) {
-      map.addLayer(this);
-      return this;
-    },
-    eachLayer: function(method, context) {
-      for (var i in this._layers) {
-        method.call(context, this._layers[i]);
-      }
-      return this;
-    },
-    getLayer: function(id) {
-      return this._layers[id];
-    },
-    getLayers: function() {
-      var layers = [];
-      for (var i in this._layers) {
-        layers.push(this._layers[i]);
-      }
-      return layers;
-    },
-    setZIndex: function(zIndex) {
-      return this.invoke('setZIndex', zIndex);
-    },
-    getLayerId: function(layer) {
-      return L.stamp(layer);
-    }
-  });
-  L.layerGroup = function(layers) {
-    return new L.LayerGroup(layers);
-  };
-  L.FeatureGroup = L.LayerGroup.extend({
-    includes: L.Mixin.Events,
-    statics: {EVENTS: 'click dblclick mouseover mouseout mousemove contextmenu popupopen popupclose'},
-    addLayer: function(layer) {
-      if (this.hasLayer(layer)) {
-        return this;
-      }
-      if ('on' in layer) {
-        layer.on(L.FeatureGroup.EVENTS, this._propagateEvent, this);
-      }
-      L.LayerGroup.prototype.addLayer.call(this, layer);
-      if (this._popupContent && layer.bindPopup) {
-        layer.bindPopup(this._popupContent, this._popupOptions);
-      }
-      return this.fire('layeradd', {layer: layer});
-    },
-    removeLayer: function(layer) {
-      if (!this.hasLayer(layer)) {
-        return this;
-      }
-      if (layer in this._layers) {
-        layer = this._layers[layer];
-      }
-      if ('off' in layer) {
-        layer.off(L.FeatureGroup.EVENTS, this._propagateEvent, this);
-      }
-      L.LayerGroup.prototype.removeLayer.call(this, layer);
-      if (this._popupContent) {
-        this.invoke('unbindPopup');
-      }
-      return this.fire('layerremove', {layer: layer});
-    },
-    bindPopup: function(content, options) {
-      this._popupContent = content;
-      this._popupOptions = options;
-      return this.invoke('bindPopup', content, options);
-    },
-    openPopup: function(latlng) {
-      for (var id in this._layers) {
-        this._layers[id].openPopup(latlng);
-        break;
-      }
-      return this;
-    },
-    setStyle: function(style) {
-      return this.invoke('setStyle', style);
-    },
-    bringToFront: function() {
-      return this.invoke('bringToFront');
-    },
-    bringToBack: function() {
-      return this.invoke('bringToBack');
-    },
-    getBounds: function() {
-      var bounds = new L.LatLngBounds();
-      this.eachLayer(function(layer) {
-        bounds.extend(layer instanceof L.Marker ? layer.getLatLng() : layer.getBounds());
-      });
-      return bounds;
-    },
-    _propagateEvent: function(e) {
-      e = L.extend({
-        layer: e.target,
-        target: this
-      }, e);
-      this.fire(e.type, e);
-    }
-  });
-  L.featureGroup = function(layers) {
-    return new L.FeatureGroup(layers);
-  };
-  L.Path = L.Class.extend({
-    includes: [L.Mixin.Events],
-    statics: {CLIP_PADDING: (function() {
-        var max = L.Browser.mobile ? 1280 : 2000,
-            target = (max / Math.max(window.outerWidth, window.outerHeight) - 1) / 2;
-        return Math.max(0, Math.min(0.5, target));
-      })()},
-    options: {
-      stroke: true,
-      color: '#0033ff',
-      dashArray: null,
-      lineCap: null,
-      lineJoin: null,
-      weight: 5,
-      opacity: 0.5,
-      fill: false,
-      fillColor: null,
-      fillOpacity: 0.2,
-      clickable: true
-    },
-    initialize: function(options) {
-      L.setOptions(this, options);
-    },
-    onAdd: function(map) {
-      this._map = map;
-      if (!this._container) {
-        this._initElements();
-        this._initEvents();
-      }
-      this.projectLatlngs();
-      this._updatePath();
-      if (this._container) {
-        this._map._pathRoot.appendChild(this._container);
-      }
-      this.fire('add');
-      map.on({
-        'viewreset': this.projectLatlngs,
-        'moveend': this._updatePath
-      }, this);
-    },
-    addTo: function(map) {
-      map.addLayer(this);
-      return this;
-    },
-    onRemove: function(map) {
-      map._pathRoot.removeChild(this._container);
-      this.fire('remove');
-      this._map = null;
-      if (L.Browser.vml) {
-        this._container = null;
-        this._stroke = null;
-        this._fill = null;
-      }
-      map.off({
-        'viewreset': this.projectLatlngs,
-        'moveend': this._updatePath
-      }, this);
-    },
-    projectLatlngs: function() {},
-    setStyle: function(style) {
-      L.setOptions(this, style);
-      if (this._container) {
-        this._updateStyle();
-      }
-      return this;
-    },
-    redraw: function() {
-      if (this._map) {
-        this.projectLatlngs();
-        this._updatePath();
-      }
-      return this;
-    }
-  });
-  L.Map.include({_updatePathViewport: function() {
-      var p = L.Path.CLIP_PADDING,
-          size = this.getSize(),
-          panePos = L.DomUtil.getPosition(this._mapPane),
-          min = panePos.multiplyBy(-1)._subtract(size.multiplyBy(p)._round()),
-          max = min.add(size.multiplyBy(1 + p * 2)._round());
-      this._pathViewport = new L.Bounds(min, max);
-    }});
-  L.Path.SVG_NS = 'http://www.w3.org/2000/svg';
-  L.Browser.svg = !!(document.createElementNS && document.createElementNS(L.Path.SVG_NS, 'svg').createSVGRect);
-  L.Path = L.Path.extend({
-    statics: {SVG: L.Browser.svg},
-    bringToFront: function() {
-      var root = this._map._pathRoot,
-          path = this._container;
-      if (path && root.lastChild !== path) {
-        root.appendChild(path);
-      }
-      return this;
-    },
-    bringToBack: function() {
-      var root = this._map._pathRoot,
-          path = this._container,
-          first = root.firstChild;
-      if (path && first !== path) {
-        root.insertBefore(path, first);
-      }
-      return this;
-    },
-    getPathString: function() {},
-    _createElement: function(name) {
-      return document.createElementNS(L.Path.SVG_NS, name);
-    },
-    _initElements: function() {
-      this._map._initPathRoot();
-      this._initPath();
-      this._initStyle();
-    },
-    _initPath: function() {
-      this._container = this._createElement('g');
-      this._path = this._createElement('path');
-      if (this.options.className) {
-        L.DomUtil.addClass(this._path, this.options.className);
-      }
-      this._container.appendChild(this._path);
-    },
-    _initStyle: function() {
-      if (this.options.stroke) {
-        this._path.setAttribute('stroke-linejoin', 'round');
-        this._path.setAttribute('stroke-linecap', 'round');
-      }
-      if (this.options.fill) {
-        this._path.setAttribute('fill-rule', 'evenodd');
-      }
-      if (this.options.pointerEvents) {
-        this._path.setAttribute('pointer-events', this.options.pointerEvents);
-      }
-      if (!this.options.clickable && !this.options.pointerEvents) {
-        this._path.setAttribute('pointer-events', 'none');
-      }
-      this._updateStyle();
-    },
-    _updateStyle: function() {
-      if (this.options.stroke) {
-        this._path.setAttribute('stroke', this.options.color);
-        this._path.setAttribute('stroke-opacity', this.options.opacity);
-        this._path.setAttribute('stroke-width', this.options.weight);
-        if (this.options.dashArray) {
-          this._path.setAttribute('stroke-dasharray', this.options.dashArray);
-        } else {
-          this._path.removeAttribute('stroke-dasharray');
-        }
-        if (this.options.lineCap) {
-          this._path.setAttribute('stroke-linecap', this.options.lineCap);
-        }
-        if (this.options.lineJoin) {
-          this._path.setAttribute('stroke-linejoin', this.options.lineJoin);
-        }
-      } else {
-        this._path.setAttribute('stroke', 'none');
-      }
-      if (this.options.fill) {
-        this._path.setAttribute('fill', this.options.fillColor || this.options.color);
-        this._path.setAttribute('fill-opacity', this.options.fillOpacity);
-      } else {
-        this._path.setAttribute('fill', 'none');
-      }
-    },
-    _updatePath: function() {
-      var str = this.getPathString();
-      if (!str) {
-        str = 'M0 0';
-      }
-      this._path.setAttribute('d', str);
-    },
-    _initEvents: function() {
-      if (this.options.clickable) {
-        if (L.Browser.svg || !L.Browser.vml) {
-          L.DomUtil.addClass(this._path, 'leaflet-clickable');
-        }
-        L.DomEvent.on(this._container, 'click', this._onMouseClick, this);
-        var events = ['dblclick', 'mousedown', 'mouseover', 'mouseout', 'mousemove', 'contextmenu'];
-        for (var i = 0; i < events.length; i++) {
-          L.DomEvent.on(this._container, events[i], this._fireMouseEvent, this);
-        }
-      }
-    },
-    _onMouseClick: function(e) {
-      if (this._map.dragging && this._map.dragging.moved()) {
-        return;
-      }
-      this._fireMouseEvent(e);
-    },
-    _fireMouseEvent: function(e) {
-      if (!this._map || !this.hasEventListeners(e.type)) {
-        return;
-      }
-      var map = this._map,
-          containerPoint = map.mouseEventToContainerPoint(e),
-          layerPoint = map.containerPointToLayerPoint(containerPoint),
-          latlng = map.layerPointToLatLng(layerPoint);
-      this.fire(e.type, {
-        latlng: latlng,
-        layerPoint: layerPoint,
-        containerPoint: containerPoint,
-        originalEvent: e
-      });
-      if (e.type === 'contextmenu') {
-        L.DomEvent.preventDefault(e);
-      }
-      if (e.type !== 'mousemove') {
-        L.DomEvent.stopPropagation(e);
-      }
-    }
-  });
-  L.Map.include({
-    _initPathRoot: function() {
-      if (!this._pathRoot) {
-        this._pathRoot = L.Path.prototype._createElement('svg');
-        this._panes.overlayPane.appendChild(this._pathRoot);
-        if (this.options.zoomAnimation && L.Browser.any3d) {
-          L.DomUtil.addClass(this._pathRoot, 'leaflet-zoom-animated');
-          this.on({
-            'zoomanim': this._animatePathZoom,
-            'zoomend': this._endPathZoom
-          });
-        } else {
-          L.DomUtil.addClass(this._pathRoot, 'leaflet-zoom-hide');
-        }
-        this.on('moveend', this._updateSvgViewport);
-        this._updateSvgViewport();
-      }
-    },
-    _animatePathZoom: function(e) {
-      var scale = this.getZoomScale(e.zoom),
-          offset = this._getCenterOffset(e.center)._multiplyBy(-scale)._add(this._pathViewport.min);
-      this._pathRoot.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(offset) + ' scale(' + scale + ') ';
-      this._pathZooming = true;
-    },
-    _endPathZoom: function() {
-      this._pathZooming = false;
-    },
-    _updateSvgViewport: function() {
-      if (this._pathZooming) {
-        return;
-      }
-      this._updatePathViewport();
-      var vp = this._pathViewport,
-          min = vp.min,
-          max = vp.max,
-          width = max.x - min.x,
-          height = max.y - min.y,
-          root = this._pathRoot,
-          pane = this._panes.overlayPane;
-      if (L.Browser.mobileWebkit) {
-        pane.removeChild(root);
-      }
-      L.DomUtil.setPosition(root, min);
-      root.setAttribute('width', width);
-      root.setAttribute('height', height);
-      root.setAttribute('viewBox', [min.x, min.y, width, height].join(' '));
-      if (L.Browser.mobileWebkit) {
-        pane.appendChild(root);
-      }
-    }
-  });
-  L.Path.include({
-    bindPopup: function(content, options) {
-      if (content instanceof L.Popup) {
-        this._popup = content;
-      } else {
-        if (!this._popup || options) {
-          this._popup = new L.Popup(options, this);
-        }
-        this._popup.setContent(content);
-      }
-      if (!this._popupHandlersAdded) {
-        this.on('click', this._openPopup, this).on('remove', this.closePopup, this);
-        this._popupHandlersAdded = true;
-      }
-      return this;
-    },
-    unbindPopup: function() {
-      if (this._popup) {
-        this._popup = null;
-        this.off('click', this._openPopup).off('remove', this.closePopup);
-        this._popupHandlersAdded = false;
-      }
-      return this;
-    },
-    openPopup: function(latlng) {
-      if (this._popup) {
-        latlng = latlng || this._latlng || this._latlngs[Math.floor(this._latlngs.length / 2)];
-        this._openPopup({latlng: latlng});
-      }
-      return this;
-    },
-    closePopup: function() {
-      if (this._popup) {
-        this._popup._close();
-      }
-      return this;
-    },
-    _openPopup: function(e) {
-      this._popup.setLatLng(e.latlng);
-      this._map.openPopup(this._popup);
-    }
-  });
-  L.Browser.vml = !L.Browser.svg && (function() {
-    try {
-      var div = document.createElement('div');
-      div.innerHTML = '<v:shape adj="1"/>';
-      var shape = div.firstChild;
-      shape.style.behavior = 'url(#default#VML)';
-      return shape && (typeof shape.adj === 'object');
-    } catch (e) {
-      return false;
-    }
-  }());
-  L.Path = L.Browser.svg || !L.Browser.vml ? L.Path : L.Path.extend({
-    statics: {
-      VML: true,
-      CLIP_PADDING: 0.02
-    },
-    _createElement: (function() {
-      try {
-        document.namespaces.add('lvml', 'urn:schemas-microsoft-com:vml');
-        return function(name) {
-          return document.createElement('<lvml:' + name + ' class="lvml">');
         };
-      } catch (e) {
-        return function(name) {
-          return document.createElement('<' + name + ' xmlns="urn:schemas-microsoft.com:vml" class="lvml">');
+        return NewClass;
+      };
+      L.Class.include = function (props) {
+        L.extend(this.prototype, props);
+        return this;
+      };
+      L.Class.mergeOptions = function (options) {
+        L.extend(this.prototype.options, options);
+        return this;
+      };
+      L.Class.addInitHook = function (fn) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        var init = typeof fn === 'function' ? fn : function () {
+          this[fn].apply(this, args);
         };
-      }
-    }()),
-    _initPath: function() {
-      var container = this._container = this._createElement('shape');
-      L.DomUtil.addClass(container, 'leaflet-vml-shape' + (this.options.className ? ' ' + this.options.className : ''));
-      if (this.options.clickable) {
-        L.DomUtil.addClass(container, 'leaflet-clickable');
-      }
-      container.coordsize = '1 1';
-      this._path = this._createElement('path');
-      container.appendChild(this._path);
-      this._map._pathRoot.appendChild(container);
-    },
-    _initStyle: function() {
-      this._updateStyle();
-    },
-    _updateStyle: function() {
-      var stroke = this._stroke,
-          fill = this._fill,
-          options = this.options,
-          container = this._container;
-      container.stroked = options.stroke;
-      container.filled = options.fill;
-      if (options.stroke) {
-        if (!stroke) {
-          stroke = this._stroke = this._createElement('stroke');
-          stroke.endcap = 'round';
-          container.appendChild(stroke);
-        }
-        stroke.weight = options.weight + 'px';
-        stroke.color = options.color;
-        stroke.opacity = options.opacity;
-        if (options.dashArray) {
-          stroke.dashStyle = L.Util.isArray(options.dashArray) ? options.dashArray.join(' ') : options.dashArray.replace(/( *, *)/g, ' ');
-        } else {
-          stroke.dashStyle = '';
-        }
-        if (options.lineCap) {
-          stroke.endcap = options.lineCap.replace('butt', 'flat');
-        }
-        if (options.lineJoin) {
-          stroke.joinstyle = options.lineJoin;
-        }
-      } else if (stroke) {
-        container.removeChild(stroke);
-        this._stroke = null;
-      }
-      if (options.fill) {
-        if (!fill) {
-          fill = this._fill = this._createElement('fill');
-          container.appendChild(fill);
-        }
-        fill.color = options.fillColor || options.color;
-        fill.opacity = options.fillOpacity;
-      } else if (fill) {
-        container.removeChild(fill);
-        this._fill = null;
-      }
-    },
-    _updatePath: function() {
-      var style = this._container.style;
-      style.display = 'none';
-      this._path.v = this.getPathString() + ' ';
-      style.display = '';
-    }
-  });
-  L.Map.include(L.Browser.svg || !L.Browser.vml ? {} : {_initPathRoot: function() {
-      if (this._pathRoot) {
-        return;
-      }
-      var root = this._pathRoot = document.createElement('div');
-      root.className = 'leaflet-vml-container';
-      this._panes.overlayPane.appendChild(root);
-      this.on('moveend', this._updatePathViewport);
-      this._updatePathViewport();
-    }});
-  L.Browser.canvas = (function() {
-    return !!document.createElement('canvas').getContext;
-  }());
-  L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path : L.Path.extend({
-    statics: {
-      CANVAS: true,
-      SVG: false
-    },
-    redraw: function() {
-      if (this._map) {
-        this.projectLatlngs();
-        this._requestUpdate();
-      }
-      return this;
-    },
-    setStyle: function(style) {
-      L.setOptions(this, style);
-      if (this._map) {
-        this._updateStyle();
-        this._requestUpdate();
-      }
-      return this;
-    },
-    onRemove: function(map) {
-      map.off('viewreset', this.projectLatlngs, this).off('moveend', this._updatePath, this);
-      if (this.options.clickable) {
-        this._map.off('click', this._onClick, this);
-        this._map.off('mousemove', this._onMouseMove, this);
-      }
-      this._requestUpdate();
-      this.fire('remove');
-      this._map = null;
-    },
-    _requestUpdate: function() {
-      if (this._map && !L.Path._updateRequest) {
-        L.Path._updateRequest = L.Util.requestAnimFrame(this._fireMapMoveEnd, this._map);
-      }
-    },
-    _fireMapMoveEnd: function() {
-      L.Path._updateRequest = null;
-      this.fire('moveend');
-    },
-    _initElements: function() {
-      this._map._initPathRoot();
-      this._ctx = this._map._canvasCtx;
-    },
-    _updateStyle: function() {
-      var options = this.options;
-      if (options.stroke) {
-        this._ctx.lineWidth = options.weight;
-        this._ctx.strokeStyle = options.color;
-      }
-      if (options.fill) {
-        this._ctx.fillStyle = options.fillColor || options.color;
-      }
-      if (options.lineCap) {
-        this._ctx.lineCap = options.lineCap;
-      }
-      if (options.lineJoin) {
-        this._ctx.lineJoin = options.lineJoin;
-      }
-    },
-    _drawPath: function() {
-      var i,
-          j,
-          len,
-          len2,
-          point,
-          drawMethod;
-      this._ctx.beginPath();
-      for (i = 0, len = this._parts.length; i < len; i++) {
-        for (j = 0, len2 = this._parts[i].length; j < len2; j++) {
-          point = this._parts[i][j];
-          drawMethod = (j === 0 ? 'move' : 'line') + 'To';
-          this._ctx[drawMethod](point.x, point.y);
-        }
-        if (this instanceof L.Polygon) {
-          this._ctx.closePath();
-        }
-      }
-    },
-    _checkIfEmpty: function() {
-      return !this._parts.length;
-    },
-    _updatePath: function() {
-      if (this._checkIfEmpty()) {
-        return;
-      }
-      var ctx = this._ctx,
-          options = this.options;
-      this._drawPath();
-      ctx.save();
-      this._updateStyle();
-      if (options.fill) {
-        ctx.globalAlpha = options.fillOpacity;
-        ctx.fill(options.fillRule || 'evenodd');
-      }
-      if (options.stroke) {
-        ctx.globalAlpha = options.opacity;
-        ctx.stroke();
-      }
-      ctx.restore();
-    },
-    _initEvents: function() {
-      if (this.options.clickable) {
-        this._map.on('mousemove', this._onMouseMove, this);
-        this._map.on('click dblclick contextmenu', this._fireMouseEvent, this);
-      }
-    },
-    _fireMouseEvent: function(e) {
-      if (this._containsPoint(e.layerPoint)) {
-        this.fire(e.type, e);
-      }
-    },
-    _onMouseMove: function(e) {
-      if (!this._map || this._map._animatingZoom) {
-        return;
-      }
-      if (this._containsPoint(e.layerPoint)) {
-        this._ctx.canvas.style.cursor = 'pointer';
-        this._mouseInside = true;
-        this.fire('mouseover', e);
-      } else if (this._mouseInside) {
-        this._ctx.canvas.style.cursor = '';
-        this._mouseInside = false;
-        this.fire('mouseout', e);
-      }
-    }
-  });
-  L.Map.include((L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? {} : {
-    _initPathRoot: function() {
-      var root = this._pathRoot,
-          ctx;
-      if (!root) {
-        root = this._pathRoot = document.createElement('canvas');
-        root.style.position = 'absolute';
-        ctx = this._canvasCtx = root.getContext('2d');
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        this._panes.overlayPane.appendChild(root);
-        if (this.options.zoomAnimation) {
-          this._pathRoot.className = 'leaflet-zoom-animated';
-          this.on('zoomanim', this._animatePathZoom);
-          this.on('zoomend', this._endPathZoom);
-        }
-        this.on('moveend', this._updateCanvasViewport);
-        this._updateCanvasViewport();
-      }
-    },
-    _updateCanvasViewport: function() {
-      if (this._pathZooming) {
-        return;
-      }
-      this._updatePathViewport();
-      var vp = this._pathViewport,
-          min = vp.min,
-          size = vp.max.subtract(min),
-          root = this._pathRoot;
-      L.DomUtil.setPosition(root, min);
-      root.width = size.x;
-      root.height = size.y;
-      root.getContext('2d').translate(-min.x, -min.y);
-    }
-  });
-  L.LineUtil = {
-    simplify: function(points, tolerance) {
-      if (!tolerance || !points.length) {
-        return points.slice();
-      }
-      var sqTolerance = tolerance * tolerance;
-      points = this._reducePoints(points, sqTolerance);
-      points = this._simplifyDP(points, sqTolerance);
-      return points;
-    },
-    pointToSegmentDistance: function(p, p1, p2) {
-      return Math.sqrt(this._sqClosestPointOnSegment(p, p1, p2, true));
-    },
-    closestPointOnSegment: function(p, p1, p2) {
-      return this._sqClosestPointOnSegment(p, p1, p2);
-    },
-    _simplifyDP: function(points, sqTolerance) {
-      var len = points.length,
-          ArrayConstructor = typeof Uint8Array !== undefined + '' ? Uint8Array : Array,
-          markers = new ArrayConstructor(len);
-      markers[0] = markers[len - 1] = 1;
-      this._simplifyDPStep(points, markers, sqTolerance, 0, len - 1);
-      var i,
-          newPoints = [];
-      for (i = 0; i < len; i++) {
-        if (markers[i]) {
-          newPoints.push(points[i]);
-        }
-      }
-      return newPoints;
-    },
-    _simplifyDPStep: function(points, markers, sqTolerance, first, last) {
-      var maxSqDist = 0,
-          index,
-          i,
-          sqDist;
-      for (i = first + 1; i <= last - 1; i++) {
-        sqDist = this._sqClosestPointOnSegment(points[i], points[first], points[last], true);
-        if (sqDist > maxSqDist) {
-          index = i;
-          maxSqDist = sqDist;
-        }
-      }
-      if (maxSqDist > sqTolerance) {
-        markers[index] = 1;
-        this._simplifyDPStep(points, markers, sqTolerance, first, index);
-        this._simplifyDPStep(points, markers, sqTolerance, index, last);
-      }
-    },
-    _reducePoints: function(points, sqTolerance) {
-      var reducedPoints = [points[0]];
-      for (var i = 1,
-          prev = 0,
-          len = points.length; i < len; i++) {
-        if (this._sqDist(points[i], points[prev]) > sqTolerance) {
-          reducedPoints.push(points[i]);
-          prev = i;
-        }
-      }
-      if (prev < len - 1) {
-        reducedPoints.push(points[len - 1]);
-      }
-      return reducedPoints;
-    },
-    clipSegment: function(a, b, bounds, useLastCode) {
-      var codeA = useLastCode ? this._lastCode : this._getBitCode(a, bounds),
-          codeB = this._getBitCode(b, bounds),
-          codeOut,
-          p,
-          newCode;
-      this._lastCode = codeB;
-      while (true) {
-        if (!(codeA | codeB)) {
-          return [a, b];
-        } else if (codeA & codeB) {
-          return false;
-        } else {
-          codeOut = codeA || codeB;
-          p = this._getEdgeIntersection(a, b, codeOut, bounds);
-          newCode = this._getBitCode(p, bounds);
-          if (codeOut === codeA) {
-            a = p;
-            codeA = newCode;
-          } else {
-            b = p;
-            codeB = newCode;
-          }
-        }
-      }
-    },
-    _getEdgeIntersection: function(a, b, code, bounds) {
-      var dx = b.x - a.x,
-          dy = b.y - a.y,
-          min = bounds.min,
-          max = bounds.max;
-      if (code & 8) {
-        return new L.Point(a.x + dx * (max.y - a.y) / dy, max.y);
-      } else if (code & 4) {
-        return new L.Point(a.x + dx * (min.y - a.y) / dy, min.y);
-      } else if (code & 2) {
-        return new L.Point(max.x, a.y + dy * (max.x - a.x) / dx);
-      } else if (code & 1) {
-        return new L.Point(min.x, a.y + dy * (min.x - a.x) / dx);
-      }
-    },
-    _getBitCode: function(p, bounds) {
-      var code = 0;
-      if (p.x < bounds.min.x) {
-        code |= 1;
-      } else if (p.x > bounds.max.x) {
-        code |= 2;
-      }
-      if (p.y < bounds.min.y) {
-        code |= 4;
-      } else if (p.y > bounds.max.y) {
-        code |= 8;
-      }
-      return code;
-    },
-    _sqDist: function(p1, p2) {
-      var dx = p2.x - p1.x,
-          dy = p2.y - p1.y;
-      return dx * dx + dy * dy;
-    },
-    _sqClosestPointOnSegment: function(p, p1, p2, sqDist) {
-      var x = p1.x,
-          y = p1.y,
-          dx = p2.x - x,
-          dy = p2.y - y,
-          dot = dx * dx + dy * dy,
-          t;
-      if (dot > 0) {
-        t = ((p.x - x) * dx + (p.y - y) * dy) / dot;
-        if (t > 1) {
-          x = p2.x;
-          y = p2.y;
-        } else if (t > 0) {
-          x += dx * t;
-          y += dy * t;
-        }
-      }
-      dx = p.x - x;
-      dy = p.y - y;
-      return sqDist ? dx * dx + dy * dy : new L.Point(x, y);
-    }
-  };
-  L.Polyline = L.Path.extend({
-    initialize: function(latlngs, options) {
-      L.Path.prototype.initialize.call(this, options);
-      this._latlngs = this._convertLatLngs(latlngs);
-    },
-    options: {
-      smoothFactor: 1.0,
-      noClip: false
-    },
-    projectLatlngs: function() {
-      this._originalPoints = [];
-      for (var i = 0,
-          len = this._latlngs.length; i < len; i++) {
-        this._originalPoints[i] = this._map.latLngToLayerPoint(this._latlngs[i]);
-      }
-    },
-    getPathString: function() {
-      for (var i = 0,
-          len = this._parts.length,
-          str = ''; i < len; i++) {
-        str += this._getPathPartStr(this._parts[i]);
-      }
-      return str;
-    },
-    getLatLngs: function() {
-      return this._latlngs;
-    },
-    setLatLngs: function(latlngs) {
-      this._latlngs = this._convertLatLngs(latlngs);
-      return this.redraw();
-    },
-    addLatLng: function(latlng) {
-      this._latlngs.push(L.latLng(latlng));
-      return this.redraw();
-    },
-    spliceLatLngs: function() {
-      var removed = [].splice.apply(this._latlngs, arguments);
-      this._convertLatLngs(this._latlngs, true);
-      this.redraw();
-      return removed;
-    },
-    closestLayerPoint: function(p) {
-      var minDistance = Infinity,
-          parts = this._parts,
-          p1,
-          p2,
-          minPoint = null;
-      for (var j = 0,
-          jLen = parts.length; j < jLen; j++) {
-        var points = parts[j];
-        for (var i = 1,
-            len = points.length; i < len; i++) {
-          p1 = points[i - 1];
-          p2 = points[i];
-          var sqDist = L.LineUtil._sqClosestPointOnSegment(p, p1, p2, true);
-          if (sqDist < minDistance) {
-            minDistance = sqDist;
-            minPoint = L.LineUtil._sqClosestPointOnSegment(p, p1, p2);
-          }
-        }
-      }
-      if (minPoint) {
-        minPoint.distance = Math.sqrt(minDistance);
-      }
-      return minPoint;
-    },
-    getBounds: function() {
-      return new L.LatLngBounds(this.getLatLngs());
-    },
-    _convertLatLngs: function(latlngs, overwrite) {
-      var i,
-          len,
-          target = overwrite ? latlngs : [];
-      for (i = 0, len = latlngs.length; i < len; i++) {
-        if (L.Util.isArray(latlngs[i]) && typeof latlngs[i][0] !== 'number') {
-          return;
-        }
-        target[i] = L.latLng(latlngs[i]);
-      }
-      return target;
-    },
-    _initEvents: function() {
-      L.Path.prototype._initEvents.call(this);
-    },
-    _getPathPartStr: function(points) {
-      var round = L.Path.VML;
-      for (var j = 0,
-          len2 = points.length,
-          str = '',
-          p; j < len2; j++) {
-        p = points[j];
-        if (round) {
-          p._round();
-        }
-        str += (j ? 'L' : 'M') + p.x + ' ' + p.y;
-      }
-      return str;
-    },
-    _clipPoints: function() {
-      var points = this._originalPoints,
-          len = points.length,
-          i,
-          k,
-          segment;
-      if (this.options.noClip) {
-        this._parts = [points];
-        return;
-      }
-      this._parts = [];
-      var parts = this._parts,
-          vp = this._map._pathViewport,
-          lu = L.LineUtil;
-      for (i = 0, k = 0; i < len - 1; i++) {
-        segment = lu.clipSegment(points[i], points[i + 1], vp, i);
-        if (!segment) {
-          continue;
-        }
-        parts[k] = parts[k] || [];
-        parts[k].push(segment[0]);
-        if ((segment[1] !== points[i + 1]) || (i === len - 2)) {
-          parts[k].push(segment[1]);
-          k++;
-        }
-      }
-    },
-    _simplifyPoints: function() {
-      var parts = this._parts,
-          lu = L.LineUtil;
-      for (var i = 0,
-          len = parts.length; i < len; i++) {
-        parts[i] = lu.simplify(parts[i], this.options.smoothFactor);
-      }
-    },
-    _updatePath: function() {
-      if (!this._map) {
-        return;
-      }
-      this._clipPoints();
-      this._simplifyPoints();
-      L.Path.prototype._updatePath.call(this);
-    }
-  });
-  L.polyline = function(latlngs, options) {
-    return new L.Polyline(latlngs, options);
-  };
-  L.PolyUtil = {};
-  L.PolyUtil.clipPolygon = function(points, bounds) {
-    var clippedPoints,
-        edges = [1, 4, 2, 8],
-        i,
-        j,
-        k,
-        a,
-        b,
-        len,
-        edge,
-        p,
-        lu = L.LineUtil;
-    for (i = 0, len = points.length; i < len; i++) {
-      points[i]._code = lu._getBitCode(points[i], bounds);
-    }
-    for (k = 0; k < 4; k++) {
-      edge = edges[k];
-      clippedPoints = [];
-      for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
-        a = points[i];
-        b = points[j];
-        if (!(a._code & edge)) {
-          if (b._code & edge) {
-            p = lu._getEdgeIntersection(b, a, edge, bounds);
-            p._code = lu._getBitCode(p, bounds);
-            clippedPoints.push(p);
-          }
-          clippedPoints.push(a);
-        } else if (!(b._code & edge)) {
-          p = lu._getEdgeIntersection(b, a, edge, bounds);
-          p._code = lu._getBitCode(p, bounds);
-          clippedPoints.push(p);
-        }
-      }
-      points = clippedPoints;
-    }
-    return points;
-  };
-  L.Polygon = L.Polyline.extend({
-    options: {fill: true},
-    initialize: function(latlngs, options) {
-      L.Polyline.prototype.initialize.call(this, latlngs, options);
-      this._initWithHoles(latlngs);
-    },
-    _initWithHoles: function(latlngs) {
-      var i,
-          len,
-          hole;
-      if (latlngs && L.Util.isArray(latlngs[0]) && (typeof latlngs[0][0] !== 'number')) {
-        this._latlngs = this._convertLatLngs(latlngs[0]);
-        this._holes = latlngs.slice(1);
-        for (i = 0, len = this._holes.length; i < len; i++) {
-          hole = this._holes[i] = this._convertLatLngs(this._holes[i]);
-          if (hole[0].equals(hole[hole.length - 1])) {
-            hole.pop();
-          }
-        }
-      }
-      latlngs = this._latlngs;
-      if (latlngs.length >= 2 && latlngs[0].equals(latlngs[latlngs.length - 1])) {
-        latlngs.pop();
-      }
-    },
-    projectLatlngs: function() {
-      L.Polyline.prototype.projectLatlngs.call(this);
-      this._holePoints = [];
-      if (!this._holes) {
-        return;
-      }
-      var i,
-          j,
-          len,
-          len2;
-      for (i = 0, len = this._holes.length; i < len; i++) {
-        this._holePoints[i] = [];
-        for (j = 0, len2 = this._holes[i].length; j < len2; j++) {
-          this._holePoints[i][j] = this._map.latLngToLayerPoint(this._holes[i][j]);
-        }
-      }
-    },
-    setLatLngs: function(latlngs) {
-      if (latlngs && L.Util.isArray(latlngs[0]) && (typeof latlngs[0][0] !== 'number')) {
-        this._initWithHoles(latlngs);
-        return this.redraw();
-      } else {
-        return L.Polyline.prototype.setLatLngs.call(this, latlngs);
-      }
-    },
-    _clipPoints: function() {
-      var points = this._originalPoints,
-          newParts = [];
-      this._parts = [points].concat(this._holePoints);
-      if (this.options.noClip) {
-        return;
-      }
-      for (var i = 0,
-          len = this._parts.length; i < len; i++) {
-        var clipped = L.PolyUtil.clipPolygon(this._parts[i], this._map._pathViewport);
-        if (clipped.length) {
-          newParts.push(clipped);
-        }
-      }
-      this._parts = newParts;
-    },
-    _getPathPartStr: function(points) {
-      var str = L.Polyline.prototype._getPathPartStr.call(this, points);
-      return str + (L.Browser.svg ? 'z' : 'x');
-    }
-  });
-  L.polygon = function(latlngs, options) {
-    return new L.Polygon(latlngs, options);
-  };
-  (function() {
-    function createMulti(Klass) {
-      return L.FeatureGroup.extend({
-        initialize: function(latlngs, options) {
-          this._layers = {};
-          this._options = options;
-          this.setLatLngs(latlngs);
-        },
-        setLatLngs: function(latlngs) {
-          var i = 0,
-              len = latlngs.length;
-          this.eachLayer(function(layer) {
-            if (i < len) {
-              layer.setLatLngs(latlngs[i++]);
-            } else {
-              this.removeLayer(layer);
+        this.prototype._initHooks = this.prototype._initHooks || [];
+        this.prototype._initHooks.push(init);
+        return this;
+      };
+      L.Evented = L.Class.extend({
+        on: function (types, fn, context) {
+          if (typeof types === 'object') {
+            for (var type in types) {
+              this._on(type, types[type], fn);
             }
-          }, this);
-          while (i < len) {
-            this.addLayer(new Klass(latlngs[i++], this._options));
+          } else {
+            types = L.Util.splitWords(types);
+            for (var i = 0, len = types.length; i < len; i++) {
+              this._on(types[i], fn, context);
+            }
           }
           return this;
         },
-        getLatLngs: function() {
-          var latlngs = [];
-          this.eachLayer(function(layer) {
-            latlngs.push(layer.getLatLngs());
-          });
-          return latlngs;
-        }
-      });
-    }
-    L.MultiPolyline = createMulti(L.Polyline);
-    L.MultiPolygon = createMulti(L.Polygon);
-    L.multiPolyline = function(latlngs, options) {
-      return new L.MultiPolyline(latlngs, options);
-    };
-    L.multiPolygon = function(latlngs, options) {
-      return new L.MultiPolygon(latlngs, options);
-    };
-  }());
-  L.Rectangle = L.Polygon.extend({
-    initialize: function(latLngBounds, options) {
-      L.Polygon.prototype.initialize.call(this, this._boundsToLatLngs(latLngBounds), options);
-    },
-    setBounds: function(latLngBounds) {
-      this.setLatLngs(this._boundsToLatLngs(latLngBounds));
-    },
-    _boundsToLatLngs: function(latLngBounds) {
-      latLngBounds = L.latLngBounds(latLngBounds);
-      return [latLngBounds.getSouthWest(), latLngBounds.getNorthWest(), latLngBounds.getNorthEast(), latLngBounds.getSouthEast()];
-    }
-  });
-  L.rectangle = function(latLngBounds, options) {
-    return new L.Rectangle(latLngBounds, options);
-  };
-  L.Circle = L.Path.extend({
-    initialize: function(latlng, radius, options) {
-      L.Path.prototype.initialize.call(this, options);
-      this._latlng = L.latLng(latlng);
-      this._mRadius = radius;
-    },
-    options: {fill: true},
-    setLatLng: function(latlng) {
-      this._latlng = L.latLng(latlng);
-      return this.redraw();
-    },
-    setRadius: function(radius) {
-      this._mRadius = radius;
-      return this.redraw();
-    },
-    projectLatlngs: function() {
-      var lngRadius = this._getLngRadius(),
-          latlng = this._latlng,
-          pointLeft = this._map.latLngToLayerPoint([latlng.lat, latlng.lng - lngRadius]);
-      this._point = this._map.latLngToLayerPoint(latlng);
-      this._radius = Math.max(this._point.x - pointLeft.x, 1);
-    },
-    getBounds: function() {
-      var lngRadius = this._getLngRadius(),
-          latRadius = (this._mRadius / 40075017) * 360,
-          latlng = this._latlng;
-      return new L.LatLngBounds([latlng.lat - latRadius, latlng.lng - lngRadius], [latlng.lat + latRadius, latlng.lng + lngRadius]);
-    },
-    getLatLng: function() {
-      return this._latlng;
-    },
-    getPathString: function() {
-      var p = this._point,
-          r = this._radius;
-      if (this._checkIfEmpty()) {
-        return '';
-      }
-      if (L.Browser.svg) {
-        return 'M' + p.x + ',' + (p.y - r) + 'A' + r + ',' + r + ',0,1,1,' + (p.x - 0.1) + ',' + (p.y - r) + ' z';
-      } else {
-        p._round();
-        r = Math.round(r);
-        return 'AL ' + p.x + ',' + p.y + ' ' + r + ',' + r + ' 0,' + (65535 * 360);
-      }
-    },
-    getRadius: function() {
-      return this._mRadius;
-    },
-    _getLatRadius: function() {
-      return (this._mRadius / 40075017) * 360;
-    },
-    _getLngRadius: function() {
-      return this._getLatRadius() / Math.cos(L.LatLng.DEG_TO_RAD * this._latlng.lat);
-    },
-    _checkIfEmpty: function() {
-      if (!this._map) {
-        return false;
-      }
-      var vp = this._map._pathViewport,
-          r = this._radius,
-          p = this._point;
-      return p.x - r > vp.max.x || p.y - r > vp.max.y || p.x + r < vp.min.x || p.y + r < vp.min.y;
-    }
-  });
-  L.circle = function(latlng, radius, options) {
-    return new L.Circle(latlng, radius, options);
-  };
-  L.CircleMarker = L.Circle.extend({
-    options: {
-      radius: 10,
-      weight: 2
-    },
-    initialize: function(latlng, options) {
-      L.Circle.prototype.initialize.call(this, latlng, null, options);
-      this._radius = this.options.radius;
-    },
-    projectLatlngs: function() {
-      this._point = this._map.latLngToLayerPoint(this._latlng);
-    },
-    _updateStyle: function() {
-      L.Circle.prototype._updateStyle.call(this);
-      this.setRadius(this.options.radius);
-    },
-    setLatLng: function(latlng) {
-      L.Circle.prototype.setLatLng.call(this, latlng);
-      if (this._popup && this._popup._isOpen) {
-        this._popup.setLatLng(latlng);
-      }
-      return this;
-    },
-    setRadius: function(radius) {
-      this.options.radius = this._radius = radius;
-      return this.redraw();
-    },
-    getRadius: function() {
-      return this._radius;
-    }
-  });
-  L.circleMarker = function(latlng, options) {
-    return new L.CircleMarker(latlng, options);
-  };
-  L.Polyline.include(!L.Path.CANVAS ? {} : {_containsPoint: function(p, closed) {
-      var i,
-          j,
-          k,
-          len,
-          len2,
-          dist,
-          part,
-          w = this.options.weight / 2;
-      if (L.Browser.touch) {
-        w += 10;
-      }
-      for (i = 0, len = this._parts.length; i < len; i++) {
-        part = this._parts[i];
-        for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
-          if (!closed && (j === 0)) {
-            continue;
+        off: function (types, fn, context) {
+          if (!types) {
+            delete this._events;
+          } else if (typeof types === 'object') {
+            for (var type in types) {
+              this._off(type, types[type], fn);
+            }
+          } else {
+            types = L.Util.splitWords(types);
+            for (var i = 0, len = types.length; i < len; i++) {
+              this._off(types[i], fn, context);
+            }
           }
-          dist = L.LineUtil.pointToSegmentDistance(p, part[k], part[j]);
-          if (dist <= w) {
-            return true;
+          return this;
+        },
+        _on: function (type, fn, context) {
+          this._events = this._events || {};
+          var typeListeners = this._events[type];
+          if (!typeListeners) {
+            typeListeners = [];
+            this._events[type] = typeListeners;
           }
-        }
-      }
-      return false;
-    }});
-  L.Polygon.include(!L.Path.CANVAS ? {} : {_containsPoint: function(p) {
-      var inside = false,
-          part,
-          p1,
-          p2,
-          i,
-          j,
-          k,
-          len,
-          len2;
-      if (L.Polyline.prototype._containsPoint.call(this, p, true)) {
-        return true;
-      }
-      for (i = 0, len = this._parts.length; i < len; i++) {
-        part = this._parts[i];
-        for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
-          p1 = part[j];
-          p2 = part[k];
-          if (((p1.y > p.y) !== (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) {
-            inside = !inside;
+          if (context === this) {
+            context = undefined;
           }
-        }
-      }
-      return inside;
-    }});
-  L.Circle.include(!L.Path.CANVAS ? {} : {
-    _drawPath: function() {
-      var p = this._point;
-      this._ctx.beginPath();
-      this._ctx.arc(p.x, p.y, this._radius, 0, Math.PI * 2, false);
-    },
-    _containsPoint: function(p) {
-      var center = this._point,
-          w2 = this.options.stroke ? this.options.weight / 2 : 0;
-      return (p.distanceTo(center) <= this._radius + w2);
-    }
-  });
-  L.CircleMarker.include(!L.Path.CANVAS ? {} : {_updateStyle: function() {
-      L.Path.prototype._updateStyle.call(this);
-    }});
-  L.GeoJSON = L.FeatureGroup.extend({
-    initialize: function(geojson, options) {
-      L.setOptions(this, options);
-      this._layers = {};
-      if (geojson) {
-        this.addData(geojson);
-      }
-    },
-    addData: function(geojson) {
-      var features = L.Util.isArray(geojson) ? geojson : geojson.features,
-          i,
-          len,
-          feature;
-      if (features) {
-        for (i = 0, len = features.length; i < len; i++) {
-          feature = features[i];
-          if (feature.geometries || feature.geometry || feature.features || feature.coordinates) {
-            this.addData(features[i]);
-          }
-        }
-        return this;
-      }
-      var options = this.options;
-      if (options.filter && !options.filter(geojson)) {
-        return;
-      }
-      var layer = L.GeoJSON.geometryToLayer(geojson, options.pointToLayer, options.coordsToLatLng, options);
-      layer.feature = L.GeoJSON.asFeature(geojson);
-      layer.defaultOptions = layer.options;
-      this.resetStyle(layer);
-      if (options.onEachFeature) {
-        options.onEachFeature(geojson, layer);
-      }
-      return this.addLayer(layer);
-    },
-    resetStyle: function(layer) {
-      var style = this.options.style;
-      if (style) {
-        L.Util.extend(layer.options, layer.defaultOptions);
-        this._setLayerStyle(layer, style);
-      }
-    },
-    setStyle: function(style) {
-      this.eachLayer(function(layer) {
-        this._setLayerStyle(layer, style);
-      }, this);
-    },
-    _setLayerStyle: function(layer, style) {
-      if (typeof style === 'function') {
-        style = style(layer.feature);
-      }
-      if (layer.setStyle) {
-        layer.setStyle(style);
-      }
-    }
-  });
-  L.extend(L.GeoJSON, {
-    geometryToLayer: function(geojson, pointToLayer, coordsToLatLng, vectorOptions) {
-      var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson,
-          coords = geometry.coordinates,
-          layers = [],
-          latlng,
-          latlngs,
-          i,
-          len;
-      coordsToLatLng = coordsToLatLng || this.coordsToLatLng;
-      switch (geometry.type) {
-        case 'Point':
-          latlng = coordsToLatLng(coords);
-          return pointToLayer ? pointToLayer(geojson, latlng) : new L.Marker(latlng);
-        case 'MultiPoint':
-          for (i = 0, len = coords.length; i < len; i++) {
-            latlng = coordsToLatLng(coords[i]);
-            layers.push(pointToLayer ? pointToLayer(geojson, latlng) : new L.Marker(latlng));
-          }
-          return new L.FeatureGroup(layers);
-        case 'LineString':
-          latlngs = this.coordsToLatLngs(coords, 0, coordsToLatLng);
-          return new L.Polyline(latlngs, vectorOptions);
-        case 'Polygon':
-          if (coords.length === 2 && !coords[1].length) {
-            throw new Error('Invalid GeoJSON object.');
-          }
-          latlngs = this.coordsToLatLngs(coords, 1, coordsToLatLng);
-          return new L.Polygon(latlngs, vectorOptions);
-        case 'MultiLineString':
-          latlngs = this.coordsToLatLngs(coords, 1, coordsToLatLng);
-          return new L.MultiPolyline(latlngs, vectorOptions);
-        case 'MultiPolygon':
-          latlngs = this.coordsToLatLngs(coords, 2, coordsToLatLng);
-          return new L.MultiPolygon(latlngs, vectorOptions);
-        case 'GeometryCollection':
-          for (i = 0, len = geometry.geometries.length; i < len; i++) {
-            layers.push(this.geometryToLayer({
-              geometry: geometry.geometries[i],
-              type: 'Feature',
-              properties: geojson.properties
-            }, pointToLayer, coordsToLatLng, vectorOptions));
-          }
-          return new L.FeatureGroup(layers);
-        default:
-          throw new Error('Invalid GeoJSON object.');
-      }
-    },
-    coordsToLatLng: function(coords) {
-      return new L.LatLng(coords[1], coords[0], coords[2]);
-    },
-    coordsToLatLngs: function(coords, levelsDeep, coordsToLatLng) {
-      var latlng,
-          i,
-          len,
-          latlngs = [];
-      for (i = 0, len = coords.length; i < len; i++) {
-        latlng = levelsDeep ? this.coordsToLatLngs(coords[i], levelsDeep - 1, coordsToLatLng) : (coordsToLatLng || this.coordsToLatLng)(coords[i]);
-        latlngs.push(latlng);
-      }
-      return latlngs;
-    },
-    latLngToCoords: function(latlng) {
-      var coords = [latlng.lng, latlng.lat];
-      if (latlng.alt !== undefined) {
-        coords.push(latlng.alt);
-      }
-      return coords;
-    },
-    latLngsToCoords: function(latLngs) {
-      var coords = [];
-      for (var i = 0,
-          len = latLngs.length; i < len; i++) {
-        coords.push(L.GeoJSON.latLngToCoords(latLngs[i]));
-      }
-      return coords;
-    },
-    getFeature: function(layer, newGeometry) {
-      return layer.feature ? L.extend({}, layer.feature, {geometry: newGeometry}) : L.GeoJSON.asFeature(newGeometry);
-    },
-    asFeature: function(geoJSON) {
-      if (geoJSON.type === 'Feature') {
-        return geoJSON;
-      }
-      return {
-        type: 'Feature',
-        properties: {},
-        geometry: geoJSON
-      };
-    }
-  });
-  var PointToGeoJSON = {toGeoJSON: function() {
-      return L.GeoJSON.getFeature(this, {
-        type: 'Point',
-        coordinates: L.GeoJSON.latLngToCoords(this.getLatLng())
-      });
-    }};
-  L.Marker.include(PointToGeoJSON);
-  L.Circle.include(PointToGeoJSON);
-  L.CircleMarker.include(PointToGeoJSON);
-  L.Polyline.include({toGeoJSON: function() {
-      return L.GeoJSON.getFeature(this, {
-        type: 'LineString',
-        coordinates: L.GeoJSON.latLngsToCoords(this.getLatLngs())
-      });
-    }});
-  L.Polygon.include({toGeoJSON: function() {
-      var coords = [L.GeoJSON.latLngsToCoords(this.getLatLngs())],
-          i,
-          len,
-          hole;
-      coords[0].push(coords[0][0]);
-      if (this._holes) {
-        for (i = 0, len = this._holes.length; i < len; i++) {
-          hole = L.GeoJSON.latLngsToCoords(this._holes[i]);
-          hole.push(hole[0]);
-          coords.push(hole);
-        }
-      }
-      return L.GeoJSON.getFeature(this, {
-        type: 'Polygon',
-        coordinates: coords
-      });
-    }});
-  (function() {
-    function multiToGeoJSON(type) {
-      return function() {
-        var coords = [];
-        this.eachLayer(function(layer) {
-          coords.push(layer.toGeoJSON().geometry.coordinates);
-        });
-        return L.GeoJSON.getFeature(this, {
-          type: type,
-          coordinates: coords
-        });
-      };
-    }
-    L.MultiPolyline.include({toGeoJSON: multiToGeoJSON('MultiLineString')});
-    L.MultiPolygon.include({toGeoJSON: multiToGeoJSON('MultiPolygon')});
-    L.LayerGroup.include({toGeoJSON: function() {
-        var geometry = this.feature && this.feature.geometry,
-            jsons = [],
-            json;
-        if (geometry && geometry.type === 'MultiPoint') {
-          return multiToGeoJSON('MultiPoint').call(this);
-        }
-        var isGeometryCollection = geometry && geometry.type === 'GeometryCollection';
-        this.eachLayer(function(layer) {
-          if (layer.toGeoJSON) {
-            json = layer.toGeoJSON();
-            jsons.push(isGeometryCollection ? json.geometry : L.GeoJSON.asFeature(json));
-          }
-        });
-        if (isGeometryCollection) {
-          return L.GeoJSON.getFeature(this, {
-            geometries: jsons,
-            type: 'GeometryCollection'
-          });
-        }
-        return {
-          type: 'FeatureCollection',
-          features: jsons
-        };
-      }});
-  }());
-  L.geoJson = function(geojson, options) {
-    return new L.GeoJSON(geojson, options);
-  };
-  L.DomEvent = {
-    addListener: function(obj, type, fn, context) {
-      var id = L.stamp(fn),
-          key = '_leaflet_' + type + id,
-          handler,
-          originalHandler,
-          newType;
-      if (obj[key]) {
-        return this;
-      }
-      handler = function(e) {
-        return fn.call(context || obj, e || L.DomEvent._getEvent());
-      };
-      if (L.Browser.pointer && type.indexOf('touch') === 0) {
-        return this.addPointerListener(obj, type, handler, id);
-      }
-      if (L.Browser.touch && (type === 'dblclick') && this.addDoubleTapListener) {
-        this.addDoubleTapListener(obj, handler, id);
-      }
-      if ('addEventListener' in obj) {
-        if (type === 'mousewheel') {
-          obj.addEventListener('DOMMouseScroll', handler, false);
-          obj.addEventListener(type, handler, false);
-        } else if ((type === 'mouseenter') || (type === 'mouseleave')) {
-          originalHandler = handler;
-          newType = (type === 'mouseenter' ? 'mouseover' : 'mouseout');
-          handler = function(e) {
-            if (!L.DomEvent._checkMouse(obj, e)) {
+          var newListener = {
+            fn: fn,
+            ctx: context
+          },
+              listeners = typeListeners;
+          for (var i = 0, len = listeners.length; i < len; i++) {
+            if (listeners[i].fn === fn && listeners[i].ctx === context) {
               return;
             }
-            return originalHandler(e);
-          };
-          obj.addEventListener(newType, handler, false);
-        } else if (type === 'click' && L.Browser.android) {
-          originalHandler = handler;
-          handler = function(e) {
-            return L.DomEvent._filterClick(e, originalHandler);
-          };
-          obj.addEventListener(type, handler, false);
-        } else {
-          obj.addEventListener(type, handler, false);
-        }
-      } else if ('attachEvent' in obj) {
-        obj.attachEvent('on' + type, handler);
-      }
-      obj[key] = handler;
-      return this;
-    },
-    removeListener: function(obj, type, fn) {
-      var id = L.stamp(fn),
-          key = '_leaflet_' + type + id,
-          handler = obj[key];
-      if (!handler) {
-        return this;
-      }
-      if (L.Browser.pointer && type.indexOf('touch') === 0) {
-        this.removePointerListener(obj, type, id);
-      } else if (L.Browser.touch && (type === 'dblclick') && this.removeDoubleTapListener) {
-        this.removeDoubleTapListener(obj, id);
-      } else if ('removeEventListener' in obj) {
-        if (type === 'mousewheel') {
-          obj.removeEventListener('DOMMouseScroll', handler, false);
-          obj.removeEventListener(type, handler, false);
-        } else if ((type === 'mouseenter') || (type === 'mouseleave')) {
-          obj.removeEventListener((type === 'mouseenter' ? 'mouseover' : 'mouseout'), handler, false);
-        } else {
-          obj.removeEventListener(type, handler, false);
-        }
-      } else if ('detachEvent' in obj) {
-        obj.detachEvent('on' + type, handler);
-      }
-      obj[key] = null;
-      return this;
-    },
-    stopPropagation: function(e) {
-      if (e.stopPropagation) {
-        e.stopPropagation();
-      } else {
-        e.cancelBubble = true;
-      }
-      L.DomEvent._skipped(e);
-      return this;
-    },
-    disableScrollPropagation: function(el) {
-      var stop = L.DomEvent.stopPropagation;
-      return L.DomEvent.on(el, 'mousewheel', stop).on(el, 'MozMousePixelScroll', stop);
-    },
-    disableClickPropagation: function(el) {
-      var stop = L.DomEvent.stopPropagation;
-      for (var i = L.Draggable.START.length - 1; i >= 0; i--) {
-        L.DomEvent.on(el, L.Draggable.START[i], stop);
-      }
-      return L.DomEvent.on(el, 'click', L.DomEvent._fakeStop).on(el, 'dblclick', stop);
-    },
-    preventDefault: function(e) {
-      if (e.preventDefault) {
-        e.preventDefault();
-      } else {
-        e.returnValue = false;
-      }
-      return this;
-    },
-    stop: function(e) {
-      return L.DomEvent.preventDefault(e).stopPropagation(e);
-    },
-    getMousePosition: function(e, container) {
-      if (!container) {
-        return new L.Point(e.clientX, e.clientY);
-      }
-      var rect = container.getBoundingClientRect();
-      return new L.Point(e.clientX - rect.left - container.clientLeft, e.clientY - rect.top - container.clientTop);
-    },
-    getWheelDelta: function(e) {
-      var delta = 0;
-      if (e.wheelDelta) {
-        delta = e.wheelDelta / 120;
-      }
-      if (e.detail) {
-        delta = -e.detail / 3;
-      }
-      return delta;
-    },
-    _skipEvents: {},
-    _fakeStop: function(e) {
-      L.DomEvent._skipEvents[e.type] = true;
-    },
-    _skipped: function(e) {
-      var skipped = this._skipEvents[e.type];
-      this._skipEvents[e.type] = false;
-      return skipped;
-    },
-    _checkMouse: function(el, e) {
-      var related = e.relatedTarget;
-      if (!related) {
-        return true;
-      }
-      try {
-        while (related && (related !== el)) {
-          related = related.parentNode;
-        }
-      } catch (err) {
-        return false;
-      }
-      return (related !== el);
-    },
-    _getEvent: function() {
-      var e = window.event;
-      if (!e) {
-        var caller = arguments.callee.caller;
-        while (caller) {
-          e = caller['arguments'][0];
-          if (e && window.Event === e.constructor) {
-            break;
           }
-          caller = caller.caller;
-        }
-      }
-      return e;
-    },
-    _filterClick: function(e, handler) {
-      var timeStamp = (e.timeStamp || e.originalEvent.timeStamp),
-          elapsed = L.DomEvent._lastClick && (timeStamp - L.DomEvent._lastClick);
-      if ((elapsed && elapsed > 100 && elapsed < 500) || (e.target._simulatedClick && !e._simulated)) {
-        L.DomEvent.stop(e);
-        return;
-      }
-      L.DomEvent._lastClick = timeStamp;
-      return handler(e);
-    }
-  };
-  L.DomEvent.on = L.DomEvent.addListener;
-  L.DomEvent.off = L.DomEvent.removeListener;
-  L.Draggable = L.Class.extend({
-    includes: L.Mixin.Events,
-    statics: {
-      START: L.Browser.touch ? ['touchstart', 'mousedown'] : ['mousedown'],
-      END: {
-        mousedown: 'mouseup',
-        touchstart: 'touchend',
-        pointerdown: 'touchend',
-        MSPointerDown: 'touchend'
-      },
-      MOVE: {
-        mousedown: 'mousemove',
-        touchstart: 'touchmove',
-        pointerdown: 'touchmove',
-        MSPointerDown: 'touchmove'
-      }
-    },
-    initialize: function(element, dragStartTarget) {
-      this._element = element;
-      this._dragStartTarget = dragStartTarget || element;
-    },
-    enable: function() {
-      if (this._enabled) {
-        return;
-      }
-      for (var i = L.Draggable.START.length - 1; i >= 0; i--) {
-        L.DomEvent.on(this._dragStartTarget, L.Draggable.START[i], this._onDown, this);
-      }
-      this._enabled = true;
-    },
-    disable: function() {
-      if (!this._enabled) {
-        return;
-      }
-      for (var i = L.Draggable.START.length - 1; i >= 0; i--) {
-        L.DomEvent.off(this._dragStartTarget, L.Draggable.START[i], this._onDown, this);
-      }
-      this._enabled = false;
-      this._moved = false;
-    },
-    _onDown: function(e) {
-      this._moved = false;
-      if (e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches)) {
-        return;
-      }
-      L.DomEvent.stopPropagation(e);
-      if (L.Draggable._disabled) {
-        return;
-      }
-      L.DomUtil.disableImageDrag();
-      L.DomUtil.disableTextSelection();
-      if (this._moving) {
-        return;
-      }
-      var first = e.touches ? e.touches[0] : e;
-      this._startPoint = new L.Point(first.clientX, first.clientY);
-      this._startPos = this._newPos = L.DomUtil.getPosition(this._element);
-      L.DomEvent.on(document, L.Draggable.MOVE[e.type], this._onMove, this).on(document, L.Draggable.END[e.type], this._onUp, this);
-    },
-    _onMove: function(e) {
-      if (e.touches && e.touches.length > 1) {
-        this._moved = true;
-        return;
-      }
-      var first = (e.touches && e.touches.length === 1 ? e.touches[0] : e),
-          newPoint = new L.Point(first.clientX, first.clientY),
-          offset = newPoint.subtract(this._startPoint);
-      if (!offset.x && !offset.y) {
-        return;
-      }
-      if (L.Browser.touch && Math.abs(offset.x) + Math.abs(offset.y) < 3) {
-        return;
-      }
-      L.DomEvent.preventDefault(e);
-      if (!this._moved) {
-        this.fire('dragstart');
-        this._moved = true;
-        this._startPos = L.DomUtil.getPosition(this._element).subtract(offset);
-        L.DomUtil.addClass(document.body, 'leaflet-dragging');
-        this._lastTarget = e.target || e.srcElement;
-        L.DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
-      }
-      this._newPos = this._startPos.add(offset);
-      this._moving = true;
-      L.Util.cancelAnimFrame(this._animRequest);
-      this._animRequest = L.Util.requestAnimFrame(this._updatePosition, this, true, this._dragStartTarget);
-    },
-    _updatePosition: function() {
-      this.fire('predrag');
-      L.DomUtil.setPosition(this._element, this._newPos);
-      this.fire('drag');
-    },
-    _onUp: function() {
-      L.DomUtil.removeClass(document.body, 'leaflet-dragging');
-      if (this._lastTarget) {
-        L.DomUtil.removeClass(this._lastTarget, 'leaflet-drag-target');
-        this._lastTarget = null;
-      }
-      for (var i in L.Draggable.MOVE) {
-        L.DomEvent.off(document, L.Draggable.MOVE[i], this._onMove).off(document, L.Draggable.END[i], this._onUp);
-      }
-      L.DomUtil.enableImageDrag();
-      L.DomUtil.enableTextSelection();
-      if (this._moved && this._moving) {
-        L.Util.cancelAnimFrame(this._animRequest);
-        this.fire('dragend', {distance: this._newPos.distanceTo(this._startPos)});
-      }
-      this._moving = false;
-    }
-  });
-  L.Handler = L.Class.extend({
-    initialize: function(map) {
-      this._map = map;
-    },
-    enable: function() {
-      if (this._enabled) {
-        return;
-      }
-      this._enabled = true;
-      this.addHooks();
-    },
-    disable: function() {
-      if (!this._enabled) {
-        return;
-      }
-      this._enabled = false;
-      this.removeHooks();
-    },
-    enabled: function() {
-      return !!this._enabled;
-    }
-  });
-  L.Map.mergeOptions({
-    dragging: true,
-    inertia: !L.Browser.android23,
-    inertiaDeceleration: 3400,
-    inertiaMaxSpeed: Infinity,
-    inertiaThreshold: L.Browser.touch ? 32 : 18,
-    easeLinearity: 0.25,
-    worldCopyJump: false
-  });
-  L.Map.Drag = L.Handler.extend({
-    addHooks: function() {
-      if (!this._draggable) {
-        var map = this._map;
-        this._draggable = new L.Draggable(map._mapPane, map._container);
-        this._draggable.on({
-          'dragstart': this._onDragStart,
-          'drag': this._onDrag,
-          'dragend': this._onDragEnd
-        }, this);
-        if (map.options.worldCopyJump) {
-          this._draggable.on('predrag', this._onPreDrag, this);
-          map.on('viewreset', this._onViewReset, this);
-          map.whenReady(this._onViewReset, this);
-        }
-      }
-      this._draggable.enable();
-    },
-    removeHooks: function() {
-      this._draggable.disable();
-    },
-    moved: function() {
-      return this._draggable && this._draggable._moved;
-    },
-    _onDragStart: function() {
-      var map = this._map;
-      if (map._panAnim) {
-        map._panAnim.stop();
-      }
-      map.fire('movestart').fire('dragstart');
-      if (map.options.inertia) {
-        this._positions = [];
-        this._times = [];
-      }
-    },
-    _onDrag: function() {
-      if (this._map.options.inertia) {
-        var time = this._lastTime = +new Date(),
-            pos = this._lastPos = this._draggable._newPos;
-        this._positions.push(pos);
-        this._times.push(time);
-        if (time - this._times[0] > 200) {
-          this._positions.shift();
-          this._times.shift();
-        }
-      }
-      this._map.fire('move').fire('drag');
-    },
-    _onViewReset: function() {
-      var pxCenter = this._map.getSize()._divideBy(2),
-          pxWorldCenter = this._map.latLngToLayerPoint([0, 0]);
-      this._initialWorldOffset = pxWorldCenter.subtract(pxCenter).x;
-      this._worldWidth = this._map.project([0, 180]).x;
-    },
-    _onPreDrag: function() {
-      var worldWidth = this._worldWidth,
-          halfWidth = Math.round(worldWidth / 2),
-          dx = this._initialWorldOffset,
-          x = this._draggable._newPos.x,
-          newX1 = (x - halfWidth + dx) % worldWidth + halfWidth - dx,
-          newX2 = (x + halfWidth + dx) % worldWidth - halfWidth - dx,
-          newX = Math.abs(newX1 + dx) < Math.abs(newX2 + dx) ? newX1 : newX2;
-      this._draggable._newPos.x = newX;
-    },
-    _onDragEnd: function(e) {
-      var map = this._map,
-          options = map.options,
-          delay = +new Date() - this._lastTime,
-          noInertia = !options.inertia || delay > options.inertiaThreshold || !this._positions[0];
-      map.fire('dragend', e);
-      if (noInertia) {
-        map.fire('moveend');
-      } else {
-        var direction = this._lastPos.subtract(this._positions[0]),
-            duration = (this._lastTime + delay - this._times[0]) / 1000,
-            ease = options.easeLinearity,
-            speedVector = direction.multiplyBy(ease / duration),
-            speed = speedVector.distanceTo([0, 0]),
-            limitedSpeed = Math.min(options.inertiaMaxSpeed, speed),
-            limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed),
-            decelerationDuration = limitedSpeed / (options.inertiaDeceleration * ease),
-            offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
-        if (!offset.x || !offset.y) {
-          map.fire('moveend');
-        } else {
-          offset = map._limitOffset(offset, map.options.maxBounds);
-          L.Util.requestAnimFrame(function() {
-            map.panBy(offset, {
-              duration: decelerationDuration,
-              easeLinearity: ease,
-              noMoveStart: true
-            });
-          });
-        }
-      }
-    }
-  });
-  L.Map.addInitHook('addHandler', 'dragging', L.Map.Drag);
-  L.Map.mergeOptions({doubleClickZoom: true});
-  L.Map.DoubleClickZoom = L.Handler.extend({
-    addHooks: function() {
-      this._map.on('dblclick', this._onDoubleClick, this);
-    },
-    removeHooks: function() {
-      this._map.off('dblclick', this._onDoubleClick, this);
-    },
-    _onDoubleClick: function(e) {
-      var map = this._map,
-          zoom = map.getZoom() + (e.originalEvent.shiftKey ? -1 : 1);
-      if (map.options.doubleClickZoom === 'center') {
-        map.setZoom(zoom);
-      } else {
-        map.setZoomAround(e.containerPoint, zoom);
-      }
-    }
-  });
-  L.Map.addInitHook('addHandler', 'doubleClickZoom', L.Map.DoubleClickZoom);
-  L.Map.mergeOptions({scrollWheelZoom: true});
-  L.Map.ScrollWheelZoom = L.Handler.extend({
-    addHooks: function() {
-      L.DomEvent.on(this._map._container, 'mousewheel', this._onWheelScroll, this);
-      L.DomEvent.on(this._map._container, 'MozMousePixelScroll', L.DomEvent.preventDefault);
-      this._delta = 0;
-    },
-    removeHooks: function() {
-      L.DomEvent.off(this._map._container, 'mousewheel', this._onWheelScroll);
-      L.DomEvent.off(this._map._container, 'MozMousePixelScroll', L.DomEvent.preventDefault);
-    },
-    _onWheelScroll: function(e) {
-      var delta = L.DomEvent.getWheelDelta(e);
-      this._delta += delta;
-      this._lastMousePos = this._map.mouseEventToContainerPoint(e);
-      if (!this._startTime) {
-        this._startTime = +new Date();
-      }
-      var left = Math.max(40 - (+new Date() - this._startTime), 0);
-      clearTimeout(this._timer);
-      this._timer = setTimeout(L.bind(this._performZoom, this), left);
-      L.DomEvent.preventDefault(e);
-      L.DomEvent.stopPropagation(e);
-    },
-    _performZoom: function() {
-      var map = this._map,
-          delta = this._delta,
-          zoom = map.getZoom();
-      delta = delta > 0 ? Math.ceil(delta) : Math.floor(delta);
-      delta = Math.max(Math.min(delta, 4), -4);
-      delta = map._limitZoom(zoom + delta) - zoom;
-      this._delta = 0;
-      this._startTime = null;
-      if (!delta) {
-        return;
-      }
-      if (map.options.scrollWheelZoom === 'center') {
-        map.setZoom(zoom + delta);
-      } else {
-        map.setZoomAround(this._lastMousePos, zoom + delta);
-      }
-    }
-  });
-  L.Map.addInitHook('addHandler', 'scrollWheelZoom', L.Map.ScrollWheelZoom);
-  L.extend(L.DomEvent, {
-    _touchstart: L.Browser.msPointer ? 'MSPointerDown' : L.Browser.pointer ? 'pointerdown' : 'touchstart',
-    _touchend: L.Browser.msPointer ? 'MSPointerUp' : L.Browser.pointer ? 'pointerup' : 'touchend',
-    addDoubleTapListener: function(obj, handler, id) {
-      var last,
-          doubleTap = false,
-          delay = 250,
-          touch,
-          pre = '_leaflet_',
-          touchstart = this._touchstart,
-          touchend = this._touchend,
-          trackedTouches = [];
-      function onTouchStart(e) {
-        var count;
-        if (L.Browser.pointer) {
-          trackedTouches.push(e.pointerId);
-          count = trackedTouches.length;
-        } else {
-          count = e.touches.length;
-        }
-        if (count > 1) {
-          return;
-        }
-        var now = Date.now(),
-            delta = now - (last || now);
-        touch = e.touches ? e.touches[0] : e;
-        doubleTap = (delta > 0 && delta <= delay);
-        last = now;
-      }
-      function onTouchEnd(e) {
-        if (L.Browser.pointer) {
-          var idx = trackedTouches.indexOf(e.pointerId);
-          if (idx === -1) {
+          listeners.push(newListener);
+          typeListeners.count++;
+        },
+        _off: function (type, fn, context) {
+          var listeners, i, len;
+          if (!this._events) {
             return;
           }
-          trackedTouches.splice(idx, 1);
-        }
-        if (doubleTap) {
-          if (L.Browser.pointer) {
-            var newTouch = {},
-                prop;
-            for (var i in touch) {
-              prop = touch[i];
-              if (typeof prop === 'function') {
-                newTouch[i] = prop.bind(touch);
-              } else {
-                newTouch[i] = prop;
+          listeners = this._events[type];
+          if (!listeners) {
+            return;
+          }
+          if (!fn) {
+            for (i = 0, len = listeners.length; i < len; i++) {
+              listeners[i].fn = L.Util.falseFn;
+            }
+            delete this._events[type];
+            return;
+          }
+          if (context === this) {
+            context = undefined;
+          }
+          if (listeners) {
+            for (i = 0, len = listeners.length; i < len; i++) {
+              var l = listeners[i];
+              if (l.ctx !== context) {
+                continue;
+              }
+              if (l.fn === fn) {
+                l.fn = L.Util.falseFn;
+                if (this._firingCount) {
+                  this._events[type] = listeners = listeners.slice();
+                }
+                listeners.splice(i, 1);
+                return;
               }
             }
-            touch = newTouch;
           }
-          touch.type = 'dblclick';
-          handler(touch);
-          last = null;
-        }
-      }
-      obj[pre + touchstart + id] = onTouchStart;
-      obj[pre + touchend + id] = onTouchEnd;
-      var endElement = L.Browser.pointer ? document.documentElement : obj;
-      obj.addEventListener(touchstart, onTouchStart, false);
-      endElement.addEventListener(touchend, onTouchEnd, false);
-      if (L.Browser.pointer) {
-        endElement.addEventListener(L.DomEvent.POINTER_CANCEL, onTouchEnd, false);
-      }
-      return this;
-    },
-    removeDoubleTapListener: function(obj, id) {
-      var pre = '_leaflet_';
-      obj.removeEventListener(this._touchstart, obj[pre + this._touchstart + id], false);
-      (L.Browser.pointer ? document.documentElement : obj).removeEventListener(this._touchend, obj[pre + this._touchend + id], false);
-      if (L.Browser.pointer) {
-        document.documentElement.removeEventListener(L.DomEvent.POINTER_CANCEL, obj[pre + this._touchend + id], false);
-      }
-      return this;
-    }
-  });
-  L.extend(L.DomEvent, {
-    POINTER_DOWN: L.Browser.msPointer ? 'MSPointerDown' : 'pointerdown',
-    POINTER_MOVE: L.Browser.msPointer ? 'MSPointerMove' : 'pointermove',
-    POINTER_UP: L.Browser.msPointer ? 'MSPointerUp' : 'pointerup',
-    POINTER_CANCEL: L.Browser.msPointer ? 'MSPointerCancel' : 'pointercancel',
-    _pointers: [],
-    _pointerDocumentListener: false,
-    addPointerListener: function(obj, type, handler, id) {
-      switch (type) {
-        case 'touchstart':
-          return this.addPointerListenerStart(obj, type, handler, id);
-        case 'touchend':
-          return this.addPointerListenerEnd(obj, type, handler, id);
-        case 'touchmove':
-          return this.addPointerListenerMove(obj, type, handler, id);
-        default:
-          throw 'Unknown touch event type';
-      }
-    },
-    addPointerListenerStart: function(obj, type, handler, id) {
-      var pre = '_leaflet_',
-          pointers = this._pointers;
-      var cb = function(e) {
-        if (e.pointerType !== 'mouse' && e.pointerType !== e.MSPOINTER_TYPE_MOUSE) {
-          L.DomEvent.preventDefault(e);
-        }
-        var alreadyInArray = false;
-        for (var i = 0; i < pointers.length; i++) {
-          if (pointers[i].pointerId === e.pointerId) {
-            alreadyInArray = true;
-            break;
+        },
+        fire: function (type, data, propagate) {
+          if (!this.listens(type, propagate)) {
+            return this;
+          }
+          var event = L.Util.extend({}, data, {
+            type: type,
+            target: this
+          });
+          if (this._events) {
+            var listeners = this._events[type];
+            if (listeners) {
+              this._firingCount = this._firingCount + 1 || 1;
+              for (var i = 0, len = listeners.length; i < len; i++) {
+                var l = listeners[i];
+                l.fn.call(l.ctx || this, event);
+              }
+              this._firingCount--;
+            }
+          }
+          if (propagate) {
+            this._propagateEvent(event);
+          }
+          return this;
+        },
+        listens: function (type, propagate) {
+          var listeners = this._events && this._events[type];
+          if (listeners && listeners.length) {
+            return true;
+          }
+          if (propagate) {
+            for (var id in this._eventParents) {
+              if (this._eventParents[id].listens(type, propagate)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        },
+        once: function (types, fn, context) {
+          if (typeof types === 'object') {
+            for (var type in types) {
+              this.once(type, types[type], fn);
+            }
+            return this;
+          }
+          var handler = L.bind(function () {
+            this.off(types, fn, context).off(types, handler, context);
+          }, this);
+          return this.on(types, fn, context).on(types, handler, context);
+        },
+        addEventParent: function (obj) {
+          this._eventParents = this._eventParents || {};
+          this._eventParents[L.stamp(obj)] = obj;
+          return this;
+        },
+        removeEventParent: function (obj) {
+          if (this._eventParents) {
+            delete this._eventParents[L.stamp(obj)];
+          }
+          return this;
+        },
+        _propagateEvent: function (e) {
+          for (var id in this._eventParents) {
+            this._eventParents[id].fire(e.type, L.extend({ layer: e.target }, e), true);
           }
         }
-        if (!alreadyInArray) {
-          pointers.push(e);
-        }
-        e.touches = pointers.slice();
-        e.changedTouches = [e];
-        handler(e);
+      });
+      var proto = L.Evented.prototype;
+      proto.addEventListener = proto.on;
+      proto.removeEventListener = proto.clearAllEventListeners = proto.off;
+      proto.addOneTimeEventListener = proto.once;
+      proto.fireEvent = proto.fire;
+      proto.hasEventListeners = proto.listens;
+      L.Mixin = { Events: proto };
+      (function () {
+        var ua = navigator.userAgent.toLowerCase(),
+            doc = document.documentElement,
+            ie = 'ActiveXObject' in window,
+            webkit = ua.indexOf('webkit') !== -1,
+            phantomjs = ua.indexOf('phantom') !== -1,
+            android23 = ua.search('android [23]') !== -1,
+            chrome = ua.indexOf('chrome') !== -1,
+            gecko = ua.indexOf('gecko') !== -1 && !webkit && !window.opera && !ie,
+            win = navigator.platform.indexOf('Win') === 0,
+            mobile = typeof orientation !== 'undefined' || ua.indexOf('mobile') !== -1,
+            msPointer = !window.PointerEvent && window.MSPointerEvent,
+            pointer = window.PointerEvent || msPointer,
+            ie3d = ie && 'transition' in doc.style,
+            webkit3d = 'WebKitCSSMatrix' in window && 'm11' in new window.WebKitCSSMatrix() && !android23,
+            gecko3d = 'MozPerspective' in doc.style,
+            opera12 = 'OTransition' in doc.style;
+        var touch = !window.L_NO_TOUCH && (pointer || 'ontouchstart' in window || window.DocumentTouch && document instanceof window.DocumentTouch);
+        L.Browser = {
+          ie: ie,
+          ielt9: ie && !document.addEventListener,
+          edge: 'msLaunchUri' in navigator && !('documentMode' in document),
+          webkit: webkit,
+          gecko: gecko,
+          android: ua.indexOf('android') !== -1,
+          android23: android23,
+          chrome: chrome,
+          safari: !chrome && ua.indexOf('safari') !== -1,
+          win: win,
+          ie3d: ie3d,
+          webkit3d: webkit3d,
+          gecko3d: gecko3d,
+          opera12: opera12,
+          any3d: !window.L_DISABLE_3D && (ie3d || webkit3d || gecko3d) && !opera12 && !phantomjs,
+          mobile: mobile,
+          mobileWebkit: mobile && webkit,
+          mobileWebkit3d: mobile && webkit3d,
+          mobileOpera: mobile && window.opera,
+          mobileGecko: mobile && gecko,
+          touch: !!touch,
+          msPointer: !!msPointer,
+          pointer: !!pointer,
+          retina: (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1
+        };
+      })();
+      L.Point = function (x, y, round) {
+        this.x = round ? Math.round(x) : x;
+        this.y = round ? Math.round(y) : y;
       };
-      obj[pre + 'touchstart' + id] = cb;
-      obj.addEventListener(this.POINTER_DOWN, cb, false);
-      if (!this._pointerDocumentListener) {
-        var internalCb = function(e) {
-          for (var i = 0; i < pointers.length; i++) {
-            if (pointers[i].pointerId === e.pointerId) {
-              pointers.splice(i, 1);
+      L.Point.prototype = {
+        clone: function () {
+          return new L.Point(this.x, this.y);
+        },
+        add: function (point) {
+          return this.clone()._add(L.point(point));
+        },
+        _add: function (point) {
+          this.x += point.x;
+          this.y += point.y;
+          return this;
+        },
+        subtract: function (point) {
+          return this.clone()._subtract(L.point(point));
+        },
+        _subtract: function (point) {
+          this.x -= point.x;
+          this.y -= point.y;
+          return this;
+        },
+        divideBy: function (num) {
+          return this.clone()._divideBy(num);
+        },
+        _divideBy: function (num) {
+          this.x /= num;
+          this.y /= num;
+          return this;
+        },
+        multiplyBy: function (num) {
+          return this.clone()._multiplyBy(num);
+        },
+        _multiplyBy: function (num) {
+          this.x *= num;
+          this.y *= num;
+          return this;
+        },
+        scaleBy: function (point) {
+          return new L.Point(this.x * point.x, this.y * point.y);
+        },
+        unscaleBy: function (point) {
+          return new L.Point(this.x / point.x, this.y / point.y);
+        },
+        round: function () {
+          return this.clone()._round();
+        },
+        _round: function () {
+          this.x = Math.round(this.x);
+          this.y = Math.round(this.y);
+          return this;
+        },
+        floor: function () {
+          return this.clone()._floor();
+        },
+        _floor: function () {
+          this.x = Math.floor(this.x);
+          this.y = Math.floor(this.y);
+          return this;
+        },
+        ceil: function () {
+          return this.clone()._ceil();
+        },
+        _ceil: function () {
+          this.x = Math.ceil(this.x);
+          this.y = Math.ceil(this.y);
+          return this;
+        },
+        distanceTo: function (point) {
+          point = L.point(point);
+          var x = point.x - this.x,
+              y = point.y - this.y;
+          return Math.sqrt(x * x + y * y);
+        },
+        equals: function (point) {
+          point = L.point(point);
+          return point.x === this.x && point.y === this.y;
+        },
+        contains: function (point) {
+          point = L.point(point);
+          return Math.abs(point.x) <= Math.abs(this.x) && Math.abs(point.y) <= Math.abs(this.y);
+        },
+        toString: function () {
+          return 'Point(' + L.Util.formatNum(this.x) + ', ' + L.Util.formatNum(this.y) + ')';
+        }
+      };
+      L.point = function (x, y, round) {
+        if (x instanceof L.Point) {
+          return x;
+        }
+        if (L.Util.isArray(x)) {
+          return new L.Point(x[0], x[1]);
+        }
+        if (x === undefined || x === null) {
+          return x;
+        }
+        if (typeof x === 'object' && 'x' in x && 'y' in x) {
+          return new L.Point(x.x, x.y);
+        }
+        return new L.Point(x, y, round);
+      };
+      L.Bounds = function (a, b) {
+        if (!a) {
+          return;
+        }
+        var points = b ? [a, b] : a;
+        for (var i = 0, len = points.length; i < len; i++) {
+          this.extend(points[i]);
+        }
+      };
+      L.Bounds.prototype = {
+        extend: function (point) {
+          point = L.point(point);
+          if (!this.min && !this.max) {
+            this.min = point.clone();
+            this.max = point.clone();
+          } else {
+            this.min.x = Math.min(point.x, this.min.x);
+            this.max.x = Math.max(point.x, this.max.x);
+            this.min.y = Math.min(point.y, this.min.y);
+            this.max.y = Math.max(point.y, this.max.y);
+          }
+          return this;
+        },
+        getCenter: function (round) {
+          return new L.Point((this.min.x + this.max.x) / 2, (this.min.y + this.max.y) / 2, round);
+        },
+        getBottomLeft: function () {
+          return new L.Point(this.min.x, this.max.y);
+        },
+        getTopRight: function () {
+          return new L.Point(this.max.x, this.min.y);
+        },
+        getSize: function () {
+          return this.max.subtract(this.min);
+        },
+        contains: function (obj) {
+          var min, max;
+          if (typeof obj[0] === 'number' || obj instanceof L.Point) {
+            obj = L.point(obj);
+          } else {
+            obj = L.bounds(obj);
+          }
+          if (obj instanceof L.Bounds) {
+            min = obj.min;
+            max = obj.max;
+          } else {
+            min = max = obj;
+          }
+          return min.x >= this.min.x && max.x <= this.max.x && min.y >= this.min.y && max.y <= this.max.y;
+        },
+        intersects: function (bounds) {
+          bounds = L.bounds(bounds);
+          var min = this.min,
+              max = this.max,
+              min2 = bounds.min,
+              max2 = bounds.max,
+              xIntersects = max2.x >= min.x && min2.x <= max.x,
+              yIntersects = max2.y >= min.y && min2.y <= max.y;
+          return xIntersects && yIntersects;
+        },
+        overlaps: function (bounds) {
+          bounds = L.bounds(bounds);
+          var min = this.min,
+              max = this.max,
+              min2 = bounds.min,
+              max2 = bounds.max,
+              xOverlaps = max2.x > min.x && min2.x < max.x,
+              yOverlaps = max2.y > min.y && min2.y < max.y;
+          return xOverlaps && yOverlaps;
+        },
+        isValid: function () {
+          return !!(this.min && this.max);
+        }
+      };
+      L.bounds = function (a, b) {
+        if (!a || a instanceof L.Bounds) {
+          return a;
+        }
+        return new L.Bounds(a, b);
+      };
+      L.Transformation = function (a, b, c, d) {
+        this._a = a;
+        this._b = b;
+        this._c = c;
+        this._d = d;
+      };
+      L.Transformation.prototype = {
+        transform: function (point, scale) {
+          return this._transform(point.clone(), scale);
+        },
+        _transform: function (point, scale) {
+          scale = scale || 1;
+          point.x = scale * (this._a * point.x + this._b);
+          point.y = scale * (this._c * point.y + this._d);
+          return point;
+        },
+        untransform: function (point, scale) {
+          scale = scale || 1;
+          return new L.Point((point.x / scale - this._b) / this._a, (point.y / scale - this._d) / this._c);
+        }
+      };
+      L.DomUtil = {
+        get: function (id) {
+          return typeof id === 'string' ? document.getElementById(id) : id;
+        },
+        getStyle: function (el, style) {
+          var value = el.style[style] || el.currentStyle && el.currentStyle[style];
+          if ((!value || value === 'auto') && document.defaultView) {
+            var css = document.defaultView.getComputedStyle(el, null);
+            value = css ? css[style] : null;
+          }
+          return value === 'auto' ? null : value;
+        },
+        create: function (tagName, className, container) {
+          var el = document.createElement(tagName);
+          el.className = className || '';
+          if (container) {
+            container.appendChild(el);
+          }
+          return el;
+        },
+        remove: function (el) {
+          var parent = el.parentNode;
+          if (parent) {
+            parent.removeChild(el);
+          }
+        },
+        empty: function (el) {
+          while (el.firstChild) {
+            el.removeChild(el.firstChild);
+          }
+        },
+        toFront: function (el) {
+          el.parentNode.appendChild(el);
+        },
+        toBack: function (el) {
+          var parent = el.parentNode;
+          parent.insertBefore(el, parent.firstChild);
+        },
+        hasClass: function (el, name) {
+          if (el.classList !== undefined) {
+            return el.classList.contains(name);
+          }
+          var className = L.DomUtil.getClass(el);
+          return className.length > 0 && new RegExp('(^|\\s)' + name + '(\\s|$)').test(className);
+        },
+        addClass: function (el, name) {
+          if (el.classList !== undefined) {
+            var classes = L.Util.splitWords(name);
+            for (var i = 0, len = classes.length; i < len; i++) {
+              el.classList.add(classes[i]);
+            }
+          } else if (!L.DomUtil.hasClass(el, name)) {
+            var className = L.DomUtil.getClass(el);
+            L.DomUtil.setClass(el, (className ? className + ' ' : '') + name);
+          }
+        },
+        removeClass: function (el, name) {
+          if (el.classList !== undefined) {
+            el.classList.remove(name);
+          } else {
+            L.DomUtil.setClass(el, L.Util.trim((' ' + L.DomUtil.getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
+          }
+        },
+        setClass: function (el, name) {
+          if (el.className.baseVal === undefined) {
+            el.className = name;
+          } else {
+            el.className.baseVal = name;
+          }
+        },
+        getClass: function (el) {
+          return el.className.baseVal === undefined ? el.className : el.className.baseVal;
+        },
+        setOpacity: function (el, value) {
+          if ('opacity' in el.style) {
+            el.style.opacity = value;
+          } else if ('filter' in el.style) {
+            L.DomUtil._setOpacityIE(el, value);
+          }
+        },
+        _setOpacityIE: function (el, value) {
+          var filter = false,
+              filterName = 'DXImageTransform.Microsoft.Alpha';
+          try {
+            filter = el.filters.item(filterName);
+          } catch (e) {
+            if (value === 1) {
+              return;
+            }
+          }
+          value = Math.round(value * 100);
+          if (filter) {
+            filter.Enabled = value !== 100;
+            filter.Opacity = value;
+          } else {
+            el.style.filter += ' progid:' + filterName + '(opacity=' + value + ')';
+          }
+        },
+        testProp: function (props) {
+          var style = document.documentElement.style;
+          for (var i = 0; i < props.length; i++) {
+            if (props[i] in style) {
+              return props[i];
+            }
+          }
+          return false;
+        },
+        setTransform: function (el, offset, scale) {
+          var pos = offset || new L.Point(0, 0);
+          el.style[L.DomUtil.TRANSFORM] = (L.Browser.ie3d ? 'translate(' + pos.x + 'px,' + pos.y + 'px)' : 'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)') + (scale ? ' scale(' + scale + ')' : '');
+        },
+        setPosition: function (el, point) {
+          el._leaflet_pos = point;
+          if (L.Browser.any3d) {
+            L.DomUtil.setTransform(el, point);
+          } else {
+            el.style.left = point.x + 'px';
+            el.style.top = point.y + 'px';
+          }
+        },
+        getPosition: function (el) {
+          return el._leaflet_pos || new L.Point(0, 0);
+        }
+      };
+      (function () {
+        L.DomUtil.TRANSFORM = L.DomUtil.testProp(['transform', 'WebkitTransform', 'OTransform', 'MozTransform', 'msTransform']);
+        var transition = L.DomUtil.TRANSITION = L.DomUtil.testProp(['webkitTransition', 'transition', 'OTransition', 'MozTransition', 'msTransition']);
+        L.DomUtil.TRANSITION_END = transition === 'webkitTransition' || transition === 'OTransition' ? transition + 'End' : 'transitionend';
+        if ('onselectstart' in document) {
+          L.DomUtil.disableTextSelection = function () {
+            L.DomEvent.on(window, 'selectstart', L.DomEvent.preventDefault);
+          };
+          L.DomUtil.enableTextSelection = function () {
+            L.DomEvent.off(window, 'selectstart', L.DomEvent.preventDefault);
+          };
+        } else {
+          var userSelectProperty = L.DomUtil.testProp(['userSelect', 'WebkitUserSelect', 'OUserSelect', 'MozUserSelect', 'msUserSelect']);
+          L.DomUtil.disableTextSelection = function () {
+            if (userSelectProperty) {
+              var style = document.documentElement.style;
+              this._userSelect = style[userSelectProperty];
+              style[userSelectProperty] = 'none';
+            }
+          };
+          L.DomUtil.enableTextSelection = function () {
+            if (userSelectProperty) {
+              document.documentElement.style[userSelectProperty] = this._userSelect;
+              delete this._userSelect;
+            }
+          };
+        }
+        L.DomUtil.disableImageDrag = function () {
+          L.DomEvent.on(window, 'dragstart', L.DomEvent.preventDefault);
+        };
+        L.DomUtil.enableImageDrag = function () {
+          L.DomEvent.off(window, 'dragstart', L.DomEvent.preventDefault);
+        };
+        L.DomUtil.preventOutline = function (element) {
+          while (element.tabIndex === -1) {
+            element = element.parentNode;
+          }
+          if (!element || !element.style) {
+            return;
+          }
+          L.DomUtil.restoreOutline();
+          this._outlineElement = element;
+          this._outlineStyle = element.style.outline;
+          element.style.outline = 'none';
+          L.DomEvent.on(window, 'keydown', L.DomUtil.restoreOutline, this);
+        };
+        L.DomUtil.restoreOutline = function () {
+          if (!this._outlineElement) {
+            return;
+          }
+          this._outlineElement.style.outline = this._outlineStyle;
+          delete this._outlineElement;
+          delete this._outlineStyle;
+          L.DomEvent.off(window, 'keydown', L.DomUtil.restoreOutline, this);
+        };
+      })();
+      L.LatLng = function (lat, lng, alt) {
+        if (isNaN(lat) || isNaN(lng)) {
+          throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')');
+        }
+        this.lat = +lat;
+        this.lng = +lng;
+        if (alt !== undefined) {
+          this.alt = +alt;
+        }
+      };
+      L.LatLng.prototype = {
+        equals: function (obj, maxMargin) {
+          if (!obj) {
+            return false;
+          }
+          obj = L.latLng(obj);
+          var margin = Math.max(Math.abs(this.lat - obj.lat), Math.abs(this.lng - obj.lng));
+          return margin <= (maxMargin === undefined ? 1.0E-9 : maxMargin);
+        },
+        toString: function (precision) {
+          return 'LatLng(' + L.Util.formatNum(this.lat, precision) + ', ' + L.Util.formatNum(this.lng, precision) + ')';
+        },
+        distanceTo: function (other) {
+          return L.CRS.Earth.distance(this, L.latLng(other));
+        },
+        wrap: function () {
+          return L.CRS.Earth.wrapLatLng(this);
+        },
+        toBounds: function (sizeInMeters) {
+          var latAccuracy = 180 * sizeInMeters / 40075017,
+              lngAccuracy = latAccuracy / Math.cos(Math.PI / 180 * this.lat);
+          return L.latLngBounds([this.lat - latAccuracy, this.lng - lngAccuracy], [this.lat + latAccuracy, this.lng + lngAccuracy]);
+        },
+        clone: function () {
+          return new L.LatLng(this.lat, this.lng, this.alt);
+        }
+      };
+      L.latLng = function (a, b, c) {
+        if (a instanceof L.LatLng) {
+          return a;
+        }
+        if (L.Util.isArray(a) && typeof a[0] !== 'object') {
+          if (a.length === 3) {
+            return new L.LatLng(a[0], a[1], a[2]);
+          }
+          if (a.length === 2) {
+            return new L.LatLng(a[0], a[1]);
+          }
+          return null;
+        }
+        if (a === undefined || a === null) {
+          return a;
+        }
+        if (typeof a === 'object' && 'lat' in a) {
+          return new L.LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
+        }
+        if (b === undefined) {
+          return null;
+        }
+        return new L.LatLng(a, b, c);
+      };
+      L.LatLngBounds = function (southWest, northEast) {
+        if (!southWest) {
+          return;
+        }
+        var latlngs = northEast ? [southWest, northEast] : southWest;
+        for (var i = 0, len = latlngs.length; i < len; i++) {
+          this.extend(latlngs[i]);
+        }
+      };
+      L.LatLngBounds.prototype = {
+        extend: function (obj) {
+          var sw = this._southWest,
+              ne = this._northEast,
+              sw2,
+              ne2;
+          if (obj instanceof L.LatLng) {
+            sw2 = obj;
+            ne2 = obj;
+          } else if (obj instanceof L.LatLngBounds) {
+            sw2 = obj._southWest;
+            ne2 = obj._northEast;
+            if (!sw2 || !ne2) {
+              return this;
+            }
+          } else {
+            return obj ? this.extend(L.latLng(obj) || L.latLngBounds(obj)) : this;
+          }
+          if (!sw && !ne) {
+            this._southWest = new L.LatLng(sw2.lat, sw2.lng);
+            this._northEast = new L.LatLng(ne2.lat, ne2.lng);
+          } else {
+            sw.lat = Math.min(sw2.lat, sw.lat);
+            sw.lng = Math.min(sw2.lng, sw.lng);
+            ne.lat = Math.max(ne2.lat, ne.lat);
+            ne.lng = Math.max(ne2.lng, ne.lng);
+          }
+          return this;
+        },
+        pad: function (bufferRatio) {
+          var sw = this._southWest,
+              ne = this._northEast,
+              heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
+              widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
+          return new L.LatLngBounds(new L.LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer), new L.LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
+        },
+        getCenter: function () {
+          return new L.LatLng((this._southWest.lat + this._northEast.lat) / 2, (this._southWest.lng + this._northEast.lng) / 2);
+        },
+        getSouthWest: function () {
+          return this._southWest;
+        },
+        getNorthEast: function () {
+          return this._northEast;
+        },
+        getNorthWest: function () {
+          return new L.LatLng(this.getNorth(), this.getWest());
+        },
+        getSouthEast: function () {
+          return new L.LatLng(this.getSouth(), this.getEast());
+        },
+        getWest: function () {
+          return this._southWest.lng;
+        },
+        getSouth: function () {
+          return this._southWest.lat;
+        },
+        getEast: function () {
+          return this._northEast.lng;
+        },
+        getNorth: function () {
+          return this._northEast.lat;
+        },
+        contains: function (obj) {
+          if (typeof obj[0] === 'number' || obj instanceof L.LatLng) {
+            obj = L.latLng(obj);
+          } else {
+            obj = L.latLngBounds(obj);
+          }
+          var sw = this._southWest,
+              ne = this._northEast,
+              sw2,
+              ne2;
+          if (obj instanceof L.LatLngBounds) {
+            sw2 = obj.getSouthWest();
+            ne2 = obj.getNorthEast();
+          } else {
+            sw2 = ne2 = obj;
+          }
+          return sw2.lat >= sw.lat && ne2.lat <= ne.lat && sw2.lng >= sw.lng && ne2.lng <= ne.lng;
+        },
+        intersects: function (bounds) {
+          bounds = L.latLngBounds(bounds);
+          var sw = this._southWest,
+              ne = this._northEast,
+              sw2 = bounds.getSouthWest(),
+              ne2 = bounds.getNorthEast(),
+              latIntersects = ne2.lat >= sw.lat && sw2.lat <= ne.lat,
+              lngIntersects = ne2.lng >= sw.lng && sw2.lng <= ne.lng;
+          return latIntersects && lngIntersects;
+        },
+        overlaps: function (bounds) {
+          bounds = L.latLngBounds(bounds);
+          var sw = this._southWest,
+              ne = this._northEast,
+              sw2 = bounds.getSouthWest(),
+              ne2 = bounds.getNorthEast(),
+              latOverlaps = ne2.lat > sw.lat && sw2.lat < ne.lat,
+              lngOverlaps = ne2.lng > sw.lng && sw2.lng < ne.lng;
+          return latOverlaps && lngOverlaps;
+        },
+        toBBoxString: function () {
+          return [this.getWest(), this.getSouth(), this.getEast(), this.getNorth()].join(',');
+        },
+        equals: function (bounds) {
+          if (!bounds) {
+            return false;
+          }
+          bounds = L.latLngBounds(bounds);
+          return this._southWest.equals(bounds.getSouthWest()) && this._northEast.equals(bounds.getNorthEast());
+        },
+        isValid: function () {
+          return !!(this._southWest && this._northEast);
+        }
+      };
+      L.latLngBounds = function (a, b) {
+        if (a instanceof L.LatLngBounds) {
+          return a;
+        }
+        return new L.LatLngBounds(a, b);
+      };
+      L.Projection = {};
+      L.Projection.LonLat = {
+        project: function (latlng) {
+          return new L.Point(latlng.lng, latlng.lat);
+        },
+        unproject: function (point) {
+          return new L.LatLng(point.y, point.x);
+        },
+        bounds: L.bounds([-180, -90], [180, 90])
+      };
+      L.Projection.SphericalMercator = {
+        R: 6378137,
+        MAX_LATITUDE: 85.0511287798,
+        project: function (latlng) {
+          var d = Math.PI / 180,
+              max = this.MAX_LATITUDE,
+              lat = Math.max(Math.min(max, latlng.lat), -max),
+              sin = Math.sin(lat * d);
+          return new L.Point(this.R * latlng.lng * d, this.R * Math.log((1 + sin) / (1 - sin)) / 2);
+        },
+        unproject: function (point) {
+          var d = 180 / Math.PI;
+          return new L.LatLng((2 * Math.atan(Math.exp(point.y / this.R)) - Math.PI / 2) * d, point.x * d / this.R);
+        },
+        bounds: function () {
+          var d = 6378137 * Math.PI;
+          return L.bounds([-d, -d], [d, d]);
+        }()
+      };
+      L.CRS = {
+        latLngToPoint: function (latlng, zoom) {
+          var projectedPoint = this.projection.project(latlng),
+              scale = this.scale(zoom);
+          return this.transformation._transform(projectedPoint, scale);
+        },
+        pointToLatLng: function (point, zoom) {
+          var scale = this.scale(zoom),
+              untransformedPoint = this.transformation.untransform(point, scale);
+          return this.projection.unproject(untransformedPoint);
+        },
+        project: function (latlng) {
+          return this.projection.project(latlng);
+        },
+        unproject: function (point) {
+          return this.projection.unproject(point);
+        },
+        scale: function (zoom) {
+          return 256 * Math.pow(2, zoom);
+        },
+        zoom: function (scale) {
+          return Math.log(scale / 256) / Math.LN2;
+        },
+        getProjectedBounds: function (zoom) {
+          if (this.infinite) {
+            return null;
+          }
+          var b = this.projection.bounds,
+              s = this.scale(zoom),
+              min = this.transformation.transform(b.min, s),
+              max = this.transformation.transform(b.max, s);
+          return L.bounds(min, max);
+        },
+        infinite: false,
+        wrapLatLng: function (latlng) {
+          var lng = this.wrapLng ? L.Util.wrapNum(latlng.lng, this.wrapLng, true) : latlng.lng,
+              lat = this.wrapLat ? L.Util.wrapNum(latlng.lat, this.wrapLat, true) : latlng.lat,
+              alt = latlng.alt;
+          return L.latLng(lat, lng, alt);
+        }
+      };
+      L.CRS.Simple = L.extend({}, L.CRS, {
+        projection: L.Projection.LonLat,
+        transformation: new L.Transformation(1, 0, -1, 0),
+        scale: function (zoom) {
+          return Math.pow(2, zoom);
+        },
+        zoom: function (scale) {
+          return Math.log(scale) / Math.LN2;
+        },
+        distance: function (latlng1, latlng2) {
+          var dx = latlng2.lng - latlng1.lng,
+              dy = latlng2.lat - latlng1.lat;
+          return Math.sqrt(dx * dx + dy * dy);
+        },
+        infinite: true
+      });
+      L.CRS.Earth = L.extend({}, L.CRS, {
+        wrapLng: [-180, 180],
+        R: 6371000,
+        distance: function (latlng1, latlng2) {
+          var rad = Math.PI / 180,
+              lat1 = latlng1.lat * rad,
+              lat2 = latlng2.lat * rad,
+              a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlng2.lng - latlng1.lng) * rad);
+          return this.R * Math.acos(Math.min(a, 1));
+        }
+      });
+      L.CRS.EPSG3857 = L.extend({}, L.CRS.Earth, {
+        code: 'EPSG:3857',
+        projection: L.Projection.SphericalMercator,
+        transformation: function () {
+          var scale = 0.5 / (Math.PI * L.Projection.SphericalMercator.R);
+          return new L.Transformation(scale, 0.5, -scale, 0.5);
+        }()
+      });
+      L.CRS.EPSG900913 = L.extend({}, L.CRS.EPSG3857, { code: 'EPSG:900913' });
+      L.CRS.EPSG4326 = L.extend({}, L.CRS.Earth, {
+        code: 'EPSG:4326',
+        projection: L.Projection.LonLat,
+        transformation: new L.Transformation(1 / 180, 1, -1 / 180, 0.5)
+      });
+      L.Map = L.Evented.extend({
+        options: {
+          crs: L.CRS.EPSG3857,
+          center: undefined,
+          zoom: undefined,
+          minZoom: undefined,
+          maxZoom: undefined,
+          layers: [],
+          maxBounds: undefined,
+          renderer: undefined,
+          fadeAnimation: true,
+          markerZoomAnimation: true,
+          transform3DLimit: 8388608,
+          zoomSnap: 1,
+          zoomDelta: 1,
+          trackResize: true
+        },
+        initialize: function (id, options) {
+          options = L.setOptions(this, options);
+          this._initContainer(id);
+          this._initLayout();
+          this._onResize = L.bind(this._onResize, this);
+          this._initEvents();
+          if (options.maxBounds) {
+            this.setMaxBounds(options.maxBounds);
+          }
+          if (options.zoom !== undefined) {
+            this._zoom = this._limitZoom(options.zoom);
+          }
+          if (options.center && options.zoom !== undefined) {
+            this.setView(L.latLng(options.center), options.zoom, { reset: true });
+          }
+          this._handlers = [];
+          this._layers = {};
+          this._zoomBoundLayers = {};
+          this._sizeChanged = true;
+          this.callInitHooks();
+          this._addLayers(this.options.layers);
+        },
+        setView: function (center, zoom) {
+          zoom = zoom === undefined ? this.getZoom() : zoom;
+          this._resetView(L.latLng(center), zoom);
+          return this;
+        },
+        setZoom: function (zoom, options) {
+          if (!this._loaded) {
+            this._zoom = zoom;
+            return this;
+          }
+          return this.setView(this.getCenter(), zoom, { zoom: options });
+        },
+        zoomIn: function (delta, options) {
+          delta = delta || (L.Browser.any3d ? this.options.zoomDelta : 1);
+          return this.setZoom(this._zoom + delta, options);
+        },
+        zoomOut: function (delta, options) {
+          delta = delta || (L.Browser.any3d ? this.options.zoomDelta : 1);
+          return this.setZoom(this._zoom - delta, options);
+        },
+        setZoomAround: function (latlng, zoom, options) {
+          var scale = this.getZoomScale(zoom),
+              viewHalf = this.getSize().divideBy(2),
+              containerPoint = latlng instanceof L.Point ? latlng : this.latLngToContainerPoint(latlng),
+              centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
+              newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
+          return this.setView(newCenter, zoom, { zoom: options });
+        },
+        _getBoundsCenterZoom: function (bounds, options) {
+          options = options || {};
+          bounds = bounds.getBounds ? bounds.getBounds() : L.latLngBounds(bounds);
+          var paddingTL = L.point(options.paddingTopLeft || options.padding || [0, 0]),
+              paddingBR = L.point(options.paddingBottomRight || options.padding || [0, 0]),
+              zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
+          zoom = typeof options.maxZoom === 'number' ? Math.min(options.maxZoom, zoom) : zoom;
+          var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
+              swPoint = this.project(bounds.getSouthWest(), zoom),
+              nePoint = this.project(bounds.getNorthEast(), zoom),
+              center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
+          return {
+            center: center,
+            zoom: zoom
+          };
+        },
+        fitBounds: function (bounds, options) {
+          bounds = L.latLngBounds(bounds);
+          if (!bounds.isValid()) {
+            throw new Error('Bounds are not valid.');
+          }
+          var target = this._getBoundsCenterZoom(bounds, options);
+          return this.setView(target.center, target.zoom, options);
+        },
+        fitWorld: function (options) {
+          return this.fitBounds([[-90, -180], [90, 180]], options);
+        },
+        panTo: function (center, options) {
+          return this.setView(center, this._zoom, { pan: options });
+        },
+        panBy: function (offset) {
+          this.fire('movestart');
+          this._rawPanBy(L.point(offset));
+          this.fire('move');
+          return this.fire('moveend');
+        },
+        setMaxBounds: function (bounds) {
+          bounds = L.latLngBounds(bounds);
+          if (!bounds.isValid()) {
+            this.options.maxBounds = null;
+            return this.off('moveend', this._panInsideMaxBounds);
+          } else if (this.options.maxBounds) {
+            this.off('moveend', this._panInsideMaxBounds);
+          }
+          this.options.maxBounds = bounds;
+          if (this._loaded) {
+            this._panInsideMaxBounds();
+          }
+          return this.on('moveend', this._panInsideMaxBounds);
+        },
+        setMinZoom: function (zoom) {
+          this.options.minZoom = zoom;
+          if (this._loaded && this.getZoom() < this.options.minZoom) {
+            return this.setZoom(zoom);
+          }
+          return this;
+        },
+        setMaxZoom: function (zoom) {
+          this.options.maxZoom = zoom;
+          if (this._loaded && this.getZoom() > this.options.maxZoom) {
+            return this.setZoom(zoom);
+          }
+          return this;
+        },
+        panInsideBounds: function (bounds, options) {
+          this._enforcingBounds = true;
+          var center = this.getCenter(),
+              newCenter = this._limitCenter(center, this._zoom, L.latLngBounds(bounds));
+          if (!center.equals(newCenter)) {
+            this.panTo(newCenter, options);
+          }
+          this._enforcingBounds = false;
+          return this;
+        },
+        invalidateSize: function (options) {
+          if (!this._loaded) {
+            return this;
+          }
+          options = L.extend({
+            animate: false,
+            pan: true
+          }, options === true ? { animate: true } : options);
+          var oldSize = this.getSize();
+          this._sizeChanged = true;
+          this._lastCenter = null;
+          var newSize = this.getSize(),
+              oldCenter = oldSize.divideBy(2).round(),
+              newCenter = newSize.divideBy(2).round(),
+              offset = oldCenter.subtract(newCenter);
+          if (!offset.x && !offset.y) {
+            return this;
+          }
+          if (options.animate && options.pan) {
+            this.panBy(offset);
+          } else {
+            if (options.pan) {
+              this._rawPanBy(offset);
+            }
+            this.fire('move');
+            if (options.debounceMoveend) {
+              clearTimeout(this._sizeTimer);
+              this._sizeTimer = setTimeout(L.bind(this.fire, this, 'moveend'), 200);
+            } else {
+              this.fire('moveend');
+            }
+          }
+          return this.fire('resize', {
+            oldSize: oldSize,
+            newSize: newSize
+          });
+        },
+        stop: function () {
+          this.setZoom(this._limitZoom(this._zoom));
+          if (!this.options.zoomSnap) {
+            this.fire('viewreset');
+          }
+          return this._stop();
+        },
+        addHandler: function (name, HandlerClass) {
+          if (!HandlerClass) {
+            return this;
+          }
+          var handler = this[name] = new HandlerClass(this);
+          this._handlers.push(handler);
+          if (this.options[name]) {
+            handler.enable();
+          }
+          return this;
+        },
+        remove: function () {
+          this._initEvents(true);
+          if (this._containerId !== this._container._leaflet_id) {
+            throw new Error('Map container is being reused by another instance');
+          }
+          try {
+            delete this._container._leaflet_id;
+            delete this._containerId;
+          } catch (e) {
+            this._container._leaflet_id = undefined;
+            this._containerId = undefined;
+          }
+          L.DomUtil.remove(this._mapPane);
+          if (this._clearControlPos) {
+            this._clearControlPos();
+          }
+          this._clearHandlers();
+          if (this._loaded) {
+            this.fire('unload');
+          }
+          for (var i in this._layers) {
+            this._layers[i].remove();
+          }
+          return this;
+        },
+        createPane: function (name, container) {
+          var className = 'leaflet-pane' + (name ? ' leaflet-' + name.replace('Pane', '') + '-pane' : ''),
+              pane = L.DomUtil.create('div', className, container || this._mapPane);
+          if (name) {
+            this._panes[name] = pane;
+          }
+          return pane;
+        },
+        getCenter: function () {
+          this._checkIfLoaded();
+          if (this._lastCenter && !this._moved()) {
+            return this._lastCenter;
+          }
+          return this.layerPointToLatLng(this._getCenterLayerPoint());
+        },
+        getZoom: function () {
+          return this._zoom;
+        },
+        getBounds: function () {
+          var bounds = this.getPixelBounds(),
+              sw = this.unproject(bounds.getBottomLeft()),
+              ne = this.unproject(bounds.getTopRight());
+          return new L.LatLngBounds(sw, ne);
+        },
+        getMinZoom: function () {
+          return this.options.minZoom === undefined ? this._layersMinZoom || 0 : this.options.minZoom;
+        },
+        getMaxZoom: function () {
+          return this.options.maxZoom === undefined ? this._layersMaxZoom === undefined ? Infinity : this._layersMaxZoom : this.options.maxZoom;
+        },
+        getBoundsZoom: function (bounds, inside, padding) {
+          bounds = L.latLngBounds(bounds);
+          padding = L.point(padding || [0, 0]);
+          var zoom = this.getZoom() || 0,
+              min = this.getMinZoom(),
+              max = this.getMaxZoom(),
+              nw = bounds.getNorthWest(),
+              se = bounds.getSouthEast(),
+              size = this.getSize().subtract(padding),
+              boundsSize = this.project(se, zoom).subtract(this.project(nw, zoom)),
+              snap = L.Browser.any3d ? this.options.zoomSnap : 1;
+          var scale = Math.min(size.x / boundsSize.x, size.y / boundsSize.y);
+          zoom = this.getScaleZoom(scale, zoom);
+          if (snap) {
+            zoom = Math.round(zoom / (snap / 100)) * (snap / 100);
+            zoom = inside ? Math.ceil(zoom / snap) * snap : Math.floor(zoom / snap) * snap;
+          }
+          return Math.max(min, Math.min(max, zoom));
+        },
+        getSize: function () {
+          if (!this._size || this._sizeChanged) {
+            this._size = new L.Point(this._container.clientWidth, this._container.clientHeight);
+            this._sizeChanged = false;
+          }
+          return this._size.clone();
+        },
+        getPixelBounds: function (center, zoom) {
+          var topLeftPoint = this._getTopLeftPoint(center, zoom);
+          return new L.Bounds(topLeftPoint, topLeftPoint.add(this.getSize()));
+        },
+        getPixelOrigin: function () {
+          this._checkIfLoaded();
+          return this._pixelOrigin;
+        },
+        getPixelWorldBounds: function (zoom) {
+          return this.options.crs.getProjectedBounds(zoom === undefined ? this.getZoom() : zoom);
+        },
+        getPane: function (pane) {
+          return typeof pane === 'string' ? this._panes[pane] : pane;
+        },
+        getPanes: function () {
+          return this._panes;
+        },
+        getContainer: function () {
+          return this._container;
+        },
+        getZoomScale: function (toZoom, fromZoom) {
+          var crs = this.options.crs;
+          fromZoom = fromZoom === undefined ? this._zoom : fromZoom;
+          return crs.scale(toZoom) / crs.scale(fromZoom);
+        },
+        getScaleZoom: function (scale, fromZoom) {
+          var crs = this.options.crs;
+          fromZoom = fromZoom === undefined ? this._zoom : fromZoom;
+          var zoom = crs.zoom(scale * crs.scale(fromZoom));
+          return isNaN(zoom) ? Infinity : zoom;
+        },
+        project: function (latlng, zoom) {
+          zoom = zoom === undefined ? this._zoom : zoom;
+          return this.options.crs.latLngToPoint(L.latLng(latlng), zoom);
+        },
+        unproject: function (point, zoom) {
+          zoom = zoom === undefined ? this._zoom : zoom;
+          return this.options.crs.pointToLatLng(L.point(point), zoom);
+        },
+        layerPointToLatLng: function (point) {
+          var projectedPoint = L.point(point).add(this.getPixelOrigin());
+          return this.unproject(projectedPoint);
+        },
+        latLngToLayerPoint: function (latlng) {
+          var projectedPoint = this.project(L.latLng(latlng))._round();
+          return projectedPoint._subtract(this.getPixelOrigin());
+        },
+        wrapLatLng: function (latlng) {
+          return this.options.crs.wrapLatLng(L.latLng(latlng));
+        },
+        distance: function (latlng1, latlng2) {
+          return this.options.crs.distance(L.latLng(latlng1), L.latLng(latlng2));
+        },
+        containerPointToLayerPoint: function (point) {
+          return L.point(point).subtract(this._getMapPanePos());
+        },
+        layerPointToContainerPoint: function (point) {
+          return L.point(point).add(this._getMapPanePos());
+        },
+        containerPointToLatLng: function (point) {
+          var layerPoint = this.containerPointToLayerPoint(L.point(point));
+          return this.layerPointToLatLng(layerPoint);
+        },
+        latLngToContainerPoint: function (latlng) {
+          return this.layerPointToContainerPoint(this.latLngToLayerPoint(L.latLng(latlng)));
+        },
+        mouseEventToContainerPoint: function (e) {
+          return L.DomEvent.getMousePosition(e, this._container);
+        },
+        mouseEventToLayerPoint: function (e) {
+          return this.containerPointToLayerPoint(this.mouseEventToContainerPoint(e));
+        },
+        mouseEventToLatLng: function (e) {
+          return this.layerPointToLatLng(this.mouseEventToLayerPoint(e));
+        },
+        _initContainer: function (id) {
+          var container = this._container = L.DomUtil.get(id);
+          if (!container) {
+            throw new Error('Map container not found.');
+          } else if (container._leaflet_id) {
+            throw new Error('Map container is already initialized.');
+          }
+          L.DomEvent.addListener(container, 'scroll', this._onScroll, this);
+          this._containerId = L.Util.stamp(container);
+        },
+        _initLayout: function () {
+          var container = this._container;
+          this._fadeAnimated = this.options.fadeAnimation && L.Browser.any3d;
+          L.DomUtil.addClass(container, 'leaflet-container' + (L.Browser.touch ? ' leaflet-touch' : '') + (L.Browser.retina ? ' leaflet-retina' : '') + (L.Browser.ielt9 ? ' leaflet-oldie' : '') + (L.Browser.safari ? ' leaflet-safari' : '') + (this._fadeAnimated ? ' leaflet-fade-anim' : ''));
+          var position = L.DomUtil.getStyle(container, 'position');
+          if (position !== 'absolute' && position !== 'relative' && position !== 'fixed') {
+            container.style.position = 'relative';
+          }
+          this._initPanes();
+          if (this._initControlPos) {
+            this._initControlPos();
+          }
+        },
+        _initPanes: function () {
+          var panes = this._panes = {};
+          this._paneRenderers = {};
+          this._mapPane = this.createPane('mapPane', this._container);
+          L.DomUtil.setPosition(this._mapPane, new L.Point(0, 0));
+          this.createPane('tilePane');
+          this.createPane('shadowPane');
+          this.createPane('overlayPane');
+          this.createPane('markerPane');
+          this.createPane('tooltipPane');
+          this.createPane('popupPane');
+          if (!this.options.markerZoomAnimation) {
+            L.DomUtil.addClass(panes.markerPane, 'leaflet-zoom-hide');
+            L.DomUtil.addClass(panes.shadowPane, 'leaflet-zoom-hide');
+          }
+        },
+        _resetView: function (center, zoom) {
+          L.DomUtil.setPosition(this._mapPane, new L.Point(0, 0));
+          var loading = !this._loaded;
+          this._loaded = true;
+          zoom = this._limitZoom(zoom);
+          this.fire('viewprereset');
+          var zoomChanged = this._zoom !== zoom;
+          this._moveStart(zoomChanged)._move(center, zoom)._moveEnd(zoomChanged);
+          this.fire('viewreset');
+          if (loading) {
+            this.fire('load');
+          }
+        },
+        _moveStart: function (zoomChanged) {
+          if (zoomChanged) {
+            this.fire('zoomstart');
+          }
+          return this.fire('movestart');
+        },
+        _move: function (center, zoom, data) {
+          if (zoom === undefined) {
+            zoom = this._zoom;
+          }
+          var zoomChanged = this._zoom !== zoom;
+          this._zoom = zoom;
+          this._lastCenter = center;
+          this._pixelOrigin = this._getNewPixelOrigin(center);
+          if (zoomChanged || data && data.pinch) {
+            this.fire('zoom', data);
+          }
+          return this.fire('move', data);
+        },
+        _moveEnd: function (zoomChanged) {
+          if (zoomChanged) {
+            this.fire('zoomend');
+          }
+          return this.fire('moveend');
+        },
+        _stop: function () {
+          L.Util.cancelAnimFrame(this._flyToFrame);
+          if (this._panAnim) {
+            this._panAnim.stop();
+          }
+          return this;
+        },
+        _rawPanBy: function (offset) {
+          L.DomUtil.setPosition(this._mapPane, this._getMapPanePos().subtract(offset));
+        },
+        _getZoomSpan: function () {
+          return this.getMaxZoom() - this.getMinZoom();
+        },
+        _panInsideMaxBounds: function () {
+          if (!this._enforcingBounds) {
+            this.panInsideBounds(this.options.maxBounds);
+          }
+        },
+        _checkIfLoaded: function () {
+          if (!this._loaded) {
+            throw new Error('Set map center and zoom first.');
+          }
+        },
+        _initEvents: function (remove) {
+          if (!L.DomEvent) {
+            return;
+          }
+          this._targets = {};
+          this._targets[L.stamp(this._container)] = this;
+          var onOff = remove ? 'off' : 'on';
+          L.DomEvent[onOff](this._container, 'click dblclick mousedown mouseup ' + 'mouseover mouseout mousemove contextmenu keypress', this._handleDOMEvent, this);
+          if (this.options.trackResize) {
+            L.DomEvent[onOff](window, 'resize', this._onResize, this);
+          }
+          if (L.Browser.any3d && this.options.transform3DLimit) {
+            this[onOff]('moveend', this._onMoveEnd);
+          }
+        },
+        _onResize: function () {
+          L.Util.cancelAnimFrame(this._resizeRequest);
+          this._resizeRequest = L.Util.requestAnimFrame(function () {
+            this.invalidateSize({ debounceMoveend: true });
+          }, this);
+        },
+        _onScroll: function () {
+          this._container.scrollTop = 0;
+          this._container.scrollLeft = 0;
+        },
+        _onMoveEnd: function () {
+          var pos = this._getMapPanePos();
+          if (Math.max(Math.abs(pos.x), Math.abs(pos.y)) >= this.options.transform3DLimit) {
+            this._resetView(this.getCenter(), this.getZoom());
+          }
+        },
+        _findEventTargets: function (e, type) {
+          var targets = [],
+              target,
+              isHover = type === 'mouseout' || type === 'mouseover',
+              src = e.target || e.srcElement,
+              dragging = false;
+          while (src) {
+            target = this._targets[L.stamp(src)];
+            if (target && (type === 'click' || type === 'preclick') && !e._simulated && this._draggableMoved(target)) {
+              dragging = true;
+              break;
+            }
+            if (target && target.listens(type, true)) {
+              if (isHover && !L.DomEvent._isExternalTarget(src, e)) {
+                break;
+              }
+              targets.push(target);
+              if (isHover) {
+                break;
+              }
+            }
+            if (src === this._container) {
+              break;
+            }
+            src = src.parentNode;
+          }
+          if (!targets.length && !dragging && !isHover && L.DomEvent._isExternalTarget(src, e)) {
+            targets = [this];
+          }
+          return targets;
+        },
+        _handleDOMEvent: function (e) {
+          if (!this._loaded || L.DomEvent._skipped(e)) {
+            return;
+          }
+          var type = e.type === 'keypress' && e.keyCode === 13 ? 'click' : e.type;
+          if (type === 'mousedown') {
+            L.DomUtil.preventOutline(e.target || e.srcElement);
+          }
+          this._fireDOMEvent(e, type);
+        },
+        _fireDOMEvent: function (e, type, targets) {
+          if (e.type === 'click') {
+            var synth = L.Util.extend({}, e);
+            synth.type = 'preclick';
+            this._fireDOMEvent(synth, synth.type, targets);
+          }
+          if (e._stopped) {
+            return;
+          }
+          targets = (targets || []).concat(this._findEventTargets(e, type));
+          if (!targets.length) {
+            return;
+          }
+          var target = targets[0];
+          if (type === 'contextmenu' && target.listens(type, true)) {
+            L.DomEvent.preventDefault(e);
+          }
+          var data = { originalEvent: e };
+          if (e.type !== 'keypress') {
+            var isMarker = target instanceof L.Marker;
+            data.containerPoint = isMarker ? this.latLngToContainerPoint(target.getLatLng()) : this.mouseEventToContainerPoint(e);
+            data.layerPoint = this.containerPointToLayerPoint(data.containerPoint);
+            data.latlng = isMarker ? target.getLatLng() : this.layerPointToLatLng(data.layerPoint);
+          }
+          for (var i = 0; i < targets.length; i++) {
+            targets[i].fire(type, data, true);
+            if (data.originalEvent._stopped || targets[i].options.nonBubblingEvents && L.Util.indexOf(targets[i].options.nonBubblingEvents, type) !== -1) {
+              return;
+            }
+          }
+        },
+        _draggableMoved: function (obj) {
+          obj = obj.dragging && obj.dragging.enabled() ? obj : this;
+          return obj.dragging && obj.dragging.moved() || this.boxZoom && this.boxZoom.moved();
+        },
+        _clearHandlers: function () {
+          for (var i = 0, len = this._handlers.length; i < len; i++) {
+            this._handlers[i].disable();
+          }
+        },
+        whenReady: function (callback, context) {
+          if (this._loaded) {
+            callback.call(context || this, { target: this });
+          } else {
+            this.on('load', callback, context);
+          }
+          return this;
+        },
+        _getMapPanePos: function () {
+          return L.DomUtil.getPosition(this._mapPane) || new L.Point(0, 0);
+        },
+        _moved: function () {
+          var pos = this._getMapPanePos();
+          return pos && !pos.equals([0, 0]);
+        },
+        _getTopLeftPoint: function (center, zoom) {
+          var pixelOrigin = center && zoom !== undefined ? this._getNewPixelOrigin(center, zoom) : this.getPixelOrigin();
+          return pixelOrigin.subtract(this._getMapPanePos());
+        },
+        _getNewPixelOrigin: function (center, zoom) {
+          var viewHalf = this.getSize()._divideBy(2);
+          return this.project(center, zoom)._subtract(viewHalf)._add(this._getMapPanePos())._round();
+        },
+        _latLngToNewLayerPoint: function (latlng, zoom, center) {
+          var topLeft = this._getNewPixelOrigin(center, zoom);
+          return this.project(latlng, zoom)._subtract(topLeft);
+        },
+        _getCenterLayerPoint: function () {
+          return this.containerPointToLayerPoint(this.getSize()._divideBy(2));
+        },
+        _getCenterOffset: function (latlng) {
+          return this.latLngToLayerPoint(latlng).subtract(this._getCenterLayerPoint());
+        },
+        _limitCenter: function (center, zoom, bounds) {
+          if (!bounds) {
+            return center;
+          }
+          var centerPoint = this.project(center, zoom),
+              viewHalf = this.getSize().divideBy(2),
+              viewBounds = new L.Bounds(centerPoint.subtract(viewHalf), centerPoint.add(viewHalf)),
+              offset = this._getBoundsOffset(viewBounds, bounds, zoom);
+          if (offset.round().equals([0, 0])) {
+            return center;
+          }
+          return this.unproject(centerPoint.add(offset), zoom);
+        },
+        _limitOffset: function (offset, bounds) {
+          if (!bounds) {
+            return offset;
+          }
+          var viewBounds = this.getPixelBounds(),
+              newBounds = new L.Bounds(viewBounds.min.add(offset), viewBounds.max.add(offset));
+          return offset.add(this._getBoundsOffset(newBounds, bounds));
+        },
+        _getBoundsOffset: function (pxBounds, maxBounds, zoom) {
+          var projectedMaxBounds = L.bounds(this.project(maxBounds.getNorthEast(), zoom), this.project(maxBounds.getSouthWest(), zoom)),
+              minOffset = projectedMaxBounds.min.subtract(pxBounds.min),
+              maxOffset = projectedMaxBounds.max.subtract(pxBounds.max),
+              dx = this._rebound(minOffset.x, -maxOffset.x),
+              dy = this._rebound(minOffset.y, -maxOffset.y);
+          return new L.Point(dx, dy);
+        },
+        _rebound: function (left, right) {
+          return left + right > 0 ? Math.round(left - right) / 2 : Math.max(0, Math.ceil(left)) - Math.max(0, Math.floor(right));
+        },
+        _limitZoom: function (zoom) {
+          var min = this.getMinZoom(),
+              max = this.getMaxZoom(),
+              snap = L.Browser.any3d ? this.options.zoomSnap : 1;
+          if (snap) {
+            zoom = Math.round(zoom / snap) * snap;
+          }
+          return Math.max(min, Math.min(max, zoom));
+        }
+      });
+      L.map = function (id, options) {
+        return new L.Map(id, options);
+      };
+      L.Layer = L.Evented.extend({
+        options: {
+          pane: 'overlayPane',
+          nonBubblingEvents: []
+        },
+        addTo: function (map) {
+          map.addLayer(this);
+          return this;
+        },
+        remove: function () {
+          return this.removeFrom(this._map || this._mapToAdd);
+        },
+        removeFrom: function (obj) {
+          if (obj) {
+            obj.removeLayer(this);
+          }
+          return this;
+        },
+        getPane: function (name) {
+          return this._map.getPane(name ? this.options[name] || name : this.options.pane);
+        },
+        addInteractiveTarget: function (targetEl) {
+          this._map._targets[L.stamp(targetEl)] = this;
+          return this;
+        },
+        removeInteractiveTarget: function (targetEl) {
+          delete this._map._targets[L.stamp(targetEl)];
+          return this;
+        },
+        _layerAdd: function (e) {
+          var map = e.target;
+          if (!map.hasLayer(this)) {
+            return;
+          }
+          this._map = map;
+          this._zoomAnimated = map._zoomAnimated;
+          if (this.getEvents) {
+            var events = this.getEvents();
+            map.on(events, this);
+            this.once('remove', function () {
+              map.off(events, this);
+            }, this);
+          }
+          this.onAdd(map);
+          if (this.getAttribution && this._map.attributionControl) {
+            this._map.attributionControl.addAttribution(this.getAttribution());
+          }
+          this.fire('add');
+          map.fire('layeradd', { layer: this });
+        }
+      });
+      L.Map.include({
+        addLayer: function (layer) {
+          var id = L.stamp(layer);
+          if (this._layers[id]) {
+            return this;
+          }
+          this._layers[id] = layer;
+          layer._mapToAdd = this;
+          if (layer.beforeAdd) {
+            layer.beforeAdd(this);
+          }
+          this.whenReady(layer._layerAdd, layer);
+          return this;
+        },
+        removeLayer: function (layer) {
+          var id = L.stamp(layer);
+          if (!this._layers[id]) {
+            return this;
+          }
+          if (this._loaded) {
+            layer.onRemove(this);
+          }
+          if (layer.getAttribution && this.attributionControl) {
+            this.attributionControl.removeAttribution(layer.getAttribution());
+          }
+          delete this._layers[id];
+          if (this._loaded) {
+            this.fire('layerremove', { layer: layer });
+            layer.fire('remove');
+          }
+          layer._map = layer._mapToAdd = null;
+          return this;
+        },
+        hasLayer: function (layer) {
+          return !!layer && L.stamp(layer) in this._layers;
+        },
+        eachLayer: function (method, context) {
+          for (var i in this._layers) {
+            method.call(context, this._layers[i]);
+          }
+          return this;
+        },
+        _addLayers: function (layers) {
+          layers = layers ? L.Util.isArray(layers) ? layers : [layers] : [];
+          for (var i = 0, len = layers.length; i < len; i++) {
+            this.addLayer(layers[i]);
+          }
+        },
+        _addZoomLimit: function (layer) {
+          if (isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
+            this._zoomBoundLayers[L.stamp(layer)] = layer;
+            this._updateZoomLevels();
+          }
+        },
+        _removeZoomLimit: function (layer) {
+          var id = L.stamp(layer);
+          if (this._zoomBoundLayers[id]) {
+            delete this._zoomBoundLayers[id];
+            this._updateZoomLevels();
+          }
+        },
+        _updateZoomLevels: function () {
+          var minZoom = Infinity,
+              maxZoom = -Infinity,
+              oldZoomSpan = this._getZoomSpan();
+          for (var i in this._zoomBoundLayers) {
+            var options = this._zoomBoundLayers[i].options;
+            minZoom = options.minZoom === undefined ? minZoom : Math.min(minZoom, options.minZoom);
+            maxZoom = options.maxZoom === undefined ? maxZoom : Math.max(maxZoom, options.maxZoom);
+          }
+          this._layersMaxZoom = maxZoom === -Infinity ? undefined : maxZoom;
+          this._layersMinZoom = minZoom === Infinity ? undefined : minZoom;
+          if (oldZoomSpan !== this._getZoomSpan()) {
+            this.fire('zoomlevelschange');
+          }
+        }
+      });
+      L.Projection.Mercator = {
+        R: 6378137,
+        R_MINOR: 6356752.314245179,
+        bounds: L.bounds([-20037508.34279, -15496570.73972], [20037508.34279, 18764656.23138]),
+        project: function (latlng) {
+          var d = Math.PI / 180,
+              r = this.R,
+              y = latlng.lat * d,
+              tmp = this.R_MINOR / r,
+              e = Math.sqrt(1 - tmp * tmp),
+              con = e * Math.sin(y);
+          var ts = Math.tan(Math.PI / 4 - y / 2) / Math.pow((1 - con) / (1 + con), e / 2);
+          y = -r * Math.log(Math.max(ts, 1E-10));
+          return new L.Point(latlng.lng * d * r, y);
+        },
+        unproject: function (point) {
+          var d = 180 / Math.PI,
+              r = this.R,
+              tmp = this.R_MINOR / r,
+              e = Math.sqrt(1 - tmp * tmp),
+              ts = Math.exp(-point.y / r),
+              phi = Math.PI / 2 - 2 * Math.atan(ts);
+          for (var i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
+            con = e * Math.sin(phi);
+            con = Math.pow((1 - con) / (1 + con), e / 2);
+            dphi = Math.PI / 2 - 2 * Math.atan(ts * con) - phi;
+            phi += dphi;
+          }
+          return new L.LatLng(phi * d, point.x * d / r);
+        }
+      };
+      L.CRS.EPSG3395 = L.extend({}, L.CRS.Earth, {
+        code: 'EPSG:3395',
+        projection: L.Projection.Mercator,
+        transformation: function () {
+          var scale = 0.5 / (Math.PI * L.Projection.Mercator.R);
+          return new L.Transformation(scale, 0.5, -scale, 0.5);
+        }()
+      });
+      L.GridLayer = L.Layer.extend({
+        options: {
+          tileSize: 256,
+          opacity: 1,
+          updateWhenIdle: L.Browser.mobile,
+          updateWhenZooming: true,
+          updateInterval: 200,
+          attribution: null,
+          zIndex: 1,
+          bounds: null,
+          minZoom: 0,
+          maxZoom: undefined,
+          noWrap: false,
+          pane: 'tilePane',
+          className: '',
+          keepBuffer: 2
+        },
+        initialize: function (options) {
+          L.setOptions(this, options);
+        },
+        onAdd: function () {
+          this._initContainer();
+          this._levels = {};
+          this._tiles = {};
+          this._resetView();
+          this._update();
+        },
+        beforeAdd: function (map) {
+          map._addZoomLimit(this);
+        },
+        onRemove: function (map) {
+          this._removeAllTiles();
+          L.DomUtil.remove(this._container);
+          map._removeZoomLimit(this);
+          this._container = null;
+          this._tileZoom = null;
+        },
+        bringToFront: function () {
+          if (this._map) {
+            L.DomUtil.toFront(this._container);
+            this._setAutoZIndex(Math.max);
+          }
+          return this;
+        },
+        bringToBack: function () {
+          if (this._map) {
+            L.DomUtil.toBack(this._container);
+            this._setAutoZIndex(Math.min);
+          }
+          return this;
+        },
+        getAttribution: function () {
+          return this.options.attribution;
+        },
+        getContainer: function () {
+          return this._container;
+        },
+        setOpacity: function (opacity) {
+          this.options.opacity = opacity;
+          this._updateOpacity();
+          return this;
+        },
+        setZIndex: function (zIndex) {
+          this.options.zIndex = zIndex;
+          this._updateZIndex();
+          return this;
+        },
+        isLoading: function () {
+          return this._loading;
+        },
+        redraw: function () {
+          if (this._map) {
+            this._removeAllTiles();
+            this._update();
+          }
+          return this;
+        },
+        getEvents: function () {
+          var events = {
+            viewprereset: this._invalidateAll,
+            viewreset: this._resetView,
+            zoom: this._resetView,
+            moveend: this._onMoveEnd
+          };
+          if (!this.options.updateWhenIdle) {
+            if (!this._onMove) {
+              this._onMove = L.Util.throttle(this._onMoveEnd, this.options.updateInterval, this);
+            }
+            events.move = this._onMove;
+          }
+          if (this._zoomAnimated) {
+            events.zoomanim = this._animateZoom;
+          }
+          return events;
+        },
+        createTile: function () {
+          return document.createElement('div');
+        },
+        getTileSize: function () {
+          var s = this.options.tileSize;
+          return s instanceof L.Point ? s : new L.Point(s, s);
+        },
+        _updateZIndex: function () {
+          if (this._container && this.options.zIndex !== undefined && this.options.zIndex !== null) {
+            this._container.style.zIndex = this.options.zIndex;
+          }
+        },
+        _setAutoZIndex: function (compare) {
+          var layers = this.getPane().children,
+              edgeZIndex = -compare(-Infinity, Infinity);
+          for (var i = 0, len = layers.length, zIndex; i < len; i++) {
+            zIndex = layers[i].style.zIndex;
+            if (layers[i] !== this._container && zIndex) {
+              edgeZIndex = compare(edgeZIndex, +zIndex);
+            }
+          }
+          if (isFinite(edgeZIndex)) {
+            this.options.zIndex = edgeZIndex + compare(-1, 1);
+            this._updateZIndex();
+          }
+        },
+        _updateOpacity: function () {
+          if (!this._map) {
+            return;
+          }
+          if (L.Browser.ielt9) {
+            return;
+          }
+          L.DomUtil.setOpacity(this._container, this.options.opacity);
+          var now = +new Date(),
+              nextFrame = false,
+              willPrune = false;
+          for (var key in this._tiles) {
+            var tile = this._tiles[key];
+            if (!tile.current || !tile.loaded) {
+              continue;
+            }
+            var fade = Math.min(1, (now - tile.loaded) / 200);
+            L.DomUtil.setOpacity(tile.el, fade);
+            if (fade < 1) {
+              nextFrame = true;
+            } else {
+              if (tile.active) {
+                willPrune = true;
+              }
+              tile.active = true;
+            }
+          }
+          if (willPrune && !this._noPrune) {
+            this._pruneTiles();
+          }
+          if (nextFrame) {
+            L.Util.cancelAnimFrame(this._fadeFrame);
+            this._fadeFrame = L.Util.requestAnimFrame(this._updateOpacity, this);
+          }
+        },
+        _initContainer: function () {
+          if (this._container) {
+            return;
+          }
+          this._container = L.DomUtil.create('div', 'leaflet-layer ' + (this.options.className || ''));
+          this._updateZIndex();
+          if (this.options.opacity < 1) {
+            this._updateOpacity();
+          }
+          this.getPane().appendChild(this._container);
+        },
+        _updateLevels: function () {
+          var zoom = this._tileZoom,
+              maxZoom = this.options.maxZoom;
+          if (zoom === undefined) {
+            return undefined;
+          }
+          for (var z in this._levels) {
+            if (this._levels[z].el.children.length || z === zoom) {
+              this._levels[z].el.style.zIndex = maxZoom - Math.abs(zoom - z);
+            } else {
+              L.DomUtil.remove(this._levels[z].el);
+              this._removeTilesAtZoom(z);
+              delete this._levels[z];
+            }
+          }
+          var level = this._levels[zoom],
+              map = this._map;
+          if (!level) {
+            level = this._levels[zoom] = {};
+            level.el = L.DomUtil.create('div', 'leaflet-tile-container leaflet-zoom-animated', this._container);
+            level.el.style.zIndex = maxZoom;
+            level.origin = map.project(map.unproject(map.getPixelOrigin()), zoom).round();
+            level.zoom = zoom;
+            this._setZoomTransform(level, map.getCenter(), map.getZoom());
+            L.Util.falseFn(level.el.offsetWidth);
+          }
+          this._level = level;
+          return level;
+        },
+        _pruneTiles: function () {
+          if (!this._map) {
+            return;
+          }
+          var key, tile;
+          var zoom = this._map.getZoom();
+          if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
+            this._removeAllTiles();
+            return;
+          }
+          for (key in this._tiles) {
+            tile = this._tiles[key];
+            tile.retain = tile.current;
+          }
+          for (key in this._tiles) {
+            tile = this._tiles[key];
+            if (tile.current && !tile.active) {
+              var coords = tile.coords;
+              if (!this._retainParent(coords.x, coords.y, coords.z, coords.z - 5)) {
+                this._retainChildren(coords.x, coords.y, coords.z, coords.z + 2);
+              }
+            }
+          }
+          for (key in this._tiles) {
+            if (!this._tiles[key].retain) {
+              this._removeTile(key);
+            }
+          }
+        },
+        _removeTilesAtZoom: function (zoom) {
+          for (var key in this._tiles) {
+            if (this._tiles[key].coords.z !== zoom) {
+              continue;
+            }
+            this._removeTile(key);
+          }
+        },
+        _removeAllTiles: function () {
+          for (var key in this._tiles) {
+            this._removeTile(key);
+          }
+        },
+        _invalidateAll: function () {
+          for (var z in this._levels) {
+            L.DomUtil.remove(this._levels[z].el);
+            delete this._levels[z];
+          }
+          this._removeAllTiles();
+          this._tileZoom = null;
+        },
+        _retainParent: function (x, y, z, minZoom) {
+          var x2 = Math.floor(x / 2),
+              y2 = Math.floor(y / 2),
+              z2 = z - 1,
+              coords2 = new L.Point(+x2, +y2);
+          coords2.z = +z2;
+          var key = this._tileCoordsToKey(coords2),
+              tile = this._tiles[key];
+          if (tile && tile.active) {
+            tile.retain = true;
+            return true;
+          } else if (tile && tile.loaded) {
+            tile.retain = true;
+          }
+          if (z2 > minZoom) {
+            return this._retainParent(x2, y2, z2, minZoom);
+          }
+          return false;
+        },
+        _retainChildren: function (x, y, z, maxZoom) {
+          for (var i = 2 * x; i < 2 * x + 2; i++) {
+            for (var j = 2 * y; j < 2 * y + 2; j++) {
+              var coords = new L.Point(i, j);
+              coords.z = z + 1;
+              var key = this._tileCoordsToKey(coords),
+                  tile = this._tiles[key];
+              if (tile && tile.active) {
+                tile.retain = true;
+                continue;
+              } else if (tile && tile.loaded) {
+                tile.retain = true;
+              }
+              if (z + 1 < maxZoom) {
+                this._retainChildren(i, j, z + 1, maxZoom);
+              }
+            }
+          }
+        },
+        _resetView: function (e) {
+          var animating = e && (e.pinch || e.flyTo);
+          this._setView(this._map.getCenter(), this._map.getZoom(), animating, animating);
+        },
+        _animateZoom: function (e) {
+          this._setView(e.center, e.zoom, true, e.noUpdate);
+        },
+        _setView: function (center, zoom, noPrune, noUpdate) {
+          var tileZoom = Math.round(zoom);
+          if (this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom || this.options.minZoom !== undefined && tileZoom < this.options.minZoom) {
+            tileZoom = undefined;
+          }
+          var tileZoomChanged = this.options.updateWhenZooming && tileZoom !== this._tileZoom;
+          if (!noUpdate || tileZoomChanged) {
+            this._tileZoom = tileZoom;
+            if (this._abortLoading) {
+              this._abortLoading();
+            }
+            this._updateLevels();
+            this._resetGrid();
+            if (tileZoom !== undefined) {
+              this._update(center);
+            }
+            if (!noPrune) {
+              this._pruneTiles();
+            }
+            this._noPrune = !!noPrune;
+          }
+          this._setZoomTransforms(center, zoom);
+        },
+        _setZoomTransforms: function (center, zoom) {
+          for (var i in this._levels) {
+            this._setZoomTransform(this._levels[i], center, zoom);
+          }
+        },
+        _setZoomTransform: function (level, center, zoom) {
+          var scale = this._map.getZoomScale(zoom, level.zoom),
+              translate = level.origin.multiplyBy(scale).subtract(this._map._getNewPixelOrigin(center, zoom)).round();
+          if (L.Browser.any3d) {
+            L.DomUtil.setTransform(level.el, translate, scale);
+          } else {
+            L.DomUtil.setPosition(level.el, translate);
+          }
+        },
+        _resetGrid: function () {
+          var map = this._map,
+              crs = map.options.crs,
+              tileSize = this._tileSize = this.getTileSize(),
+              tileZoom = this._tileZoom;
+          var bounds = this._map.getPixelWorldBounds(this._tileZoom);
+          if (bounds) {
+            this._globalTileRange = this._pxBoundsToTileRange(bounds);
+          }
+          this._wrapX = crs.wrapLng && !this.options.noWrap && [Math.floor(map.project([0, crs.wrapLng[0]], tileZoom).x / tileSize.x), Math.ceil(map.project([0, crs.wrapLng[1]], tileZoom).x / tileSize.y)];
+          this._wrapY = crs.wrapLat && !this.options.noWrap && [Math.floor(map.project([crs.wrapLat[0], 0], tileZoom).y / tileSize.x), Math.ceil(map.project([crs.wrapLat[1], 0], tileZoom).y / tileSize.y)];
+        },
+        _onMoveEnd: function () {
+          if (!this._map || this._map._animatingZoom) {
+            return;
+          }
+          this._update();
+        },
+        _getTiledPixelBounds: function (center) {
+          var map = this._map,
+              mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
+              scale = map.getZoomScale(mapZoom, this._tileZoom),
+              pixelCenter = map.project(center, this._tileZoom).floor(),
+              halfSize = map.getSize().divideBy(scale * 2);
+          return new L.Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize));
+        },
+        _update: function (center) {
+          var map = this._map;
+          if (!map) {
+            return;
+          }
+          var zoom = map.getZoom();
+          if (center === undefined) {
+            center = map.getCenter();
+          }
+          if (this._tileZoom === undefined) {
+            return;
+          }
+          var pixelBounds = this._getTiledPixelBounds(center),
+              tileRange = this._pxBoundsToTileRange(pixelBounds),
+              tileCenter = tileRange.getCenter(),
+              queue = [],
+              margin = this.options.keepBuffer,
+              noPruneRange = new L.Bounds(tileRange.getBottomLeft().subtract([margin, -margin]), tileRange.getTopRight().add([margin, -margin]));
+          for (var key in this._tiles) {
+            var c = this._tiles[key].coords;
+            if (c.z !== this._tileZoom || !noPruneRange.contains(L.point(c.x, c.y))) {
+              this._tiles[key].current = false;
+            }
+          }
+          if (Math.abs(zoom - this._tileZoom) > 1) {
+            this._setView(center, zoom);
+            return;
+          }
+          for (var j = tileRange.min.y; j <= tileRange.max.y; j++) {
+            for (var i = tileRange.min.x; i <= tileRange.max.x; i++) {
+              var coords = new L.Point(i, j);
+              coords.z = this._tileZoom;
+              if (!this._isValidTile(coords)) {
+                continue;
+              }
+              var tile = this._tiles[this._tileCoordsToKey(coords)];
+              if (tile) {
+                tile.current = true;
+              } else {
+                queue.push(coords);
+              }
+            }
+          }
+          queue.sort(function (a, b) {
+            return a.distanceTo(tileCenter) - b.distanceTo(tileCenter);
+          });
+          if (queue.length !== 0) {
+            if (!this._loading) {
+              this._loading = true;
+              this.fire('loading');
+            }
+            var fragment = document.createDocumentFragment();
+            for (i = 0; i < queue.length; i++) {
+              this._addTile(queue[i], fragment);
+            }
+            this._level.el.appendChild(fragment);
+          }
+        },
+        _isValidTile: function (coords) {
+          var crs = this._map.options.crs;
+          if (!crs.infinite) {
+            var bounds = this._globalTileRange;
+            if (!crs.wrapLng && (coords.x < bounds.min.x || coords.x > bounds.max.x) || !crs.wrapLat && (coords.y < bounds.min.y || coords.y > bounds.max.y)) {
+              return false;
+            }
+          }
+          if (!this.options.bounds) {
+            return true;
+          }
+          var tileBounds = this._tileCoordsToBounds(coords);
+          return L.latLngBounds(this.options.bounds).overlaps(tileBounds);
+        },
+        _keyToBounds: function (key) {
+          return this._tileCoordsToBounds(this._keyToTileCoords(key));
+        },
+        _tileCoordsToBounds: function (coords) {
+          var map = this._map,
+              tileSize = this.getTileSize(),
+              nwPoint = coords.scaleBy(tileSize),
+              sePoint = nwPoint.add(tileSize),
+              nw = map.unproject(nwPoint, coords.z),
+              se = map.unproject(sePoint, coords.z);
+          if (!this.options.noWrap) {
+            nw = map.wrapLatLng(nw);
+            se = map.wrapLatLng(se);
+          }
+          return new L.LatLngBounds(nw, se);
+        },
+        _tileCoordsToKey: function (coords) {
+          return coords.x + ':' + coords.y + ':' + coords.z;
+        },
+        _keyToTileCoords: function (key) {
+          var k = key.split(':'),
+              coords = new L.Point(+k[0], +k[1]);
+          coords.z = +k[2];
+          return coords;
+        },
+        _removeTile: function (key) {
+          var tile = this._tiles[key];
+          if (!tile) {
+            return;
+          }
+          L.DomUtil.remove(tile.el);
+          delete this._tiles[key];
+          this.fire('tileunload', {
+            tile: tile.el,
+            coords: this._keyToTileCoords(key)
+          });
+        },
+        _initTile: function (tile) {
+          L.DomUtil.addClass(tile, 'leaflet-tile');
+          var tileSize = this.getTileSize();
+          tile.style.width = tileSize.x + 'px';
+          tile.style.height = tileSize.y + 'px';
+          tile.onselectstart = L.Util.falseFn;
+          tile.onmousemove = L.Util.falseFn;
+          if (L.Browser.ielt9 && this.options.opacity < 1) {
+            L.DomUtil.setOpacity(tile, this.options.opacity);
+          }
+          if (L.Browser.android && !L.Browser.android23) {
+            tile.style.WebkitBackfaceVisibility = 'hidden';
+          }
+        },
+        _addTile: function (coords, container) {
+          var tilePos = this._getTilePos(coords),
+              key = this._tileCoordsToKey(coords);
+          var tile = this.createTile(this._wrapCoords(coords), L.bind(this._tileReady, this, coords));
+          this._initTile(tile);
+          if (this.createTile.length < 2) {
+            L.Util.requestAnimFrame(L.bind(this._tileReady, this, coords, null, tile));
+          }
+          L.DomUtil.setPosition(tile, tilePos);
+          this._tiles[key] = {
+            el: tile,
+            coords: coords,
+            current: true
+          };
+          container.appendChild(tile);
+          this.fire('tileloadstart', {
+            tile: tile,
+            coords: coords
+          });
+        },
+        _tileReady: function (coords, err, tile) {
+          if (!this._map) {
+            return;
+          }
+          if (err) {
+            this.fire('tileerror', {
+              error: err,
+              tile: tile,
+              coords: coords
+            });
+          }
+          var key = this._tileCoordsToKey(coords);
+          tile = this._tiles[key];
+          if (!tile) {
+            return;
+          }
+          tile.loaded = +new Date();
+          if (this._map._fadeAnimated) {
+            L.DomUtil.setOpacity(tile.el, 0);
+            L.Util.cancelAnimFrame(this._fadeFrame);
+            this._fadeFrame = L.Util.requestAnimFrame(this._updateOpacity, this);
+          } else {
+            tile.active = true;
+            this._pruneTiles();
+          }
+          if (!err) {
+            L.DomUtil.addClass(tile.el, 'leaflet-tile-loaded');
+            this.fire('tileload', {
+              tile: tile.el,
+              coords: coords
+            });
+          }
+          if (this._noTilesToLoad()) {
+            this._loading = false;
+            this.fire('load');
+            if (L.Browser.ielt9 || !this._map._fadeAnimated) {
+              L.Util.requestAnimFrame(this._pruneTiles, this);
+            } else {
+              setTimeout(L.bind(this._pruneTiles, this), 250);
+            }
+          }
+        },
+        _getTilePos: function (coords) {
+          return coords.scaleBy(this.getTileSize()).subtract(this._level.origin);
+        },
+        _wrapCoords: function (coords) {
+          var newCoords = new L.Point(this._wrapX ? L.Util.wrapNum(coords.x, this._wrapX) : coords.x, this._wrapY ? L.Util.wrapNum(coords.y, this._wrapY) : coords.y);
+          newCoords.z = coords.z;
+          return newCoords;
+        },
+        _pxBoundsToTileRange: function (bounds) {
+          var tileSize = this.getTileSize();
+          return new L.Bounds(bounds.min.unscaleBy(tileSize).floor(), bounds.max.unscaleBy(tileSize).ceil().subtract([1, 1]));
+        },
+        _noTilesToLoad: function () {
+          for (var key in this._tiles) {
+            if (!this._tiles[key].loaded) {
+              return false;
+            }
+          }
+          return true;
+        }
+      });
+      L.gridLayer = function (options) {
+        return new L.GridLayer(options);
+      };
+      L.TileLayer = L.GridLayer.extend({
+        options: {
+          minZoom: 0,
+          maxZoom: 18,
+          maxNativeZoom: null,
+          subdomains: 'abc',
+          errorTileUrl: '',
+          zoomOffset: 0,
+          tms: false,
+          zoomReverse: false,
+          detectRetina: false,
+          crossOrigin: false
+        },
+        initialize: function (url, options) {
+          this._url = url;
+          options = L.setOptions(this, options);
+          if (options.detectRetina && L.Browser.retina && options.maxZoom > 0) {
+            options.tileSize = Math.floor(options.tileSize / 2);
+            if (!options.zoomReverse) {
+              options.zoomOffset++;
+              options.maxZoom--;
+            } else {
+              options.zoomOffset--;
+              options.minZoom++;
+            }
+            options.minZoom = Math.max(0, options.minZoom);
+          }
+          if (typeof options.subdomains === 'string') {
+            options.subdomains = options.subdomains.split('');
+          }
+          if (!L.Browser.android) {
+            this.on('tileunload', this._onTileRemove);
+          }
+        },
+        setUrl: function (url, noRedraw) {
+          this._url = url;
+          if (!noRedraw) {
+            this.redraw();
+          }
+          return this;
+        },
+        createTile: function (coords, done) {
+          var tile = document.createElement('img');
+          L.DomEvent.on(tile, 'load', L.bind(this._tileOnLoad, this, done, tile));
+          L.DomEvent.on(tile, 'error', L.bind(this._tileOnError, this, done, tile));
+          if (this.options.crossOrigin) {
+            tile.crossOrigin = '';
+          }
+          tile.alt = '';
+          tile.src = this.getTileUrl(coords);
+          return tile;
+        },
+        getTileUrl: function (coords) {
+          var data = {
+            r: L.Browser.retina ? '@2x' : '',
+            s: this._getSubdomain(coords),
+            x: coords.x,
+            y: coords.y,
+            z: this._getZoomForUrl()
+          };
+          if (this._map && !this._map.options.crs.infinite) {
+            var invertedY = this._globalTileRange.max.y - coords.y;
+            if (this.options.tms) {
+              data['y'] = invertedY;
+            }
+            data['-y'] = invertedY;
+          }
+          return L.Util.template(this._url, L.extend(data, this.options));
+        },
+        _tileOnLoad: function (done, tile) {
+          if (L.Browser.ielt9) {
+            setTimeout(L.bind(done, this, null, tile), 0);
+          } else {
+            done(null, tile);
+          }
+        },
+        _tileOnError: function (done, tile, e) {
+          var errorUrl = this.options.errorTileUrl;
+          if (errorUrl) {
+            tile.src = errorUrl;
+          }
+          done(e, tile);
+        },
+        getTileSize: function () {
+          var map = this._map,
+              tileSize = L.GridLayer.prototype.getTileSize.call(this),
+              zoom = this._tileZoom + this.options.zoomOffset,
+              zoomN = this.options.maxNativeZoom;
+          return zoomN !== null && zoom > zoomN ? tileSize.divideBy(map.getZoomScale(zoomN, zoom)).round() : tileSize;
+        },
+        _onTileRemove: function (e) {
+          e.tile.onload = null;
+        },
+        _getZoomForUrl: function () {
+          var options = this.options,
+              zoom = this._tileZoom;
+          if (options.zoomReverse) {
+            zoom = options.maxZoom - zoom;
+          }
+          zoom += options.zoomOffset;
+          return options.maxNativeZoom !== null ? Math.min(zoom, options.maxNativeZoom) : zoom;
+        },
+        _getSubdomain: function (tilePoint) {
+          var index = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
+          return this.options.subdomains[index];
+        },
+        _abortLoading: function () {
+          var i, tile;
+          for (i in this._tiles) {
+            if (this._tiles[i].coords.z !== this._tileZoom) {
+              tile = this._tiles[i].el;
+              tile.onload = L.Util.falseFn;
+              tile.onerror = L.Util.falseFn;
+              if (!tile.complete) {
+                tile.src = L.Util.emptyImageUrl;
+                L.DomUtil.remove(tile);
+              }
+            }
+          }
+        }
+      });
+      L.tileLayer = function (url, options) {
+        return new L.TileLayer(url, options);
+      };
+      L.TileLayer.WMS = L.TileLayer.extend({
+        defaultWmsParams: {
+          service: 'WMS',
+          request: 'GetMap',
+          layers: '',
+          styles: '',
+          format: 'image/jpeg',
+          transparent: false,
+          version: '1.1.1'
+        },
+        options: {
+          crs: null,
+          uppercase: false
+        },
+        initialize: function (url, options) {
+          this._url = url;
+          var wmsParams = L.extend({}, this.defaultWmsParams);
+          for (var i in options) {
+            if (!(i in this.options)) {
+              wmsParams[i] = options[i];
+            }
+          }
+          options = L.setOptions(this, options);
+          wmsParams.width = wmsParams.height = options.tileSize * (options.detectRetina && L.Browser.retina ? 2 : 1);
+          this.wmsParams = wmsParams;
+        },
+        onAdd: function (map) {
+          this._crs = this.options.crs || map.options.crs;
+          this._wmsVersion = parseFloat(this.wmsParams.version);
+          var projectionKey = this._wmsVersion >= 1.3 ? 'crs' : 'srs';
+          this.wmsParams[projectionKey] = this._crs.code;
+          L.TileLayer.prototype.onAdd.call(this, map);
+        },
+        getTileUrl: function (coords) {
+          var tileBounds = this._tileCoordsToBounds(coords),
+              nw = this._crs.project(tileBounds.getNorthWest()),
+              se = this._crs.project(tileBounds.getSouthEast()),
+              bbox = (this._wmsVersion >= 1.3 && this._crs === L.CRS.EPSG4326 ? [se.y, nw.x, nw.y, se.x] : [nw.x, se.y, se.x, nw.y]).join(','),
+              url = L.TileLayer.prototype.getTileUrl.call(this, coords);
+          return url + L.Util.getParamString(this.wmsParams, url, this.options.uppercase) + (this.options.uppercase ? '&BBOX=' : '&bbox=') + bbox;
+        },
+        setParams: function (params, noRedraw) {
+          L.extend(this.wmsParams, params);
+          if (!noRedraw) {
+            this.redraw();
+          }
+          return this;
+        }
+      });
+      L.tileLayer.wms = function (url, options) {
+        return new L.TileLayer.WMS(url, options);
+      };
+      L.ImageOverlay = L.Layer.extend({
+        options: {
+          opacity: 1,
+          alt: '',
+          interactive: false,
+          attribution: null,
+          crossOrigin: false
+        },
+        initialize: function (url, bounds, options) {
+          this._url = url;
+          this._bounds = L.latLngBounds(bounds);
+          L.setOptions(this, options);
+        },
+        onAdd: function () {
+          if (!this._image) {
+            this._initImage();
+            if (this.options.opacity < 1) {
+              this._updateOpacity();
+            }
+          }
+          if (this.options.interactive) {
+            L.DomUtil.addClass(this._image, 'leaflet-interactive');
+            this.addInteractiveTarget(this._image);
+          }
+          this.getPane().appendChild(this._image);
+          this._reset();
+        },
+        onRemove: function () {
+          L.DomUtil.remove(this._image);
+          if (this.options.interactive) {
+            this.removeInteractiveTarget(this._image);
+          }
+        },
+        setOpacity: function (opacity) {
+          this.options.opacity = opacity;
+          if (this._image) {
+            this._updateOpacity();
+          }
+          return this;
+        },
+        setStyle: function (styleOpts) {
+          if (styleOpts.opacity) {
+            this.setOpacity(styleOpts.opacity);
+          }
+          return this;
+        },
+        bringToFront: function () {
+          if (this._map) {
+            L.DomUtil.toFront(this._image);
+          }
+          return this;
+        },
+        bringToBack: function () {
+          if (this._map) {
+            L.DomUtil.toBack(this._image);
+          }
+          return this;
+        },
+        setUrl: function (url) {
+          this._url = url;
+          if (this._image) {
+            this._image.src = url;
+          }
+          return this;
+        },
+        setBounds: function (bounds) {
+          this._bounds = bounds;
+          if (this._map) {
+            this._reset();
+          }
+          return this;
+        },
+        getAttribution: function () {
+          return this.options.attribution;
+        },
+        getEvents: function () {
+          var events = {
+            zoom: this._reset,
+            viewreset: this._reset
+          };
+          if (this._zoomAnimated) {
+            events.zoomanim = this._animateZoom;
+          }
+          return events;
+        },
+        getBounds: function () {
+          return this._bounds;
+        },
+        getElement: function () {
+          return this._image;
+        },
+        _initImage: function () {
+          var img = this._image = L.DomUtil.create('img', 'leaflet-image-layer ' + (this._zoomAnimated ? 'leaflet-zoom-animated' : ''));
+          img.onselectstart = L.Util.falseFn;
+          img.onmousemove = L.Util.falseFn;
+          img.onload = L.bind(this.fire, this, 'load');
+          if (this.options.crossOrigin) {
+            img.crossOrigin = '';
+          }
+          img.src = this._url;
+          img.alt = this.options.alt;
+        },
+        _animateZoom: function (e) {
+          var scale = this._map.getZoomScale(e.zoom),
+              offset = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center);
+          L.DomUtil.setTransform(this._image, offset, scale);
+        },
+        _reset: function () {
+          var image = this._image,
+              bounds = new L.Bounds(this._map.latLngToLayerPoint(this._bounds.getNorthWest()), this._map.latLngToLayerPoint(this._bounds.getSouthEast())),
+              size = bounds.getSize();
+          L.DomUtil.setPosition(image, bounds.min);
+          image.style.width = size.x + 'px';
+          image.style.height = size.y + 'px';
+        },
+        _updateOpacity: function () {
+          L.DomUtil.setOpacity(this._image, this.options.opacity);
+        }
+      });
+      L.imageOverlay = function (url, bounds, options) {
+        return new L.ImageOverlay(url, bounds, options);
+      };
+      L.Icon = L.Class.extend({
+        initialize: function (options) {
+          L.setOptions(this, options);
+        },
+        createIcon: function (oldIcon) {
+          return this._createIcon('icon', oldIcon);
+        },
+        createShadow: function (oldIcon) {
+          return this._createIcon('shadow', oldIcon);
+        },
+        _createIcon: function (name, oldIcon) {
+          var src = this._getIconUrl(name);
+          if (!src) {
+            if (name === 'icon') {
+              throw new Error('iconUrl not set in Icon options (see the docs).');
+            }
+            return null;
+          }
+          var img = this._createImg(src, oldIcon && oldIcon.tagName === 'IMG' ? oldIcon : null);
+          this._setIconStyles(img, name);
+          return img;
+        },
+        _setIconStyles: function (img, name) {
+          var options = this.options;
+          var sizeOption = options[name + 'Size'];
+          if (typeof sizeOption === 'number') {
+            sizeOption = [sizeOption, sizeOption];
+          }
+          var size = L.point(sizeOption),
+              anchor = L.point(name === 'shadow' && options.shadowAnchor || options.iconAnchor || size && size.divideBy(2, true));
+          img.className = 'leaflet-marker-' + name + ' ' + (options.className || '');
+          if (anchor) {
+            img.style.marginLeft = -anchor.x + 'px';
+            img.style.marginTop = -anchor.y + 'px';
+          }
+          if (size) {
+            img.style.width = size.x + 'px';
+            img.style.height = size.y + 'px';
+          }
+        },
+        _createImg: function (src, el) {
+          el = el || document.createElement('img');
+          el.src = src;
+          return el;
+        },
+        _getIconUrl: function (name) {
+          return L.Browser.retina && this.options[name + 'RetinaUrl'] || this.options[name + 'Url'];
+        }
+      });
+      L.icon = function (options) {
+        return new L.Icon(options);
+      };
+      L.Icon.Default = L.Icon.extend({
+        options: {
+          iconUrl: 'marker-icon.png',
+          iconRetinaUrl: 'marker-icon-2x.png',
+          shadowUrl: 'marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          tooltipAnchor: [16, -28],
+          shadowSize: [41, 41]
+        },
+        _getIconUrl: function (name) {
+          if (!L.Icon.Default.imagePath) {
+            L.Icon.Default.imagePath = this._detectIconPath();
+          }
+          return (this.options.imagePath || L.Icon.Default.imagePath) + L.Icon.prototype._getIconUrl.call(this, name);
+        },
+        _detectIconPath: function () {
+          var el = L.DomUtil.create('div', 'leaflet-default-icon-path', document.body);
+          var path = L.DomUtil.getStyle(el, 'background-image') || L.DomUtil.getStyle(el, 'backgroundImage');
+          document.body.removeChild(el);
+          return path.indexOf('url') === 0 ? path.replace(/^url\([\"\']?/, '').replace(/marker-icon\.png[\"\']?\)$/, '') : '';
+        }
+      });
+      L.Marker = L.Layer.extend({
+        options: {
+          icon: new L.Icon.Default(),
+          interactive: true,
+          draggable: false,
+          keyboard: true,
+          title: '',
+          alt: '',
+          zIndexOffset: 0,
+          opacity: 1,
+          riseOnHover: false,
+          riseOffset: 250,
+          pane: 'markerPane',
+          nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu']
+        },
+        initialize: function (latlng, options) {
+          L.setOptions(this, options);
+          this._latlng = L.latLng(latlng);
+        },
+        onAdd: function (map) {
+          this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
+          if (this._zoomAnimated) {
+            map.on('zoomanim', this._animateZoom, this);
+          }
+          this._initIcon();
+          this.update();
+        },
+        onRemove: function (map) {
+          if (this.dragging && this.dragging.enabled()) {
+            this.options.draggable = true;
+            this.dragging.removeHooks();
+          }
+          if (this._zoomAnimated) {
+            map.off('zoomanim', this._animateZoom, this);
+          }
+          this._removeIcon();
+          this._removeShadow();
+        },
+        getEvents: function () {
+          return {
+            zoom: this.update,
+            viewreset: this.update
+          };
+        },
+        getLatLng: function () {
+          return this._latlng;
+        },
+        setLatLng: function (latlng) {
+          var oldLatLng = this._latlng;
+          this._latlng = L.latLng(latlng);
+          this.update();
+          return this.fire('move', {
+            oldLatLng: oldLatLng,
+            latlng: this._latlng
+          });
+        },
+        setZIndexOffset: function (offset) {
+          this.options.zIndexOffset = offset;
+          return this.update();
+        },
+        setIcon: function (icon) {
+          this.options.icon = icon;
+          if (this._map) {
+            this._initIcon();
+            this.update();
+          }
+          if (this._popup) {
+            this.bindPopup(this._popup, this._popup.options);
+          }
+          return this;
+        },
+        getElement: function () {
+          return this._icon;
+        },
+        update: function () {
+          if (this._icon) {
+            var pos = this._map.latLngToLayerPoint(this._latlng).round();
+            this._setPos(pos);
+          }
+          return this;
+        },
+        _initIcon: function () {
+          var options = this.options,
+              classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+          var icon = options.icon.createIcon(this._icon),
+              addIcon = false;
+          if (icon !== this._icon) {
+            if (this._icon) {
+              this._removeIcon();
+            }
+            addIcon = true;
+            if (options.title) {
+              icon.title = options.title;
+            }
+            if (options.alt) {
+              icon.alt = options.alt;
+            }
+          }
+          L.DomUtil.addClass(icon, classToAdd);
+          if (options.keyboard) {
+            icon.tabIndex = '0';
+          }
+          this._icon = icon;
+          if (options.riseOnHover) {
+            this.on({
+              mouseover: this._bringToFront,
+              mouseout: this._resetZIndex
+            });
+          }
+          var newShadow = options.icon.createShadow(this._shadow),
+              addShadow = false;
+          if (newShadow !== this._shadow) {
+            this._removeShadow();
+            addShadow = true;
+          }
+          if (newShadow) {
+            L.DomUtil.addClass(newShadow, classToAdd);
+          }
+          this._shadow = newShadow;
+          if (options.opacity < 1) {
+            this._updateOpacity();
+          }
+          if (addIcon) {
+            this.getPane().appendChild(this._icon);
+          }
+          this._initInteraction();
+          if (newShadow && addShadow) {
+            this.getPane('shadowPane').appendChild(this._shadow);
+          }
+        },
+        _removeIcon: function () {
+          if (this.options.riseOnHover) {
+            this.off({
+              mouseover: this._bringToFront,
+              mouseout: this._resetZIndex
+            });
+          }
+          L.DomUtil.remove(this._icon);
+          this.removeInteractiveTarget(this._icon);
+          this._icon = null;
+        },
+        _removeShadow: function () {
+          if (this._shadow) {
+            L.DomUtil.remove(this._shadow);
+          }
+          this._shadow = null;
+        },
+        _setPos: function (pos) {
+          L.DomUtil.setPosition(this._icon, pos);
+          if (this._shadow) {
+            L.DomUtil.setPosition(this._shadow, pos);
+          }
+          this._zIndex = pos.y + this.options.zIndexOffset;
+          this._resetZIndex();
+        },
+        _updateZIndex: function (offset) {
+          this._icon.style.zIndex = this._zIndex + offset;
+        },
+        _animateZoom: function (opt) {
+          var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
+          this._setPos(pos);
+        },
+        _initInteraction: function () {
+          if (!this.options.interactive) {
+            return;
+          }
+          L.DomUtil.addClass(this._icon, 'leaflet-interactive');
+          this.addInteractiveTarget(this._icon);
+          if (L.Handler.MarkerDrag) {
+            var draggable = this.options.draggable;
+            if (this.dragging) {
+              draggable = this.dragging.enabled();
+              this.dragging.disable();
+            }
+            this.dragging = new L.Handler.MarkerDrag(this);
+            if (draggable) {
+              this.dragging.enable();
+            }
+          }
+        },
+        setOpacity: function (opacity) {
+          this.options.opacity = opacity;
+          if (this._map) {
+            this._updateOpacity();
+          }
+          return this;
+        },
+        _updateOpacity: function () {
+          var opacity = this.options.opacity;
+          L.DomUtil.setOpacity(this._icon, opacity);
+          if (this._shadow) {
+            L.DomUtil.setOpacity(this._shadow, opacity);
+          }
+        },
+        _bringToFront: function () {
+          this._updateZIndex(this.options.riseOffset);
+        },
+        _resetZIndex: function () {
+          this._updateZIndex(0);
+        }
+      });
+      L.marker = function (latlng, options) {
+        return new L.Marker(latlng, options);
+      };
+      L.DivIcon = L.Icon.extend({
+        options: {
+          iconSize: [12, 12],
+          html: false,
+          bgPos: null,
+          className: 'leaflet-div-icon'
+        },
+        createIcon: function (oldIcon) {
+          var div = oldIcon && oldIcon.tagName === 'DIV' ? oldIcon : document.createElement('div'),
+              options = this.options;
+          div.innerHTML = options.html !== false ? options.html : '';
+          if (options.bgPos) {
+            var bgPos = L.point(options.bgPos);
+            div.style.backgroundPosition = -bgPos.x + 'px ' + -bgPos.y + 'px';
+          }
+          this._setIconStyles(div, 'icon');
+          return div;
+        },
+        createShadow: function () {
+          return null;
+        }
+      });
+      L.divIcon = function (options) {
+        return new L.DivIcon(options);
+      };
+      L.DivOverlay = L.Layer.extend({
+        options: {
+          offset: [0, 7],
+          className: '',
+          pane: 'popupPane'
+        },
+        initialize: function (options, source) {
+          L.setOptions(this, options);
+          this._source = source;
+        },
+        onAdd: function (map) {
+          this._zoomAnimated = map._zoomAnimated;
+          if (!this._container) {
+            this._initLayout();
+          }
+          if (map._fadeAnimated) {
+            L.DomUtil.setOpacity(this._container, 0);
+          }
+          clearTimeout(this._removeTimeout);
+          this.getPane().appendChild(this._container);
+          this.update();
+          if (map._fadeAnimated) {
+            L.DomUtil.setOpacity(this._container, 1);
+          }
+          this.bringToFront();
+        },
+        onRemove: function (map) {
+          if (map._fadeAnimated) {
+            L.DomUtil.setOpacity(this._container, 0);
+            this._removeTimeout = setTimeout(L.bind(L.DomUtil.remove, L.DomUtil, this._container), 200);
+          } else {
+            L.DomUtil.remove(this._container);
+          }
+        },
+        getLatLng: function () {
+          return this._latlng;
+        },
+        setLatLng: function (latlng) {
+          this._latlng = L.latLng(latlng);
+          if (this._map) {
+            this._updatePosition();
+            this._adjustPan();
+          }
+          return this;
+        },
+        getContent: function () {
+          return this._content;
+        },
+        setContent: function (content) {
+          this._content = content;
+          this.update();
+          return this;
+        },
+        getElement: function () {
+          return this._container;
+        },
+        update: function () {
+          if (!this._map) {
+            return;
+          }
+          this._container.style.visibility = 'hidden';
+          this._updateContent();
+          this._updateLayout();
+          this._updatePosition();
+          this._container.style.visibility = '';
+          this._adjustPan();
+        },
+        getEvents: function () {
+          var events = {
+            zoom: this._updatePosition,
+            viewreset: this._updatePosition
+          };
+          if (this._zoomAnimated) {
+            events.zoomanim = this._animateZoom;
+          }
+          return events;
+        },
+        isOpen: function () {
+          return !!this._map && this._map.hasLayer(this);
+        },
+        bringToFront: function () {
+          if (this._map) {
+            L.DomUtil.toFront(this._container);
+          }
+          return this;
+        },
+        bringToBack: function () {
+          if (this._map) {
+            L.DomUtil.toBack(this._container);
+          }
+          return this;
+        },
+        _updateContent: function () {
+          if (!this._content) {
+            return;
+          }
+          var node = this._contentNode;
+          var content = typeof this._content === 'function' ? this._content(this._source || this) : this._content;
+          if (typeof content === 'string') {
+            node.innerHTML = content;
+          } else {
+            while (node.hasChildNodes()) {
+              node.removeChild(node.firstChild);
+            }
+            node.appendChild(content);
+          }
+          this.fire('contentupdate');
+        },
+        _updatePosition: function () {
+          if (!this._map) {
+            return;
+          }
+          var pos = this._map.latLngToLayerPoint(this._latlng),
+              offset = L.point(this.options.offset),
+              anchor = this._getAnchor();
+          if (this._zoomAnimated) {
+            L.DomUtil.setPosition(this._container, pos.add(anchor));
+          } else {
+            offset = offset.add(pos).add(anchor);
+          }
+          var bottom = this._containerBottom = -offset.y,
+              left = this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x;
+          this._container.style.bottom = bottom + 'px';
+          this._container.style.left = left + 'px';
+        },
+        _getAnchor: function () {
+          return [0, 0];
+        }
+      });
+      L.Popup = L.DivOverlay.extend({
+        options: {
+          maxWidth: 300,
+          minWidth: 50,
+          maxHeight: null,
+          autoPan: true,
+          autoPanPaddingTopLeft: null,
+          autoPanPaddingBottomRight: null,
+          autoPanPadding: [5, 5],
+          keepInView: false,
+          closeButton: true,
+          autoClose: true,
+          className: ''
+        },
+        openOn: function (map) {
+          map.openPopup(this);
+          return this;
+        },
+        onAdd: function (map) {
+          L.DivOverlay.prototype.onAdd.call(this, map);
+          map.fire('popupopen', { popup: this });
+          if (this._source) {
+            this._source.fire('popupopen', { popup: this }, true);
+            if (!(this._source instanceof L.Path)) {
+              this._source.on('preclick', L.DomEvent.stopPropagation);
+            }
+          }
+        },
+        onRemove: function (map) {
+          L.DivOverlay.prototype.onRemove.call(this, map);
+          map.fire('popupclose', { popup: this });
+          if (this._source) {
+            this._source.fire('popupclose', { popup: this }, true);
+            if (!(this._source instanceof L.Path)) {
+              this._source.off('preclick', L.DomEvent.stopPropagation);
+            }
+          }
+        },
+        getEvents: function () {
+          var events = L.DivOverlay.prototype.getEvents.call(this);
+          if ('closeOnClick' in this.options ? this.options.closeOnClick : this._map.options.closePopupOnClick) {
+            events.preclick = this._close;
+          }
+          if (this.options.keepInView) {
+            events.moveend = this._adjustPan;
+          }
+          return events;
+        },
+        _close: function () {
+          if (this._map) {
+            this._map.closePopup(this);
+          }
+        },
+        _initLayout: function () {
+          var prefix = 'leaflet-popup',
+              container = this._container = L.DomUtil.create('div', prefix + ' ' + (this.options.className || '') + ' leaflet-zoom-animated');
+          if (this.options.closeButton) {
+            var closeButton = this._closeButton = L.DomUtil.create('a', prefix + '-close-button', container);
+            closeButton.href = '#close';
+            closeButton.innerHTML = '&#215;';
+            L.DomEvent.on(closeButton, 'click', this._onCloseButtonClick, this);
+          }
+          var wrapper = this._wrapper = L.DomUtil.create('div', prefix + '-content-wrapper', container);
+          this._contentNode = L.DomUtil.create('div', prefix + '-content', wrapper);
+          L.DomEvent.disableClickPropagation(wrapper).disableScrollPropagation(this._contentNode).on(wrapper, 'contextmenu', L.DomEvent.stopPropagation);
+          this._tipContainer = L.DomUtil.create('div', prefix + '-tip-container', container);
+          this._tip = L.DomUtil.create('div', prefix + '-tip', this._tipContainer);
+        },
+        _updateLayout: function () {
+          var container = this._contentNode,
+              style = container.style;
+          style.width = '';
+          style.whiteSpace = 'nowrap';
+          var width = container.offsetWidth;
+          width = Math.min(width, this.options.maxWidth);
+          width = Math.max(width, this.options.minWidth);
+          style.width = width + 1 + 'px';
+          style.whiteSpace = '';
+          style.height = '';
+          var height = container.offsetHeight,
+              maxHeight = this.options.maxHeight,
+              scrolledClass = 'leaflet-popup-scrolled';
+          if (maxHeight && height > maxHeight) {
+            style.height = maxHeight + 'px';
+            L.DomUtil.addClass(container, scrolledClass);
+          } else {
+            L.DomUtil.removeClass(container, scrolledClass);
+          }
+          this._containerWidth = this._container.offsetWidth;
+        },
+        _animateZoom: function (e) {
+          var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center),
+              anchor = this._getAnchor();
+          L.DomUtil.setPosition(this._container, pos.add(anchor));
+        },
+        _adjustPan: function () {
+          if (!this.options.autoPan || this._map._panAnim && this._map._panAnim._inProgress) {
+            return;
+          }
+          var map = this._map,
+              marginBottom = parseInt(L.DomUtil.getStyle(this._container, 'marginBottom'), 10) || 0,
+              containerHeight = this._container.offsetHeight + marginBottom,
+              containerWidth = this._containerWidth,
+              layerPos = new L.Point(this._containerLeft, -containerHeight - this._containerBottom);
+          layerPos._add(L.DomUtil.getPosition(this._container));
+          var containerPos = map.layerPointToContainerPoint(layerPos),
+              padding = L.point(this.options.autoPanPadding),
+              paddingTL = L.point(this.options.autoPanPaddingTopLeft || padding),
+              paddingBR = L.point(this.options.autoPanPaddingBottomRight || padding),
+              size = map.getSize(),
+              dx = 0,
+              dy = 0;
+          if (containerPos.x + containerWidth + paddingBR.x > size.x) {
+            dx = containerPos.x + containerWidth - size.x + paddingBR.x;
+          }
+          if (containerPos.x - dx - paddingTL.x < 0) {
+            dx = containerPos.x - paddingTL.x;
+          }
+          if (containerPos.y + containerHeight + paddingBR.y > size.y) {
+            dy = containerPos.y + containerHeight - size.y + paddingBR.y;
+          }
+          if (containerPos.y - dy - paddingTL.y < 0) {
+            dy = containerPos.y - paddingTL.y;
+          }
+          if (dx || dy) {
+            map.fire('autopanstart').panBy([dx, dy]);
+          }
+        },
+        _onCloseButtonClick: function (e) {
+          this._close();
+          L.DomEvent.stop(e);
+        },
+        _getAnchor: function () {
+          return L.point(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
+        }
+      });
+      L.popup = function (options, source) {
+        return new L.Popup(options, source);
+      };
+      L.Map.mergeOptions({ closePopupOnClick: true });
+      L.Map.include({
+        openPopup: function (popup, latlng, options) {
+          if (!(popup instanceof L.Popup)) {
+            popup = new L.Popup(options).setContent(popup);
+          }
+          if (latlng) {
+            popup.setLatLng(latlng);
+          }
+          if (this.hasLayer(popup)) {
+            return this;
+          }
+          if (this._popup && this._popup.options.autoClose) {
+            this.closePopup();
+          }
+          this._popup = popup;
+          return this.addLayer(popup);
+        },
+        closePopup: function (popup) {
+          if (!popup || popup === this._popup) {
+            popup = this._popup;
+            this._popup = null;
+          }
+          if (popup) {
+            this.removeLayer(popup);
+          }
+          return this;
+        }
+      });
+      L.Layer.include({
+        bindPopup: function (content, options) {
+          if (content instanceof L.Popup) {
+            L.setOptions(content, options);
+            this._popup = content;
+            content._source = this;
+          } else {
+            if (!this._popup || options) {
+              this._popup = new L.Popup(options, this);
+            }
+            this._popup.setContent(content);
+          }
+          if (!this._popupHandlersAdded) {
+            this.on({
+              click: this._openPopup,
+              remove: this.closePopup,
+              move: this._movePopup
+            });
+            this._popupHandlersAdded = true;
+          }
+          return this;
+        },
+        unbindPopup: function () {
+          if (this._popup) {
+            this.off({
+              click: this._openPopup,
+              remove: this.closePopup,
+              move: this._movePopup
+            });
+            this._popupHandlersAdded = false;
+            this._popup = null;
+          }
+          return this;
+        },
+        openPopup: function (layer, latlng) {
+          if (!(layer instanceof L.Layer)) {
+            latlng = layer;
+            layer = this;
+          }
+          if (layer instanceof L.FeatureGroup) {
+            for (var id in this._layers) {
+              layer = this._layers[id];
               break;
             }
           }
-        };
-        document.documentElement.addEventListener(this.POINTER_UP, internalCb, false);
-        document.documentElement.addEventListener(this.POINTER_CANCEL, internalCb, false);
-        this._pointerDocumentListener = true;
-      }
-      return this;
-    },
-    addPointerListenerMove: function(obj, type, handler, id) {
-      var pre = '_leaflet_',
-          touches = this._pointers;
-      function cb(e) {
-        if ((e.pointerType === e.MSPOINTER_TYPE_MOUSE || e.pointerType === 'mouse') && e.buttons === 0) {
-          return;
-        }
-        for (var i = 0; i < touches.length; i++) {
-          if (touches[i].pointerId === e.pointerId) {
-            touches[i] = e;
-            break;
+          if (!latlng) {
+            latlng = layer.getCenter ? layer.getCenter() : layer.getLatLng();
           }
-        }
-        e.touches = touches.slice();
-        e.changedTouches = [e];
-        handler(e);
-      }
-      obj[pre + 'touchmove' + id] = cb;
-      obj.addEventListener(this.POINTER_MOVE, cb, false);
-      return this;
-    },
-    addPointerListenerEnd: function(obj, type, handler, id) {
-      var pre = '_leaflet_',
-          touches = this._pointers;
-      var cb = function(e) {
-        for (var i = 0; i < touches.length; i++) {
-          if (touches[i].pointerId === e.pointerId) {
-            touches.splice(i, 1);
-            break;
+          if (this._popup && this._map) {
+            this._popup._source = layer;
+            this._popup.update();
+            this._map.openPopup(this._popup, latlng);
           }
+          return this;
+        },
+        closePopup: function () {
+          if (this._popup) {
+            this._popup._close();
+          }
+          return this;
+        },
+        togglePopup: function (target) {
+          if (this._popup) {
+            if (this._popup._map) {
+              this.closePopup();
+            } else {
+              this.openPopup(target);
+            }
+          }
+          return this;
+        },
+        isPopupOpen: function () {
+          return this._popup.isOpen();
+        },
+        setPopupContent: function (content) {
+          if (this._popup) {
+            this._popup.setContent(content);
+          }
+          return this;
+        },
+        getPopup: function () {
+          return this._popup;
+        },
+        _openPopup: function (e) {
+          var layer = e.layer || e.target;
+          if (!this._popup) {
+            return;
+          }
+          if (!this._map) {
+            return;
+          }
+          L.DomEvent.stop(e);
+          if (layer instanceof L.Path) {
+            this.openPopup(e.layer || e.target, e.latlng);
+            return;
+          }
+          if (this._map.hasLayer(this._popup) && this._popup._source === layer) {
+            this.closePopup();
+          } else {
+            this.openPopup(layer, e.latlng);
+          }
+        },
+        _movePopup: function (e) {
+          this._popup.setLatLng(e.latlng);
         }
-        e.touches = touches.slice();
-        e.changedTouches = [e];
-        handler(e);
+      });
+      L.Marker.include({ _getPopupAnchor: function () {
+          return this.options.icon.options.popupAnchor || [0, 0];
+        } });
+      L.Tooltip = L.DivOverlay.extend({
+        options: {
+          pane: 'tooltipPane',
+          offset: [0, 0],
+          direction: 'auto',
+          permanent: false,
+          sticky: false,
+          interactive: false,
+          opacity: 0.9
+        },
+        onAdd: function (map) {
+          L.DivOverlay.prototype.onAdd.call(this, map);
+          this.setOpacity(this.options.opacity);
+          map.fire('tooltipopen', { tooltip: this });
+          if (this._source) {
+            this._source.fire('tooltipopen', { tooltip: this }, true);
+          }
+        },
+        onRemove: function (map) {
+          L.DivOverlay.prototype.onRemove.call(this, map);
+          map.fire('tooltipclose', { tooltip: this });
+          if (this._source) {
+            this._source.fire('tooltipclose', { tooltip: this }, true);
+          }
+        },
+        getEvents: function () {
+          var events = L.DivOverlay.prototype.getEvents.call(this);
+          if (L.Browser.touch && !this.options.permanent) {
+            events.preclick = this._close;
+          }
+          return events;
+        },
+        _close: function () {
+          if (this._map) {
+            this._map.closeTooltip(this);
+          }
+        },
+        _initLayout: function () {
+          var prefix = 'leaflet-tooltip',
+              className = prefix + ' ' + (this.options.className || '') + ' leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+          this._contentNode = this._container = L.DomUtil.create('div', className);
+        },
+        _updateLayout: function () {},
+        _adjustPan: function () {},
+        _setPosition: function (pos) {
+          var map = this._map,
+              container = this._container,
+              centerPoint = map.latLngToContainerPoint(map.getCenter()),
+              tooltipPoint = map.layerPointToContainerPoint(pos),
+              direction = this.options.direction,
+              tooltipWidth = container.offsetWidth,
+              tooltipHeight = container.offsetHeight,
+              offset = L.point(this.options.offset),
+              anchor = this._getAnchor();
+          if (direction === 'top') {
+            pos = pos.add(L.point(-tooltipWidth / 2 + offset.x, -tooltipHeight + offset.y + anchor.y));
+          } else if (direction === 'bottom') {
+            pos = pos.subtract(L.point(tooltipWidth / 2 - offset.x, -offset.y));
+          } else if (direction === 'center') {
+            pos = pos.subtract(L.point(tooltipWidth / 2 + offset.x, tooltipHeight / 2 - anchor.y + offset.y));
+          } else if (direction === 'right' || direction === 'auto' && tooltipPoint.x < centerPoint.x) {
+            direction = 'right';
+            pos = pos.add([offset.x + anchor.x, anchor.y - tooltipHeight / 2 + offset.y]);
+          } else {
+            direction = 'left';
+            pos = pos.subtract(L.point(tooltipWidth + anchor.x - offset.x, tooltipHeight / 2 - anchor.y - offset.y));
+          }
+          L.DomUtil.removeClass(container, 'leaflet-tooltip-right');
+          L.DomUtil.removeClass(container, 'leaflet-tooltip-left');
+          L.DomUtil.removeClass(container, 'leaflet-tooltip-top');
+          L.DomUtil.removeClass(container, 'leaflet-tooltip-bottom');
+          L.DomUtil.addClass(container, 'leaflet-tooltip-' + direction);
+          L.DomUtil.setPosition(container, pos);
+        },
+        _updatePosition: function () {
+          var pos = this._map.latLngToLayerPoint(this._latlng);
+          this._setPosition(pos);
+        },
+        setOpacity: function (opacity) {
+          this.options.opacity = opacity;
+          if (this._container) {
+            L.DomUtil.setOpacity(this._container, opacity);
+          }
+        },
+        _animateZoom: function (e) {
+          var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center);
+          this._setPosition(pos);
+        },
+        _getAnchor: function () {
+          return L.point(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
+        }
+      });
+      L.tooltip = function (options, source) {
+        return new L.Tooltip(options, source);
       };
-      obj[pre + 'touchend' + id] = cb;
-      obj.addEventListener(this.POINTER_UP, cb, false);
-      obj.addEventListener(this.POINTER_CANCEL, cb, false);
-      return this;
-    },
-    removePointerListener: function(obj, type, id) {
-      var pre = '_leaflet_',
-          cb = obj[pre + type + id];
-      switch (type) {
-        case 'touchstart':
-          obj.removeEventListener(this.POINTER_DOWN, cb, false);
-          break;
-        case 'touchmove':
-          obj.removeEventListener(this.POINTER_MOVE, cb, false);
-          break;
-        case 'touchend':
-          obj.removeEventListener(this.POINTER_UP, cb, false);
-          obj.removeEventListener(this.POINTER_CANCEL, cb, false);
-          break;
-      }
-      return this;
-    }
-  });
-  L.Map.mergeOptions({
-    touchZoom: L.Browser.touch && !L.Browser.android23,
-    bounceAtZoomLimits: true
-  });
-  L.Map.TouchZoom = L.Handler.extend({
-    addHooks: function() {
-      L.DomEvent.on(this._map._container, 'touchstart', this._onTouchStart, this);
-    },
-    removeHooks: function() {
-      L.DomEvent.off(this._map._container, 'touchstart', this._onTouchStart, this);
-    },
-    _onTouchStart: function(e) {
-      var map = this._map;
-      if (!e.touches || e.touches.length !== 2 || map._animatingZoom || this._zooming) {
-        return;
-      }
-      var p1 = map.mouseEventToLayerPoint(e.touches[0]),
-          p2 = map.mouseEventToLayerPoint(e.touches[1]),
-          viewCenter = map._getCenterLayerPoint();
-      this._startCenter = p1.add(p2)._divideBy(2);
-      this._startDist = p1.distanceTo(p2);
-      this._moved = false;
-      this._zooming = true;
-      this._centerOffset = viewCenter.subtract(this._startCenter);
-      if (map._panAnim) {
-        map._panAnim.stop();
-      }
-      L.DomEvent.on(document, 'touchmove', this._onTouchMove, this).on(document, 'touchend', this._onTouchEnd, this);
-      L.DomEvent.preventDefault(e);
-    },
-    _onTouchMove: function(e) {
-      var map = this._map;
-      if (!e.touches || e.touches.length !== 2 || !this._zooming) {
-        return;
-      }
-      var p1 = map.mouseEventToLayerPoint(e.touches[0]),
-          p2 = map.mouseEventToLayerPoint(e.touches[1]);
-      this._scale = p1.distanceTo(p2) / this._startDist;
-      this._delta = p1._add(p2)._divideBy(2)._subtract(this._startCenter);
-      if (this._scale === 1) {
-        return;
-      }
-      if (!map.options.bounceAtZoomLimits) {
-        if ((map.getZoom() === map.getMinZoom() && this._scale < 1) || (map.getZoom() === map.getMaxZoom() && this._scale > 1)) {
-          return;
-        }
-      }
-      if (!this._moved) {
-        L.DomUtil.addClass(map._mapPane, 'leaflet-touching');
-        map.fire('movestart').fire('zoomstart');
-        this._moved = true;
-      }
-      L.Util.cancelAnimFrame(this._animRequest);
-      this._animRequest = L.Util.requestAnimFrame(this._updateOnMove, this, true, this._map._container);
-      L.DomEvent.preventDefault(e);
-    },
-    _updateOnMove: function() {
-      var map = this._map,
-          origin = this._getScaleOrigin(),
-          center = map.layerPointToLatLng(origin),
-          zoom = map.getScaleZoom(this._scale);
-      map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, false, true);
-    },
-    _onTouchEnd: function() {
-      if (!this._moved || !this._zooming) {
-        this._zooming = false;
-        return;
-      }
-      var map = this._map;
-      this._zooming = false;
-      L.DomUtil.removeClass(map._mapPane, 'leaflet-touching');
-      L.Util.cancelAnimFrame(this._animRequest);
-      L.DomEvent.off(document, 'touchmove', this._onTouchMove).off(document, 'touchend', this._onTouchEnd);
-      var origin = this._getScaleOrigin(),
-          center = map.layerPointToLatLng(origin),
-          oldZoom = map.getZoom(),
-          floatZoomDelta = map.getScaleZoom(this._scale) - oldZoom,
-          roundZoomDelta = (floatZoomDelta > 0 ? Math.ceil(floatZoomDelta) : Math.floor(floatZoomDelta)),
-          zoom = map._limitZoom(oldZoom + roundZoomDelta),
-          scale = map.getZoomScale(zoom) / this._scale;
-      map._animateZoom(center, zoom, origin, scale);
-    },
-    _getScaleOrigin: function() {
-      var centerOffset = this._centerOffset.subtract(this._delta).divideBy(this._scale);
-      return this._startCenter.add(centerOffset);
-    }
-  });
-  L.Map.addInitHook('addHandler', 'touchZoom', L.Map.TouchZoom);
-  L.Map.mergeOptions({
-    tap: true,
-    tapTolerance: 15
-  });
-  L.Map.Tap = L.Handler.extend({
-    addHooks: function() {
-      L.DomEvent.on(this._map._container, 'touchstart', this._onDown, this);
-    },
-    removeHooks: function() {
-      L.DomEvent.off(this._map._container, 'touchstart', this._onDown, this);
-    },
-    _onDown: function(e) {
-      if (!e.touches) {
-        return;
-      }
-      L.DomEvent.preventDefault(e);
-      this._fireClick = true;
-      if (e.touches.length > 1) {
-        this._fireClick = false;
-        clearTimeout(this._holdTimeout);
-        return;
-      }
-      var first = e.touches[0],
-          el = first.target;
-      this._startPos = this._newPos = new L.Point(first.clientX, first.clientY);
-      if (el.tagName && el.tagName.toLowerCase() === 'a') {
-        L.DomUtil.addClass(el, 'leaflet-active');
-      }
-      this._holdTimeout = setTimeout(L.bind(function() {
-        if (this._isTapValid()) {
-          this._fireClick = false;
-          this._onUp();
-          this._simulateEvent('contextmenu', first);
-        }
-      }, this), 1000);
-      L.DomEvent.on(document, 'touchmove', this._onMove, this).on(document, 'touchend', this._onUp, this);
-    },
-    _onUp: function(e) {
-      clearTimeout(this._holdTimeout);
-      L.DomEvent.off(document, 'touchmove', this._onMove, this).off(document, 'touchend', this._onUp, this);
-      if (this._fireClick && e && e.changedTouches) {
-        var first = e.changedTouches[0],
-            el = first.target;
-        if (el && el.tagName && el.tagName.toLowerCase() === 'a') {
-          L.DomUtil.removeClass(el, 'leaflet-active');
-        }
-        if (this._isTapValid()) {
-          this._simulateEvent('click', first);
-        }
-      }
-    },
-    _isTapValid: function() {
-      return this._newPos.distanceTo(this._startPos) <= this._map.options.tapTolerance;
-    },
-    _onMove: function(e) {
-      var first = e.touches[0];
-      this._newPos = new L.Point(first.clientX, first.clientY);
-    },
-    _simulateEvent: function(type, e) {
-      var simulatedEvent = document.createEvent('MouseEvents');
-      simulatedEvent._simulated = true;
-      e.target._simulatedClick = true;
-      simulatedEvent.initMouseEvent(type, true, true, window, 1, e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 0, null);
-      e.target.dispatchEvent(simulatedEvent);
-    }
-  });
-  if (L.Browser.touch && !L.Browser.pointer) {
-    L.Map.addInitHook('addHandler', 'tap', L.Map.Tap);
-  }
-  L.Map.mergeOptions({boxZoom: true});
-  L.Map.BoxZoom = L.Handler.extend({
-    initialize: function(map) {
-      this._map = map;
-      this._container = map._container;
-      this._pane = map._panes.overlayPane;
-      this._moved = false;
-    },
-    addHooks: function() {
-      L.DomEvent.on(this._container, 'mousedown', this._onMouseDown, this);
-    },
-    removeHooks: function() {
-      L.DomEvent.off(this._container, 'mousedown', this._onMouseDown);
-      this._moved = false;
-    },
-    moved: function() {
-      return this._moved;
-    },
-    _onMouseDown: function(e) {
-      this._moved = false;
-      if (!e.shiftKey || ((e.which !== 1) && (e.button !== 1))) {
-        return false;
-      }
-      L.DomUtil.disableTextSelection();
-      L.DomUtil.disableImageDrag();
-      this._startLayerPoint = this._map.mouseEventToLayerPoint(e);
-      L.DomEvent.on(document, 'mousemove', this._onMouseMove, this).on(document, 'mouseup', this._onMouseUp, this).on(document, 'keydown', this._onKeyDown, this);
-    },
-    _onMouseMove: function(e) {
-      if (!this._moved) {
-        this._box = L.DomUtil.create('div', 'leaflet-zoom-box', this._pane);
-        L.DomUtil.setPosition(this._box, this._startLayerPoint);
-        this._container.style.cursor = 'crosshair';
-        this._map.fire('boxzoomstart');
-      }
-      var startPoint = this._startLayerPoint,
-          box = this._box,
-          layerPoint = this._map.mouseEventToLayerPoint(e),
-          offset = layerPoint.subtract(startPoint),
-          newPos = new L.Point(Math.min(layerPoint.x, startPoint.x), Math.min(layerPoint.y, startPoint.y));
-      L.DomUtil.setPosition(box, newPos);
-      this._moved = true;
-      box.style.width = (Math.max(0, Math.abs(offset.x) - 4)) + 'px';
-      box.style.height = (Math.max(0, Math.abs(offset.y) - 4)) + 'px';
-    },
-    _finish: function() {
-      if (this._moved) {
-        this._pane.removeChild(this._box);
-        this._container.style.cursor = '';
-      }
-      L.DomUtil.enableTextSelection();
-      L.DomUtil.enableImageDrag();
-      L.DomEvent.off(document, 'mousemove', this._onMouseMove).off(document, 'mouseup', this._onMouseUp).off(document, 'keydown', this._onKeyDown);
-    },
-    _onMouseUp: function(e) {
-      this._finish();
-      var map = this._map,
-          layerPoint = map.mouseEventToLayerPoint(e);
-      if (this._startLayerPoint.equals(layerPoint)) {
-        return;
-      }
-      var bounds = new L.LatLngBounds(map.layerPointToLatLng(this._startLayerPoint), map.layerPointToLatLng(layerPoint));
-      map.fitBounds(bounds);
-      map.fire('boxzoomend', {boxZoomBounds: bounds});
-    },
-    _onKeyDown: function(e) {
-      if (e.keyCode === 27) {
-        this._finish();
-      }
-    }
-  });
-  L.Map.addInitHook('addHandler', 'boxZoom', L.Map.BoxZoom);
-  L.Map.mergeOptions({
-    keyboard: true,
-    keyboardPanOffset: 80,
-    keyboardZoomOffset: 1
-  });
-  L.Map.Keyboard = L.Handler.extend({
-    keyCodes: {
-      left: [37],
-      right: [39],
-      down: [40],
-      up: [38],
-      zoomIn: [187, 107, 61, 171],
-      zoomOut: [189, 109, 173]
-    },
-    initialize: function(map) {
-      this._map = map;
-      this._setPanOffset(map.options.keyboardPanOffset);
-      this._setZoomOffset(map.options.keyboardZoomOffset);
-    },
-    addHooks: function() {
-      var container = this._map._container;
-      if (container.tabIndex === -1) {
-        container.tabIndex = '0';
-      }
-      L.DomEvent.on(container, 'focus', this._onFocus, this).on(container, 'blur', this._onBlur, this).on(container, 'mousedown', this._onMouseDown, this);
-      this._map.on('focus', this._addHooks, this).on('blur', this._removeHooks, this);
-    },
-    removeHooks: function() {
-      this._removeHooks();
-      var container = this._map._container;
-      L.DomEvent.off(container, 'focus', this._onFocus, this).off(container, 'blur', this._onBlur, this).off(container, 'mousedown', this._onMouseDown, this);
-      this._map.off('focus', this._addHooks, this).off('blur', this._removeHooks, this);
-    },
-    _onMouseDown: function() {
-      if (this._focused) {
-        return;
-      }
-      var body = document.body,
-          docEl = document.documentElement,
-          top = body.scrollTop || docEl.scrollTop,
-          left = body.scrollLeft || docEl.scrollLeft;
-      this._map._container.focus();
-      window.scrollTo(left, top);
-    },
-    _onFocus: function() {
-      this._focused = true;
-      this._map.fire('focus');
-    },
-    _onBlur: function() {
-      this._focused = false;
-      this._map.fire('blur');
-    },
-    _setPanOffset: function(pan) {
-      var keys = this._panKeys = {},
-          codes = this.keyCodes,
-          i,
-          len;
-      for (i = 0, len = codes.left.length; i < len; i++) {
-        keys[codes.left[i]] = [-1 * pan, 0];
-      }
-      for (i = 0, len = codes.right.length; i < len; i++) {
-        keys[codes.right[i]] = [pan, 0];
-      }
-      for (i = 0, len = codes.down.length; i < len; i++) {
-        keys[codes.down[i]] = [0, pan];
-      }
-      for (i = 0, len = codes.up.length; i < len; i++) {
-        keys[codes.up[i]] = [0, -1 * pan];
-      }
-    },
-    _setZoomOffset: function(zoom) {
-      var keys = this._zoomKeys = {},
-          codes = this.keyCodes,
-          i,
-          len;
-      for (i = 0, len = codes.zoomIn.length; i < len; i++) {
-        keys[codes.zoomIn[i]] = zoom;
-      }
-      for (i = 0, len = codes.zoomOut.length; i < len; i++) {
-        keys[codes.zoomOut[i]] = -zoom;
-      }
-    },
-    _addHooks: function() {
-      L.DomEvent.on(document, 'keydown', this._onKeyDown, this);
-    },
-    _removeHooks: function() {
-      L.DomEvent.off(document, 'keydown', this._onKeyDown, this);
-    },
-    _onKeyDown: function(e) {
-      var key = e.keyCode,
-          map = this._map;
-      if (key in this._panKeys) {
-        if (map._panAnim && map._panAnim._inProgress) {
-          return;
-        }
-        map.panBy(this._panKeys[key]);
-        if (map.options.maxBounds) {
-          map.panInsideBounds(map.options.maxBounds);
-        }
-      } else if (key in this._zoomKeys) {
-        map.setZoom(map.getZoom() + this._zoomKeys[key]);
-      } else {
-        return;
-      }
-      L.DomEvent.stop(e);
-    }
-  });
-  L.Map.addInitHook('addHandler', 'keyboard', L.Map.Keyboard);
-  L.Handler.MarkerDrag = L.Handler.extend({
-    initialize: function(marker) {
-      this._marker = marker;
-    },
-    addHooks: function() {
-      var icon = this._marker._icon;
-      if (!this._draggable) {
-        this._draggable = new L.Draggable(icon, icon);
-      }
-      this._draggable.on('dragstart', this._onDragStart, this).on('drag', this._onDrag, this).on('dragend', this._onDragEnd, this);
-      this._draggable.enable();
-      L.DomUtil.addClass(this._marker._icon, 'leaflet-marker-draggable');
-    },
-    removeHooks: function() {
-      this._draggable.off('dragstart', this._onDragStart, this).off('drag', this._onDrag, this).off('dragend', this._onDragEnd, this);
-      this._draggable.disable();
-      L.DomUtil.removeClass(this._marker._icon, 'leaflet-marker-draggable');
-    },
-    moved: function() {
-      return this._draggable && this._draggable._moved;
-    },
-    _onDragStart: function() {
-      this._marker.closePopup().fire('movestart').fire('dragstart');
-    },
-    _onDrag: function() {
-      var marker = this._marker,
-          shadow = marker._shadow,
-          iconPos = L.DomUtil.getPosition(marker._icon),
-          latlng = marker._map.layerPointToLatLng(iconPos);
-      if (shadow) {
-        L.DomUtil.setPosition(shadow, iconPos);
-      }
-      marker._latlng = latlng;
-      marker.fire('move', {latlng: latlng}).fire('drag');
-    },
-    _onDragEnd: function(e) {
-      this._marker.fire('moveend').fire('dragend', e);
-    }
-  });
-  L.Control = L.Class.extend({
-    options: {position: 'topright'},
-    initialize: function(options) {
-      L.setOptions(this, options);
-    },
-    getPosition: function() {
-      return this.options.position;
-    },
-    setPosition: function(position) {
-      var map = this._map;
-      if (map) {
-        map.removeControl(this);
-      }
-      this.options.position = position;
-      if (map) {
-        map.addControl(this);
-      }
-      return this;
-    },
-    getContainer: function() {
-      return this._container;
-    },
-    addTo: function(map) {
-      this._map = map;
-      var container = this._container = this.onAdd(map),
-          pos = this.getPosition(),
-          corner = map._controlCorners[pos];
-      L.DomUtil.addClass(container, 'leaflet-control');
-      if (pos.indexOf('bottom') !== -1) {
-        corner.insertBefore(container, corner.firstChild);
-      } else {
-        corner.appendChild(container);
-      }
-      return this;
-    },
-    removeFrom: function(map) {
-      var pos = this.getPosition(),
-          corner = map._controlCorners[pos];
-      corner.removeChild(this._container);
-      this._map = null;
-      if (this.onRemove) {
-        this.onRemove(map);
-      }
-      return this;
-    },
-    _refocusOnMap: function() {
-      if (this._map) {
-        this._map.getContainer().focus();
-      }
-    }
-  });
-  L.control = function(options) {
-    return new L.Control(options);
-  };
-  L.Map.include({
-    addControl: function(control) {
-      control.addTo(this);
-      return this;
-    },
-    removeControl: function(control) {
-      control.removeFrom(this);
-      return this;
-    },
-    _initControlPos: function() {
-      var corners = this._controlCorners = {},
-          l = 'leaflet-',
-          container = this._controlContainer = L.DomUtil.create('div', l + 'control-container', this._container);
-      function createCorner(vSide, hSide) {
-        var className = l + vSide + ' ' + l + hSide;
-        corners[vSide + hSide] = L.DomUtil.create('div', className, container);
-      }
-      createCorner('top', 'left');
-      createCorner('top', 'right');
-      createCorner('bottom', 'left');
-      createCorner('bottom', 'right');
-    },
-    _clearControlPos: function() {
-      this._container.removeChild(this._controlContainer);
-    }
-  });
-  L.Control.Zoom = L.Control.extend({
-    options: {
-      position: 'topleft',
-      zoomInText: '+',
-      zoomInTitle: 'Zoom in',
-      zoomOutText: '-',
-      zoomOutTitle: 'Zoom out'
-    },
-    onAdd: function(map) {
-      var zoomName = 'leaflet-control-zoom',
-          container = L.DomUtil.create('div', zoomName + ' leaflet-bar');
-      this._map = map;
-      this._zoomInButton = this._createButton(this.options.zoomInText, this.options.zoomInTitle, zoomName + '-in', container, this._zoomIn, this);
-      this._zoomOutButton = this._createButton(this.options.zoomOutText, this.options.zoomOutTitle, zoomName + '-out', container, this._zoomOut, this);
-      this._updateDisabled();
-      map.on('zoomend zoomlevelschange', this._updateDisabled, this);
-      return container;
-    },
-    onRemove: function(map) {
-      map.off('zoomend zoomlevelschange', this._updateDisabled, this);
-    },
-    _zoomIn: function(e) {
-      this._map.zoomIn(e.shiftKey ? 3 : 1);
-    },
-    _zoomOut: function(e) {
-      this._map.zoomOut(e.shiftKey ? 3 : 1);
-    },
-    _createButton: function(html, title, className, container, fn, context) {
-      var link = L.DomUtil.create('a', className, container);
-      link.innerHTML = html;
-      link.href = '#';
-      link.title = title;
-      var stop = L.DomEvent.stopPropagation;
-      L.DomEvent.on(link, 'click', stop).on(link, 'mousedown', stop).on(link, 'dblclick', stop).on(link, 'click', L.DomEvent.preventDefault).on(link, 'click', fn, context).on(link, 'click', this._refocusOnMap, context);
-      return link;
-    },
-    _updateDisabled: function() {
-      var map = this._map,
-          className = 'leaflet-disabled';
-      L.DomUtil.removeClass(this._zoomInButton, className);
-      L.DomUtil.removeClass(this._zoomOutButton, className);
-      if (map._zoom === map.getMinZoom()) {
-        L.DomUtil.addClass(this._zoomOutButton, className);
-      }
-      if (map._zoom === map.getMaxZoom()) {
-        L.DomUtil.addClass(this._zoomInButton, className);
-      }
-    }
-  });
-  L.Map.mergeOptions({zoomControl: true});
-  L.Map.addInitHook(function() {
-    if (this.options.zoomControl) {
-      this.zoomControl = new L.Control.Zoom();
-      this.addControl(this.zoomControl);
-    }
-  });
-  L.control.zoom = function(options) {
-    return new L.Control.Zoom(options);
-  };
-  L.Control.Attribution = L.Control.extend({
-    options: {
-      position: 'bottomright',
-      prefix: '<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a>'
-    },
-    initialize: function(options) {
-      L.setOptions(this, options);
-      this._attributions = {};
-    },
-    onAdd: function(map) {
-      this._container = L.DomUtil.create('div', 'leaflet-control-attribution');
-      L.DomEvent.disableClickPropagation(this._container);
-      for (var i in map._layers) {
-        if (map._layers[i].getAttribution) {
-          this.addAttribution(map._layers[i].getAttribution());
-        }
-      }
-      map.on('layeradd', this._onLayerAdd, this).on('layerremove', this._onLayerRemove, this);
-      this._update();
-      return this._container;
-    },
-    onRemove: function(map) {
-      map.off('layeradd', this._onLayerAdd).off('layerremove', this._onLayerRemove);
-    },
-    setPrefix: function(prefix) {
-      this.options.prefix = prefix;
-      this._update();
-      return this;
-    },
-    addAttribution: function(text) {
-      if (!text) {
-        return;
-      }
-      if (!this._attributions[text]) {
-        this._attributions[text] = 0;
-      }
-      this._attributions[text]++;
-      this._update();
-      return this;
-    },
-    removeAttribution: function(text) {
-      if (!text) {
-        return;
-      }
-      if (this._attributions[text]) {
-        this._attributions[text]--;
-        this._update();
-      }
-      return this;
-    },
-    _update: function() {
-      if (!this._map) {
-        return;
-      }
-      var attribs = [];
-      for (var i in this._attributions) {
-        if (this._attributions[i]) {
-          attribs.push(i);
-        }
-      }
-      var prefixAndAttribs = [];
-      if (this.options.prefix) {
-        prefixAndAttribs.push(this.options.prefix);
-      }
-      if (attribs.length) {
-        prefixAndAttribs.push(attribs.join(', '));
-      }
-      this._container.innerHTML = prefixAndAttribs.join(' | ');
-    },
-    _onLayerAdd: function(e) {
-      if (e.layer.getAttribution) {
-        this.addAttribution(e.layer.getAttribution());
-      }
-    },
-    _onLayerRemove: function(e) {
-      if (e.layer.getAttribution) {
-        this.removeAttribution(e.layer.getAttribution());
-      }
-    }
-  });
-  L.Map.mergeOptions({attributionControl: true});
-  L.Map.addInitHook(function() {
-    if (this.options.attributionControl) {
-      this.attributionControl = (new L.Control.Attribution()).addTo(this);
-    }
-  });
-  L.control.attribution = function(options) {
-    return new L.Control.Attribution(options);
-  };
-  L.Control.Scale = L.Control.extend({
-    options: {
-      position: 'bottomleft',
-      maxWidth: 100,
-      metric: true,
-      imperial: true,
-      updateWhenIdle: false
-    },
-    onAdd: function(map) {
-      this._map = map;
-      var className = 'leaflet-control-scale',
-          container = L.DomUtil.create('div', className),
-          options = this.options;
-      this._addScales(options, className, container);
-      map.on(options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
-      map.whenReady(this._update, this);
-      return container;
-    },
-    onRemove: function(map) {
-      map.off(this.options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
-    },
-    _addScales: function(options, className, container) {
-      if (options.metric) {
-        this._mScale = L.DomUtil.create('div', className + '-line', container);
-      }
-      if (options.imperial) {
-        this._iScale = L.DomUtil.create('div', className + '-line', container);
-      }
-    },
-    _update: function() {
-      var bounds = this._map.getBounds(),
-          centerLat = bounds.getCenter().lat,
-          halfWorldMeters = 6378137 * Math.PI * Math.cos(centerLat * Math.PI / 180),
-          dist = halfWorldMeters * (bounds.getNorthEast().lng - bounds.getSouthWest().lng) / 180,
-          size = this._map.getSize(),
-          options = this.options,
-          maxMeters = 0;
-      if (size.x > 0) {
-        maxMeters = dist * (options.maxWidth / size.x);
-      }
-      this._updateScales(options, maxMeters);
-    },
-    _updateScales: function(options, maxMeters) {
-      if (options.metric && maxMeters) {
-        this._updateMetric(maxMeters);
-      }
-      if (options.imperial && maxMeters) {
-        this._updateImperial(maxMeters);
-      }
-    },
-    _updateMetric: function(maxMeters) {
-      var meters = this._getRoundNum(maxMeters);
-      this._mScale.style.width = this._getScaleWidth(meters / maxMeters) + 'px';
-      this._mScale.innerHTML = meters < 1000 ? meters + ' m' : (meters / 1000) + ' km';
-    },
-    _updateImperial: function(maxMeters) {
-      var maxFeet = maxMeters * 3.2808399,
-          scale = this._iScale,
-          maxMiles,
-          miles,
-          feet;
-      if (maxFeet > 5280) {
-        maxMiles = maxFeet / 5280;
-        miles = this._getRoundNum(maxMiles);
-        scale.style.width = this._getScaleWidth(miles / maxMiles) + 'px';
-        scale.innerHTML = miles + ' mi';
-      } else {
-        feet = this._getRoundNum(maxFeet);
-        scale.style.width = this._getScaleWidth(feet / maxFeet) + 'px';
-        scale.innerHTML = feet + ' ft';
-      }
-    },
-    _getScaleWidth: function(ratio) {
-      return Math.round(this.options.maxWidth * ratio) - 10;
-    },
-    _getRoundNum: function(num) {
-      var pow10 = Math.pow(10, (Math.floor(num) + '').length - 1),
-          d = num / pow10;
-      d = d >= 10 ? 10 : d >= 5 ? 5 : d >= 3 ? 3 : d >= 2 ? 2 : 1;
-      return pow10 * d;
-    }
-  });
-  L.control.scale = function(options) {
-    return new L.Control.Scale(options);
-  };
-  L.Control.Layers = L.Control.extend({
-    options: {
-      collapsed: true,
-      position: 'topright',
-      autoZIndex: true
-    },
-    initialize: function(baseLayers, overlays, options) {
-      L.setOptions(this, options);
-      this._layers = {};
-      this._lastZIndex = 0;
-      this._handlingClick = false;
-      for (var i in baseLayers) {
-        this._addLayer(baseLayers[i], i);
-      }
-      for (i in overlays) {
-        this._addLayer(overlays[i], i, true);
-      }
-    },
-    onAdd: function(map) {
-      this._initLayout();
-      this._update();
-      map.on('layeradd', this._onLayerChange, this).on('layerremove', this._onLayerChange, this);
-      return this._container;
-    },
-    onRemove: function(map) {
-      map.off('layeradd', this._onLayerChange, this).off('layerremove', this._onLayerChange, this);
-    },
-    addBaseLayer: function(layer, name) {
-      this._addLayer(layer, name);
-      this._update();
-      return this;
-    },
-    addOverlay: function(layer, name) {
-      this._addLayer(layer, name, true);
-      this._update();
-      return this;
-    },
-    removeLayer: function(layer) {
-      var id = L.stamp(layer);
-      delete this._layers[id];
-      this._update();
-      return this;
-    },
-    _initLayout: function() {
-      var className = 'leaflet-control-layers',
-          container = this._container = L.DomUtil.create('div', className);
-      container.setAttribute('aria-haspopup', true);
-      if (!L.Browser.touch) {
-        L.DomEvent.disableClickPropagation(container).disableScrollPropagation(container);
-      } else {
-        L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);
-      }
-      var form = this._form = L.DomUtil.create('form', className + '-list');
-      if (this.options.collapsed) {
-        if (!L.Browser.android) {
-          L.DomEvent.on(container, 'mouseover', this._expand, this).on(container, 'mouseout', this._collapse, this);
-        }
-        var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-        link.href = '#';
-        link.title = 'Layers';
-        if (L.Browser.touch) {
-          L.DomEvent.on(link, 'click', L.DomEvent.stop).on(link, 'click', this._expand, this);
-        } else {
-          L.DomEvent.on(link, 'focus', this._expand, this);
-        }
-        L.DomEvent.on(form, 'click', function() {
-          setTimeout(L.bind(this._onInputClick, this), 0);
-        }, this);
-        this._map.on('click', this._collapse, this);
-      } else {
-        this._expand();
-      }
-      this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
-      this._separator = L.DomUtil.create('div', className + '-separator', form);
-      this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
-      container.appendChild(form);
-    },
-    _addLayer: function(layer, name, overlay) {
-      var id = L.stamp(layer);
-      this._layers[id] = {
-        layer: layer,
-        name: name,
-        overlay: overlay
-      };
-      if (this.options.autoZIndex && layer.setZIndex) {
-        this._lastZIndex++;
-        layer.setZIndex(this._lastZIndex);
-      }
-    },
-    _update: function() {
-      if (!this._container) {
-        return;
-      }
-      this._baseLayersList.innerHTML = '';
-      this._overlaysList.innerHTML = '';
-      var baseLayersPresent = false,
-          overlaysPresent = false,
-          i,
-          obj;
-      for (i in this._layers) {
-        obj = this._layers[i];
-        this._addItem(obj);
-        overlaysPresent = overlaysPresent || obj.overlay;
-        baseLayersPresent = baseLayersPresent || !obj.overlay;
-      }
-      this._separator.style.display = overlaysPresent && baseLayersPresent ? '' : 'none';
-    },
-    _onLayerChange: function(e) {
-      var obj = this._layers[L.stamp(e.layer)];
-      if (!obj) {
-        return;
-      }
-      if (!this._handlingClick) {
-        this._update();
-      }
-      var type = obj.overlay ? (e.type === 'layeradd' ? 'overlayadd' : 'overlayremove') : (e.type === 'layeradd' ? 'baselayerchange' : null);
-      if (type) {
-        this._map.fire(type, obj);
-      }
-    },
-    _createRadioElement: function(name, checked) {
-      var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' + name + '"';
-      if (checked) {
-        radioHtml += ' checked="checked"';
-      }
-      radioHtml += '/>';
-      var radioFragment = document.createElement('div');
-      radioFragment.innerHTML = radioHtml;
-      return radioFragment.firstChild;
-    },
-    _addItem: function(obj) {
-      var label = document.createElement('label'),
-          input,
-          checked = this._map.hasLayer(obj.layer);
-      if (obj.overlay) {
-        input = document.createElement('input');
-        input.type = 'checkbox';
-        input.className = 'leaflet-control-layers-selector';
-        input.defaultChecked = checked;
-      } else {
-        input = this._createRadioElement('leaflet-base-layers', checked);
-      }
-      input.layerId = L.stamp(obj.layer);
-      L.DomEvent.on(input, 'click', this._onInputClick, this);
-      var name = document.createElement('span');
-      name.innerHTML = ' ' + obj.name;
-      label.appendChild(input);
-      label.appendChild(name);
-      var container = obj.overlay ? this._overlaysList : this._baseLayersList;
-      container.appendChild(label);
-      return label;
-    },
-    _onInputClick: function() {
-      var i,
-          input,
-          obj,
-          inputs = this._form.getElementsByTagName('input'),
-          inputsLen = inputs.length;
-      this._handlingClick = true;
-      for (i = 0; i < inputsLen; i++) {
-        input = inputs[i];
-        obj = this._layers[input.layerId];
-        if (input.checked && !this._map.hasLayer(obj.layer)) {
-          this._map.addLayer(obj.layer);
-        } else if (!input.checked && this._map.hasLayer(obj.layer)) {
-          this._map.removeLayer(obj.layer);
-        }
-      }
-      this._handlingClick = false;
-      this._refocusOnMap();
-    },
-    _expand: function() {
-      L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
-    },
-    _collapse: function() {
-      this._container.className = this._container.className.replace(' leaflet-control-layers-expanded', '');
-    }
-  });
-  L.control.layers = function(baseLayers, overlays, options) {
-    return new L.Control.Layers(baseLayers, overlays, options);
-  };
-  L.PosAnimation = L.Class.extend({
-    includes: L.Mixin.Events,
-    run: function(el, newPos, duration, easeLinearity) {
-      this.stop();
-      this._el = el;
-      this._inProgress = true;
-      this._newPos = newPos;
-      this.fire('start');
-      el.style[L.DomUtil.TRANSITION] = 'all ' + (duration || 0.25) + 's cubic-bezier(0,0,' + (easeLinearity || 0.5) + ',1)';
-      L.DomEvent.on(el, L.DomUtil.TRANSITION_END, this._onTransitionEnd, this);
-      L.DomUtil.setPosition(el, newPos);
-      L.Util.falseFn(el.offsetWidth);
-      this._stepTimer = setInterval(L.bind(this._onStep, this), 50);
-    },
-    stop: function() {
-      if (!this._inProgress) {
-        return;
-      }
-      L.DomUtil.setPosition(this._el, this._getPos());
-      this._onTransitionEnd();
-      L.Util.falseFn(this._el.offsetWidth);
-    },
-    _onStep: function() {
-      var stepPos = this._getPos();
-      if (!stepPos) {
-        this._onTransitionEnd();
-        return;
-      }
-      this._el._leaflet_pos = stepPos;
-      this.fire('step');
-    },
-    _transformRe: /([-+]?(?:\d*\.)?\d+)\D*, ([-+]?(?:\d*\.)?\d+)\D*\)/,
-    _getPos: function() {
-      var left,
-          top,
-          matches,
-          el = this._el,
-          style = window.getComputedStyle(el);
-      if (L.Browser.any3d) {
-        matches = style[L.DomUtil.TRANSFORM].match(this._transformRe);
-        if (!matches) {
-          return;
-        }
-        left = parseFloat(matches[1]);
-        top = parseFloat(matches[2]);
-      } else {
-        left = parseFloat(style.left);
-        top = parseFloat(style.top);
-      }
-      return new L.Point(left, top, true);
-    },
-    _onTransitionEnd: function() {
-      L.DomEvent.off(this._el, L.DomUtil.TRANSITION_END, this._onTransitionEnd, this);
-      if (!this._inProgress) {
-        return;
-      }
-      this._inProgress = false;
-      this._el.style[L.DomUtil.TRANSITION] = '';
-      this._el._leaflet_pos = this._newPos;
-      clearInterval(this._stepTimer);
-      this.fire('step').fire('end');
-    }
-  });
-  L.Map.include({
-    setView: function(center, zoom, options) {
-      zoom = zoom === undefined ? this._zoom : this._limitZoom(zoom);
-      center = this._limitCenter(L.latLng(center), zoom, this.options.maxBounds);
-      options = options || {};
-      if (this._panAnim) {
-        this._panAnim.stop();
-      }
-      if (this._loaded && !options.reset && options !== true) {
-        if (options.animate !== undefined) {
-          options.zoom = L.extend({animate: options.animate}, options.zoom);
-          options.pan = L.extend({animate: options.animate}, options.pan);
-        }
-        var animated = (this._zoom !== zoom) ? this._tryAnimatedZoom && this._tryAnimatedZoom(center, zoom, options.zoom) : this._tryAnimatedPan(center, options.pan);
-        if (animated) {
-          clearTimeout(this._sizeTimer);
+      L.Map.include({
+        openTooltip: function (tooltip, latlng, options) {
+          if (!(tooltip instanceof L.Tooltip)) {
+            tooltip = new L.Tooltip(options).setContent(tooltip);
+          }
+          if (latlng) {
+            tooltip.setLatLng(latlng);
+          }
+          if (this.hasLayer(tooltip)) {
+            return this;
+          }
+          return this.addLayer(tooltip);
+        },
+        closeTooltip: function (tooltip) {
+          if (tooltip) {
+            this.removeLayer(tooltip);
+          }
           return this;
         }
-      }
-      this._resetView(center, zoom);
-      return this;
-    },
-    panBy: function(offset, options) {
-      offset = L.point(offset).round();
-      options = options || {};
-      if (!offset.x && !offset.y) {
-        return this;
-      }
-      if (!this._panAnim) {
-        this._panAnim = new L.PosAnimation();
-        this._panAnim.on({
-          'step': this._onPanTransitionStep,
-          'end': this._onPanTransitionEnd
-        }, this);
-      }
-      if (!options.noMoveStart) {
-        this.fire('movestart');
-      }
-      if (options.animate !== false) {
-        L.DomUtil.addClass(this._mapPane, 'leaflet-pan-anim');
-        var newPos = this._getMapPanePos().subtract(offset);
-        this._panAnim.run(this._mapPane, newPos, options.duration || 0.25, options.easeLinearity);
-      } else {
-        this._rawPanBy(offset);
-        this.fire('move').fire('moveend');
-      }
-      return this;
-    },
-    _onPanTransitionStep: function() {
-      this.fire('move');
-    },
-    _onPanTransitionEnd: function() {
-      L.DomUtil.removeClass(this._mapPane, 'leaflet-pan-anim');
-      this.fire('moveend');
-    },
-    _tryAnimatedPan: function(center, options) {
-      var offset = this._getCenterOffset(center)._floor();
-      if ((options && options.animate) !== true && !this.getSize().contains(offset)) {
-        return false;
-      }
-      this.panBy(offset, options);
-      return true;
-    }
-  });
-  L.PosAnimation = L.DomUtil.TRANSITION ? L.PosAnimation : L.PosAnimation.extend({
-    run: function(el, newPos, duration, easeLinearity) {
-      this.stop();
-      this._el = el;
-      this._inProgress = true;
-      this._duration = duration || 0.25;
-      this._easeOutPower = 1 / Math.max(easeLinearity || 0.5, 0.2);
-      this._startPos = L.DomUtil.getPosition(el);
-      this._offset = newPos.subtract(this._startPos);
-      this._startTime = +new Date();
-      this.fire('start');
-      this._animate();
-    },
-    stop: function() {
-      if (!this._inProgress) {
-        return;
-      }
-      this._step();
-      this._complete();
-    },
-    _animate: function() {
-      this._animId = L.Util.requestAnimFrame(this._animate, this);
-      this._step();
-    },
-    _step: function() {
-      var elapsed = (+new Date()) - this._startTime,
-          duration = this._duration * 1000;
-      if (elapsed < duration) {
-        this._runFrame(this._easeOut(elapsed / duration));
-      } else {
-        this._runFrame(1);
-        this._complete();
-      }
-    },
-    _runFrame: function(progress) {
-      var pos = this._startPos.add(this._offset.multiplyBy(progress));
-      L.DomUtil.setPosition(this._el, pos);
-      this.fire('step');
-    },
-    _complete: function() {
-      L.Util.cancelAnimFrame(this._animId);
-      this._inProgress = false;
-      this.fire('end');
-    },
-    _easeOut: function(t) {
-      return 1 - Math.pow(1 - t, this._easeOutPower);
-    }
-  });
-  L.Map.mergeOptions({
-    zoomAnimation: true,
-    zoomAnimationThreshold: 4
-  });
-  if (L.DomUtil.TRANSITION) {
-    L.Map.addInitHook(function() {
-      this._zoomAnimated = this.options.zoomAnimation && L.DomUtil.TRANSITION && L.Browser.any3d && !L.Browser.android23 && !L.Browser.mobileOpera;
-      if (this._zoomAnimated) {
-        L.DomEvent.on(this._mapPane, L.DomUtil.TRANSITION_END, this._catchTransitionEnd, this);
-      }
-    });
-  }
-  L.Map.include(!L.DomUtil.TRANSITION ? {} : {
-    _catchTransitionEnd: function(e) {
-      if (this._animatingZoom && e.propertyName.indexOf('transform') >= 0) {
-        this._onZoomTransitionEnd();
-      }
-    },
-    _nothingToAnimate: function() {
-      return !this._container.getElementsByClassName('leaflet-zoom-animated').length;
-    },
-    _tryAnimatedZoom: function(center, zoom, options) {
-      if (this._animatingZoom) {
-        return true;
-      }
-      options = options || {};
-      if (!this._zoomAnimated || options.animate === false || this._nothingToAnimate() || Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) {
-        return false;
-      }
-      var scale = this.getZoomScale(zoom),
-          offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale),
-          origin = this._getCenterLayerPoint()._add(offset);
-      if (options.animate !== true && !this.getSize().contains(offset)) {
-        return false;
-      }
-      this.fire('movestart').fire('zoomstart');
-      this._animateZoom(center, zoom, origin, scale, null, true);
-      return true;
-    },
-    _animateZoom: function(center, zoom, origin, scale, delta, backwards, forTouchZoom) {
-      if (!forTouchZoom) {
-        this._animatingZoom = true;
-      }
-      L.DomUtil.addClass(this._mapPane, 'leaflet-zoom-anim');
-      this._animateToCenter = center;
-      this._animateToZoom = zoom;
-      if (L.Draggable) {
-        L.Draggable._disabled = true;
-      }
-      L.Util.requestAnimFrame(function() {
-        this.fire('zoomanim', {
-          center: center,
-          zoom: zoom,
-          origin: origin,
-          scale: scale,
-          delta: delta,
-          backwards: backwards
-        });
-        setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
-      }, this);
-    },
-    _onZoomTransitionEnd: function() {
-      if (!this._animatingZoom) {
-        return;
-      }
-      this._animatingZoom = false;
-      L.DomUtil.removeClass(this._mapPane, 'leaflet-zoom-anim');
-      L.Util.requestAnimFrame(function() {
-        this._resetView(this._animateToCenter, this._animateToZoom, true, true);
-        if (L.Draggable) {
-          L.Draggable._disabled = false;
-        }
-      }, this);
-    }
-  });
-  L.TileLayer.include({
-    _animateZoom: function(e) {
-      if (!this._animating) {
-        this._animating = true;
-        this._prepareBgBuffer();
-      }
-      var bg = this._bgBuffer,
-          transform = L.DomUtil.TRANSFORM,
-          initialTransform = e.delta ? L.DomUtil.getTranslateString(e.delta) : bg.style[transform],
-          scaleStr = L.DomUtil.getScaleString(e.scale, e.origin);
-      bg.style[transform] = e.backwards ? scaleStr + ' ' + initialTransform : initialTransform + ' ' + scaleStr;
-    },
-    _endZoomAnim: function() {
-      var front = this._tileContainer,
-          bg = this._bgBuffer;
-      front.style.visibility = '';
-      front.parentNode.appendChild(front);
-      L.Util.falseFn(bg.offsetWidth);
-      var zoom = this._map.getZoom();
-      if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
-        this._clearBgBuffer();
-      }
-      this._animating = false;
-    },
-    _clearBgBuffer: function() {
-      var map = this._map;
-      if (map && !map._animatingZoom && !map.touchZoom._zooming) {
-        this._bgBuffer.innerHTML = '';
-        this._bgBuffer.style[L.DomUtil.TRANSFORM] = '';
-      }
-    },
-    _prepareBgBuffer: function() {
-      var front = this._tileContainer,
-          bg = this._bgBuffer;
-      var bgLoaded = this._getLoadedTilesPercentage(bg),
-          frontLoaded = this._getLoadedTilesPercentage(front);
-      if (bg && bgLoaded > 0.5 && frontLoaded < 0.5) {
-        front.style.visibility = 'hidden';
-        this._stopLoadingImages(front);
-        return;
-      }
-      bg.style.visibility = 'hidden';
-      bg.style[L.DomUtil.TRANSFORM] = '';
-      this._tileContainer = bg;
-      bg = this._bgBuffer = front;
-      this._stopLoadingImages(bg);
-      clearTimeout(this._clearBgBufferTimer);
-    },
-    _getLoadedTilesPercentage: function(container) {
-      var tiles = container.getElementsByTagName('img'),
-          i,
-          len,
-          count = 0;
-      for (i = 0, len = tiles.length; i < len; i++) {
-        if (tiles[i].complete) {
-          count++;
-        }
-      }
-      return count / len;
-    },
-    _stopLoadingImages: function(container) {
-      var tiles = Array.prototype.slice.call(container.getElementsByTagName('img')),
-          i,
-          len,
-          tile;
-      for (i = 0, len = tiles.length; i < len; i++) {
-        tile = tiles[i];
-        if (!tile.complete) {
-          tile.onload = L.Util.falseFn;
-          tile.onerror = L.Util.falseFn;
-          tile.src = L.Util.emptyImageUrl;
-          tile.parentNode.removeChild(tile);
-        }
-      }
-    }
-  });
-  L.Map.include({
-    _defaultLocateOptions: {
-      watch: false,
-      setView: false,
-      maxZoom: Infinity,
-      timeout: 10000,
-      maximumAge: 0,
-      enableHighAccuracy: false
-    },
-    locate: function(options) {
-      options = this._locateOptions = L.extend(this._defaultLocateOptions, options);
-      if (!navigator.geolocation) {
-        this._handleGeolocationError({
-          code: 0,
-          message: 'Geolocation not supported.'
-        });
-        return this;
-      }
-      var onResponse = L.bind(this._handleGeolocationResponse, this),
-          onError = L.bind(this._handleGeolocationError, this);
-      if (options.watch) {
-        this._locationWatchId = navigator.geolocation.watchPosition(onResponse, onError, options);
-      } else {
-        navigator.geolocation.getCurrentPosition(onResponse, onError, options);
-      }
-      return this;
-    },
-    stopLocate: function() {
-      if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(this._locationWatchId);
-      }
-      if (this._locateOptions) {
-        this._locateOptions.setView = false;
-      }
-      return this;
-    },
-    _handleGeolocationError: function(error) {
-      var c = error.code,
-          message = error.message || (c === 1 ? 'permission denied' : (c === 2 ? 'position unavailable' : 'timeout'));
-      if (this._locateOptions.setView && !this._loaded) {
-        this.fitWorld();
-      }
-      this.fire('locationerror', {
-        code: c,
-        message: 'Geolocation error: ' + message + '.'
       });
-    },
-    _handleGeolocationResponse: function(pos) {
-      var lat = pos.coords.latitude,
-          lng = pos.coords.longitude,
-          latlng = new L.LatLng(lat, lng),
-          latAccuracy = 180 * pos.coords.accuracy / 40075017,
-          lngAccuracy = latAccuracy / Math.cos(L.LatLng.DEG_TO_RAD * lat),
-          bounds = L.latLngBounds([lat - latAccuracy, lng - lngAccuracy], [lat + latAccuracy, lng + lngAccuracy]),
-          options = this._locateOptions;
-      if (options.setView) {
-        var zoom = Math.min(this.getBoundsZoom(bounds), options.maxZoom);
-        this.setView(latlng, zoom);
-      }
-      var data = {
-        latlng: latlng,
-        bounds: bounds,
-        timestamp: pos.timestamp
-      };
-      for (var i in pos.coords) {
-        if (typeof pos.coords[i] === 'number') {
-          data[i] = pos.coords[i];
+      L.Layer.include({
+        bindTooltip: function (content, options) {
+          if (content instanceof L.Tooltip) {
+            L.setOptions(content, options);
+            this._tooltip = content;
+            content._source = this;
+          } else {
+            if (!this._tooltip || options) {
+              this._tooltip = L.tooltip(options, this);
+            }
+            this._tooltip.setContent(content);
+          }
+          this._initTooltipInteractions();
+          if (this._tooltip.options.permanent && this._map && this._map.hasLayer(this)) {
+            this.openTooltip();
+          }
+          return this;
+        },
+        unbindTooltip: function () {
+          if (this._tooltip) {
+            this._initTooltipInteractions(true);
+            this.closeTooltip();
+            this._tooltip = null;
+          }
+          return this;
+        },
+        _initTooltipInteractions: function (remove) {
+          if (!remove && this._tooltipHandlersAdded) {
+            return;
+          }
+          var onOff = remove ? 'off' : 'on',
+              events = {
+            remove: this.closeTooltip,
+            move: this._moveTooltip
+          };
+          if (!this._tooltip.options.permanent) {
+            events.mouseover = this._openTooltip;
+            events.mouseout = this.closeTooltip;
+            if (this._tooltip.options.sticky) {
+              events.mousemove = this._moveTooltip;
+            }
+            if (L.Browser.touch) {
+              events.click = this._openTooltip;
+            }
+          } else {
+            events.add = this._openTooltip;
+          }
+          this[onOff](events);
+          this._tooltipHandlersAdded = !remove;
+        },
+        openTooltip: function (layer, latlng) {
+          if (!(layer instanceof L.Layer)) {
+            latlng = layer;
+            layer = this;
+          }
+          if (layer instanceof L.FeatureGroup) {
+            for (var id in this._layers) {
+              layer = this._layers[id];
+              break;
+            }
+          }
+          if (!latlng) {
+            latlng = layer.getCenter ? layer.getCenter() : layer.getLatLng();
+          }
+          if (this._tooltip && this._map) {
+            this._tooltip._source = layer;
+            this._tooltip.update();
+            this._map.openTooltip(this._tooltip, latlng);
+            if (this._tooltip.options.interactive && this._tooltip._container) {
+              L.DomUtil.addClass(this._tooltip._container, 'leaflet-clickable');
+              this.addInteractiveTarget(this._tooltip._container);
+            }
+          }
+          return this;
+        },
+        closeTooltip: function () {
+          if (this._tooltip) {
+            this._tooltip._close();
+            if (this._tooltip.options.interactive && this._tooltip._container) {
+              L.DomUtil.removeClass(this._tooltip._container, 'leaflet-clickable');
+              this.removeInteractiveTarget(this._tooltip._container);
+            }
+          }
+          return this;
+        },
+        toggleTooltip: function (target) {
+          if (this._tooltip) {
+            if (this._tooltip._map) {
+              this.closeTooltip();
+            } else {
+              this.openTooltip(target);
+            }
+          }
+          return this;
+        },
+        isTooltipOpen: function () {
+          return this._tooltip.isOpen();
+        },
+        setTooltipContent: function (content) {
+          if (this._tooltip) {
+            this._tooltip.setContent(content);
+          }
+          return this;
+        },
+        getTooltip: function () {
+          return this._tooltip;
+        },
+        _openTooltip: function (e) {
+          var layer = e.layer || e.target;
+          if (!this._tooltip || !this._map) {
+            return;
+          }
+          this.openTooltip(layer, this._tooltip.options.sticky ? e.latlng : undefined);
+        },
+        _moveTooltip: function (e) {
+          var latlng = e.latlng,
+              containerPoint,
+              layerPoint;
+          if (this._tooltip.options.sticky && e.originalEvent) {
+            containerPoint = this._map.mouseEventToContainerPoint(e.originalEvent);
+            layerPoint = this._map.containerPointToLayerPoint(containerPoint);
+            latlng = this._map.layerPointToLatLng(layerPoint);
+          }
+          this._tooltip.setLatLng(latlng);
         }
+      });
+      L.Marker.include({ _getTooltipAnchor: function () {
+          return this.options.icon.options.tooltipAnchor || [0, 0];
+        } });
+      L.LayerGroup = L.Layer.extend({
+        initialize: function (layers) {
+          this._layers = {};
+          var i, len;
+          if (layers) {
+            for (i = 0, len = layers.length; i < len; i++) {
+              this.addLayer(layers[i]);
+            }
+          }
+        },
+        addLayer: function (layer) {
+          var id = this.getLayerId(layer);
+          this._layers[id] = layer;
+          if (this._map) {
+            this._map.addLayer(layer);
+          }
+          return this;
+        },
+        removeLayer: function (layer) {
+          var id = layer in this._layers ? layer : this.getLayerId(layer);
+          if (this._map && this._layers[id]) {
+            this._map.removeLayer(this._layers[id]);
+          }
+          delete this._layers[id];
+          return this;
+        },
+        hasLayer: function (layer) {
+          return !!layer && (layer in this._layers || this.getLayerId(layer) in this._layers);
+        },
+        clearLayers: function () {
+          for (var i in this._layers) {
+            this.removeLayer(this._layers[i]);
+          }
+          return this;
+        },
+        invoke: function (methodName) {
+          var args = Array.prototype.slice.call(arguments, 1),
+              i,
+              layer;
+          for (i in this._layers) {
+            layer = this._layers[i];
+            if (layer[methodName]) {
+              layer[methodName].apply(layer, args);
+            }
+          }
+          return this;
+        },
+        onAdd: function (map) {
+          for (var i in this._layers) {
+            map.addLayer(this._layers[i]);
+          }
+        },
+        onRemove: function (map) {
+          for (var i in this._layers) {
+            map.removeLayer(this._layers[i]);
+          }
+        },
+        eachLayer: function (method, context) {
+          for (var i in this._layers) {
+            method.call(context, this._layers[i]);
+          }
+          return this;
+        },
+        getLayer: function (id) {
+          return this._layers[id];
+        },
+        getLayers: function () {
+          var layers = [];
+          for (var i in this._layers) {
+            layers.push(this._layers[i]);
+          }
+          return layers;
+        },
+        setZIndex: function (zIndex) {
+          return this.invoke('setZIndex', zIndex);
+        },
+        getLayerId: function (layer) {
+          return L.stamp(layer);
+        }
+      });
+      L.layerGroup = function (layers) {
+        return new L.LayerGroup(layers);
+      };
+      L.FeatureGroup = L.LayerGroup.extend({
+        addLayer: function (layer) {
+          if (this.hasLayer(layer)) {
+            return this;
+          }
+          layer.addEventParent(this);
+          L.LayerGroup.prototype.addLayer.call(this, layer);
+          return this.fire('layeradd', { layer: layer });
+        },
+        removeLayer: function (layer) {
+          if (!this.hasLayer(layer)) {
+            return this;
+          }
+          if (layer in this._layers) {
+            layer = this._layers[layer];
+          }
+          layer.removeEventParent(this);
+          L.LayerGroup.prototype.removeLayer.call(this, layer);
+          return this.fire('layerremove', { layer: layer });
+        },
+        setStyle: function (style) {
+          return this.invoke('setStyle', style);
+        },
+        bringToFront: function () {
+          return this.invoke('bringToFront');
+        },
+        bringToBack: function () {
+          return this.invoke('bringToBack');
+        },
+        getBounds: function () {
+          var bounds = new L.LatLngBounds();
+          for (var id in this._layers) {
+            var layer = this._layers[id];
+            bounds.extend(layer.getBounds ? layer.getBounds() : layer.getLatLng());
+          }
+          return bounds;
+        }
+      });
+      L.featureGroup = function (layers) {
+        return new L.FeatureGroup(layers);
+      };
+      L.Renderer = L.Layer.extend({
+        options: { padding: 0.1 },
+        initialize: function (options) {
+          L.setOptions(this, options);
+          L.stamp(this);
+        },
+        onAdd: function () {
+          if (!this._container) {
+            this._initContainer();
+            if (this._zoomAnimated) {
+              L.DomUtil.addClass(this._container, 'leaflet-zoom-animated');
+            }
+          }
+          this.getPane().appendChild(this._container);
+          this._update();
+        },
+        onRemove: function () {
+          L.DomUtil.remove(this._container);
+        },
+        getEvents: function () {
+          var events = {
+            viewreset: this._reset,
+            zoom: this._onZoom,
+            moveend: this._update
+          };
+          if (this._zoomAnimated) {
+            events.zoomanim = this._onAnimZoom;
+          }
+          return events;
+        },
+        _onAnimZoom: function (ev) {
+          this._updateTransform(ev.center, ev.zoom);
+        },
+        _onZoom: function () {
+          this._updateTransform(this._map.getCenter(), this._map.getZoom());
+        },
+        _updateTransform: function (center, zoom) {
+          var scale = this._map.getZoomScale(zoom, this._zoom),
+              position = L.DomUtil.getPosition(this._container),
+              viewHalf = this._map.getSize().multiplyBy(0.5 + this.options.padding),
+              currentCenterPoint = this._map.project(this._center, zoom),
+              destCenterPoint = this._map.project(center, zoom),
+              centerOffset = destCenterPoint.subtract(currentCenterPoint),
+              topLeftOffset = viewHalf.multiplyBy(-scale).add(position).add(viewHalf).subtract(centerOffset);
+          if (L.Browser.any3d) {
+            L.DomUtil.setTransform(this._container, topLeftOffset, scale);
+          } else {
+            L.DomUtil.setPosition(this._container, topLeftOffset);
+          }
+        },
+        _reset: function () {
+          this._update();
+          this._updateTransform(this._center, this._zoom);
+        },
+        _update: function () {
+          var p = this.options.padding,
+              size = this._map.getSize(),
+              min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
+          this._bounds = new L.Bounds(min, min.add(size.multiplyBy(1 + p * 2)).round());
+          this._center = this._map.getCenter();
+          this._zoom = this._map.getZoom();
+        }
+      });
+      L.Map.include({
+        getRenderer: function (layer) {
+          var renderer = layer.options.renderer || this._getPaneRenderer(layer.options.pane) || this.options.renderer || this._renderer;
+          if (!renderer) {
+            renderer = this._renderer = this.options.preferCanvas && L.canvas() || L.svg();
+          }
+          if (!this.hasLayer(renderer)) {
+            this.addLayer(renderer);
+          }
+          return renderer;
+        },
+        _getPaneRenderer: function (name) {
+          if (name === 'overlayPane' || name === undefined) {
+            return false;
+          }
+          var renderer = this._paneRenderers[name];
+          if (renderer === undefined) {
+            renderer = L.SVG && L.svg({ pane: name }) || L.Canvas && L.canvas({ pane: name });
+            this._paneRenderers[name] = renderer;
+          }
+          return renderer;
+        }
+      });
+      L.Path = L.Layer.extend({
+        options: {
+          stroke: true,
+          color: '#3388ff',
+          weight: 3,
+          opacity: 1,
+          lineCap: 'round',
+          lineJoin: 'round',
+          dashArray: null,
+          dashOffset: null,
+          fill: false,
+          fillColor: null,
+          fillOpacity: 0.2,
+          fillRule: 'evenodd',
+          interactive: true
+        },
+        beforeAdd: function (map) {
+          this._renderer = map.getRenderer(this);
+        },
+        onAdd: function () {
+          this._renderer._initPath(this);
+          this._reset();
+          this._renderer._addPath(this);
+          this._renderer.on('update', this._update, this);
+        },
+        onRemove: function () {
+          this._renderer._removePath(this);
+          this._renderer.off('update', this._update, this);
+        },
+        getEvents: function () {
+          return {
+            zoomend: this._project,
+            viewreset: this._reset
+          };
+        },
+        redraw: function () {
+          if (this._map) {
+            this._renderer._updatePath(this);
+          }
+          return this;
+        },
+        setStyle: function (style) {
+          L.setOptions(this, style);
+          if (this._renderer) {
+            this._renderer._updateStyle(this);
+          }
+          return this;
+        },
+        bringToFront: function () {
+          if (this._renderer) {
+            this._renderer._bringToFront(this);
+          }
+          return this;
+        },
+        bringToBack: function () {
+          if (this._renderer) {
+            this._renderer._bringToBack(this);
+          }
+          return this;
+        },
+        getElement: function () {
+          return this._path;
+        },
+        _reset: function () {
+          this._project();
+          this._update();
+        },
+        _clickTolerance: function () {
+          return (this.options.stroke ? this.options.weight / 2 : 0) + (L.Browser.touch ? 10 : 0);
+        }
+      });
+      L.LineUtil = {
+        simplify: function (points, tolerance) {
+          if (!tolerance || !points.length) {
+            return points.slice();
+          }
+          var sqTolerance = tolerance * tolerance;
+          points = this._reducePoints(points, sqTolerance);
+          points = this._simplifyDP(points, sqTolerance);
+          return points;
+        },
+        pointToSegmentDistance: function (p, p1, p2) {
+          return Math.sqrt(this._sqClosestPointOnSegment(p, p1, p2, true));
+        },
+        closestPointOnSegment: function (p, p1, p2) {
+          return this._sqClosestPointOnSegment(p, p1, p2);
+        },
+        _simplifyDP: function (points, sqTolerance) {
+          var len = points.length,
+              ArrayConstructor = typeof Uint8Array !== undefined + '' ? Uint8Array : Array,
+              markers = new ArrayConstructor(len);
+          markers[0] = markers[len - 1] = 1;
+          this._simplifyDPStep(points, markers, sqTolerance, 0, len - 1);
+          var i,
+              newPoints = [];
+          for (i = 0; i < len; i++) {
+            if (markers[i]) {
+              newPoints.push(points[i]);
+            }
+          }
+          return newPoints;
+        },
+        _simplifyDPStep: function (points, markers, sqTolerance, first, last) {
+          var maxSqDist = 0,
+              index,
+              i,
+              sqDist;
+          for (i = first + 1; i <= last - 1; i++) {
+            sqDist = this._sqClosestPointOnSegment(points[i], points[first], points[last], true);
+            if (sqDist > maxSqDist) {
+              index = i;
+              maxSqDist = sqDist;
+            }
+          }
+          if (maxSqDist > sqTolerance) {
+            markers[index] = 1;
+            this._simplifyDPStep(points, markers, sqTolerance, first, index);
+            this._simplifyDPStep(points, markers, sqTolerance, index, last);
+          }
+        },
+        _reducePoints: function (points, sqTolerance) {
+          var reducedPoints = [points[0]];
+          for (var i = 1, prev = 0, len = points.length; i < len; i++) {
+            if (this._sqDist(points[i], points[prev]) > sqTolerance) {
+              reducedPoints.push(points[i]);
+              prev = i;
+            }
+          }
+          if (prev < len - 1) {
+            reducedPoints.push(points[len - 1]);
+          }
+          return reducedPoints;
+        },
+        clipSegment: function (a, b, bounds, useLastCode, round) {
+          var codeA = useLastCode ? this._lastCode : this._getBitCode(a, bounds),
+              codeB = this._getBitCode(b, bounds),
+              codeOut,
+              p,
+              newCode;
+          this._lastCode = codeB;
+          while (true) {
+            if (!(codeA | codeB)) {
+              return [a, b];
+            }
+            if (codeA & codeB) {
+              return false;
+            }
+            codeOut = codeA || codeB;
+            p = this._getEdgeIntersection(a, b, codeOut, bounds, round);
+            newCode = this._getBitCode(p, bounds);
+            if (codeOut === codeA) {
+              a = p;
+              codeA = newCode;
+            } else {
+              b = p;
+              codeB = newCode;
+            }
+          }
+        },
+        _getEdgeIntersection: function (a, b, code, bounds, round) {
+          var dx = b.x - a.x,
+              dy = b.y - a.y,
+              min = bounds.min,
+              max = bounds.max,
+              x,
+              y;
+          if (code & 8) {
+            x = a.x + dx * (max.y - a.y) / dy;
+            y = max.y;
+          } else if (code & 4) {
+            x = a.x + dx * (min.y - a.y) / dy;
+            y = min.y;
+          } else if (code & 2) {
+            x = max.x;
+            y = a.y + dy * (max.x - a.x) / dx;
+          } else if (code & 1) {
+            x = min.x;
+            y = a.y + dy * (min.x - a.x) / dx;
+          }
+          return new L.Point(x, y, round);
+        },
+        _getBitCode: function (p, bounds) {
+          var code = 0;
+          if (p.x < bounds.min.x) {
+            code |= 1;
+          } else if (p.x > bounds.max.x) {
+            code |= 2;
+          }
+          if (p.y < bounds.min.y) {
+            code |= 4;
+          } else if (p.y > bounds.max.y) {
+            code |= 8;
+          }
+          return code;
+        },
+        _sqDist: function (p1, p2) {
+          var dx = p2.x - p1.x,
+              dy = p2.y - p1.y;
+          return dx * dx + dy * dy;
+        },
+        _sqClosestPointOnSegment: function (p, p1, p2, sqDist) {
+          var x = p1.x,
+              y = p1.y,
+              dx = p2.x - x,
+              dy = p2.y - y,
+              dot = dx * dx + dy * dy,
+              t;
+          if (dot > 0) {
+            t = ((p.x - x) * dx + (p.y - y) * dy) / dot;
+            if (t > 1) {
+              x = p2.x;
+              y = p2.y;
+            } else if (t > 0) {
+              x += dx * t;
+              y += dy * t;
+            }
+          }
+          dx = p.x - x;
+          dy = p.y - y;
+          return sqDist ? dx * dx + dy * dy : new L.Point(x, y);
+        }
+      };
+      L.Polyline = L.Path.extend({
+        options: {
+          smoothFactor: 1.0,
+          noClip: false
+        },
+        initialize: function (latlngs, options) {
+          L.setOptions(this, options);
+          this._setLatLngs(latlngs);
+        },
+        getLatLngs: function () {
+          return this._latlngs;
+        },
+        setLatLngs: function (latlngs) {
+          this._setLatLngs(latlngs);
+          return this.redraw();
+        },
+        isEmpty: function () {
+          return !this._latlngs.length;
+        },
+        closestLayerPoint: function (p) {
+          var minDistance = Infinity,
+              minPoint = null,
+              closest = L.LineUtil._sqClosestPointOnSegment,
+              p1,
+              p2;
+          for (var j = 0, jLen = this._parts.length; j < jLen; j++) {
+            var points = this._parts[j];
+            for (var i = 1, len = points.length; i < len; i++) {
+              p1 = points[i - 1];
+              p2 = points[i];
+              var sqDist = closest(p, p1, p2, true);
+              if (sqDist < minDistance) {
+                minDistance = sqDist;
+                minPoint = closest(p, p1, p2);
+              }
+            }
+          }
+          if (minPoint) {
+            minPoint.distance = Math.sqrt(minDistance);
+          }
+          return minPoint;
+        },
+        getCenter: function () {
+          if (!this._map) {
+            throw new Error('Must add layer to map before using getCenter()');
+          }
+          var i,
+              halfDist,
+              segDist,
+              dist,
+              p1,
+              p2,
+              ratio,
+              points = this._rings[0],
+              len = points.length;
+          if (!len) {
+            return null;
+          }
+          for (i = 0, halfDist = 0; i < len - 1; i++) {
+            halfDist += points[i].distanceTo(points[i + 1]) / 2;
+          }
+          if (halfDist === 0) {
+            return this._map.layerPointToLatLng(points[0]);
+          }
+          for (i = 0, dist = 0; i < len - 1; i++) {
+            p1 = points[i];
+            p2 = points[i + 1];
+            segDist = p1.distanceTo(p2);
+            dist += segDist;
+            if (dist > halfDist) {
+              ratio = (dist - halfDist) / segDist;
+              return this._map.layerPointToLatLng([p2.x - ratio * (p2.x - p1.x), p2.y - ratio * (p2.y - p1.y)]);
+            }
+          }
+        },
+        getBounds: function () {
+          return this._bounds;
+        },
+        addLatLng: function (latlng, latlngs) {
+          latlngs = latlngs || this._defaultShape();
+          latlng = L.latLng(latlng);
+          latlngs.push(latlng);
+          this._bounds.extend(latlng);
+          return this.redraw();
+        },
+        _setLatLngs: function (latlngs) {
+          this._bounds = new L.LatLngBounds();
+          this._latlngs = this._convertLatLngs(latlngs);
+        },
+        _defaultShape: function () {
+          return L.Polyline._flat(this._latlngs) ? this._latlngs : this._latlngs[0];
+        },
+        _convertLatLngs: function (latlngs) {
+          var result = [],
+              flat = L.Polyline._flat(latlngs);
+          for (var i = 0, len = latlngs.length; i < len; i++) {
+            if (flat) {
+              result[i] = L.latLng(latlngs[i]);
+              this._bounds.extend(result[i]);
+            } else {
+              result[i] = this._convertLatLngs(latlngs[i]);
+            }
+          }
+          return result;
+        },
+        _project: function () {
+          var pxBounds = new L.Bounds();
+          this._rings = [];
+          this._projectLatlngs(this._latlngs, this._rings, pxBounds);
+          var w = this._clickTolerance(),
+              p = new L.Point(w, w);
+          if (this._bounds.isValid() && pxBounds.isValid()) {
+            pxBounds.min._subtract(p);
+            pxBounds.max._add(p);
+            this._pxBounds = pxBounds;
+          }
+        },
+        _projectLatlngs: function (latlngs, result, projectedBounds) {
+          var flat = latlngs[0] instanceof L.LatLng,
+              len = latlngs.length,
+              i,
+              ring;
+          if (flat) {
+            ring = [];
+            for (i = 0; i < len; i++) {
+              ring[i] = this._map.latLngToLayerPoint(latlngs[i]);
+              projectedBounds.extend(ring[i]);
+            }
+            result.push(ring);
+          } else {
+            for (i = 0; i < len; i++) {
+              this._projectLatlngs(latlngs[i], result, projectedBounds);
+            }
+          }
+        },
+        _clipPoints: function () {
+          var bounds = this._renderer._bounds;
+          this._parts = [];
+          if (!this._pxBounds || !this._pxBounds.intersects(bounds)) {
+            return;
+          }
+          if (this.options.noClip) {
+            this._parts = this._rings;
+            return;
+          }
+          var parts = this._parts,
+              i,
+              j,
+              k,
+              len,
+              len2,
+              segment,
+              points;
+          for (i = 0, k = 0, len = this._rings.length; i < len; i++) {
+            points = this._rings[i];
+            for (j = 0, len2 = points.length; j < len2 - 1; j++) {
+              segment = L.LineUtil.clipSegment(points[j], points[j + 1], bounds, j, true);
+              if (!segment) {
+                continue;
+              }
+              parts[k] = parts[k] || [];
+              parts[k].push(segment[0]);
+              if (segment[1] !== points[j + 1] || j === len2 - 2) {
+                parts[k].push(segment[1]);
+                k++;
+              }
+            }
+          }
+        },
+        _simplifyPoints: function () {
+          var parts = this._parts,
+              tolerance = this.options.smoothFactor;
+          for (var i = 0, len = parts.length; i < len; i++) {
+            parts[i] = L.LineUtil.simplify(parts[i], tolerance);
+          }
+        },
+        _update: function () {
+          if (!this._map) {
+            return;
+          }
+          this._clipPoints();
+          this._simplifyPoints();
+          this._updatePath();
+        },
+        _updatePath: function () {
+          this._renderer._updatePoly(this);
+        }
+      });
+      L.polyline = function (latlngs, options) {
+        return new L.Polyline(latlngs, options);
+      };
+      L.Polyline._flat = function (latlngs) {
+        return !L.Util.isArray(latlngs[0]) || typeof latlngs[0][0] !== 'object' && typeof latlngs[0][0] !== 'undefined';
+      };
+      L.PolyUtil = {};
+      L.PolyUtil.clipPolygon = function (points, bounds, round) {
+        var clippedPoints,
+            edges = [1, 4, 2, 8],
+            i,
+            j,
+            k,
+            a,
+            b,
+            len,
+            edge,
+            p,
+            lu = L.LineUtil;
+        for (i = 0, len = points.length; i < len; i++) {
+          points[i]._code = lu._getBitCode(points[i], bounds);
+        }
+        for (k = 0; k < 4; k++) {
+          edge = edges[k];
+          clippedPoints = [];
+          for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+            a = points[i];
+            b = points[j];
+            if (!(a._code & edge)) {
+              if (b._code & edge) {
+                p = lu._getEdgeIntersection(b, a, edge, bounds, round);
+                p._code = lu._getBitCode(p, bounds);
+                clippedPoints.push(p);
+              }
+              clippedPoints.push(a);
+            } else if (!(b._code & edge)) {
+              p = lu._getEdgeIntersection(b, a, edge, bounds, round);
+              p._code = lu._getBitCode(p, bounds);
+              clippedPoints.push(p);
+            }
+          }
+          points = clippedPoints;
+        }
+        return points;
+      };
+      L.Polygon = L.Polyline.extend({
+        options: { fill: true },
+        isEmpty: function () {
+          return !this._latlngs.length || !this._latlngs[0].length;
+        },
+        getCenter: function () {
+          if (!this._map) {
+            throw new Error('Must add layer to map before using getCenter()');
+          }
+          var i,
+              j,
+              p1,
+              p2,
+              f,
+              area,
+              x,
+              y,
+              center,
+              points = this._rings[0],
+              len = points.length;
+          if (!len) {
+            return null;
+          }
+          area = x = y = 0;
+          for (i = 0, j = len - 1; i < len; j = i++) {
+            p1 = points[i];
+            p2 = points[j];
+            f = p1.y * p2.x - p2.y * p1.x;
+            x += (p1.x + p2.x) * f;
+            y += (p1.y + p2.y) * f;
+            area += f * 3;
+          }
+          if (area === 0) {
+            center = points[0];
+          } else {
+            center = [x / area, y / area];
+          }
+          return this._map.layerPointToLatLng(center);
+        },
+        _convertLatLngs: function (latlngs) {
+          var result = L.Polyline.prototype._convertLatLngs.call(this, latlngs),
+              len = result.length;
+          if (len >= 2 && result[0] instanceof L.LatLng && result[0].equals(result[len - 1])) {
+            result.pop();
+          }
+          return result;
+        },
+        _setLatLngs: function (latlngs) {
+          L.Polyline.prototype._setLatLngs.call(this, latlngs);
+          if (L.Polyline._flat(this._latlngs)) {
+            this._latlngs = [this._latlngs];
+          }
+        },
+        _defaultShape: function () {
+          return L.Polyline._flat(this._latlngs[0]) ? this._latlngs[0] : this._latlngs[0][0];
+        },
+        _clipPoints: function () {
+          var bounds = this._renderer._bounds,
+              w = this.options.weight,
+              p = new L.Point(w, w);
+          bounds = new L.Bounds(bounds.min.subtract(p), bounds.max.add(p));
+          this._parts = [];
+          if (!this._pxBounds || !this._pxBounds.intersects(bounds)) {
+            return;
+          }
+          if (this.options.noClip) {
+            this._parts = this._rings;
+            return;
+          }
+          for (var i = 0, len = this._rings.length, clipped; i < len; i++) {
+            clipped = L.PolyUtil.clipPolygon(this._rings[i], bounds, true);
+            if (clipped.length) {
+              this._parts.push(clipped);
+            }
+          }
+        },
+        _updatePath: function () {
+          this._renderer._updatePoly(this, true);
+        }
+      });
+      L.polygon = function (latlngs, options) {
+        return new L.Polygon(latlngs, options);
+      };
+      L.Rectangle = L.Polygon.extend({
+        initialize: function (latLngBounds, options) {
+          L.Polygon.prototype.initialize.call(this, this._boundsToLatLngs(latLngBounds), options);
+        },
+        setBounds: function (latLngBounds) {
+          return this.setLatLngs(this._boundsToLatLngs(latLngBounds));
+        },
+        _boundsToLatLngs: function (latLngBounds) {
+          latLngBounds = L.latLngBounds(latLngBounds);
+          return [latLngBounds.getSouthWest(), latLngBounds.getNorthWest(), latLngBounds.getNorthEast(), latLngBounds.getSouthEast()];
+        }
+      });
+      L.rectangle = function (latLngBounds, options) {
+        return new L.Rectangle(latLngBounds, options);
+      };
+      L.CircleMarker = L.Path.extend({
+        options: {
+          fill: true,
+          radius: 10
+        },
+        initialize: function (latlng, options) {
+          L.setOptions(this, options);
+          this._latlng = L.latLng(latlng);
+          this._radius = this.options.radius;
+        },
+        setLatLng: function (latlng) {
+          this._latlng = L.latLng(latlng);
+          this.redraw();
+          return this.fire('move', { latlng: this._latlng });
+        },
+        getLatLng: function () {
+          return this._latlng;
+        },
+        setRadius: function (radius) {
+          this.options.radius = this._radius = radius;
+          return this.redraw();
+        },
+        getRadius: function () {
+          return this._radius;
+        },
+        setStyle: function (options) {
+          var radius = options && options.radius || this._radius;
+          L.Path.prototype.setStyle.call(this, options);
+          this.setRadius(radius);
+          return this;
+        },
+        _project: function () {
+          this._point = this._map.latLngToLayerPoint(this._latlng);
+          this._updateBounds();
+        },
+        _updateBounds: function () {
+          var r = this._radius,
+              r2 = this._radiusY || r,
+              w = this._clickTolerance(),
+              p = [r + w, r2 + w];
+          this._pxBounds = new L.Bounds(this._point.subtract(p), this._point.add(p));
+        },
+        _update: function () {
+          if (this._map) {
+            this._updatePath();
+          }
+        },
+        _updatePath: function () {
+          this._renderer._updateCircle(this);
+        },
+        _empty: function () {
+          return this._radius && !this._renderer._bounds.intersects(this._pxBounds);
+        }
+      });
+      L.circleMarker = function (latlng, options) {
+        return new L.CircleMarker(latlng, options);
+      };
+      L.Circle = L.CircleMarker.extend({
+        initialize: function (latlng, options, legacyOptions) {
+          if (typeof options === 'number') {
+            options = L.extend({}, legacyOptions, { radius: options });
+          }
+          L.setOptions(this, options);
+          this._latlng = L.latLng(latlng);
+          if (isNaN(this.options.radius)) {
+            throw new Error('Circle radius cannot be NaN');
+          }
+          this._mRadius = this.options.radius;
+        },
+        setRadius: function (radius) {
+          this._mRadius = radius;
+          return this.redraw();
+        },
+        getRadius: function () {
+          return this._mRadius;
+        },
+        getBounds: function () {
+          var half = [this._radius, this._radiusY || this._radius];
+          return new L.LatLngBounds(this._map.layerPointToLatLng(this._point.subtract(half)), this._map.layerPointToLatLng(this._point.add(half)));
+        },
+        setStyle: L.Path.prototype.setStyle,
+        _project: function () {
+          var lng = this._latlng.lng,
+              lat = this._latlng.lat,
+              map = this._map,
+              crs = map.options.crs;
+          if (crs.distance === L.CRS.Earth.distance) {
+            var d = Math.PI / 180,
+                latR = this._mRadius / L.CRS.Earth.R / d,
+                top = map.project([lat + latR, lng]),
+                bottom = map.project([lat - latR, lng]),
+                p = top.add(bottom).divideBy(2),
+                lat2 = map.unproject(p).lat,
+                lngR = Math.acos((Math.cos(latR * d) - Math.sin(lat * d) * Math.sin(lat2 * d)) / (Math.cos(lat * d) * Math.cos(lat2 * d))) / d;
+            if (isNaN(lngR) || lngR === 0) {
+              lngR = latR / Math.cos(Math.PI / 180 * lat);
+            }
+            this._point = p.subtract(map.getPixelOrigin());
+            this._radius = isNaN(lngR) ? 0 : Math.max(Math.round(p.x - map.project([lat2, lng - lngR]).x), 1);
+            this._radiusY = Math.max(Math.round(p.y - top.y), 1);
+          } else {
+            var latlng2 = crs.unproject(crs.project(this._latlng).subtract([this._mRadius, 0]));
+            this._point = map.latLngToLayerPoint(this._latlng);
+            this._radius = this._point.x - map.latLngToLayerPoint(latlng2).x;
+          }
+          this._updateBounds();
+        }
+      });
+      L.circle = function (latlng, options, legacyOptions) {
+        return new L.Circle(latlng, options, legacyOptions);
+      };
+      L.SVG = L.Renderer.extend({
+        getEvents: function () {
+          var events = L.Renderer.prototype.getEvents.call(this);
+          events.zoomstart = this._onZoomStart;
+          return events;
+        },
+        _initContainer: function () {
+          this._container = L.SVG.create('svg');
+          this._container.setAttribute('pointer-events', 'none');
+          this._rootGroup = L.SVG.create('g');
+          this._container.appendChild(this._rootGroup);
+        },
+        _onZoomStart: function () {
+          this._update();
+        },
+        _update: function () {
+          if (this._map._animatingZoom && this._bounds) {
+            return;
+          }
+          L.Renderer.prototype._update.call(this);
+          var b = this._bounds,
+              size = b.getSize(),
+              container = this._container;
+          if (!this._svgSize || !this._svgSize.equals(size)) {
+            this._svgSize = size;
+            container.setAttribute('width', size.x);
+            container.setAttribute('height', size.y);
+          }
+          L.DomUtil.setPosition(container, b.min);
+          container.setAttribute('viewBox', [b.min.x, b.min.y, size.x, size.y].join(' '));
+          this.fire('update');
+        },
+        _initPath: function (layer) {
+          var path = layer._path = L.SVG.create('path');
+          if (layer.options.className) {
+            L.DomUtil.addClass(path, layer.options.className);
+          }
+          if (layer.options.interactive) {
+            L.DomUtil.addClass(path, 'leaflet-interactive');
+          }
+          this._updateStyle(layer);
+        },
+        _addPath: function (layer) {
+          this._rootGroup.appendChild(layer._path);
+          layer.addInteractiveTarget(layer._path);
+        },
+        _removePath: function (layer) {
+          L.DomUtil.remove(layer._path);
+          layer.removeInteractiveTarget(layer._path);
+        },
+        _updatePath: function (layer) {
+          layer._project();
+          layer._update();
+        },
+        _updateStyle: function (layer) {
+          var path = layer._path,
+              options = layer.options;
+          if (!path) {
+            return;
+          }
+          if (options.stroke) {
+            path.setAttribute('stroke', options.color);
+            path.setAttribute('stroke-opacity', options.opacity);
+            path.setAttribute('stroke-width', options.weight);
+            path.setAttribute('stroke-linecap', options.lineCap);
+            path.setAttribute('stroke-linejoin', options.lineJoin);
+            if (options.dashArray) {
+              path.setAttribute('stroke-dasharray', options.dashArray);
+            } else {
+              path.removeAttribute('stroke-dasharray');
+            }
+            if (options.dashOffset) {
+              path.setAttribute('stroke-dashoffset', options.dashOffset);
+            } else {
+              path.removeAttribute('stroke-dashoffset');
+            }
+          } else {
+            path.setAttribute('stroke', 'none');
+          }
+          if (options.fill) {
+            path.setAttribute('fill', options.fillColor || options.color);
+            path.setAttribute('fill-opacity', options.fillOpacity);
+            path.setAttribute('fill-rule', options.fillRule || 'evenodd');
+          } else {
+            path.setAttribute('fill', 'none');
+          }
+        },
+        _updatePoly: function (layer, closed) {
+          this._setPath(layer, L.SVG.pointsToPath(layer._parts, closed));
+        },
+        _updateCircle: function (layer) {
+          var p = layer._point,
+              r = layer._radius,
+              r2 = layer._radiusY || r,
+              arc = 'a' + r + ',' + r2 + ' 0 1,0 ';
+          var d = layer._empty() ? 'M0 0' : 'M' + (p.x - r) + ',' + p.y + arc + r * 2 + ',0 ' + arc + -r * 2 + ',0 ';
+          this._setPath(layer, d);
+        },
+        _setPath: function (layer, path) {
+          layer._path.setAttribute('d', path);
+        },
+        _bringToFront: function (layer) {
+          L.DomUtil.toFront(layer._path);
+        },
+        _bringToBack: function (layer) {
+          L.DomUtil.toBack(layer._path);
+        }
+      });
+      L.extend(L.SVG, {
+        create: function (name) {
+          return document.createElementNS('http://www.w3.org/2000/svg', name);
+        },
+        pointsToPath: function (rings, closed) {
+          var str = '',
+              i,
+              j,
+              len,
+              len2,
+              points,
+              p;
+          for (i = 0, len = rings.length; i < len; i++) {
+            points = rings[i];
+            for (j = 0, len2 = points.length; j < len2; j++) {
+              p = points[j];
+              str += (j ? 'L' : 'M') + p.x + ' ' + p.y;
+            }
+            str += closed ? L.Browser.svg ? 'z' : 'x' : '';
+          }
+          return str || 'M0 0';
+        }
+      });
+      L.Browser.svg = !!(document.createElementNS && L.SVG.create('svg').createSVGRect);
+      L.svg = function (options) {
+        return L.Browser.svg || L.Browser.vml ? new L.SVG(options) : null;
+      };
+      L.Browser.vml = !L.Browser.svg && function () {
+        try {
+          var div = document.createElement('div');
+          div.innerHTML = '<v:shape adj="1"/>';
+          var shape = div.firstChild;
+          shape.style.behavior = 'url(#default#VML)';
+          return shape && typeof shape.adj === 'object';
+        } catch (e) {
+          return false;
+        }
+      }();
+      L.SVG.include(!L.Browser.vml ? {} : {
+        _initContainer: function () {
+          this._container = L.DomUtil.create('div', 'leaflet-vml-container');
+        },
+        _update: function () {
+          if (this._map._animatingZoom) {
+            return;
+          }
+          L.Renderer.prototype._update.call(this);
+          this.fire('update');
+        },
+        _initPath: function (layer) {
+          var container = layer._container = L.SVG.create('shape');
+          L.DomUtil.addClass(container, 'leaflet-vml-shape ' + (this.options.className || ''));
+          container.coordsize = '1 1';
+          layer._path = L.SVG.create('path');
+          container.appendChild(layer._path);
+          this._updateStyle(layer);
+        },
+        _addPath: function (layer) {
+          var container = layer._container;
+          this._container.appendChild(container);
+          if (layer.options.interactive) {
+            layer.addInteractiveTarget(container);
+          }
+        },
+        _removePath: function (layer) {
+          var container = layer._container;
+          L.DomUtil.remove(container);
+          layer.removeInteractiveTarget(container);
+        },
+        _updateStyle: function (layer) {
+          var stroke = layer._stroke,
+              fill = layer._fill,
+              options = layer.options,
+              container = layer._container;
+          container.stroked = !!options.stroke;
+          container.filled = !!options.fill;
+          if (options.stroke) {
+            if (!stroke) {
+              stroke = layer._stroke = L.SVG.create('stroke');
+            }
+            container.appendChild(stroke);
+            stroke.weight = options.weight + 'px';
+            stroke.color = options.color;
+            stroke.opacity = options.opacity;
+            if (options.dashArray) {
+              stroke.dashStyle = L.Util.isArray(options.dashArray) ? options.dashArray.join(' ') : options.dashArray.replace(/( *, *)/g, ' ');
+            } else {
+              stroke.dashStyle = '';
+            }
+            stroke.endcap = options.lineCap.replace('butt', 'flat');
+            stroke.joinstyle = options.lineJoin;
+          } else if (stroke) {
+            container.removeChild(stroke);
+            layer._stroke = null;
+          }
+          if (options.fill) {
+            if (!fill) {
+              fill = layer._fill = L.SVG.create('fill');
+            }
+            container.appendChild(fill);
+            fill.color = options.fillColor || options.color;
+            fill.opacity = options.fillOpacity;
+          } else if (fill) {
+            container.removeChild(fill);
+            layer._fill = null;
+          }
+        },
+        _updateCircle: function (layer) {
+          var p = layer._point.round(),
+              r = Math.round(layer._radius),
+              r2 = Math.round(layer._radiusY || r);
+          this._setPath(layer, layer._empty() ? 'M0 0' : 'AL ' + p.x + ',' + p.y + ' ' + r + ',' + r2 + ' 0,' + 65535 * 360);
+        },
+        _setPath: function (layer, path) {
+          layer._path.v = path;
+        },
+        _bringToFront: function (layer) {
+          L.DomUtil.toFront(layer._container);
+        },
+        _bringToBack: function (layer) {
+          L.DomUtil.toBack(layer._container);
+        }
+      });
+      if (L.Browser.vml) {
+        L.SVG.create = function () {
+          try {
+            document.namespaces.add('lvml', 'urn:schemas-microsoft-com:vml');
+            return function (name) {
+              return document.createElement('<lvml:' + name + ' class="lvml">');
+            };
+          } catch (e) {
+            return function (name) {
+              return document.createElement('<' + name + ' xmlns="urn:schemas-microsoft.com:vml" class="lvml">');
+            };
+          }
+        }();
       }
-      this.fire('locationfound', data);
-    }
-  });
-}(window, document));
-
-})();
-(function() {
-var define = $__System.amdDefine;
-define("4a", ["143"], function(main) {
-  return main;
+      L.Canvas = L.Renderer.extend({
+        onAdd: function () {
+          L.Renderer.prototype.onAdd.call(this);
+          this._layers = this._layers || {};
+          this._draw();
+        },
+        _initContainer: function () {
+          var container = this._container = document.createElement('canvas');
+          L.DomEvent.on(container, 'mousemove', L.Util.throttle(this._onMouseMove, 32, this), this).on(container, 'click dblclick mousedown mouseup contextmenu', this._onClick, this).on(container, 'mouseout', this._handleMouseOut, this);
+          this._ctx = container.getContext('2d');
+        },
+        _update: function () {
+          if (this._map._animatingZoom && this._bounds) {
+            return;
+          }
+          this._drawnLayers = {};
+          L.Renderer.prototype._update.call(this);
+          var b = this._bounds,
+              container = this._container,
+              size = b.getSize(),
+              m = L.Browser.retina ? 2 : 1;
+          L.DomUtil.setPosition(container, b.min);
+          container.width = m * size.x;
+          container.height = m * size.y;
+          container.style.width = size.x + 'px';
+          container.style.height = size.y + 'px';
+          if (L.Browser.retina) {
+            this._ctx.scale(2, 2);
+          }
+          this._ctx.translate(-b.min.x, -b.min.y);
+          this.fire('update');
+        },
+        _initPath: function (layer) {
+          this._updateDashArray(layer);
+          this._layers[L.stamp(layer)] = layer;
+        },
+        _addPath: L.Util.falseFn,
+        _removePath: function (layer) {
+          layer._removed = true;
+          this._requestRedraw(layer);
+        },
+        _updatePath: function (layer) {
+          this._redrawBounds = layer._pxBounds;
+          this._draw(true);
+          layer._project();
+          layer._update();
+          this._draw();
+          this._redrawBounds = null;
+        },
+        _updateStyle: function (layer) {
+          this._updateDashArray(layer);
+          this._requestRedraw(layer);
+        },
+        _updateDashArray: function (layer) {
+          if (layer.options.dashArray) {
+            var parts = layer.options.dashArray.split(','),
+                dashArray = [],
+                i;
+            for (i = 0; i < parts.length; i++) {
+              dashArray.push(Number(parts[i]));
+            }
+            layer.options._dashArray = dashArray;
+          }
+        },
+        _requestRedraw: function (layer) {
+          if (!this._map) {
+            return;
+          }
+          var padding = (layer.options.weight || 0) + 1;
+          this._redrawBounds = this._redrawBounds || new L.Bounds();
+          this._redrawBounds.extend(layer._pxBounds.min.subtract([padding, padding]));
+          this._redrawBounds.extend(layer._pxBounds.max.add([padding, padding]));
+          this._redrawRequest = this._redrawRequest || L.Util.requestAnimFrame(this._redraw, this);
+        },
+        _redraw: function () {
+          this._redrawRequest = null;
+          this._draw(true);
+          this._draw();
+          this._redrawBounds = null;
+        },
+        _draw: function (clear) {
+          this._clear = clear;
+          var layer,
+              bounds = this._redrawBounds;
+          this._ctx.save();
+          if (bounds) {
+            this._ctx.beginPath();
+            this._ctx.rect(bounds.min.x, bounds.min.y, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y);
+            this._ctx.clip();
+          }
+          for (var id in this._layers) {
+            layer = this._layers[id];
+            if (!bounds || layer._pxBounds && layer._pxBounds.intersects(bounds)) {
+              layer._updatePath();
+            }
+            if (clear && layer._removed) {
+              delete layer._removed;
+              delete this._layers[id];
+            }
+          }
+          this._ctx.restore();
+        },
+        _updatePoly: function (layer, closed) {
+          var i,
+              j,
+              len2,
+              p,
+              parts = layer._parts,
+              len = parts.length,
+              ctx = this._ctx;
+          if (!len) {
+            return;
+          }
+          this._drawnLayers[layer._leaflet_id] = layer;
+          ctx.beginPath();
+          if (ctx.setLineDash) {
+            ctx.setLineDash(layer.options && layer.options._dashArray || []);
+          }
+          for (i = 0; i < len; i++) {
+            for (j = 0, len2 = parts[i].length; j < len2; j++) {
+              p = parts[i][j];
+              ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
+            }
+            if (closed) {
+              ctx.closePath();
+            }
+          }
+          this._fillStroke(ctx, layer);
+        },
+        _updateCircle: function (layer) {
+          if (layer._empty()) {
+            return;
+          }
+          var p = layer._point,
+              ctx = this._ctx,
+              r = layer._radius,
+              s = (layer._radiusY || r) / r;
+          this._drawnLayers[layer._leaflet_id] = layer;
+          if (s !== 1) {
+            ctx.save();
+            ctx.scale(1, s);
+          }
+          ctx.beginPath();
+          ctx.arc(p.x, p.y / s, r, 0, Math.PI * 2, false);
+          if (s !== 1) {
+            ctx.restore();
+          }
+          this._fillStroke(ctx, layer);
+        },
+        _fillStroke: function (ctx, layer) {
+          var clear = this._clear,
+              options = layer.options;
+          ctx.globalCompositeOperation = clear ? 'destination-out' : 'source-over';
+          if (options.fill) {
+            ctx.globalAlpha = clear ? 1 : options.fillOpacity;
+            ctx.fillStyle = options.fillColor || options.color;
+            ctx.fill(options.fillRule || 'evenodd');
+          }
+          if (options.stroke && options.weight !== 0) {
+            ctx.globalAlpha = clear ? 1 : options.opacity;
+            layer._prevWeight = ctx.lineWidth = clear ? layer._prevWeight + 1 : options.weight;
+            ctx.strokeStyle = options.color;
+            ctx.lineCap = options.lineCap;
+            ctx.lineJoin = options.lineJoin;
+            ctx.stroke();
+          }
+        },
+        _onClick: function (e) {
+          var point = this._map.mouseEventToLayerPoint(e),
+              layers = [],
+              layer;
+          for (var id in this._layers) {
+            layer = this._layers[id];
+            if (layer.options.interactive && layer._containsPoint(point) && !this._map._draggableMoved(layer)) {
+              L.DomEvent._fakeStop(e);
+              layers.push(layer);
+            }
+          }
+          if (layers.length) {
+            this._fireEvent(layers, e);
+          }
+        },
+        _onMouseMove: function (e) {
+          if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) {
+            return;
+          }
+          var point = this._map.mouseEventToLayerPoint(e);
+          this._handleMouseOut(e, point);
+          this._handleMouseHover(e, point);
+        },
+        _handleMouseOut: function (e, point) {
+          var layer = this._hoveredLayer;
+          if (layer && (e.type === 'mouseout' || !layer._containsPoint(point))) {
+            L.DomUtil.removeClass(this._container, 'leaflet-interactive');
+            this._fireEvent([layer], e, 'mouseout');
+            this._hoveredLayer = null;
+          }
+        },
+        _handleMouseHover: function (e, point) {
+          var id, layer;
+          for (id in this._drawnLayers) {
+            layer = this._drawnLayers[id];
+            if (layer.options.interactive && layer._containsPoint(point)) {
+              L.DomUtil.addClass(this._container, 'leaflet-interactive');
+              this._fireEvent([layer], e, 'mouseover');
+              this._hoveredLayer = layer;
+            }
+          }
+          if (this._hoveredLayer) {
+            this._fireEvent([this._hoveredLayer], e);
+          }
+        },
+        _fireEvent: function (layers, e, type) {
+          this._map._fireDOMEvent(e, type || e.type, layers);
+        },
+        _bringToFront: L.Util.falseFn,
+        _bringToBack: L.Util.falseFn
+      });
+      L.Browser.canvas = function () {
+        return !!document.createElement('canvas').getContext;
+      }();
+      L.canvas = function (options) {
+        return L.Browser.canvas ? new L.Canvas(options) : null;
+      };
+      L.Polyline.prototype._containsPoint = function (p, closed) {
+        var i,
+            j,
+            k,
+            len,
+            len2,
+            part,
+            w = this._clickTolerance();
+        if (!this._pxBounds.contains(p)) {
+          return false;
+        }
+        for (i = 0, len = this._parts.length; i < len; i++) {
+          part = this._parts[i];
+          for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
+            if (!closed && j === 0) {
+              continue;
+            }
+            if (L.LineUtil.pointToSegmentDistance(p, part[k], part[j]) <= w) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+      L.Polygon.prototype._containsPoint = function (p) {
+        var inside = false,
+            part,
+            p1,
+            p2,
+            i,
+            j,
+            k,
+            len,
+            len2;
+        if (!this._pxBounds.contains(p)) {
+          return false;
+        }
+        for (i = 0, len = this._parts.length; i < len; i++) {
+          part = this._parts[i];
+          for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
+            p1 = part[j];
+            p2 = part[k];
+            if (p1.y > p.y !== p2.y > p.y && p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x) {
+              inside = !inside;
+            }
+          }
+        }
+        return inside || L.Polyline.prototype._containsPoint.call(this, p, true);
+      };
+      L.CircleMarker.prototype._containsPoint = function (p) {
+        return p.distanceTo(this._point) <= this._radius + this._clickTolerance();
+      };
+      L.GeoJSON = L.FeatureGroup.extend({
+        initialize: function (geojson, options) {
+          L.setOptions(this, options);
+          this._layers = {};
+          if (geojson) {
+            this.addData(geojson);
+          }
+        },
+        addData: function (geojson) {
+          var features = L.Util.isArray(geojson) ? geojson : geojson.features,
+              i,
+              len,
+              feature;
+          if (features) {
+            for (i = 0, len = features.length; i < len; i++) {
+              feature = features[i];
+              if (feature.geometries || feature.geometry || feature.features || feature.coordinates) {
+                this.addData(feature);
+              }
+            }
+            return this;
+          }
+          var options = this.options;
+          if (options.filter && !options.filter(geojson)) {
+            return this;
+          }
+          var layer = L.GeoJSON.geometryToLayer(geojson, options);
+          if (!layer) {
+            return this;
+          }
+          layer.feature = L.GeoJSON.asFeature(geojson);
+          layer.defaultOptions = layer.options;
+          this.resetStyle(layer);
+          if (options.onEachFeature) {
+            options.onEachFeature(geojson, layer);
+          }
+          return this.addLayer(layer);
+        },
+        resetStyle: function (layer) {
+          layer.options = L.Util.extend({}, layer.defaultOptions);
+          this._setLayerStyle(layer, this.options.style);
+          return this;
+        },
+        setStyle: function (style) {
+          return this.eachLayer(function (layer) {
+            this._setLayerStyle(layer, style);
+          }, this);
+        },
+        _setLayerStyle: function (layer, style) {
+          if (typeof style === 'function') {
+            style = style(layer.feature);
+          }
+          if (layer.setStyle) {
+            layer.setStyle(style);
+          }
+        }
+      });
+      L.extend(L.GeoJSON, {
+        geometryToLayer: function (geojson, options) {
+          var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson,
+              coords = geometry ? geometry.coordinates : null,
+              layers = [],
+              pointToLayer = options && options.pointToLayer,
+              coordsToLatLng = options && options.coordsToLatLng || this.coordsToLatLng,
+              latlng,
+              latlngs,
+              i,
+              len;
+          if (!coords && !geometry) {
+            return null;
+          }
+          switch (geometry.type) {
+            case 'Point':
+              latlng = coordsToLatLng(coords);
+              return pointToLayer ? pointToLayer(geojson, latlng) : new L.Marker(latlng);
+            case 'MultiPoint':
+              for (i = 0, len = coords.length; i < len; i++) {
+                latlng = coordsToLatLng(coords[i]);
+                layers.push(pointToLayer ? pointToLayer(geojson, latlng) : new L.Marker(latlng));
+              }
+              return new L.FeatureGroup(layers);
+            case 'LineString':
+            case 'MultiLineString':
+              latlngs = this.coordsToLatLngs(coords, geometry.type === 'LineString' ? 0 : 1, coordsToLatLng);
+              return new L.Polyline(latlngs, options);
+            case 'Polygon':
+            case 'MultiPolygon':
+              latlngs = this.coordsToLatLngs(coords, geometry.type === 'Polygon' ? 1 : 2, coordsToLatLng);
+              return new L.Polygon(latlngs, options);
+            case 'GeometryCollection':
+              for (i = 0, len = geometry.geometries.length; i < len; i++) {
+                var layer = this.geometryToLayer({
+                  geometry: geometry.geometries[i],
+                  type: 'Feature',
+                  properties: geojson.properties
+                }, options);
+                if (layer) {
+                  layers.push(layer);
+                }
+              }
+              return new L.FeatureGroup(layers);
+            default:
+              throw new Error('Invalid GeoJSON object.');
+          }
+        },
+        coordsToLatLng: function (coords) {
+          return new L.LatLng(coords[1], coords[0], coords[2]);
+        },
+        coordsToLatLngs: function (coords, levelsDeep, coordsToLatLng) {
+          var latlngs = [];
+          for (var i = 0, len = coords.length, latlng; i < len; i++) {
+            latlng = levelsDeep ? this.coordsToLatLngs(coords[i], levelsDeep - 1, coordsToLatLng) : (coordsToLatLng || this.coordsToLatLng)(coords[i]);
+            latlngs.push(latlng);
+          }
+          return latlngs;
+        },
+        latLngToCoords: function (latlng) {
+          return latlng.alt !== undefined ? [latlng.lng, latlng.lat, latlng.alt] : [latlng.lng, latlng.lat];
+        },
+        latLngsToCoords: function (latlngs, levelsDeep, closed) {
+          var coords = [];
+          for (var i = 0, len = latlngs.length; i < len; i++) {
+            coords.push(levelsDeep ? L.GeoJSON.latLngsToCoords(latlngs[i], levelsDeep - 1, closed) : L.GeoJSON.latLngToCoords(latlngs[i]));
+          }
+          if (!levelsDeep && closed) {
+            coords.push(coords[0]);
+          }
+          return coords;
+        },
+        getFeature: function (layer, newGeometry) {
+          return layer.feature ? L.extend({}, layer.feature, { geometry: newGeometry }) : L.GeoJSON.asFeature(newGeometry);
+        },
+        asFeature: function (geojson) {
+          if (geojson.type === 'Feature') {
+            return geojson;
+          }
+          return {
+            type: 'Feature',
+            properties: {},
+            geometry: geojson
+          };
+        }
+      });
+      var PointToGeoJSON = { toGeoJSON: function () {
+          return L.GeoJSON.getFeature(this, {
+            type: 'Point',
+            coordinates: L.GeoJSON.latLngToCoords(this.getLatLng())
+          });
+        } };
+      L.Marker.include(PointToGeoJSON);
+      L.Circle.include(PointToGeoJSON);
+      L.CircleMarker.include(PointToGeoJSON);
+      L.Polyline.prototype.toGeoJSON = function () {
+        var multi = !L.Polyline._flat(this._latlngs);
+        var coords = L.GeoJSON.latLngsToCoords(this._latlngs, multi ? 1 : 0);
+        return L.GeoJSON.getFeature(this, {
+          type: (multi ? 'Multi' : '') + 'LineString',
+          coordinates: coords
+        });
+      };
+      L.Polygon.prototype.toGeoJSON = function () {
+        var holes = !L.Polyline._flat(this._latlngs),
+            multi = holes && !L.Polyline._flat(this._latlngs[0]);
+        var coords = L.GeoJSON.latLngsToCoords(this._latlngs, multi ? 2 : holes ? 1 : 0, true);
+        if (!holes) {
+          coords = [coords];
+        }
+        return L.GeoJSON.getFeature(this, {
+          type: (multi ? 'Multi' : '') + 'Polygon',
+          coordinates: coords
+        });
+      };
+      L.LayerGroup.include({
+        toMultiPoint: function () {
+          var coords = [];
+          this.eachLayer(function (layer) {
+            coords.push(layer.toGeoJSON().geometry.coordinates);
+          });
+          return L.GeoJSON.getFeature(this, {
+            type: 'MultiPoint',
+            coordinates: coords
+          });
+        },
+        toGeoJSON: function () {
+          var type = this.feature && this.feature.geometry && this.feature.geometry.type;
+          if (type === 'MultiPoint') {
+            return this.toMultiPoint();
+          }
+          var isGeometryCollection = type === 'GeometryCollection',
+              jsons = [];
+          this.eachLayer(function (layer) {
+            if (layer.toGeoJSON) {
+              var json = layer.toGeoJSON();
+              jsons.push(isGeometryCollection ? json.geometry : L.GeoJSON.asFeature(json));
+            }
+          });
+          if (isGeometryCollection) {
+            return L.GeoJSON.getFeature(this, {
+              geometries: jsons,
+              type: 'GeometryCollection'
+            });
+          }
+          return {
+            type: 'FeatureCollection',
+            features: jsons
+          };
+        }
+      });
+      L.geoJSON = function (geojson, options) {
+        return new L.GeoJSON(geojson, options);
+      };
+      L.geoJson = L.geoJSON;
+      var eventsKey = '_leaflet_events';
+      L.DomEvent = {
+        on: function (obj, types, fn, context) {
+          if (typeof types === 'object') {
+            for (var type in types) {
+              this._on(obj, type, types[type], fn);
+            }
+          } else {
+            types = L.Util.splitWords(types);
+            for (var i = 0, len = types.length; i < len; i++) {
+              this._on(obj, types[i], fn, context);
+            }
+          }
+          return this;
+        },
+        off: function (obj, types, fn, context) {
+          if (typeof types === 'object') {
+            for (var type in types) {
+              this._off(obj, type, types[type], fn);
+            }
+          } else {
+            types = L.Util.splitWords(types);
+            for (var i = 0, len = types.length; i < len; i++) {
+              this._off(obj, types[i], fn, context);
+            }
+          }
+          return this;
+        },
+        _on: function (obj, type, fn, context) {
+          var id = type + L.stamp(fn) + (context ? '_' + L.stamp(context) : '');
+          if (obj[eventsKey] && obj[eventsKey][id]) {
+            return this;
+          }
+          var handler = function (e) {
+            return fn.call(context || obj, e || window.event);
+          };
+          var originalHandler = handler;
+          if (L.Browser.pointer && type.indexOf('touch') === 0) {
+            this.addPointerListener(obj, type, handler, id);
+          } else if (L.Browser.touch && type === 'dblclick' && this.addDoubleTapListener) {
+            this.addDoubleTapListener(obj, handler, id);
+          } else if ('addEventListener' in obj) {
+            if (type === 'mousewheel') {
+              obj.addEventListener('onwheel' in obj ? 'wheel' : 'mousewheel', handler, false);
+            } else if (type === 'mouseenter' || type === 'mouseleave') {
+              handler = function (e) {
+                e = e || window.event;
+                if (L.DomEvent._isExternalTarget(obj, e)) {
+                  originalHandler(e);
+                }
+              };
+              obj.addEventListener(type === 'mouseenter' ? 'mouseover' : 'mouseout', handler, false);
+            } else {
+              if (type === 'click' && L.Browser.android) {
+                handler = function (e) {
+                  return L.DomEvent._filterClick(e, originalHandler);
+                };
+              }
+              obj.addEventListener(type, handler, false);
+            }
+          } else if ('attachEvent' in obj) {
+            obj.attachEvent('on' + type, handler);
+          }
+          obj[eventsKey] = obj[eventsKey] || {};
+          obj[eventsKey][id] = handler;
+          return this;
+        },
+        _off: function (obj, type, fn, context) {
+          var id = type + L.stamp(fn) + (context ? '_' + L.stamp(context) : ''),
+              handler = obj[eventsKey] && obj[eventsKey][id];
+          if (!handler) {
+            return this;
+          }
+          if (L.Browser.pointer && type.indexOf('touch') === 0) {
+            this.removePointerListener(obj, type, id);
+          } else if (L.Browser.touch && type === 'dblclick' && this.removeDoubleTapListener) {
+            this.removeDoubleTapListener(obj, id);
+          } else if ('removeEventListener' in obj) {
+            if (type === 'mousewheel') {
+              obj.removeEventListener('onwheel' in obj ? 'wheel' : 'mousewheel', handler, false);
+            } else {
+              obj.removeEventListener(type === 'mouseenter' ? 'mouseover' : type === 'mouseleave' ? 'mouseout' : type, handler, false);
+            }
+          } else if ('detachEvent' in obj) {
+            obj.detachEvent('on' + type, handler);
+          }
+          obj[eventsKey][id] = null;
+          return this;
+        },
+        stopPropagation: function (e) {
+          if (e.stopPropagation) {
+            e.stopPropagation();
+          } else if (e.originalEvent) {
+            e.originalEvent._stopped = true;
+          } else {
+            e.cancelBubble = true;
+          }
+          L.DomEvent._skipped(e);
+          return this;
+        },
+        disableScrollPropagation: function (el) {
+          return L.DomEvent.on(el, 'mousewheel', L.DomEvent.stopPropagation);
+        },
+        disableClickPropagation: function (el) {
+          var stop = L.DomEvent.stopPropagation;
+          L.DomEvent.on(el, L.Draggable.START.join(' '), stop);
+          return L.DomEvent.on(el, {
+            click: L.DomEvent._fakeStop,
+            dblclick: stop
+          });
+        },
+        preventDefault: function (e) {
+          if (e.preventDefault) {
+            e.preventDefault();
+          } else {
+            e.returnValue = false;
+          }
+          return this;
+        },
+        stop: function (e) {
+          return L.DomEvent.preventDefault(e).stopPropagation(e);
+        },
+        getMousePosition: function (e, container) {
+          if (!container) {
+            return new L.Point(e.clientX, e.clientY);
+          }
+          var rect = container.getBoundingClientRect();
+          return new L.Point(e.clientX - rect.left - container.clientLeft, e.clientY - rect.top - container.clientTop);
+        },
+        _wheelPxFactor: L.Browser.win && L.Browser.chrome ? 2 : L.Browser.gecko ? window.devicePixelRatio : 1,
+        getWheelDelta: function (e) {
+          return L.Browser.edge ? e.wheelDeltaY / 2 : e.deltaY && e.deltaMode === 0 ? -e.deltaY / L.DomEvent._wheelPxFactor : e.deltaY && e.deltaMode === 1 ? -e.deltaY * 20 : e.deltaY && e.deltaMode === 2 ? -e.deltaY * 60 : e.deltaX || e.deltaZ ? 0 : e.wheelDelta ? (e.wheelDeltaY || e.wheelDelta) / 2 : e.detail && Math.abs(e.detail) < 32765 ? -e.detail * 20 : e.detail ? e.detail / -32765 * 60 : 0;
+        },
+        _skipEvents: {},
+        _fakeStop: function (e) {
+          L.DomEvent._skipEvents[e.type] = true;
+        },
+        _skipped: function (e) {
+          var skipped = this._skipEvents[e.type];
+          this._skipEvents[e.type] = false;
+          return skipped;
+        },
+        _isExternalTarget: function (el, e) {
+          var related = e.relatedTarget;
+          if (!related) {
+            return true;
+          }
+          try {
+            while (related && related !== el) {
+              related = related.parentNode;
+            }
+          } catch (err) {
+            return false;
+          }
+          return related !== el;
+        },
+        _filterClick: function (e, handler) {
+          var timeStamp = e.timeStamp || e.originalEvent && e.originalEvent.timeStamp,
+              elapsed = L.DomEvent._lastClick && timeStamp - L.DomEvent._lastClick;
+          if (elapsed && elapsed > 100 && elapsed < 500 || e.target._simulatedClick && !e._simulated) {
+            L.DomEvent.stop(e);
+            return;
+          }
+          L.DomEvent._lastClick = timeStamp;
+          handler(e);
+        }
+      };
+      L.DomEvent.addListener = L.DomEvent.on;
+      L.DomEvent.removeListener = L.DomEvent.off;
+      L.Draggable = L.Evented.extend({
+        options: { clickTolerance: 3 },
+        statics: {
+          START: L.Browser.touch ? ['touchstart', 'mousedown'] : ['mousedown'],
+          END: {
+            mousedown: 'mouseup',
+            touchstart: 'touchend',
+            pointerdown: 'touchend',
+            MSPointerDown: 'touchend'
+          },
+          MOVE: {
+            mousedown: 'mousemove',
+            touchstart: 'touchmove',
+            pointerdown: 'touchmove',
+            MSPointerDown: 'touchmove'
+          }
+        },
+        initialize: function (element, dragStartTarget, preventOutline) {
+          this._element = element;
+          this._dragStartTarget = dragStartTarget || element;
+          this._preventOutline = preventOutline;
+        },
+        enable: function () {
+          if (this._enabled) {
+            return;
+          }
+          L.DomEvent.on(this._dragStartTarget, L.Draggable.START.join(' '), this._onDown, this);
+          this._enabled = true;
+        },
+        disable: function () {
+          if (!this._enabled) {
+            return;
+          }
+          L.DomEvent.off(this._dragStartTarget, L.Draggable.START.join(' '), this._onDown, this);
+          this._enabled = false;
+          this._moved = false;
+        },
+        _onDown: function (e) {
+          if (e._simulated || !this._enabled) {
+            return;
+          }
+          this._moved = false;
+          if (L.DomUtil.hasClass(this._element, 'leaflet-zoom-anim')) {
+            return;
+          }
+          if (L.Draggable._dragging || e.shiftKey || e.which !== 1 && e.button !== 1 && !e.touches || !this._enabled) {
+            return;
+          }
+          L.Draggable._dragging = true;
+          if (this._preventOutline) {
+            L.DomUtil.preventOutline(this._element);
+          }
+          L.DomUtil.disableImageDrag();
+          L.DomUtil.disableTextSelection();
+          if (this._moving) {
+            return;
+          }
+          this.fire('down');
+          var first = e.touches ? e.touches[0] : e;
+          this._startPoint = new L.Point(first.clientX, first.clientY);
+          L.DomEvent.on(document, L.Draggable.MOVE[e.type], this._onMove, this).on(document, L.Draggable.END[e.type], this._onUp, this);
+        },
+        _onMove: function (e) {
+          if (e._simulated || !this._enabled) {
+            return;
+          }
+          if (e.touches && e.touches.length > 1) {
+            this._moved = true;
+            return;
+          }
+          var first = e.touches && e.touches.length === 1 ? e.touches[0] : e,
+              newPoint = new L.Point(first.clientX, first.clientY),
+              offset = newPoint.subtract(this._startPoint);
+          if (!offset.x && !offset.y) {
+            return;
+          }
+          if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) {
+            return;
+          }
+          L.DomEvent.preventDefault(e);
+          if (!this._moved) {
+            this.fire('dragstart');
+            this._moved = true;
+            this._startPos = L.DomUtil.getPosition(this._element).subtract(offset);
+            L.DomUtil.addClass(document.body, 'leaflet-dragging');
+            this._lastTarget = e.target || e.srcElement;
+            if (window.SVGElementInstance && this._lastTarget instanceof SVGElementInstance) {
+              this._lastTarget = this._lastTarget.correspondingUseElement;
+            }
+            L.DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
+          }
+          this._newPos = this._startPos.add(offset);
+          this._moving = true;
+          L.Util.cancelAnimFrame(this._animRequest);
+          this._lastEvent = e;
+          this._animRequest = L.Util.requestAnimFrame(this._updatePosition, this, true);
+        },
+        _updatePosition: function () {
+          var e = { originalEvent: this._lastEvent };
+          this.fire('predrag', e);
+          L.DomUtil.setPosition(this._element, this._newPos);
+          this.fire('drag', e);
+        },
+        _onUp: function (e) {
+          if (e._simulated || !this._enabled) {
+            return;
+          }
+          L.DomUtil.removeClass(document.body, 'leaflet-dragging');
+          if (this._lastTarget) {
+            L.DomUtil.removeClass(this._lastTarget, 'leaflet-drag-target');
+            this._lastTarget = null;
+          }
+          for (var i in L.Draggable.MOVE) {
+            L.DomEvent.off(document, L.Draggable.MOVE[i], this._onMove, this).off(document, L.Draggable.END[i], this._onUp, this);
+          }
+          L.DomUtil.enableImageDrag();
+          L.DomUtil.enableTextSelection();
+          if (this._moved && this._moving) {
+            L.Util.cancelAnimFrame(this._animRequest);
+            this.fire('dragend', { distance: this._newPos.distanceTo(this._startPos) });
+          }
+          this._moving = false;
+          L.Draggable._dragging = false;
+        }
+      });
+      L.Handler = L.Class.extend({
+        initialize: function (map) {
+          this._map = map;
+        },
+        enable: function () {
+          if (this._enabled) {
+            return this;
+          }
+          this._enabled = true;
+          this.addHooks();
+          return this;
+        },
+        disable: function () {
+          if (!this._enabled) {
+            return this;
+          }
+          this._enabled = false;
+          this.removeHooks();
+          return this;
+        },
+        enabled: function () {
+          return !!this._enabled;
+        }
+      });
+      L.Map.mergeOptions({
+        dragging: true,
+        inertia: !L.Browser.android23,
+        inertiaDeceleration: 3400,
+        inertiaMaxSpeed: Infinity,
+        easeLinearity: 0.2,
+        worldCopyJump: false,
+        maxBoundsViscosity: 0.0
+      });
+      L.Map.Drag = L.Handler.extend({
+        addHooks: function () {
+          if (!this._draggable) {
+            var map = this._map;
+            this._draggable = new L.Draggable(map._mapPane, map._container);
+            this._draggable.on({
+              down: this._onDown,
+              dragstart: this._onDragStart,
+              drag: this._onDrag,
+              dragend: this._onDragEnd
+            }, this);
+            this._draggable.on('predrag', this._onPreDragLimit, this);
+            if (map.options.worldCopyJump) {
+              this._draggable.on('predrag', this._onPreDragWrap, this);
+              map.on('zoomend', this._onZoomEnd, this);
+              map.whenReady(this._onZoomEnd, this);
+            }
+          }
+          L.DomUtil.addClass(this._map._container, 'leaflet-grab leaflet-touch-drag');
+          this._draggable.enable();
+          this._positions = [];
+          this._times = [];
+        },
+        removeHooks: function () {
+          L.DomUtil.removeClass(this._map._container, 'leaflet-grab');
+          L.DomUtil.removeClass(this._map._container, 'leaflet-touch-drag');
+          this._draggable.disable();
+        },
+        moved: function () {
+          return this._draggable && this._draggable._moved;
+        },
+        moving: function () {
+          return this._draggable && this._draggable._moving;
+        },
+        _onDown: function () {
+          this._map._stop();
+        },
+        _onDragStart: function () {
+          var map = this._map;
+          if (this._map.options.maxBounds && this._map.options.maxBoundsViscosity) {
+            var bounds = L.latLngBounds(this._map.options.maxBounds);
+            this._offsetLimit = L.bounds(this._map.latLngToContainerPoint(bounds.getNorthWest()).multiplyBy(-1), this._map.latLngToContainerPoint(bounds.getSouthEast()).multiplyBy(-1).add(this._map.getSize()));
+            this._viscosity = Math.min(1.0, Math.max(0.0, this._map.options.maxBoundsViscosity));
+          } else {
+            this._offsetLimit = null;
+          }
+          map.fire('movestart').fire('dragstart');
+          if (map.options.inertia) {
+            this._positions = [];
+            this._times = [];
+          }
+        },
+        _onDrag: function (e) {
+          if (this._map.options.inertia) {
+            var time = this._lastTime = +new Date(),
+                pos = this._lastPos = this._draggable._absPos || this._draggable._newPos;
+            this._positions.push(pos);
+            this._times.push(time);
+            if (time - this._times[0] > 50) {
+              this._positions.shift();
+              this._times.shift();
+            }
+          }
+          this._map.fire('move', e).fire('drag', e);
+        },
+        _onZoomEnd: function () {
+          var pxCenter = this._map.getSize().divideBy(2),
+              pxWorldCenter = this._map.latLngToLayerPoint([0, 0]);
+          this._initialWorldOffset = pxWorldCenter.subtract(pxCenter).x;
+          this._worldWidth = this._map.getPixelWorldBounds().getSize().x;
+        },
+        _viscousLimit: function (value, threshold) {
+          return value - (value - threshold) * this._viscosity;
+        },
+        _onPreDragLimit: function () {
+          if (!this._viscosity || !this._offsetLimit) {
+            return;
+          }
+          var offset = this._draggable._newPos.subtract(this._draggable._startPos);
+          var limit = this._offsetLimit;
+          if (offset.x < limit.min.x) {
+            offset.x = this._viscousLimit(offset.x, limit.min.x);
+          }
+          if (offset.y < limit.min.y) {
+            offset.y = this._viscousLimit(offset.y, limit.min.y);
+          }
+          if (offset.x > limit.max.x) {
+            offset.x = this._viscousLimit(offset.x, limit.max.x);
+          }
+          if (offset.y > limit.max.y) {
+            offset.y = this._viscousLimit(offset.y, limit.max.y);
+          }
+          this._draggable._newPos = this._draggable._startPos.add(offset);
+        },
+        _onPreDragWrap: function () {
+          var worldWidth = this._worldWidth,
+              halfWidth = Math.round(worldWidth / 2),
+              dx = this._initialWorldOffset,
+              x = this._draggable._newPos.x,
+              newX1 = (x - halfWidth + dx) % worldWidth + halfWidth - dx,
+              newX2 = (x + halfWidth + dx) % worldWidth - halfWidth - dx,
+              newX = Math.abs(newX1 + dx) < Math.abs(newX2 + dx) ? newX1 : newX2;
+          this._draggable._absPos = this._draggable._newPos.clone();
+          this._draggable._newPos.x = newX;
+        },
+        _onDragEnd: function (e) {
+          var map = this._map,
+              options = map.options,
+              noInertia = !options.inertia || this._times.length < 2;
+          map.fire('dragend', e);
+          if (noInertia) {
+            map.fire('moveend');
+          } else {
+            var direction = this._lastPos.subtract(this._positions[0]),
+                duration = (this._lastTime - this._times[0]) / 1000,
+                ease = options.easeLinearity,
+                speedVector = direction.multiplyBy(ease / duration),
+                speed = speedVector.distanceTo([0, 0]),
+                limitedSpeed = Math.min(options.inertiaMaxSpeed, speed),
+                limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed),
+                decelerationDuration = limitedSpeed / (options.inertiaDeceleration * ease),
+                offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
+            if (!offset.x && !offset.y) {
+              map.fire('moveend');
+            } else {
+              offset = map._limitOffset(offset, map.options.maxBounds);
+              L.Util.requestAnimFrame(function () {
+                map.panBy(offset, {
+                  duration: decelerationDuration,
+                  easeLinearity: ease,
+                  noMoveStart: true,
+                  animate: true
+                });
+              });
+            }
+          }
+        }
+      });
+      L.Map.addInitHook('addHandler', 'dragging', L.Map.Drag);
+      L.Map.mergeOptions({ doubleClickZoom: true });
+      L.Map.DoubleClickZoom = L.Handler.extend({
+        addHooks: function () {
+          this._map.on('dblclick', this._onDoubleClick, this);
+        },
+        removeHooks: function () {
+          this._map.off('dblclick', this._onDoubleClick, this);
+        },
+        _onDoubleClick: function (e) {
+          var map = this._map,
+              oldZoom = map.getZoom(),
+              delta = map.options.zoomDelta,
+              zoom = e.originalEvent.shiftKey ? oldZoom - delta : oldZoom + delta;
+          if (map.options.doubleClickZoom === 'center') {
+            map.setZoom(zoom);
+          } else {
+            map.setZoomAround(e.containerPoint, zoom);
+          }
+        }
+      });
+      L.Map.addInitHook('addHandler', 'doubleClickZoom', L.Map.DoubleClickZoom);
+      L.Map.mergeOptions({
+        scrollWheelZoom: true,
+        wheelDebounceTime: 40,
+        wheelPxPerZoomLevel: 60
+      });
+      L.Map.ScrollWheelZoom = L.Handler.extend({
+        addHooks: function () {
+          L.DomEvent.on(this._map._container, 'mousewheel', this._onWheelScroll, this);
+          this._delta = 0;
+        },
+        removeHooks: function () {
+          L.DomEvent.off(this._map._container, 'mousewheel', this._onWheelScroll, this);
+        },
+        _onWheelScroll: function (e) {
+          var delta = L.DomEvent.getWheelDelta(e);
+          var debounce = this._map.options.wheelDebounceTime;
+          this._delta += delta;
+          this._lastMousePos = this._map.mouseEventToContainerPoint(e);
+          if (!this._startTime) {
+            this._startTime = +new Date();
+          }
+          var left = Math.max(debounce - (+new Date() - this._startTime), 0);
+          clearTimeout(this._timer);
+          this._timer = setTimeout(L.bind(this._performZoom, this), left);
+          L.DomEvent.stop(e);
+        },
+        _performZoom: function () {
+          var map = this._map,
+              zoom = map.getZoom(),
+              snap = this._map.options.zoomSnap || 0;
+          map._stop();
+          var d2 = this._delta / (this._map.options.wheelPxPerZoomLevel * 4),
+              d3 = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(d2)))) / Math.LN2,
+              d4 = snap ? Math.ceil(d3 / snap) * snap : d3,
+              delta = map._limitZoom(zoom + (this._delta > 0 ? d4 : -d4)) - zoom;
+          this._delta = 0;
+          this._startTime = null;
+          if (!delta) {
+            return;
+          }
+          if (map.options.scrollWheelZoom === 'center') {
+            map.setZoom(zoom + delta);
+          } else {
+            map.setZoomAround(this._lastMousePos, zoom + delta);
+          }
+        }
+      });
+      L.Map.addInitHook('addHandler', 'scrollWheelZoom', L.Map.ScrollWheelZoom);
+      L.extend(L.DomEvent, {
+        _touchstart: L.Browser.msPointer ? 'MSPointerDown' : L.Browser.pointer ? 'pointerdown' : 'touchstart',
+        _touchend: L.Browser.msPointer ? 'MSPointerUp' : L.Browser.pointer ? 'pointerup' : 'touchend',
+        addDoubleTapListener: function (obj, handler, id) {
+          var last,
+              touch,
+              doubleTap = false,
+              delay = 250;
+          function onTouchStart(e) {
+            var count;
+            if (L.Browser.pointer) {
+              count = L.DomEvent._pointersCount;
+            } else {
+              count = e.touches.length;
+            }
+            if (count > 1) {
+              return;
+            }
+            var now = Date.now(),
+                delta = now - (last || now);
+            touch = e.touches ? e.touches[0] : e;
+            doubleTap = delta > 0 && delta <= delay;
+            last = now;
+          }
+          function onTouchEnd() {
+            if (doubleTap && !touch.cancelBubble) {
+              if (L.Browser.pointer) {
+                var newTouch = {},
+                    prop,
+                    i;
+                for (i in touch) {
+                  prop = touch[i];
+                  newTouch[i] = prop && prop.bind ? prop.bind(touch) : prop;
+                }
+                touch = newTouch;
+              }
+              touch.type = 'dblclick';
+              handler(touch);
+              last = null;
+            }
+          }
+          var pre = '_leaflet_',
+              touchstart = this._touchstart,
+              touchend = this._touchend;
+          obj[pre + touchstart + id] = onTouchStart;
+          obj[pre + touchend + id] = onTouchEnd;
+          obj[pre + 'dblclick' + id] = handler;
+          obj.addEventListener(touchstart, onTouchStart, false);
+          obj.addEventListener(touchend, onTouchEnd, false);
+          if (!L.Browser.edge) {
+            obj.addEventListener('dblclick', handler, false);
+          }
+          return this;
+        },
+        removeDoubleTapListener: function (obj, id) {
+          var pre = '_leaflet_',
+              touchstart = obj[pre + this._touchstart + id],
+              touchend = obj[pre + this._touchend + id],
+              dblclick = obj[pre + 'dblclick' + id];
+          obj.removeEventListener(this._touchstart, touchstart, false);
+          obj.removeEventListener(this._touchend, touchend, false);
+          if (!L.Browser.edge) {
+            obj.removeEventListener('dblclick', dblclick, false);
+          }
+          return this;
+        }
+      });
+      L.extend(L.DomEvent, {
+        POINTER_DOWN: L.Browser.msPointer ? 'MSPointerDown' : 'pointerdown',
+        POINTER_MOVE: L.Browser.msPointer ? 'MSPointerMove' : 'pointermove',
+        POINTER_UP: L.Browser.msPointer ? 'MSPointerUp' : 'pointerup',
+        POINTER_CANCEL: L.Browser.msPointer ? 'MSPointerCancel' : 'pointercancel',
+        TAG_WHITE_LIST: ['INPUT', 'SELECT', 'OPTION'],
+        _pointers: {},
+        _pointersCount: 0,
+        addPointerListener: function (obj, type, handler, id) {
+          if (type === 'touchstart') {
+            this._addPointerStart(obj, handler, id);
+          } else if (type === 'touchmove') {
+            this._addPointerMove(obj, handler, id);
+          } else if (type === 'touchend') {
+            this._addPointerEnd(obj, handler, id);
+          }
+          return this;
+        },
+        removePointerListener: function (obj, type, id) {
+          var handler = obj['_leaflet_' + type + id];
+          if (type === 'touchstart') {
+            obj.removeEventListener(this.POINTER_DOWN, handler, false);
+          } else if (type === 'touchmove') {
+            obj.removeEventListener(this.POINTER_MOVE, handler, false);
+          } else if (type === 'touchend') {
+            obj.removeEventListener(this.POINTER_UP, handler, false);
+            obj.removeEventListener(this.POINTER_CANCEL, handler, false);
+          }
+          return this;
+        },
+        _addPointerStart: function (obj, handler, id) {
+          var onDown = L.bind(function (e) {
+            if (e.pointerType !== 'mouse' && e.pointerType !== e.MSPOINTER_TYPE_MOUSE) {
+              if (this.TAG_WHITE_LIST.indexOf(e.target.tagName) < 0) {
+                L.DomEvent.preventDefault(e);
+              } else {
+                return;
+              }
+            }
+            this._handlePointer(e, handler);
+          }, this);
+          obj['_leaflet_touchstart' + id] = onDown;
+          obj.addEventListener(this.POINTER_DOWN, onDown, false);
+          if (!this._pointerDocListener) {
+            var pointerUp = L.bind(this._globalPointerUp, this);
+            document.documentElement.addEventListener(this.POINTER_DOWN, L.bind(this._globalPointerDown, this), true);
+            document.documentElement.addEventListener(this.POINTER_MOVE, L.bind(this._globalPointerMove, this), true);
+            document.documentElement.addEventListener(this.POINTER_UP, pointerUp, true);
+            document.documentElement.addEventListener(this.POINTER_CANCEL, pointerUp, true);
+            this._pointerDocListener = true;
+          }
+        },
+        _globalPointerDown: function (e) {
+          this._pointers[e.pointerId] = e;
+          this._pointersCount++;
+        },
+        _globalPointerMove: function (e) {
+          if (this._pointers[e.pointerId]) {
+            this._pointers[e.pointerId] = e;
+          }
+        },
+        _globalPointerUp: function (e) {
+          delete this._pointers[e.pointerId];
+          this._pointersCount--;
+        },
+        _handlePointer: function (e, handler) {
+          e.touches = [];
+          for (var i in this._pointers) {
+            e.touches.push(this._pointers[i]);
+          }
+          e.changedTouches = [e];
+          handler(e);
+        },
+        _addPointerMove: function (obj, handler, id) {
+          var onMove = L.bind(function (e) {
+            if ((e.pointerType === e.MSPOINTER_TYPE_MOUSE || e.pointerType === 'mouse') && e.buttons === 0) {
+              return;
+            }
+            this._handlePointer(e, handler);
+          }, this);
+          obj['_leaflet_touchmove' + id] = onMove;
+          obj.addEventListener(this.POINTER_MOVE, onMove, false);
+        },
+        _addPointerEnd: function (obj, handler, id) {
+          var onUp = L.bind(function (e) {
+            this._handlePointer(e, handler);
+          }, this);
+          obj['_leaflet_touchend' + id] = onUp;
+          obj.addEventListener(this.POINTER_UP, onUp, false);
+          obj.addEventListener(this.POINTER_CANCEL, onUp, false);
+        }
+      });
+      L.Map.mergeOptions({
+        touchZoom: L.Browser.touch && !L.Browser.android23,
+        bounceAtZoomLimits: true
+      });
+      L.Map.TouchZoom = L.Handler.extend({
+        addHooks: function () {
+          L.DomUtil.addClass(this._map._container, 'leaflet-touch-zoom');
+          L.DomEvent.on(this._map._container, 'touchstart', this._onTouchStart, this);
+        },
+        removeHooks: function () {
+          L.DomUtil.removeClass(this._map._container, 'leaflet-touch-zoom');
+          L.DomEvent.off(this._map._container, 'touchstart', this._onTouchStart, this);
+        },
+        _onTouchStart: function (e) {
+          var map = this._map;
+          if (!e.touches || e.touches.length !== 2 || map._animatingZoom || this._zooming) {
+            return;
+          }
+          var p1 = map.mouseEventToContainerPoint(e.touches[0]),
+              p2 = map.mouseEventToContainerPoint(e.touches[1]);
+          this._centerPoint = map.getSize()._divideBy(2);
+          this._startLatLng = map.containerPointToLatLng(this._centerPoint);
+          if (map.options.touchZoom !== 'center') {
+            this._pinchStartLatLng = map.containerPointToLatLng(p1.add(p2)._divideBy(2));
+          }
+          this._startDist = p1.distanceTo(p2);
+          this._startZoom = map.getZoom();
+          this._moved = false;
+          this._zooming = true;
+          map._stop();
+          L.DomEvent.on(document, 'touchmove', this._onTouchMove, this).on(document, 'touchend', this._onTouchEnd, this);
+          L.DomEvent.preventDefault(e);
+        },
+        _onTouchMove: function (e) {
+          if (!e.touches || e.touches.length !== 2 || !this._zooming) {
+            return;
+          }
+          var map = this._map,
+              p1 = map.mouseEventToContainerPoint(e.touches[0]),
+              p2 = map.mouseEventToContainerPoint(e.touches[1]),
+              scale = p1.distanceTo(p2) / this._startDist;
+          this._zoom = map.getScaleZoom(scale, this._startZoom);
+          if (!map.options.bounceAtZoomLimits && (this._zoom < map.getMinZoom() && scale < 1 || this._zoom > map.getMaxZoom() && scale > 1)) {
+            this._zoom = map._limitZoom(this._zoom);
+          }
+          if (map.options.touchZoom === 'center') {
+            this._center = this._startLatLng;
+            if (scale === 1) {
+              return;
+            }
+          } else {
+            var delta = p1._add(p2)._divideBy(2)._subtract(this._centerPoint);
+            if (scale === 1 && delta.x === 0 && delta.y === 0) {
+              return;
+            }
+            this._center = map.unproject(map.project(this._pinchStartLatLng, this._zoom).subtract(delta), this._zoom);
+          }
+          if (!this._moved) {
+            map._moveStart(true);
+            this._moved = true;
+          }
+          L.Util.cancelAnimFrame(this._animRequest);
+          var moveFn = L.bind(map._move, map, this._center, this._zoom, {
+            pinch: true,
+            round: false
+          });
+          this._animRequest = L.Util.requestAnimFrame(moveFn, this, true);
+          L.DomEvent.preventDefault(e);
+        },
+        _onTouchEnd: function () {
+          if (!this._moved || !this._zooming) {
+            this._zooming = false;
+            return;
+          }
+          this._zooming = false;
+          L.Util.cancelAnimFrame(this._animRequest);
+          L.DomEvent.off(document, 'touchmove', this._onTouchMove).off(document, 'touchend', this._onTouchEnd);
+          if (this._map.options.zoomAnimation) {
+            this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), true, this._map.options.zoomSnap);
+          } else {
+            this._map._resetView(this._center, this._map._limitZoom(this._zoom));
+          }
+        }
+      });
+      L.Map.addInitHook('addHandler', 'touchZoom', L.Map.TouchZoom);
+      L.Map.mergeOptions({
+        tap: true,
+        tapTolerance: 15
+      });
+      L.Map.Tap = L.Handler.extend({
+        addHooks: function () {
+          L.DomEvent.on(this._map._container, 'touchstart', this._onDown, this);
+        },
+        removeHooks: function () {
+          L.DomEvent.off(this._map._container, 'touchstart', this._onDown, this);
+        },
+        _onDown: function (e) {
+          if (!e.touches) {
+            return;
+          }
+          L.DomEvent.preventDefault(e);
+          this._fireClick = true;
+          if (e.touches.length > 1) {
+            this._fireClick = false;
+            clearTimeout(this._holdTimeout);
+            return;
+          }
+          var first = e.touches[0],
+              el = first.target;
+          this._startPos = this._newPos = new L.Point(first.clientX, first.clientY);
+          if (el.tagName && el.tagName.toLowerCase() === 'a') {
+            L.DomUtil.addClass(el, 'leaflet-active');
+          }
+          this._holdTimeout = setTimeout(L.bind(function () {
+            if (this._isTapValid()) {
+              this._fireClick = false;
+              this._onUp();
+              this._simulateEvent('contextmenu', first);
+            }
+          }, this), 1000);
+          this._simulateEvent('mousedown', first);
+          L.DomEvent.on(document, {
+            touchmove: this._onMove,
+            touchend: this._onUp
+          }, this);
+        },
+        _onUp: function (e) {
+          clearTimeout(this._holdTimeout);
+          L.DomEvent.off(document, {
+            touchmove: this._onMove,
+            touchend: this._onUp
+          }, this);
+          if (this._fireClick && e && e.changedTouches) {
+            var first = e.changedTouches[0],
+                el = first.target;
+            if (el && el.tagName && el.tagName.toLowerCase() === 'a') {
+              L.DomUtil.removeClass(el, 'leaflet-active');
+            }
+            this._simulateEvent('mouseup', first);
+            if (this._isTapValid()) {
+              this._simulateEvent('click', first);
+            }
+          }
+        },
+        _isTapValid: function () {
+          return this._newPos.distanceTo(this._startPos) <= this._map.options.tapTolerance;
+        },
+        _onMove: function (e) {
+          var first = e.touches[0];
+          this._newPos = new L.Point(first.clientX, first.clientY);
+          this._simulateEvent('mousemove', first);
+        },
+        _simulateEvent: function (type, e) {
+          var simulatedEvent = document.createEvent('MouseEvents');
+          simulatedEvent._simulated = true;
+          e.target._simulatedClick = true;
+          simulatedEvent.initMouseEvent(type, true, true, window, 1, e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 0, null);
+          e.target.dispatchEvent(simulatedEvent);
+        }
+      });
+      if (L.Browser.touch && !L.Browser.pointer) {
+        L.Map.addInitHook('addHandler', 'tap', L.Map.Tap);
+      }
+      L.Map.mergeOptions({ boxZoom: true });
+      L.Map.BoxZoom = L.Handler.extend({
+        initialize: function (map) {
+          this._map = map;
+          this._container = map._container;
+          this._pane = map._panes.overlayPane;
+        },
+        addHooks: function () {
+          L.DomEvent.on(this._container, 'mousedown', this._onMouseDown, this);
+        },
+        removeHooks: function () {
+          L.DomEvent.off(this._container, 'mousedown', this._onMouseDown, this);
+        },
+        moved: function () {
+          return this._moved;
+        },
+        _resetState: function () {
+          this._moved = false;
+        },
+        _onMouseDown: function (e) {
+          if (!e.shiftKey || e.which !== 1 && e.button !== 1) {
+            return false;
+          }
+          this._resetState();
+          L.DomUtil.disableTextSelection();
+          L.DomUtil.disableImageDrag();
+          this._startPoint = this._map.mouseEventToContainerPoint(e);
+          L.DomEvent.on(document, {
+            contextmenu: L.DomEvent.stop,
+            mousemove: this._onMouseMove,
+            mouseup: this._onMouseUp,
+            keydown: this._onKeyDown
+          }, this);
+        },
+        _onMouseMove: function (e) {
+          if (!this._moved) {
+            this._moved = true;
+            this._box = L.DomUtil.create('div', 'leaflet-zoom-box', this._container);
+            L.DomUtil.addClass(this._container, 'leaflet-crosshair');
+            this._map.fire('boxzoomstart');
+          }
+          this._point = this._map.mouseEventToContainerPoint(e);
+          var bounds = new L.Bounds(this._point, this._startPoint),
+              size = bounds.getSize();
+          L.DomUtil.setPosition(this._box, bounds.min);
+          this._box.style.width = size.x + 'px';
+          this._box.style.height = size.y + 'px';
+        },
+        _finish: function () {
+          if (this._moved) {
+            L.DomUtil.remove(this._box);
+            L.DomUtil.removeClass(this._container, 'leaflet-crosshair');
+          }
+          L.DomUtil.enableTextSelection();
+          L.DomUtil.enableImageDrag();
+          L.DomEvent.off(document, {
+            contextmenu: L.DomEvent.stop,
+            mousemove: this._onMouseMove,
+            mouseup: this._onMouseUp,
+            keydown: this._onKeyDown
+          }, this);
+        },
+        _onMouseUp: function (e) {
+          if (e.which !== 1 && e.button !== 1) {
+            return;
+          }
+          this._finish();
+          if (!this._moved) {
+            return;
+          }
+          setTimeout(L.bind(this._resetState, this), 0);
+          var bounds = new L.LatLngBounds(this._map.containerPointToLatLng(this._startPoint), this._map.containerPointToLatLng(this._point));
+          this._map.fitBounds(bounds).fire('boxzoomend', { boxZoomBounds: bounds });
+        },
+        _onKeyDown: function (e) {
+          if (e.keyCode === 27) {
+            this._finish();
+          }
+        }
+      });
+      L.Map.addInitHook('addHandler', 'boxZoom', L.Map.BoxZoom);
+      L.Map.mergeOptions({
+        keyboard: true,
+        keyboardPanDelta: 80
+      });
+      L.Map.Keyboard = L.Handler.extend({
+        keyCodes: {
+          left: [37],
+          right: [39],
+          down: [40],
+          up: [38],
+          zoomIn: [187, 107, 61, 171],
+          zoomOut: [189, 109, 54, 173]
+        },
+        initialize: function (map) {
+          this._map = map;
+          this._setPanDelta(map.options.keyboardPanDelta);
+          this._setZoomDelta(map.options.zoomDelta);
+        },
+        addHooks: function () {
+          var container = this._map._container;
+          if (container.tabIndex <= 0) {
+            container.tabIndex = '0';
+          }
+          L.DomEvent.on(container, {
+            focus: this._onFocus,
+            blur: this._onBlur,
+            mousedown: this._onMouseDown
+          }, this);
+          this._map.on({
+            focus: this._addHooks,
+            blur: this._removeHooks
+          }, this);
+        },
+        removeHooks: function () {
+          this._removeHooks();
+          L.DomEvent.off(this._map._container, {
+            focus: this._onFocus,
+            blur: this._onBlur,
+            mousedown: this._onMouseDown
+          }, this);
+          this._map.off({
+            focus: this._addHooks,
+            blur: this._removeHooks
+          }, this);
+        },
+        _onMouseDown: function () {
+          if (this._focused) {
+            return;
+          }
+          var body = document.body,
+              docEl = document.documentElement,
+              top = body.scrollTop || docEl.scrollTop,
+              left = body.scrollLeft || docEl.scrollLeft;
+          this._map._container.focus();
+          window.scrollTo(left, top);
+        },
+        _onFocus: function () {
+          this._focused = true;
+          this._map.fire('focus');
+        },
+        _onBlur: function () {
+          this._focused = false;
+          this._map.fire('blur');
+        },
+        _setPanDelta: function (panDelta) {
+          var keys = this._panKeys = {},
+              codes = this.keyCodes,
+              i,
+              len;
+          for (i = 0, len = codes.left.length; i < len; i++) {
+            keys[codes.left[i]] = [-1 * panDelta, 0];
+          }
+          for (i = 0, len = codes.right.length; i < len; i++) {
+            keys[codes.right[i]] = [panDelta, 0];
+          }
+          for (i = 0, len = codes.down.length; i < len; i++) {
+            keys[codes.down[i]] = [0, panDelta];
+          }
+          for (i = 0, len = codes.up.length; i < len; i++) {
+            keys[codes.up[i]] = [0, -1 * panDelta];
+          }
+        },
+        _setZoomDelta: function (zoomDelta) {
+          var keys = this._zoomKeys = {},
+              codes = this.keyCodes,
+              i,
+              len;
+          for (i = 0, len = codes.zoomIn.length; i < len; i++) {
+            keys[codes.zoomIn[i]] = zoomDelta;
+          }
+          for (i = 0, len = codes.zoomOut.length; i < len; i++) {
+            keys[codes.zoomOut[i]] = -zoomDelta;
+          }
+        },
+        _addHooks: function () {
+          L.DomEvent.on(document, 'keydown', this._onKeyDown, this);
+        },
+        _removeHooks: function () {
+          L.DomEvent.off(document, 'keydown', this._onKeyDown, this);
+        },
+        _onKeyDown: function (e) {
+          if (e.altKey || e.ctrlKey || e.metaKey) {
+            return;
+          }
+          var key = e.keyCode,
+              map = this._map,
+              offset;
+          if (key in this._panKeys) {
+            if (map._panAnim && map._panAnim._inProgress) {
+              return;
+            }
+            offset = this._panKeys[key];
+            if (e.shiftKey) {
+              offset = L.point(offset).multiplyBy(3);
+            }
+            map.panBy(offset);
+            if (map.options.maxBounds) {
+              map.panInsideBounds(map.options.maxBounds);
+            }
+          } else if (key in this._zoomKeys) {
+            map.setZoom(map.getZoom() + (e.shiftKey ? 3 : 1) * this._zoomKeys[key]);
+          } else if (key === 27) {
+            map.closePopup();
+          } else {
+            return;
+          }
+          L.DomEvent.stop(e);
+        }
+      });
+      L.Map.addInitHook('addHandler', 'keyboard', L.Map.Keyboard);
+      L.Handler.MarkerDrag = L.Handler.extend({
+        initialize: function (marker) {
+          this._marker = marker;
+        },
+        addHooks: function () {
+          var icon = this._marker._icon;
+          if (!this._draggable) {
+            this._draggable = new L.Draggable(icon, icon, true);
+          }
+          this._draggable.on({
+            dragstart: this._onDragStart,
+            drag: this._onDrag,
+            dragend: this._onDragEnd
+          }, this).enable();
+          L.DomUtil.addClass(icon, 'leaflet-marker-draggable');
+        },
+        removeHooks: function () {
+          this._draggable.off({
+            dragstart: this._onDragStart,
+            drag: this._onDrag,
+            dragend: this._onDragEnd
+          }, this).disable();
+          if (this._marker._icon) {
+            L.DomUtil.removeClass(this._marker._icon, 'leaflet-marker-draggable');
+          }
+        },
+        moved: function () {
+          return this._draggable && this._draggable._moved;
+        },
+        _onDragStart: function () {
+          this._oldLatLng = this._marker.getLatLng();
+          this._marker.closePopup().fire('movestart').fire('dragstart');
+        },
+        _onDrag: function (e) {
+          var marker = this._marker,
+              shadow = marker._shadow,
+              iconPos = L.DomUtil.getPosition(marker._icon),
+              latlng = marker._map.layerPointToLatLng(iconPos);
+          if (shadow) {
+            L.DomUtil.setPosition(shadow, iconPos);
+          }
+          marker._latlng = latlng;
+          e.latlng = latlng;
+          e.oldLatLng = this._oldLatLng;
+          marker.fire('move', e).fire('drag', e);
+        },
+        _onDragEnd: function (e) {
+          delete this._oldLatLng;
+          this._marker.fire('moveend').fire('dragend', e);
+        }
+      });
+      L.Control = L.Class.extend({
+        options: { position: 'topright' },
+        initialize: function (options) {
+          L.setOptions(this, options);
+        },
+        getPosition: function () {
+          return this.options.position;
+        },
+        setPosition: function (position) {
+          var map = this._map;
+          if (map) {
+            map.removeControl(this);
+          }
+          this.options.position = position;
+          if (map) {
+            map.addControl(this);
+          }
+          return this;
+        },
+        getContainer: function () {
+          return this._container;
+        },
+        addTo: function (map) {
+          this.remove();
+          this._map = map;
+          var container = this._container = this.onAdd(map),
+              pos = this.getPosition(),
+              corner = map._controlCorners[pos];
+          L.DomUtil.addClass(container, 'leaflet-control');
+          if (pos.indexOf('bottom') !== -1) {
+            corner.insertBefore(container, corner.firstChild);
+          } else {
+            corner.appendChild(container);
+          }
+          return this;
+        },
+        remove: function () {
+          if (!this._map) {
+            return this;
+          }
+          L.DomUtil.remove(this._container);
+          if (this.onRemove) {
+            this.onRemove(this._map);
+          }
+          this._map = null;
+          return this;
+        },
+        _refocusOnMap: function (e) {
+          if (this._map && e && e.screenX > 0 && e.screenY > 0) {
+            this._map.getContainer().focus();
+          }
+        }
+      });
+      L.control = function (options) {
+        return new L.Control(options);
+      };
+      L.Map.include({
+        addControl: function (control) {
+          control.addTo(this);
+          return this;
+        },
+        removeControl: function (control) {
+          control.remove();
+          return this;
+        },
+        _initControlPos: function () {
+          var corners = this._controlCorners = {},
+              l = 'leaflet-',
+              container = this._controlContainer = L.DomUtil.create('div', l + 'control-container', this._container);
+          function createCorner(vSide, hSide) {
+            var className = l + vSide + ' ' + l + hSide;
+            corners[vSide + hSide] = L.DomUtil.create('div', className, container);
+          }
+          createCorner('top', 'left');
+          createCorner('top', 'right');
+          createCorner('bottom', 'left');
+          createCorner('bottom', 'right');
+        },
+        _clearControlPos: function () {
+          L.DomUtil.remove(this._controlContainer);
+        }
+      });
+      L.Control.Zoom = L.Control.extend({
+        options: {
+          position: 'topleft',
+          zoomInText: '+',
+          zoomInTitle: 'Zoom in',
+          zoomOutText: '-',
+          zoomOutTitle: 'Zoom out'
+        },
+        onAdd: function (map) {
+          var zoomName = 'leaflet-control-zoom',
+              container = L.DomUtil.create('div', zoomName + ' leaflet-bar'),
+              options = this.options;
+          this._zoomInButton = this._createButton(options.zoomInText, options.zoomInTitle, zoomName + '-in', container, this._zoomIn);
+          this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle, zoomName + '-out', container, this._zoomOut);
+          this._updateDisabled();
+          map.on('zoomend zoomlevelschange', this._updateDisabled, this);
+          return container;
+        },
+        onRemove: function (map) {
+          map.off('zoomend zoomlevelschange', this._updateDisabled, this);
+        },
+        disable: function () {
+          this._disabled = true;
+          this._updateDisabled();
+          return this;
+        },
+        enable: function () {
+          this._disabled = false;
+          this._updateDisabled();
+          return this;
+        },
+        _zoomIn: function (e) {
+          if (!this._disabled && this._map._zoom < this._map.getMaxZoom()) {
+            this._map.zoomIn(this._map.options.zoomDelta * (e.shiftKey ? 3 : 1));
+          }
+        },
+        _zoomOut: function (e) {
+          if (!this._disabled && this._map._zoom > this._map.getMinZoom()) {
+            this._map.zoomOut(this._map.options.zoomDelta * (e.shiftKey ? 3 : 1));
+          }
+        },
+        _createButton: function (html, title, className, container, fn) {
+          var link = L.DomUtil.create('a', className, container);
+          link.innerHTML = html;
+          link.href = '#';
+          link.title = title;
+          L.DomEvent.on(link, 'mousedown dblclick', L.DomEvent.stopPropagation).on(link, 'click', L.DomEvent.stop).on(link, 'click', fn, this).on(link, 'click', this._refocusOnMap, this);
+          return link;
+        },
+        _updateDisabled: function () {
+          var map = this._map,
+              className = 'leaflet-disabled';
+          L.DomUtil.removeClass(this._zoomInButton, className);
+          L.DomUtil.removeClass(this._zoomOutButton, className);
+          if (this._disabled || map._zoom === map.getMinZoom()) {
+            L.DomUtil.addClass(this._zoomOutButton, className);
+          }
+          if (this._disabled || map._zoom === map.getMaxZoom()) {
+            L.DomUtil.addClass(this._zoomInButton, className);
+          }
+        }
+      });
+      L.Map.mergeOptions({ zoomControl: true });
+      L.Map.addInitHook(function () {
+        if (this.options.zoomControl) {
+          this.zoomControl = new L.Control.Zoom();
+          this.addControl(this.zoomControl);
+        }
+      });
+      L.control.zoom = function (options) {
+        return new L.Control.Zoom(options);
+      };
+      L.Control.Attribution = L.Control.extend({
+        options: {
+          position: 'bottomright',
+          prefix: '<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a>'
+        },
+        initialize: function (options) {
+          L.setOptions(this, options);
+          this._attributions = {};
+        },
+        onAdd: function (map) {
+          map.attributionControl = this;
+          this._container = L.DomUtil.create('div', 'leaflet-control-attribution');
+          if (L.DomEvent) {
+            L.DomEvent.disableClickPropagation(this._container);
+          }
+          for (var i in map._layers) {
+            if (map._layers[i].getAttribution) {
+              this.addAttribution(map._layers[i].getAttribution());
+            }
+          }
+          this._update();
+          return this._container;
+        },
+        setPrefix: function (prefix) {
+          this.options.prefix = prefix;
+          this._update();
+          return this;
+        },
+        addAttribution: function (text) {
+          if (!text) {
+            return this;
+          }
+          if (!this._attributions[text]) {
+            this._attributions[text] = 0;
+          }
+          this._attributions[text]++;
+          this._update();
+          return this;
+        },
+        removeAttribution: function (text) {
+          if (!text) {
+            return this;
+          }
+          if (this._attributions[text]) {
+            this._attributions[text]--;
+            this._update();
+          }
+          return this;
+        },
+        _update: function () {
+          if (!this._map) {
+            return;
+          }
+          var attribs = [];
+          for (var i in this._attributions) {
+            if (this._attributions[i]) {
+              attribs.push(i);
+            }
+          }
+          var prefixAndAttribs = [];
+          if (this.options.prefix) {
+            prefixAndAttribs.push(this.options.prefix);
+          }
+          if (attribs.length) {
+            prefixAndAttribs.push(attribs.join(', '));
+          }
+          this._container.innerHTML = prefixAndAttribs.join(' | ');
+        }
+      });
+      L.Map.mergeOptions({ attributionControl: true });
+      L.Map.addInitHook(function () {
+        if (this.options.attributionControl) {
+          new L.Control.Attribution().addTo(this);
+        }
+      });
+      L.control.attribution = function (options) {
+        return new L.Control.Attribution(options);
+      };
+      L.Control.Scale = L.Control.extend({
+        options: {
+          position: 'bottomleft',
+          maxWidth: 100,
+          metric: true,
+          imperial: true
+        },
+        onAdd: function (map) {
+          var className = 'leaflet-control-scale',
+              container = L.DomUtil.create('div', className),
+              options = this.options;
+          this._addScales(options, className + '-line', container);
+          map.on(options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+          map.whenReady(this._update, this);
+          return container;
+        },
+        onRemove: function (map) {
+          map.off(this.options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+        },
+        _addScales: function (options, className, container) {
+          if (options.metric) {
+            this._mScale = L.DomUtil.create('div', className, container);
+          }
+          if (options.imperial) {
+            this._iScale = L.DomUtil.create('div', className, container);
+          }
+        },
+        _update: function () {
+          var map = this._map,
+              y = map.getSize().y / 2;
+          var maxMeters = map.distance(map.containerPointToLatLng([0, y]), map.containerPointToLatLng([this.options.maxWidth, y]));
+          this._updateScales(maxMeters);
+        },
+        _updateScales: function (maxMeters) {
+          if (this.options.metric && maxMeters) {
+            this._updateMetric(maxMeters);
+          }
+          if (this.options.imperial && maxMeters) {
+            this._updateImperial(maxMeters);
+          }
+        },
+        _updateMetric: function (maxMeters) {
+          var meters = this._getRoundNum(maxMeters),
+              label = meters < 1000 ? meters + ' m' : meters / 1000 + ' km';
+          this._updateScale(this._mScale, label, meters / maxMeters);
+        },
+        _updateImperial: function (maxMeters) {
+          var maxFeet = maxMeters * 3.2808399,
+              maxMiles,
+              miles,
+              feet;
+          if (maxFeet > 5280) {
+            maxMiles = maxFeet / 5280;
+            miles = this._getRoundNum(maxMiles);
+            this._updateScale(this._iScale, miles + ' mi', miles / maxMiles);
+          } else {
+            feet = this._getRoundNum(maxFeet);
+            this._updateScale(this._iScale, feet + ' ft', feet / maxFeet);
+          }
+        },
+        _updateScale: function (scale, text, ratio) {
+          scale.style.width = Math.round(this.options.maxWidth * ratio) + 'px';
+          scale.innerHTML = text;
+        },
+        _getRoundNum: function (num) {
+          var pow10 = Math.pow(10, (Math.floor(num) + '').length - 1),
+              d = num / pow10;
+          d = d >= 10 ? 10 : d >= 5 ? 5 : d >= 3 ? 3 : d >= 2 ? 2 : 1;
+          return pow10 * d;
+        }
+      });
+      L.control.scale = function (options) {
+        return new L.Control.Scale(options);
+      };
+      L.Control.Layers = L.Control.extend({
+        options: {
+          collapsed: true,
+          position: 'topright',
+          autoZIndex: true,
+          hideSingleBase: false
+        },
+        initialize: function (baseLayers, overlays, options) {
+          L.setOptions(this, options);
+          this._layers = [];
+          this._lastZIndex = 0;
+          this._handlingClick = false;
+          for (var i in baseLayers) {
+            this._addLayer(baseLayers[i], i);
+          }
+          for (i in overlays) {
+            this._addLayer(overlays[i], i, true);
+          }
+        },
+        onAdd: function (map) {
+          this._initLayout();
+          this._update();
+          this._map = map;
+          map.on('zoomend', this._checkDisabledLayers, this);
+          return this._container;
+        },
+        onRemove: function () {
+          this._map.off('zoomend', this._checkDisabledLayers, this);
+          for (var i = 0; i < this._layers.length; i++) {
+            this._layers[i].layer.off('add remove', this._onLayerChange, this);
+          }
+        },
+        addBaseLayer: function (layer, name) {
+          this._addLayer(layer, name);
+          return this._map ? this._update() : this;
+        },
+        addOverlay: function (layer, name) {
+          this._addLayer(layer, name, true);
+          return this._map ? this._update() : this;
+        },
+        removeLayer: function (layer) {
+          layer.off('add remove', this._onLayerChange, this);
+          var obj = this._getLayer(L.stamp(layer));
+          if (obj) {
+            this._layers.splice(this._layers.indexOf(obj), 1);
+          }
+          return this._map ? this._update() : this;
+        },
+        expand: function () {
+          L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
+          this._form.style.height = null;
+          var acceptableHeight = this._map.getSize().y - (this._container.offsetTop + 50);
+          if (acceptableHeight < this._form.clientHeight) {
+            L.DomUtil.addClass(this._form, 'leaflet-control-layers-scrollbar');
+            this._form.style.height = acceptableHeight + 'px';
+          } else {
+            L.DomUtil.removeClass(this._form, 'leaflet-control-layers-scrollbar');
+          }
+          this._checkDisabledLayers();
+          return this;
+        },
+        collapse: function () {
+          L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
+          return this;
+        },
+        _initLayout: function () {
+          var className = 'leaflet-control-layers',
+              container = this._container = L.DomUtil.create('div', className);
+          container.setAttribute('aria-haspopup', true);
+          L.DomEvent.disableClickPropagation(container);
+          if (!L.Browser.touch) {
+            L.DomEvent.disableScrollPropagation(container);
+          }
+          var form = this._form = L.DomUtil.create('form', className + '-list');
+          if (this.options.collapsed) {
+            if (!L.Browser.android) {
+              L.DomEvent.on(container, {
+                mouseenter: this.expand,
+                mouseleave: this.collapse
+              }, this);
+            }
+            var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+            link.href = '#';
+            link.title = 'Layers';
+            if (L.Browser.touch) {
+              L.DomEvent.on(link, 'click', L.DomEvent.stop).on(link, 'click', this.expand, this);
+            } else {
+              L.DomEvent.on(link, 'focus', this.expand, this);
+            }
+            L.DomEvent.on(form, 'click', function () {
+              setTimeout(L.bind(this._onInputClick, this), 0);
+            }, this);
+            this._map.on('click', this.collapse, this);
+          } else {
+            this.expand();
+          }
+          this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
+          this._separator = L.DomUtil.create('div', className + '-separator', form);
+          this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
+          container.appendChild(form);
+        },
+        _getLayer: function (id) {
+          for (var i = 0; i < this._layers.length; i++) {
+            if (this._layers[i] && L.stamp(this._layers[i].layer) === id) {
+              return this._layers[i];
+            }
+          }
+        },
+        _addLayer: function (layer, name, overlay) {
+          layer.on('add remove', this._onLayerChange, this);
+          this._layers.push({
+            layer: layer,
+            name: name,
+            overlay: overlay
+          });
+          if (this.options.autoZIndex && layer.setZIndex) {
+            this._lastZIndex++;
+            layer.setZIndex(this._lastZIndex);
+          }
+        },
+        _update: function () {
+          if (!this._container) {
+            return this;
+          }
+          L.DomUtil.empty(this._baseLayersList);
+          L.DomUtil.empty(this._overlaysList);
+          var baseLayersPresent,
+              overlaysPresent,
+              i,
+              obj,
+              baseLayersCount = 0;
+          for (i = 0; i < this._layers.length; i++) {
+            obj = this._layers[i];
+            this._addItem(obj);
+            overlaysPresent = overlaysPresent || obj.overlay;
+            baseLayersPresent = baseLayersPresent || !obj.overlay;
+            baseLayersCount += !obj.overlay ? 1 : 0;
+          }
+          if (this.options.hideSingleBase) {
+            baseLayersPresent = baseLayersPresent && baseLayersCount > 1;
+            this._baseLayersList.style.display = baseLayersPresent ? '' : 'none';
+          }
+          this._separator.style.display = overlaysPresent && baseLayersPresent ? '' : 'none';
+          return this;
+        },
+        _onLayerChange: function (e) {
+          if (!this._handlingClick) {
+            this._update();
+          }
+          var obj = this._getLayer(L.stamp(e.target));
+          var type = obj.overlay ? e.type === 'add' ? 'overlayadd' : 'overlayremove' : e.type === 'add' ? 'baselayerchange' : null;
+          if (type) {
+            this._map.fire(type, obj);
+          }
+        },
+        _createRadioElement: function (name, checked) {
+          var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' + name + '"' + (checked ? ' checked="checked"' : '') + '/>';
+          var radioFragment = document.createElement('div');
+          radioFragment.innerHTML = radioHtml;
+          return radioFragment.firstChild;
+        },
+        _addItem: function (obj) {
+          var label = document.createElement('label'),
+              checked = this._map.hasLayer(obj.layer),
+              input;
+          if (obj.overlay) {
+            input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'leaflet-control-layers-selector';
+            input.defaultChecked = checked;
+          } else {
+            input = this._createRadioElement('leaflet-base-layers', checked);
+          }
+          input.layerId = L.stamp(obj.layer);
+          L.DomEvent.on(input, 'click', this._onInputClick, this);
+          var name = document.createElement('span');
+          name.innerHTML = ' ' + obj.name;
+          var holder = document.createElement('div');
+          label.appendChild(holder);
+          holder.appendChild(input);
+          holder.appendChild(name);
+          var container = obj.overlay ? this._overlaysList : this._baseLayersList;
+          container.appendChild(label);
+          this._checkDisabledLayers();
+          return label;
+        },
+        _onInputClick: function () {
+          var inputs = this._form.getElementsByTagName('input'),
+              input,
+              layer,
+              hasLayer;
+          var addedLayers = [],
+              removedLayers = [];
+          this._handlingClick = true;
+          for (var i = inputs.length - 1; i >= 0; i--) {
+            input = inputs[i];
+            layer = this._getLayer(input.layerId).layer;
+            hasLayer = this._map.hasLayer(layer);
+            if (input.checked && !hasLayer) {
+              addedLayers.push(layer);
+            } else if (!input.checked && hasLayer) {
+              removedLayers.push(layer);
+            }
+          }
+          for (i = 0; i < removedLayers.length; i++) {
+            this._map.removeLayer(removedLayers[i]);
+          }
+          for (i = 0; i < addedLayers.length; i++) {
+            this._map.addLayer(addedLayers[i]);
+          }
+          this._handlingClick = false;
+          this._refocusOnMap();
+        },
+        _checkDisabledLayers: function () {
+          var inputs = this._form.getElementsByTagName('input'),
+              input,
+              layer,
+              zoom = this._map.getZoom();
+          for (var i = inputs.length - 1; i >= 0; i--) {
+            input = inputs[i];
+            layer = this._getLayer(input.layerId).layer;
+            input.disabled = layer.options.minZoom !== undefined && zoom < layer.options.minZoom || layer.options.maxZoom !== undefined && zoom > layer.options.maxZoom;
+          }
+        },
+        _expand: function () {
+          return this.expand();
+        },
+        _collapse: function () {
+          return this.collapse();
+        }
+      });
+      L.control.layers = function (baseLayers, overlays, options) {
+        return new L.Control.Layers(baseLayers, overlays, options);
+      };
+      L.PosAnimation = L.Evented.extend({
+        run: function (el, newPos, duration, easeLinearity) {
+          this.stop();
+          this._el = el;
+          this._inProgress = true;
+          this._duration = duration || 0.25;
+          this._easeOutPower = 1 / Math.max(easeLinearity || 0.5, 0.2);
+          this._startPos = L.DomUtil.getPosition(el);
+          this._offset = newPos.subtract(this._startPos);
+          this._startTime = +new Date();
+          this.fire('start');
+          this._animate();
+        },
+        stop: function () {
+          if (!this._inProgress) {
+            return;
+          }
+          this._step(true);
+          this._complete();
+        },
+        _animate: function () {
+          this._animId = L.Util.requestAnimFrame(this._animate, this);
+          this._step();
+        },
+        _step: function (round) {
+          var elapsed = +new Date() - this._startTime,
+              duration = this._duration * 1000;
+          if (elapsed < duration) {
+            this._runFrame(this._easeOut(elapsed / duration), round);
+          } else {
+            this._runFrame(1);
+            this._complete();
+          }
+        },
+        _runFrame: function (progress, round) {
+          var pos = this._startPos.add(this._offset.multiplyBy(progress));
+          if (round) {
+            pos._round();
+          }
+          L.DomUtil.setPosition(this._el, pos);
+          this.fire('step');
+        },
+        _complete: function () {
+          L.Util.cancelAnimFrame(this._animId);
+          this._inProgress = false;
+          this.fire('end');
+        },
+        _easeOut: function (t) {
+          return 1 - Math.pow(1 - t, this._easeOutPower);
+        }
+      });
+      L.Map.include({
+        setView: function (center, zoom, options) {
+          zoom = zoom === undefined ? this._zoom : this._limitZoom(zoom);
+          center = this._limitCenter(L.latLng(center), zoom, this.options.maxBounds);
+          options = options || {};
+          this._stop();
+          if (this._loaded && !options.reset && options !== true) {
+            if (options.animate !== undefined) {
+              options.zoom = L.extend({ animate: options.animate }, options.zoom);
+              options.pan = L.extend({
+                animate: options.animate,
+                duration: options.duration
+              }, options.pan);
+            }
+            var moved = this._zoom !== zoom ? this._tryAnimatedZoom && this._tryAnimatedZoom(center, zoom, options.zoom) : this._tryAnimatedPan(center, options.pan);
+            if (moved) {
+              clearTimeout(this._sizeTimer);
+              return this;
+            }
+          }
+          this._resetView(center, zoom);
+          return this;
+        },
+        panBy: function (offset, options) {
+          offset = L.point(offset).round();
+          options = options || {};
+          if (!offset.x && !offset.y) {
+            return this.fire('moveend');
+          }
+          if (options.animate !== true && !this.getSize().contains(offset)) {
+            this._resetView(this.unproject(this.project(this.getCenter()).add(offset)), this.getZoom());
+            return this;
+          }
+          if (!this._panAnim) {
+            this._panAnim = new L.PosAnimation();
+            this._panAnim.on({
+              'step': this._onPanTransitionStep,
+              'end': this._onPanTransitionEnd
+            }, this);
+          }
+          if (!options.noMoveStart) {
+            this.fire('movestart');
+          }
+          if (options.animate !== false) {
+            L.DomUtil.addClass(this._mapPane, 'leaflet-pan-anim');
+            var newPos = this._getMapPanePos().subtract(offset).round();
+            this._panAnim.run(this._mapPane, newPos, options.duration || 0.25, options.easeLinearity);
+          } else {
+            this._rawPanBy(offset);
+            this.fire('move').fire('moveend');
+          }
+          return this;
+        },
+        _onPanTransitionStep: function () {
+          this.fire('move');
+        },
+        _onPanTransitionEnd: function () {
+          L.DomUtil.removeClass(this._mapPane, 'leaflet-pan-anim');
+          this.fire('moveend');
+        },
+        _tryAnimatedPan: function (center, options) {
+          var offset = this._getCenterOffset(center)._floor();
+          if ((options && options.animate) !== true && !this.getSize().contains(offset)) {
+            return false;
+          }
+          this.panBy(offset, options);
+          return true;
+        }
+      });
+      L.Map.mergeOptions({
+        zoomAnimation: true,
+        zoomAnimationThreshold: 4
+      });
+      var zoomAnimated = L.DomUtil.TRANSITION && L.Browser.any3d && !L.Browser.mobileOpera;
+      if (zoomAnimated) {
+        L.Map.addInitHook(function () {
+          this._zoomAnimated = this.options.zoomAnimation;
+          if (this._zoomAnimated) {
+            this._createAnimProxy();
+            L.DomEvent.on(this._proxy, L.DomUtil.TRANSITION_END, this._catchTransitionEnd, this);
+          }
+        });
+      }
+      L.Map.include(!zoomAnimated ? {} : {
+        _createAnimProxy: function () {
+          var proxy = this._proxy = L.DomUtil.create('div', 'leaflet-proxy leaflet-zoom-animated');
+          this._panes.mapPane.appendChild(proxy);
+          this.on('zoomanim', function (e) {
+            var prop = L.DomUtil.TRANSFORM,
+                transform = proxy.style[prop];
+            L.DomUtil.setTransform(proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
+            if (transform === proxy.style[prop] && this._animatingZoom) {
+              this._onZoomTransitionEnd();
+            }
+          }, this);
+          this.on('load moveend', function () {
+            var c = this.getCenter(),
+                z = this.getZoom();
+            L.DomUtil.setTransform(proxy, this.project(c, z), this.getZoomScale(z, 1));
+          }, this);
+        },
+        _catchTransitionEnd: function (e) {
+          if (this._animatingZoom && e.propertyName.indexOf('transform') >= 0) {
+            this._onZoomTransitionEnd();
+          }
+        },
+        _nothingToAnimate: function () {
+          return !this._container.getElementsByClassName('leaflet-zoom-animated').length;
+        },
+        _tryAnimatedZoom: function (center, zoom, options) {
+          if (this._animatingZoom) {
+            return true;
+          }
+          options = options || {};
+          if (!this._zoomAnimated || options.animate === false || this._nothingToAnimate() || Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) {
+            return false;
+          }
+          var scale = this.getZoomScale(zoom),
+              offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale);
+          if (options.animate !== true && !this.getSize().contains(offset)) {
+            return false;
+          }
+          L.Util.requestAnimFrame(function () {
+            this._moveStart(true)._animateZoom(center, zoom, true);
+          }, this);
+          return true;
+        },
+        _animateZoom: function (center, zoom, startAnim, noUpdate) {
+          if (startAnim) {
+            this._animatingZoom = true;
+            this._animateToCenter = center;
+            this._animateToZoom = zoom;
+            L.DomUtil.addClass(this._mapPane, 'leaflet-zoom-anim');
+          }
+          this.fire('zoomanim', {
+            center: center,
+            zoom: zoom,
+            noUpdate: noUpdate
+          });
+          setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
+        },
+        _onZoomTransitionEnd: function () {
+          if (!this._animatingZoom) {
+            return;
+          }
+          L.DomUtil.removeClass(this._mapPane, 'leaflet-zoom-anim');
+          this._animatingZoom = false;
+          this._move(this._animateToCenter, this._animateToZoom);
+          L.Util.requestAnimFrame(function () {
+            this._moveEnd(true);
+          }, this);
+        }
+      });
+      L.Map.include({
+        flyTo: function (targetCenter, targetZoom, options) {
+          options = options || {};
+          if (options.animate === false || !L.Browser.any3d) {
+            return this.setView(targetCenter, targetZoom, options);
+          }
+          this._stop();
+          var from = this.project(this.getCenter()),
+              to = this.project(targetCenter),
+              size = this.getSize(),
+              startZoom = this._zoom;
+          targetCenter = L.latLng(targetCenter);
+          targetZoom = targetZoom === undefined ? startZoom : targetZoom;
+          var w0 = Math.max(size.x, size.y),
+              w1 = w0 * this.getZoomScale(startZoom, targetZoom),
+              u1 = to.distanceTo(from) || 1,
+              rho = 1.42,
+              rho2 = rho * rho;
+          function r(i) {
+            var s1 = i ? -1 : 1,
+                s2 = i ? w1 : w0,
+                t1 = w1 * w1 - w0 * w0 + s1 * rho2 * rho2 * u1 * u1,
+                b1 = 2 * s2 * rho2 * u1,
+                b = t1 / b1,
+                sq = Math.sqrt(b * b + 1) - b;
+            var log = sq < 0.000000001 ? -18 : Math.log(sq);
+            return log;
+          }
+          function sinh(n) {
+            return (Math.exp(n) - Math.exp(-n)) / 2;
+          }
+          function cosh(n) {
+            return (Math.exp(n) + Math.exp(-n)) / 2;
+          }
+          function tanh(n) {
+            return sinh(n) / cosh(n);
+          }
+          var r0 = r(0);
+          function w(s) {
+            return w0 * (cosh(r0) / cosh(r0 + rho * s));
+          }
+          function u(s) {
+            return w0 * (cosh(r0) * tanh(r0 + rho * s) - sinh(r0)) / rho2;
+          }
+          function easeOut(t) {
+            return 1 - Math.pow(1 - t, 1.5);
+          }
+          var start = Date.now(),
+              S = (r(1) - r0) / rho,
+              duration = options.duration ? 1000 * options.duration : 1000 * S * 0.8;
+          function frame() {
+            var t = (Date.now() - start) / duration,
+                s = easeOut(t) * S;
+            if (t <= 1) {
+              this._flyToFrame = L.Util.requestAnimFrame(frame, this);
+              this._move(this.unproject(from.add(to.subtract(from).multiplyBy(u(s) / u1)), startZoom), this.getScaleZoom(w0 / w(s), startZoom), { flyTo: true });
+            } else {
+              this._move(targetCenter, targetZoom)._moveEnd(true);
+            }
+          }
+          this._moveStart(true);
+          frame.call(this);
+          return this;
+        },
+        flyToBounds: function (bounds, options) {
+          var target = this._getBoundsCenterZoom(bounds, options);
+          return this.flyTo(target.center, target.zoom, options);
+        }
+      });
+      L.Map.include({
+        _defaultLocateOptions: {
+          timeout: 10000,
+          watch: false
+        },
+        locate: function (options) {
+          options = this._locateOptions = L.extend({}, this._defaultLocateOptions, options);
+          if (!('geolocation' in navigator)) {
+            this._handleGeolocationError({
+              code: 0,
+              message: 'Geolocation not supported.'
+            });
+            return this;
+          }
+          var onResponse = L.bind(this._handleGeolocationResponse, this),
+              onError = L.bind(this._handleGeolocationError, this);
+          if (options.watch) {
+            this._locationWatchId = navigator.geolocation.watchPosition(onResponse, onError, options);
+          } else {
+            navigator.geolocation.getCurrentPosition(onResponse, onError, options);
+          }
+          return this;
+        },
+        stopLocate: function () {
+          if (navigator.geolocation && navigator.geolocation.clearWatch) {
+            navigator.geolocation.clearWatch(this._locationWatchId);
+          }
+          if (this._locateOptions) {
+            this._locateOptions.setView = false;
+          }
+          return this;
+        },
+        _handleGeolocationError: function (error) {
+          var c = error.code,
+              message = error.message || (c === 1 ? 'permission denied' : c === 2 ? 'position unavailable' : 'timeout');
+          if (this._locateOptions.setView && !this._loaded) {
+            this.fitWorld();
+          }
+          this.fire('locationerror', {
+            code: c,
+            message: 'Geolocation error: ' + message + '.'
+          });
+        },
+        _handleGeolocationResponse: function (pos) {
+          var lat = pos.coords.latitude,
+              lng = pos.coords.longitude,
+              latlng = new L.LatLng(lat, lng),
+              bounds = latlng.toBounds(pos.coords.accuracy),
+              options = this._locateOptions;
+          if (options.setView) {
+            var zoom = this.getBoundsZoom(bounds);
+            this.setView(latlng, options.maxZoom ? Math.min(zoom, options.maxZoom) : zoom);
+          }
+          var data = {
+            latlng: latlng,
+            bounds: bounds,
+            timestamp: pos.timestamp
+          };
+          for (var i in pos.coords) {
+            if (typeof pos.coords[i] === 'number') {
+              data[i] = pos.coords[i];
+            }
+          }
+          this.fire('locationfound', data);
+        }
+      });
+    })(window, document);
+  })($__require("3b"));
+  return module.exports;
 });
-
-})();
+$__System.registerDynamic("4a", ["143"], true, function ($__require, exports, module) {
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("143");
+  return module.exports;
+});
 $__System.register('144', ['4a'], function (_export) {
 
     // https://github.com/Outdooractive/leaflet-singleclick_0.7
@@ -79623,9 +80387,14 @@ define("54", ["145"], function(main) {
 });
 
 })();
-$__System.register("146", [], function() { return { setters: [], execute: function() {} } });
+$__System.registerDynamic("146", [], false, function ($__require, $__exports, $__module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
-$__System.register('1', ['7', '18', '45', '47', '48', '54', '140', '141', '142', '144', '146', 'f', 'aa', '4a', '4b', '4d', '4e', '6f', '6e', 'a7', '13f'], function (_export) {
+  (function ($__global) {})(this);
+
+  return _retrieveGlobal();
+});
+$__System.register('1', ['7', '18', '45', '47', '48', '54', '144', '146', 'f', 'aa', '4a', '4b', '4d', '4e', '6f', '6e', 'a7', '13c', '13d', '13e', '13f'], function (_export) {
 
   // Xmas magic
   'use strict';
@@ -79698,10 +80467,10 @@ $__System.register('1', ['7', '18', '45', '47', '48', '54', '140', '141', '142',
   return {
     setters: [function (_) {}, function (_2) {}, function (_3) {}, function (_4) {
       stringQs = _4.stringQs;
-    }, function (_5) {}, function (_10) {
-      $ = _10.$;
-      HTML = _10.HTML;
-    }, function (_6) {}, function (_7) {}, function (_8) {}, function (_9) {}, function (_11) {}, function (_f) {}, function (_aa) {}, function (_a) {
+    }, function (_5) {}, function (_7) {
+      $ = _7.$;
+      HTML = _7.HTML;
+    }, function (_6) {}, function (_8) {}, function (_f) {}, function (_aa) {}, function (_a) {
       L = _a['default'];
     }, function (_b) {}, function (_d) {}, function (_e) {}, function (_f2) {
       DraggableValuePopup = _f2.DraggableValuePopup;
@@ -79711,9 +80480,9 @@ $__System.register('1', ['7', '18', '45', '47', '48', '54', '140', '141', '142',
       MELODIES_DCAT_CATALOG_URL = _e2.MELODIES_DCAT_CATALOG_URL;
     }, function (_a7) {
       App = _a7['default'];
-    }, function (_f3) {
-      Sidebar = _f3['default'];
-    }],
+    }, function (_c) {
+      Sidebar = _c['default'];
+    }, function (_d2) {}, function (_e3) {}, function (_f3) {}],
     execute: function () {
       $('body').add(HTML('\n  <div id="snow1" class="snow"></div>\n  <div id="snow2" class="snow"></div>\n  <div id="snow3" class="snow"></div>\n'));document.getElementById('map').addEventListener('keypress', function (e) {
         if (String.fromCharCode(e.charCode) == 's') letItSnow();
@@ -79893,18 +80662,8 @@ $__System.register('1', ['7', '18', '45', '47', '48', '54', '140', '141', '142',
   };
 });
 
-$__System.register('npm:leaflet@0.7.7/dist/leaflet.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('github:ebrelsford/Leaflet.loading@0.1.18/src/Control.Loading.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('npm:leaflet-coverage@0.6.3/leaflet-coverage.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('github:guygriffiths/category-remapper-js@master/css/remapper.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('npm:c3@0.4.11/c3.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('app/sidebar/leaflet-sidebar.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('github:twbs/bootstrap@3.3.6/css/bootstrap.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('app/css/style.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('app/css/styledLayerControl/styledLayerControl.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-$__System.register('app/css/snow.css!github:systemjs/plugin-css@0.1.21.js', [], false, function() {});
-(function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})
-(".leaflet-image-layer,.leaflet-layer,.leaflet-map-pane,.leaflet-marker-icon,.leaflet-marker-pane,.leaflet-marker-shadow,.leaflet-overlay-pane,.leaflet-overlay-pane svg,.leaflet-popup-pane,.leaflet-shadow-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-tile-pane,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden;-ms-touch-action:none;touch-action:none}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container img{max-width:none!important}.leaflet-container img.leaflet-image-layer{max-width:15000px!important}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-tile-pane{z-index:2}.leaflet-objects-pane{z-index:3}.leaflet-overlay-pane{z-index:4}.leaflet-shadow-pane{z-index:5}.leaflet-marker-pane{z-index:6}.leaflet-popup-pane{z-index:7}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:7;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup,.leaflet-fade-anim .leaflet-tile{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;-o-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup,.leaflet-fade-anim .leaflet-tile-loaded{opacity:1}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);-o-transition:-o-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-touching .leaflet-zoom-animated,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-clickable{cursor:pointer}.leaflet-container{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-clickable,.leaflet-dragging .leaflet-container{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078A8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font:12px/1.5 \"Helvetica Neue\",Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/npm/leaflet@0.7.7/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/npm/leaflet@0.7.7/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box;background:#fff;background:rgba(255,255,255,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{margin:0 auto;width:40px;height:20px;position:relative;overflow:hidden}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:0 0}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678, M12=.70710678, M21=-.70710678, M22=.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}.leaflet-coverage-control{padding:6px 8px;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}.leaflet-coverage-control.legend{color:#555}.leaflet-coverage-control.legend .legend-title-container{max-width:120px}.leaflet-coverage-control.legend .legend-title{word-wrap:break-word}.leaflet-coverage-control.discrete-legend .discrete-legend-palette{padding:2px 1px;line-height:18px}.leaflet-coverage-control.discrete-legend .discrete-legend-palette i{float:left;height:18px;margin-right:8px;width:18px}.leaflet-popup-draggable .leaflet-popup-content-wrapper{cursor:move}.jsplumb-connector{z-index:9040}.jsplumb-endpoint{z-index:9050}.jsplumb-overlay{z-index:9060}.main-remapper{position:fixed;width:100%;height:100%;left:0;top:0;z-index:1000}.remap-froms,.remap-tos{position:absolute;top:0;left:0;width:250px;height:100%;background-color:rgba(150,220,255,.8);color:#000;text-align:right}.remap-tos{left:auto;right:0;width:250px;overflow:hidden;color:#000;text-align:left}.centrecontent{position:absolute;opacity:.8;bottom:0;height:100%;left:250px;right:250px;background:#fff;text-align:center;vertical-align:bottom}.buttonholder{position:absolute;bottom:0;background-color:rgba(255,255,255,0);left:250px;right:250px;text-align:center}.cancel-remap-button,.remap-button{font-size:20pt;padding:20px;margin:20px}.map-from,.map-to{margin:2px;border-style:solid;border-width:thin;font-family:sans-serif;background-color:rgba(0,210,255,1)}.map-from{padding-right:10px}.map-to{padding-left:10px}.c3 svg{font:10px sans-serif;-webkit-tap-highlight-color:transparent}.c3 line,.c3 path{fill:none;stroke:#000}.c3 text{-webkit-user-select:none;-moz-user-select:none;user-select:none}.c3-bars path,.c3-event-rect,.c3-legend-item-tile,.c3-xgrid-focus,.c3-ygrid{shape-rendering:crispEdges}.c3-chart-arc path{stroke:#fff}.c3-chart-arc text{fill:#fff;font-size:13px}.c3-grid line{stroke:#aaa}.c3-grid text{fill:#aaa}.c3-xgrid,.c3-ygrid{stroke-dasharray:3 3}.c3-text.c3-empty{fill:grey;font-size:2em}.c3-line{stroke-width:1px}.c3-circle._expanded_{stroke-width:1px;stroke:#fff}.c3-selected-circle{fill:#fff;stroke-width:2px}.c3-bar{stroke-width:0}.c3-bar._expanded_{fill-opacity:.75}.c3-target.c3-focused{opacity:1}.c3-target.c3-focused path.c3-line,.c3-target.c3-focused path.c3-step{stroke-width:2px}.c3-target.c3-defocused{opacity:.3!important}.c3-region{fill:#4682b4;fill-opacity:.1}.c3-brush .extent{fill-opacity:.1}.c3-legend-item{font-size:12px}.c3-legend-item-hidden{opacity:.15}.c3-legend-background{opacity:.75;fill:#fff;stroke:#d3d3d3;stroke-width:1}.c3-title{font:14px sans-serif}.c3-tooltip-container{z-index:10}.c3-tooltip{border-collapse:collapse;border-spacing:0;background-color:#fff;empty-cells:show;-webkit-box-shadow:7px 7px 12px -9px #777;-moz-box-shadow:7px 7px 12px -9px #777;box-shadow:7px 7px 12px -9px #777;opacity:.9}.c3-tooltip tr{border:1px solid #CCC}.c3-tooltip th{background-color:#aaa;font-size:14px;padding:2px 5px;text-align:left;color:#FFF}.c3-tooltip td{font-size:13px;padding:3px 6px;background-color:#fff;border-left:1px dotted #999}.c3-tooltip td>span{display:inline-block;width:10px;height:10px;margin-right:6px}.c3-tooltip td.value{text-align:right}.c3-area{stroke-width:0;opacity:.2}.c3-chart-arcs-title{dominant-baseline:middle;font-size:1.3em}.c3-chart-arcs .c3-chart-arcs-background{fill:#e0e0e0;stroke:none}.c3-chart-arcs .c3-chart-arcs-gauge-unit{fill:#000;font-size:16px}.c3-chart-arcs .c3-chart-arcs-gauge-max{fill:#777}.c3-chart-arcs .c3-chart-arcs-gauge-min{fill:#777}.c3-chart-arc .c3-gauge-value{fill:#000}.sidebar{position:absolute;top:0;bottom:0;width:100%;overflow:hidden;z-index:2000}.sidebar.collapsed{width:40px}@media (min-width:768px){.sidebar{top:10px;bottom:10px;transition:width .5s}}@media (min-width:768px) and (max-width:991px){.sidebar{width:305px}}@media (min-width:992px) and (max-width:1199px){.sidebar{width:390px}}@media (min-width:1200px){.sidebar{width:460px}}.sidebar-left{left:0}@media (min-width:768px){.sidebar-left{left:10px}}.sidebar-right{right:0}@media (min-width:768px){.sidebar-right{right:10px}}.sidebar-tabs{top:0;bottom:0;height:100%;background-color:#fff}.sidebar-left .sidebar-tabs{left:0}.sidebar-right .sidebar-tabs{right:0}.sidebar-tabs,.sidebar-tabs>ul{position:absolute;width:40px;margin:0;padding:0}.sidebar-tabs>li,.sidebar-tabs>ul>li{width:100%;height:40px;color:#333;font-size:12pt;overflow:hidden;transition:all 80ms}.sidebar-tabs>li:hover,.sidebar-tabs>ul>li:hover{color:#000;background-color:#eee}.sidebar-tabs>li.active,.sidebar-tabs>ul>li.active{color:#fff;background-color:#0074d9}.sidebar-tabs>li.disabled,.sidebar-tabs>ul>li.disabled{color:rgba(51,51,51,.4)}.sidebar-tabs>li.disabled:hover,.sidebar-tabs>ul>li.disabled:hover{background:0 0}.sidebar-tabs>li.disabled>a,.sidebar-tabs>ul>li.disabled>a{cursor:default}.sidebar-tabs>li>a,.sidebar-tabs>ul>li>a{display:block;width:100%;height:100%;line-height:40px;color:inherit;text-decoration:none;text-align:center}.sidebar-tabs>ul+ul{bottom:0}.sidebar-content{position:absolute;top:0;bottom:0;background-color:rgba(255,255,255,.95);overflow-x:hidden;overflow-y:auto}.sidebar-left .sidebar-content{left:40px;right:0}.sidebar-right .sidebar-content{left:0;right:40px}.sidebar.collapsed>.sidebar-content{overflow-y:hidden}.sidebar-pane{display:none;left:0;right:0;box-sizing:border-box;padding:10px 20px}.sidebar-pane.active{display:block}@media (min-width:768px) and (max-width:991px){.sidebar-pane{min-width:265px}}@media (min-width:992px) and (max-width:1199px){.sidebar-pane{min-width:350px}}@media (min-width:1200px){.sidebar-pane{min-width:420px}}.sidebar-header{margin:-10px -20px 0;height:40px;padding:0 20px;line-height:40px;font-size:14.4pt;color:#fff;background-color:#0074d9}.sidebar-right .sidebar-header{padding-left:40px}.sidebar-close{position:absolute;top:0;width:40px;height:40px;text-align:center;cursor:pointer}.sidebar-left .sidebar-close{right:0}.sidebar-right .sidebar-close{left:0}.sidebar-left~.sidebar-map{margin-left:40px}@media (min-width:768px){.sidebar-left~.sidebar-map{margin-left:0}}.sidebar-right~.sidebar-map{margin-right:40px}@media (min-width:768px){.sidebar-right~.sidebar-map{margin-right:0}}.sidebar{box-shadow:0 1px 5px rgba(0,0,0,.65)}.sidebar.leaflet-touch{box-shadow:none;border-right:2px solid rgba(0,0,0,.2)}@media (min-width:768px){.sidebar{border-radius:4px}.sidebar.leaflet-touch{border:2px solid rgba(0,0,0,.2)}}@media (min-width:768px){.sidebar-left~.sidebar-map .leaflet-left{transition:left .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-left~.sidebar-map .leaflet-left{left:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-left~.sidebar-map .leaflet-left{left:400px}}@media (min-width:1200px){.sidebar-left~.sidebar-map .leaflet-left{left:470px}}@media (min-width:768px){.sidebar-left.collapsed~.sidebar-map .leaflet-left{left:50px}}@media (min-width:768px){.sidebar-right~.sidebar-map .leaflet-right{transition:right .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-right~.sidebar-map .leaflet-right{right:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-right~.sidebar-map .leaflet-right{right:400px}}@media (min-width:1200px){.sidebar-right~.sidebar-map .leaflet-right{right:470px}}@media (min-width:768px){.sidebar-right.collapsed~.sidebar-map .leaflet-right{right:50px}}/*!\n * Bootstrap v3.3.6 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type=checkbox],input[type=radio]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:0 0!important;-webkit-box-shadow:none!important;box-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000!important}.label{border:1px solid #000}.table{border-collapse:collapse!important}.table td,.table th{background-color:#fff!important}.table-bordered td,.table-bordered th{border:1px solid #ddd!important}}@font-face{font-family:'Glyphicons Halflings';src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot);src:url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff2) format('woff2'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff) format('woff'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.ttf) format('truetype'),url(jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:'Glyphicons Halflings';font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-eur:before,.glyphicon-euro:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before{content:\"\\e227\"}.glyphicon-btc:before{content:\"\\e227\"}.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-jpy:before{content:\"\\00a5\"}.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-rub:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}:after,:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:transparent}body{font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#337ab7;text-decoration:none}a:focus,a:hover{color:#23527c;text-decoration:underline}a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:6px}.img-thumbnail{display:inline-block;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out}.img-circle{border-radius:50%}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}.h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}.h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}.h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}.h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}.lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}.mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}.page-header{padding-bottom:9px;margin:40px 0 20px;border-bottom:1px solid #eee}ol,ul{margin-top:0;margin-bottom:10px}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}.list-unstyled{padding-left:0;list-style:none}.list-inline{padding-left:0;margin-left:-5px;list-style:none}.list-inline>li{display:inline-block;padding-right:5px;padding-left:5px}dl{margin-top:0;margin-bottom:20px}dd,dt{line-height:1.42857143}dt{font-weight:700}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;overflow:hidden;clear:left;text-align:right;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[data-original-title],abbr[title]{cursor:help;border-bottom:1px dotted #777}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10px 20px;margin:0 0 20px;font-size:17.5px;border-left:5px solid #eee}blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{margin-bottom:0}blockquote .small,blockquote footer,blockquote small{display:block;font-size:80%;line-height:1.42857143;color:#777}blockquote .small:before,blockquote footer:before,blockquote small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;text-align:right;border-right:5px solid #eee;border-left:0}.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{content:''}.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{content:'\\00A0 \\2014'}address{margin-bottom:20px;font-style:normal;line-height:1.42857143}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,\"Courier New\",monospace}code{padding:2px 4px;font-size:90%;color:#c7254e;background-color:#f9f2f4;border-radius:4px}kbd{padding:2px 4px;font-size:90%;color:#fff;background-color:#333;border-radius:3px;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}kbd kbd{padding:0;font-size:100%;font-weight:700;-webkit-box-shadow:none;box-shadow:none}pre{display:block;padding:9.5px;margin:0 0 10px;font-size:13px;line-height:1.42857143;color:#333;word-break:break-all;word-wrap:break-word;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{margin-right:-15px;margin-left:-15px}.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{position:relative;min-height:1px;padding-right:15px;padding-left:15px}.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0}@media (min-width:768px){.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0}}@media (min-width:992px){.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0}}@media (min-width:1200px){.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#777;text-align:left}th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:20px}.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}.table>caption+thead>tr:first-child>td,.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>td,.table>thead:first-child>tr:first-child>th{border-top:0}.table>tbody+tbody{border-top:2px solid #ddd}.table .table{background-color:#fff}.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:5px}.table-bordered{border:1px solid #ddd}.table-bordered>tbody>tr>td,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>td,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border:1px solid #ddd}.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=col-]{position:static;display:table-column;float:none}table td[class*=col-],table th[class*=col-]{position:static;display:table-cell;float:none}.table>tbody>tr.active>td,.table>tbody>tr.active>th,.table>tbody>tr>td.active,.table>tbody>tr>th.active,.table>tfoot>tr.active>td,.table>tfoot>tr.active>th,.table>tfoot>tr>td.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>thead>tr.active>th,.table>thead>tr>td.active,.table>thead>tr>th.active{background-color:#f5f5f5}.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr.active:hover>th,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover{background-color:#e8e8e8}.table>tbody>tr.success>td,.table>tbody>tr.success>th,.table>tbody>tr>td.success,.table>tbody>tr>th.success,.table>tfoot>tr.success>td,.table>tfoot>tr.success>th,.table>tfoot>tr>td.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>thead>tr.success>th,.table>thead>tr>td.success,.table>thead>tr>th.success{background-color:#dff0d8}.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr.success:hover>th,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover{background-color:#d0e9c6}.table>tbody>tr.info>td,.table>tbody>tr.info>th,.table>tbody>tr>td.info,.table>tbody>tr>th.info,.table>tfoot>tr.info>td,.table>tfoot>tr.info>th,.table>tfoot>tr>td.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>thead>tr.info>th,.table>thead>tr>td.info,.table>thead>tr>th.info{background-color:#d9edf7}.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr.info:hover>th,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover{background-color:#c4e3f3}.table>tbody>tr.warning>td,.table>tbody>tr.warning>th,.table>tbody>tr>td.warning,.table>tbody>tr>th.warning,.table>tfoot>tr.warning>td,.table>tfoot>tr.warning>th,.table>tfoot>tr>td.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>thead>tr.warning>th,.table>thead>tr>td.warning,.table>thead>tr>th.warning{background-color:#fcf8e3}.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr.warning:hover>th,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover{background-color:#faf2cc}.table>tbody>tr.danger>td,.table>tbody>tr.danger>th,.table>tbody>tr>td.danger,.table>tbody>tr>th.danger,.table>tfoot>tr.danger>td,.table>tfoot>tr.danger>th,.table>tfoot>tr>td.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>thead>tr.danger>th,.table>thead>tr>td.danger,.table>thead>tr>th.danger{background-color:#f2dede}.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr.danger:hover>th,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover{background-color:#ebcccc}.table-responsive{min-height:.01%;overflow-x:auto}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #ddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>td,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>thead>tr>th{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}}fieldset{min-width:0;padding:0;margin:0;border:0}legend{display:block;width:100%;padding:0;margin-bottom:20px;font-size:21px;line-height:inherit;color:#333;border:0;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700}input[type=search]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}input[type=checkbox],input[type=radio]{margin:4px 0 0;margin-top:1px\\9;line-height:normal}input[type=file]{display:block}input[type=range]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=file]:focus,input[type=checkbox]:focus,input[type=radio]:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{display:block;padding-top:7px;font-size:14px;line-height:1.42857143;color:#555}.form-control{display:block;width:100%;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}.form-control:focus{border-color:#66afe9;outline:0;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control::-ms-expand{background-color:transparent;border:0}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=search]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=date].form-control,input[type=time].form-control,input[type=datetime-local].form-control,input[type=month].form-control{line-height:34px}.input-group-sm input[type=date],.input-group-sm input[type=time],.input-group-sm input[type=datetime-local],.input-group-sm input[type=month],input[type=date].input-sm,input[type=time].input-sm,input[type=datetime-local].input-sm,input[type=month].input-sm{line-height:30px}.input-group-lg input[type=date],.input-group-lg input[type=time],.input-group-lg input[type=datetime-local],.input-group-lg input[type=month],input[type=date].input-lg,input[type=time].input-lg,input[type=datetime-local].input-lg,input[type=month].input-lg{line-height:46px}}.form-group{margin-bottom:15px}.checkbox,.radio{position:relative;display:block;margin-top:10px;margin-bottom:10px}.checkbox label,.radio label{min-height:20px;padding-left:20px;margin-bottom:0;font-weight:400;cursor:pointer}.checkbox input[type=checkbox],.checkbox-inline input[type=checkbox],.radio input[type=radio],.radio-inline input[type=radio]{position:absolute;margin-top:4px\\9;margin-left:-20px}.checkbox+.checkbox,.radio+.radio{margin-top:-5px}.checkbox-inline,.radio-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;font-weight:400;vertical-align:middle;cursor:pointer}.checkbox-inline+.checkbox-inline,.radio-inline+.radio-inline{margin-top:0;margin-left:10px}fieldset[disabled] input[type=checkbox],fieldset[disabled] input[type=radio],input[type=checkbox].disabled,input[type=checkbox][disabled],input[type=radio].disabled,input[type=radio][disabled]{cursor:not-allowed}.checkbox-inline.disabled,.radio-inline.disabled,fieldset[disabled] .checkbox-inline,fieldset[disabled] .radio-inline{cursor:not-allowed}.checkbox.disabled label,.radio.disabled label,fieldset[disabled] .checkbox label,fieldset[disabled] .radio label{cursor:not-allowed}.form-control-static{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}.form-control-static.input-lg,.form-control-static.input-sm{padding-right:0;padding-left:0}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}select[multiple].input-sm,textarea.input-sm{height:auto}.form-group-sm .form-control{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.form-group-sm select.form-control{height:30px;line-height:30px}.form-group-sm select[multiple].form-control,.form-group-sm textarea.form-control{height:auto}.form-group-sm .form-control-static{height:30px;min-height:32px;padding:6px 10px;font-size:12px;line-height:1.5}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-lg{height:46px;line-height:46px}select[multiple].input-lg,textarea.input-lg{height:auto}.form-group-lg .form-control{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.form-group-lg select.form-control{height:46px;line-height:46px}.form-group-lg select[multiple].form-control,.form-group-lg textarea.form-control{height:auto}.form-group-lg .form-control-static{height:46px;min-height:38px;padding:11px 16px;font-size:18px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:42.5px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:34px;height:34px;line-height:34px;text-align:center;pointer-events:none}.form-group-lg .form-control+.form-control-feedback,.input-group-lg+.form-control-feedback,.input-lg+.form-control-feedback{width:46px;height:46px;line-height:46px}.form-group-sm .form-control+.form-control-feedback,.input-group-sm+.form-control-feedback,.input-sm+.form-control-feedback{width:30px;height:30px;line-height:30px}.has-success .checkbox,.has-success .checkbox-inline,.has-success .control-label,.has-success .help-block,.has-success .radio,.has-success .radio-inline,.has-success.checkbox label,.has-success.checkbox-inline label,.has-success.radio label,.has-success.radio-inline label{color:#3c763d}.has-success .form-control{border-color:#3c763d;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-success .form-control:focus{border-color:#2b542c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168}.has-success .input-group-addon{color:#3c763d;background-color:#dff0d8;border-color:#3c763d}.has-success .form-control-feedback{color:#3c763d}.has-warning .checkbox,.has-warning .checkbox-inline,.has-warning .control-label,.has-warning .help-block,.has-warning .radio,.has-warning .radio-inline,.has-warning.checkbox label,.has-warning.checkbox-inline label,.has-warning.radio label,.has-warning.radio-inline label{color:#8a6d3b}.has-warning .form-control{border-color:#8a6d3b;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-warning .form-control:focus{border-color:#66512c;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b}.has-warning .input-group-addon{color:#8a6d3b;background-color:#fcf8e3;border-color:#8a6d3b}.has-warning .form-control-feedback{color:#8a6d3b}.has-error .checkbox,.has-error .checkbox-inline,.has-error .control-label,.has-error .help-block,.has-error .radio,.has-error .radio-inline,.has-error.checkbox label,.has-error.checkbox-inline label,.has-error.radio label,.has-error.radio-inline label{color:#a94442}.has-error .form-control{border-color:#a94442;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-error .form-control:focus{border-color:#843534;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483}.has-error .input-group-addon{color:#a94442;background-color:#f2dede;border-color:#a94442}.has-error .form-control-feedback{color:#a94442}.has-feedback label~.form-control-feedback{top:25px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#737373}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .form-control,.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .checkbox,.form-inline .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .checkbox label,.form-inline .radio label{padding-left:0}.form-inline .checkbox input[type=checkbox],.form-inline .radio input[type=radio]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .checkbox,.form-horizontal .checkbox-inline,.form-horizontal .radio,.form-horizontal .radio-inline{padding-top:7px;margin-top:0;margin-bottom:0}.form-horizontal .checkbox,.form-horizontal .radio{min-height:27px}.form-horizontal .form-group{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.form-horizontal .control-label{padding-top:7px;margin-bottom:0;text-align:right}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:11px;font-size:18px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:6px;font-size:12px}}.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px}.btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn.focus,.btn:focus,.btn:hover{color:#333;text-decoration:none}.btn.active,.btn:active{background-image:none;outline:0;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none;opacity:.65}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333;background-color:#fff;border-color:#ccc}.btn-default.focus,.btn-default:focus{color:#333;background-color:#e6e6e6;border-color:#8c8c8c}.btn-default:hover{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active.focus,.btn-default.active:focus,.btn-default.active:hover,.btn-default:active.focus,.btn-default:active:focus,.btn-default:active:hover,.open>.dropdown-toggle.btn-default.focus,.open>.dropdown-toggle.btn-default:focus,.open>.dropdown-toggle.btn-default:hover{color:#333;background-color:#d4d4d4;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled.focus,.btn-default.disabled:focus,.btn-default.disabled:hover,.btn-default[disabled].focus,.btn-default[disabled]:focus,.btn-default[disabled]:hover,fieldset[disabled] .btn-default.focus,fieldset[disabled] .btn-default:focus,fieldset[disabled] .btn-default:hover{background-color:#fff;border-color:#ccc}.btn-default .badge{color:#fff;background-color:#333}.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active.focus,.btn-primary.active:focus,.btn-primary.active:hover,.btn-primary:active.focus,.btn-primary:active:focus,.btn-primary:active:hover,.open>.dropdown-toggle.btn-primary.focus,.open>.dropdown-toggle.btn-primary:focus,.open>.dropdown-toggle.btn-primary:hover{color:#fff;background-color:#204d74;border-color:#122b40}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled.focus,.btn-primary.disabled:focus,.btn-primary.disabled:hover,.btn-primary[disabled].focus,.btn-primary[disabled]:focus,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary.focus,fieldset[disabled] .btn-primary:focus,fieldset[disabled] .btn-primary:hover{background-color:#337ab7;border-color:#2e6da4}.btn-primary .badge{color:#337ab7;background-color:#fff}.btn-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c}.btn-success.focus,.btn-success:focus{color:#fff;background-color:#449d44;border-color:#255625}.btn-success:hover{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active.focus,.btn-success.active:focus,.btn-success.active:hover,.btn-success:active.focus,.btn-success:active:focus,.btn-success:active:hover,.open>.dropdown-toggle.btn-success.focus,.open>.dropdown-toggle.btn-success:focus,.open>.dropdown-toggle.btn-success:hover{color:#fff;background-color:#398439;border-color:#255625}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled.focus,.btn-success.disabled:focus,.btn-success.disabled:hover,.btn-success[disabled].focus,.btn-success[disabled]:focus,.btn-success[disabled]:hover,fieldset[disabled] .btn-success.focus,fieldset[disabled] .btn-success:focus,fieldset[disabled] .btn-success:hover{background-color:#5cb85c;border-color:#4cae4c}.btn-success .badge{color:#5cb85c;background-color:#fff}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn-info.focus,.btn-info:focus{color:#fff;background-color:#31b0d5;border-color:#1b6d85}.btn-info:hover{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active.focus,.btn-info.active:focus,.btn-info.active:hover,.btn-info:active.focus,.btn-info:active:focus,.btn-info:active:hover,.open>.dropdown-toggle.btn-info.focus,.open>.dropdown-toggle.btn-info:focus,.open>.dropdown-toggle.btn-info:hover{color:#fff;background-color:#269abc;border-color:#1b6d85}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled.focus,.btn-info.disabled:focus,.btn-info.disabled:hover,.btn-info[disabled].focus,.btn-info[disabled]:focus,.btn-info[disabled]:hover,fieldset[disabled] .btn-info.focus,fieldset[disabled] .btn-info:focus,fieldset[disabled] .btn-info:hover{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#fff}.btn-warning{color:#fff;background-color:#f0ad4e;border-color:#eea236}.btn-warning.focus,.btn-warning:focus{color:#fff;background-color:#ec971f;border-color:#985f0d}.btn-warning:hover{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active.focus,.btn-warning.active:focus,.btn-warning.active:hover,.btn-warning:active.focus,.btn-warning:active:focus,.btn-warning:active:hover,.open>.dropdown-toggle.btn-warning.focus,.open>.dropdown-toggle.btn-warning:focus,.open>.dropdown-toggle.btn-warning:hover{color:#fff;background-color:#d58512;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled.focus,.btn-warning.disabled:focus,.btn-warning.disabled:hover,.btn-warning[disabled].focus,.btn-warning[disabled]:focus,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning.focus,fieldset[disabled] .btn-warning:focus,fieldset[disabled] .btn-warning:hover{background-color:#f0ad4e;border-color:#eea236}.btn-warning .badge{color:#f0ad4e;background-color:#fff}.btn-danger{color:#fff;background-color:#d9534f;border-color:#d43f3a}.btn-danger.focus,.btn-danger:focus{color:#fff;background-color:#c9302c;border-color:#761c19}.btn-danger:hover{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active.focus,.btn-danger.active:focus,.btn-danger.active:hover,.btn-danger:active.focus,.btn-danger:active:focus,.btn-danger:active:hover,.open>.dropdown-toggle.btn-danger.focus,.open>.dropdown-toggle.btn-danger:focus,.open>.dropdown-toggle.btn-danger:hover{color:#fff;background-color:#ac2925;border-color:#761c19}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled.focus,.btn-danger.disabled:focus,.btn-danger.disabled:hover,.btn-danger[disabled].focus,.btn-danger[disabled]:focus,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger.focus,fieldset[disabled] .btn-danger:focus,fieldset[disabled] .btn-danger:hover{background-color:#d9534f;border-color:#d43f3a}.btn-danger .badge{color:#d9534f;background-color:#fff}.btn-link{font-weight:400;color:#337ab7;border-radius:0}.btn-link,.btn-link.active,.btn-link:active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;-webkit-box-shadow:none;box-shadow:none}.btn-link,.btn-link:active,.btn-link:focus,.btn-link:hover{border-color:transparent}.btn-link:focus,.btn-link:hover{color:#23527c;text-decoration:underline;background-color:transparent}.btn-link[disabled]:focus,.btn-link[disabled]:hover,fieldset[disabled] .btn-link:focus,fieldset[disabled] .btn-link:hover{color:#777;text-decoration:none}.btn-group-lg>.btn,.btn-lg{padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-group-xs>.btn,.btn-xs{padding:1px 5px;font-size:12px;line-height:1.5;border-radius:3px}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=button].btn-block,input[type=reset].btn-block,input[type=submit].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity .15s linear;-o-transition:opacity .15s linear;transition:opacity .15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-timing-function:ease;-o-transition-timing-function:ease;transition-timing-function:ease;-webkit-transition-duration:.35s;-o-transition-duration:.35s;transition-duration:.35s;-webkit-transition-property:height,visibility;-o-transition-property:height,visibility;transition-property:height,visibility}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid\\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropdown,.dropup{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;font-size:14px;text-align:left;list-style:none;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.15);border-radius:4px;-webkit-box-shadow:0 6px 12px rgba(0,0,0,.175);box-shadow:0 6px 12px rgba(0,0,0,.175)}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{color:#262626;text-decoration:none;background-color:#f5f5f5}.dropdown-menu>.active>a,.dropdown-menu>.active>a:focus,.dropdown-menu>.active>a:hover{color:#fff;text-decoration:none;background-color:#337ab7;outline:0}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{color:#777}.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{text-decoration:none;cursor:not-allowed;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false)}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{right:0;left:auto}.dropdown-menu-left{right:auto;left:0}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.42857143;color:#777;white-space:nowrap}.dropdown-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:990}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{content:\"\";border-top:0;border-bottom:4px dashed;border-bottom:4px solid\\9}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{right:0;left:auto}.navbar-right .dropdown-menu-left{right:auto;left:0}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group-vertical>.btn,.btn-group>.btn{position:relative;float:left}.btn-group-vertical>.btn.active,.btn-group-vertical>.btn:active,.btn-group-vertical>.btn:focus,.btn-group-vertical>.btn:hover,.btn-group>.btn.active,.btn-group>.btn:active,.btn-group>.btn:focus,.btn-group>.btn:hover{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-bottom-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-right:8px;padding-left:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-right:12px;padding-left:12px}.btn-group.open .dropdown-toggle{-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn-group.open .dropdown-toggle.btn-link{-webkit-box-shadow:none;box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-top-right-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{display:table-cell;float:none;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=buttons]>.btn input[type=checkbox],[data-toggle=buttons]>.btn input[type=radio],[data-toggle=buttons]>.btn-group>.btn input[type=checkbox],[data-toggle=buttons]>.btn-group>.btn input[type=radio]{position:absolute;clip:rect(0,0,0,0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=col-]{float:none;padding-right:0;padding-left:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:46px;line-height:46px}select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn,textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:30px;line-height:30px}select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{height:auto}.input-group .form-control,.input-group-addon,.input-group-btn{display:table-cell}.input-group .form-control:not(:first-child):not(:last-child),.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:6px 12px;font-size:14px;font-weight:400;line-height:1;color:#555;text-align:center;background-color:#eee;border:1px solid #ccc;border-radius:4px}.input-group-addon.input-sm{padding:5px 10px;font-size:12px;border-radius:3px}.input-group-addon.input-lg{padding:10px 16px;font-size:18px;border-radius:6px}.input-group-addon input[type=checkbox],.input-group-addon input[type=radio]{margin-top:0}.input-group .form-control:first-child,.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn-group:not(:last-child)>.btn,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group .form-control:last-child,.input-group-addon:last-child,.input-group-btn:first-child>.btn-group:not(:first-child)>.btn,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle{border-top-left-radius:0;border-bottom-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{position:relative;font-size:0;white-space:nowrap}.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:active,.input-group-btn>.btn:focus,.input-group-btn>.btn:hover{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{padding-left:0;margin-bottom:0;list-style:none}.nav>li{position:relative;display:block}.nav>li>a{position:relative;display:block;padding:10px 15px}.nav>li>a:focus,.nav>li>a:hover{text-decoration:none;background-color:#eee}.nav>li.disabled>a{color:#777}.nav>li.disabled>a:focus,.nav>li.disabled>a:hover{color:#777;text-decoration:none;cursor:not-allowed;background-color:transparent}.nav .open>a,.nav .open>a:focus,.nav .open>a:hover{background-color:#eee;border-color:#337ab7}.nav .nav-divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #ddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.42857143;border:1px solid transparent;border-radius:4px 4px 0 0}.nav-tabs>li>a:hover{border-color:#eee #eee #ddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:focus,.nav-tabs>li.active>a:hover{color:#555;cursor:default;background-color:#fff;border:1px solid #ddd;border-bottom-color:transparent}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border-bottom-color:#fff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:4px}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:focus,.nav-pills>li.active>a:hover{color:#fff;background-color:#337ab7}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border-bottom-color:#fff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}.navbar{position:relative;min-height:50px;margin-bottom:20px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:4px}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{padding-right:15px;padding-left:15px;overflow-x:visible;-webkit-overflow-scrolling:touch;border-top:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;-webkit-box-shadow:none;box-shadow:none}.navbar-collapse.collapse{display:block!important;height:auto!important;padding-bottom:0;overflow:visible!important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse{padding-right:0;padding-left:0}}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:200px}}.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:0;margin-left:0}}.navbar-static-top{z-index:1000;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-bottom,.navbar-fixed-top{position:fixed;right:0;left:0;z-index:1030}@media (min-width:768px){.navbar-fixed-bottom,.navbar-fixed-top{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;height:50px;padding:15px 15px;font-size:18px;line-height:20px}.navbar-brand:focus,.navbar-brand:hover{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container .navbar-brand,.navbar>.container-fluid .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;padding:9px 10px;margin-top:8px;margin-right:15px;margin-bottom:8px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:4px}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:7.5px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:20px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none}.navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:20px}.navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:15px;padding-bottom:15px}}.navbar-form{padding:10px 15px;margin-top:8px;margin-right:-15px;margin-bottom:8px;margin-left:-15px;border-top:1px solid transparent;border-bottom:1px solid transparent;-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1)}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .form-control,.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .checkbox,.navbar-form .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .checkbox label,.navbar-form .radio label{padding-left:0}.navbar-form .checkbox input[type=checkbox],.navbar-form .radio input[type=radio]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;padding-top:0;padding-bottom:0;margin-right:0;margin-left:0;border:0;-webkit-box-shadow:none;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:8px;margin-bottom:8px}.navbar-btn.btn-sm{margin-top:10px;margin-bottom:10px}.navbar-btn.btn-xs{margin-top:14px;margin-bottom:14px}.navbar-text{margin-top:15px;margin-bottom:15px}@media (min-width:768px){.navbar-text{float:left;margin-right:15px;margin-left:15px}}@media (min-width:768px){.navbar-left{float:left!important}.navbar-right{float:right!important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#f8f8f8;border-color:#e7e7e7}.navbar-default .navbar-brand{color:#777}.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{color:#5e5e5e;background-color:transparent}.navbar-default .navbar-text{color:#777}.navbar-default .navbar-nav>li>a{color:#777}.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:focus,.navbar-default .navbar-nav>.disabled>a:hover{color:#ccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:#ddd}.navbar-default .navbar-toggle:focus,.navbar-default .navbar-toggle:hover{background-color:#ddd}.navbar-default .navbar-toggle .icon-bar{background-color:#888}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#e7e7e7}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:focus,.navbar-default .navbar-nav>.open>a:hover{color:#555;background-color:#e7e7e7}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#777}.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#ccc;background-color:transparent}}.navbar-default .navbar-link{color:#777}.navbar-default .navbar-link:hover{color:#333}.navbar-default .btn-link{color:#777}.navbar-default .btn-link:focus,.navbar-default .btn-link:hover{color:#333}.navbar-default .btn-link[disabled]:focus,.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:focus,fieldset[disabled] .navbar-default .btn-link:hover{color:#ccc}.navbar-inverse{background-color:#222;border-color:#080808}.navbar-inverse .navbar-brand{color:#9d9d9d}.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-text{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a:focus,.navbar-inverse .navbar-nav>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:focus,.navbar-inverse .navbar-nav>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:focus,.navbar-inverse .navbar-nav>.disabled>a:hover{color:#444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:#333}.navbar-inverse .navbar-toggle:focus,.navbar-inverse .navbar-toggle:hover{background-color:#333}.navbar-inverse .navbar-toggle .icon-bar{background-color:#fff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#101010}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:focus,.navbar-inverse .navbar-nav>.open>a:hover{color:#fff;background-color:#080808}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#444;background-color:transparent}}.navbar-inverse .navbar-link{color:#9d9d9d}.navbar-inverse .navbar-link:hover{color:#fff}.navbar-inverse .btn-link{color:#9d9d9d}.navbar-inverse .btn-link:focus,.navbar-inverse .btn-link:hover{color:#fff}.navbar-inverse .btn-link[disabled]:focus,.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:focus,fieldset[disabled] .navbar-inverse .btn-link:hover{color:#444}.breadcrumb{padding:8px 15px;margin-bottom:20px;list-style:none;background-color:#f5f5f5;border-radius:4px}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{padding:0 5px;color:#ccc;content:\"/\\00a0\"}.breadcrumb>.active{color:#777}.pagination{display:inline-block;padding-left:0;margin:20px 0;border-radius:4px}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:6px 12px;margin-left:-1px;line-height:1.42857143;color:#337ab7;text-decoration:none;background-color:#fff;border:1px solid #ddd}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination>li:last-child>a,.pagination>li:last-child>span{border-top-right-radius:4px;border-bottom-right-radius:4px}.pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{z-index:2;color:#23527c;background-color:#eee;border-color:#ddd}.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span,.pagination>.active>span:focus,.pagination>.active>span:hover{z-index:3;color:#fff;cursor:default;background-color:#337ab7;border-color:#337ab7}.pagination>.disabled>a,.pagination>.disabled>a:focus,.pagination>.disabled>a:hover,.pagination>.disabled>span,.pagination>.disabled>span:focus,.pagination>.disabled>span:hover{color:#777;cursor:not-allowed;background-color:#fff;border-color:#ddd}.pagination-lg>li>a,.pagination-lg>li>span{padding:10px 16px;font-size:18px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-top-left-radius:6px;border-bottom-left-radius:6px}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-top-right-radius:6px;border-bottom-right-radius:6px}.pagination-sm>li>a,.pagination-sm>li>span{padding:5px 10px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-top-left-radius:3px;border-bottom-left-radius:3px}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-top-right-radius:3px;border-bottom-right-radius:3px}.pager{padding-left:0;margin:20px 0;text-align:center;list-style:none}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:#fff;border:1px solid #ddd;border-radius:15px}.pager li>a:focus,.pager li>a:hover{text-decoration:none;background-color:#eee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:focus,.pager .disabled>a:hover,.pager .disabled>span{color:#777;cursor:not-allowed;background-color:#fff}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:focus,a.label:hover{color:#fff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#777}.label-default[href]:focus,.label-default[href]:hover{background-color:#5e5e5e}.label-primary{background-color:#337ab7}.label-primary[href]:focus,.label-primary[href]:hover{background-color:#286090}.label-success{background-color:#5cb85c}.label-success[href]:focus,.label-success[href]:hover{background-color:#449d44}.label-info{background-color:#5bc0de}.label-info[href]:focus,.label-info[href]:hover{background-color:#31b0d5}.label-warning{background-color:#f0ad4e}.label-warning[href]:focus,.label-warning[href]:hover{background-color:#ec971f}.label-danger{background-color:#d9534f}.label-danger[href]:focus,.label-danger[href]:hover{background-color:#c9302c}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:middle;background-color:#777;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-group-xs>.btn .badge,.btn-xs .badge{top:0;padding:1px 5px}a.badge:focus,a.badge:hover{color:#fff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#337ab7;background-color:#fff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;color:inherit;background-color:#eee}.jumbotron .h1,.jumbotron h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:21px;font-weight:200}.jumbotron>hr{border-top-color:#d5d5d5}.container .jumbotron,.container-fluid .jumbotron{padding-right:15px;padding-left:15px;border-radius:6px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container .jumbotron,.container-fluid .jumbotron{padding-right:60px;padding-left:60px}.jumbotron .h1,.jumbotron h1{font-size:63px}}.thumbnail{display:block;padding:4px;margin-bottom:20px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:border .2s ease-in-out;-o-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail a>img,.thumbnail>img{margin-right:auto;margin-left:auto}a.thumbnail.active,a.thumbnail:focus,a.thumbnail:hover{border-color:#337ab7}.thumbnail .caption{padding:9px;color:#333}.alert{padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:700}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.alert-success hr{border-top-color:#c9e2b3}.alert-success .alert-link{color:#2b542c}.alert-info{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.alert-info hr{border-top-color:#a6e1ec}.alert-info .alert-link{color:#245269}.alert-warning{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.alert-warning hr{border-top-color:#f7e1b5}.alert-warning .alert-link{color:#66512c}.alert-danger{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.alert-danger hr{border-top-color:#e4b9c0}.alert-danger .alert-link{color:#843534}@-webkit-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@-o-keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{from{background-position:40px 0}to{background-position:0 0}}.progress{height:20px;margin-bottom:20px;overflow:hidden;background-color:#f5f5f5;border-radius:4px;-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.1)}.progress-bar{float:left;width:0;height:100%;font-size:12px;line-height:20px;color:#fff;text-align:center;background-color:#337ab7;-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition:width .6s ease;-o-transition:width .6s ease;transition:width .6s ease}.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}.progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}.progress-bar-success{background-color:#5cb85c}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-warning{background-color:#f0ad4e}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.progress-bar-danger{background-color:#d9534f}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{overflow:hidden;zoom:1}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-body,.media-left,.media-right{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{padding-left:0;margin-bottom:20px}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#fff;border:1px solid #ddd}.list-group-item:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}a.list-group-item,button.list-group-item{color:#555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:focus,.list-group-item.disabled:hover{color:#777;cursor:not-allowed;background-color:#eee}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text{color:#777}.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#fff;background-color:#337ab7;border-color:#337ab7}.list-group-item.active .list-group-item-heading,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#c7ddef}.list-group-item-success{color:#3c763d;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#3c763d}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:focus,a.list-group-item-success:hover,button.list-group-item-success:focus,button.list-group-item-success:hover{color:#3c763d;background-color:#d0e9c6}a.list-group-item-success.active,a.list-group-item-success.active:focus,a.list-group-item-success.active:hover,button.list-group-item-success.active,button.list-group-item-success.active:focus,button.list-group-item-success.active:hover{color:#fff;background-color:#3c763d;border-color:#3c763d}.list-group-item-info{color:#31708f;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#31708f}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:focus,a.list-group-item-info:hover,button.list-group-item-info:focus,button.list-group-item-info:hover{color:#31708f;background-color:#c4e3f3}a.list-group-item-info.active,a.list-group-item-info.active:focus,a.list-group-item-info.active:hover,button.list-group-item-info.active,button.list-group-item-info.active:focus,button.list-group-item-info.active:hover{color:#fff;background-color:#31708f;border-color:#31708f}.list-group-item-warning{color:#8a6d3b;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#8a6d3b}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:focus,a.list-group-item-warning:hover,button.list-group-item-warning:focus,button.list-group-item-warning:hover{color:#8a6d3b;background-color:#faf2cc}a.list-group-item-warning.active,a.list-group-item-warning.active:focus,a.list-group-item-warning.active:hover,button.list-group-item-warning.active,button.list-group-item-warning.active:focus,button.list-group-item-warning.active:hover{color:#fff;background-color:#8a6d3b;border-color:#8a6d3b}.list-group-item-danger{color:#a94442;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#a94442}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:focus,a.list-group-item-danger:hover,button.list-group-item-danger:focus,button.list-group-item-danger:hover{color:#a94442;background-color:#ebcccc}a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-group-item-danger.active:hover,button.list-group-item-danger.active,button.list-group-item-danger.active:focus,button.list-group-item-danger.active:hover{color:#fff;background-color:#a94442;border-color:#a94442}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,.05);box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-left-radius:3px;border-top-right-radius:3px}.panel-heading>.dropdown .dropdown-toggle{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:16px;color:inherit}.panel-title>.small,.panel-title>.small>a,.panel-title>a,.panel-title>small,.panel-title>small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-left-radius:3px;border-top-right-radius:3px}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-left-radius:0;border-top-right-radius:0}.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.list-group+.panel-footer{border-top-width:0}.panel>.panel-collapse>.table,.panel>.table,.panel>.table-responsive>.table{margin-bottom:0}.panel>.panel-collapse>.table caption,.panel>.table caption,.panel>.table-responsive>.table caption{padding-right:15px;padding-left:15px}.panel>.table-responsive:first-child>.table:first-child,.panel>.table:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table:first-child>thead:first-child>tr:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child{border-top-left-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child{border-top-right-radius:3px}.panel>.table-responsive:last-child>.table:last-child,.panel>.table:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:3px}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #ddd}.panel>.table>tbody:first-child>tr:first-child td,.panel>.table>tbody:first-child>tr:first-child th{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th{border-bottom:0}.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}.panel>.table-responsive{margin-bottom:0;border:0}.panel-group{margin-bottom:20px}.panel-group .panel{margin-bottom:0;border-radius:4px}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.list-group,.panel-group .panel-heading+.panel-collapse>.panel-body{border-top:1px solid #ddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #ddd}.panel-default{border-color:#ddd}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ddd}.panel-primary{border-color:#337ab7}.panel-primary>.panel-heading{color:#fff;background-color:#337ab7;border-color:#337ab7}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#337ab7}.panel-primary>.panel-heading .badge{color:#337ab7;background-color:#fff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#337ab7}.panel-success{border-color:#d6e9c6}.panel-success>.panel-heading{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d6e9c6}.panel-success>.panel-heading .badge{color:#dff0d8;background-color:#3c763d}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d6e9c6}.panel-info{border-color:#bce8f1}.panel-info>.panel-heading{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#bce8f1}.panel-info>.panel-heading .badge{color:#d9edf7;background-color:#31708f}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#bce8f1}.panel-warning{border-color:#faebcc}.panel-warning>.panel-heading{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#faebcc}.panel-warning>.panel-heading .badge{color:#fcf8e3;background-color:#8a6d3b}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#faebcc}.panel-danger{border-color:#ebccd1}.panel-danger>.panel-heading{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ebccd1}.panel-danger>.panel-heading .badge{color:#f2dede;background-color:#a94442}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ebccd1}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video{position:absolute;top:0;bottom:0;left:0;width:100%;height:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.05);box-shadow:inset 0 1px 1px rgba(0,0,0,.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,.15)}.well-lg{padding:24px;border-radius:6px}.well-sm{padding:9px;border-radius:3px}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;filter:alpha(opacity=20);opacity:.2}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;filter:alpha(opacity=50);opacity:.5}button.close{-webkit-appearance:none;padding:0;cursor:pointer;background:0 0;border:0}.modal-open{overflow:hidden}.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;display:none;overflow:hidden;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transition:-webkit-transform .3s ease-out;-o-transition:-o-transform .3s ease-out;transition:transform .3s ease-out;-webkit-transform:translate(0,-25%);-ms-transform:translate(0,-25%);-o-transform:translate(0,-25%);transform:translate(0,-25%)}.modal.in .modal-dialog{-webkit-transform:translate(0,0);-ms-transform:translate(0,0);-o-transform:translate(0,0);transform:translate(0,0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;-webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);box-shadow:0 3px 9px rgba(0,0,0,.5)}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1040;background-color:#000}.modal-backdrop.fade{filter:alpha(opacity=0);opacity:0}.modal-backdrop.in{filter:alpha(opacity=50);opacity:.5}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.42857143}.modal-body{position:relative;padding:15px}.modal-footer{padding:15px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-bottom:0;margin-left:5px}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{-webkit-box-shadow:0 5px 15px rgba(0,0,0,.5);box-shadow:0 5px 15px rgba(0,0,0,.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:1070;display:block;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto}.tooltip.in{filter:alpha(opacity=90);opacity:.9}.tooltip.top{padding:5px 0;margin-top:-3px}.tooltip.right{padding:0 5px;margin-left:3px}.tooltip.bottom{padding:5px 0;margin-top:3px}.tooltip.left{padding:0 5px;margin-left:-3px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#fff;text-align:center;background-color:#000;border-radius:4px}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-left .tooltip-arrow{right:5px;bottom:0;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-right .tooltip-arrow{bottom:0;left:5px;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#000}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#000}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.popover{position:absolute;top:0;left:0;z-index:1060;display:none;max-width:276px;padding:1px;font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif;font-size:14px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;background-color:#fff;-webkit-background-clip:padding-box;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.2);border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,.2);box-shadow:0 5px 10px rgba(0,0,0,.2);line-break:auto}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{padding:8px 14px;margin:0;font-size:14px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;border-radius:5px 5px 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{content:\"\";border-width:10px}.popover.top>.arrow{bottom:-11px;left:50%;margin-left:-11px;border-top-color:#999;border-top-color:rgba(0,0,0,.25);border-bottom-width:0}.popover.top>.arrow:after{bottom:1px;margin-left:-10px;content:\" \";border-top-color:#fff;border-bottom-width:0}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-right-color:#999;border-right-color:rgba(0,0,0,.25);border-left-width:0}.popover.right>.arrow:after{bottom:-10px;left:1px;content:\" \";border-right-color:#fff;border-left-width:0}.popover.bottom>.arrow{top:-11px;left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#999;border-bottom-color:rgba(0,0,0,.25)}.popover.bottom>.arrow:after{top:1px;margin-left:-10px;content:\" \";border-top-width:0;border-bottom-color:#fff}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#999;border-left-color:rgba(0,0,0,.25)}.popover.left>.arrow:after{right:1px;bottom:-10px;content:\" \";border-right-width:0;border-left-color:#fff}.carousel{position:relative}.carousel-inner{position:relative;width:100%;overflow:hidden}.carousel-inner>.item{position:relative;display:none;-webkit-transition:.6s ease-in-out left;-o-transition:.6s ease-in-out left;transition:.6s ease-in-out left}.carousel-inner>.item>a>img,.carousel-inner>.item>img{line-height:1}@media all and (transform-3d),(-webkit-transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;-o-transition:-o-transform .6s ease-in-out;transition:transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.active.right,.carousel-inner>.item.next{left:0;-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0)}.carousel-inner>.item.active.left,.carousel-inner>.item.prev{left:0;-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0)}.carousel-inner>.item.active,.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right{left:0;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;bottom:0;left:0;width:15%;font-size:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);background-color:rgba(0,0,0,0);filter:alpha(opacity=50);opacity:.5}.carousel-control.left{background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,.0001)));background-image:linear-gradient(to right,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);background-repeat:repeat-x}.carousel-control.right{right:0;left:auto;background-image:-webkit-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-o-linear-gradient(left,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.0001)),to(rgba(0,0,0,.5)));background-image:linear-gradient(to right,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);background-repeat:repeat-x}.carousel-control:focus,.carousel-control:hover{color:#fff;text-decoration:none;filter:alpha(opacity=90);outline:0;opacity:.9}.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{position:absolute;top:50%;z-index:5;display:inline-block;margin-top:-10px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{left:50%;margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{right:50%;margin-right:-10px}.carousel-control .icon-next,.carousel-control .icon-prev{width:20px;height:20px;font-family:serif;line-height:1}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:15;width:60%;padding-left:0;margin-left:-30%;text-align:center;list-style:none}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;cursor:pointer;background-color:#000\\9;background-color:rgba(0,0,0,0);border:1px solid #fff;border-radius:10px}.carousel-indicators .active{width:12px;height:12px;margin:0;background-color:#fff}.carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:10;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{right:20%;left:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.btn-group-vertical>.btn-group:after,.btn-group-vertical>.btn-group:before,.btn-toolbar:after,.btn-toolbar:before,.clearfix:after,.clearfix:before,.container-fluid:after,.container-fluid:before,.container:after,.container:before,.dl-horizontal dd:after,.dl-horizontal dd:before,.form-horizontal .form-group:after,.form-horizontal .form-group:before,.modal-footer:after,.modal-footer:before,.modal-header:after,.modal-header:before,.nav:after,.nav:before,.navbar-collapse:after,.navbar-collapse:before,.navbar-header:after,.navbar-header:before,.navbar:after,.navbar:before,.pager:after,.pager:before,.panel-body:after,.panel-body:before,.row:after,.row:before{display:table;content:\" \"}.btn-group-vertical>.btn-group:after,.btn-toolbar:after,.clearfix:after,.container-fluid:after,.container:after,.dl-horizontal dd:after,.form-horizontal .form-group:after,.modal-footer:after,.modal-header:after,.nav:after,.navbar-collapse:after,.navbar-header:after,.navbar:after,.pager:after,.panel-body:after,.row:after{clear:both}.center-block{display:block;margin-right:auto;margin-left:auto}.pull-right{float:right!important}.pull-left{float:left!important}.hide{display:none!important}.show{display:block!important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none!important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-lg,.visible-md,.visible-sm,.visible-xs{display:none!important}.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block{display:none!important}@media (max-width:767px){.visible-xs{display:block!important}table.visible-xs{display:table!important}tr.visible-xs{display:table-row!important}td.visible-xs,th.visible-xs{display:table-cell!important}}@media (max-width:767px){.visible-xs-block{display:block!important}}@media (max-width:767px){.visible-xs-inline{display:inline!important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block!important}table.visible-sm{display:table!important}tr.visible-sm{display:table-row!important}td.visible-sm,th.visible-sm{display:table-cell!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block!important}table.visible-md{display:table!important}tr.visible-md{display:table-row!important}td.visible-md,th.visible-md{display:table-cell!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block!important}}@media (min-width:1200px){.visible-lg{display:block!important}table.visible-lg{display:table!important}tr.visible-lg{display:table-row!important}td.visible-lg,th.visible-lg{display:table-cell!important}}@media (min-width:1200px){.visible-lg-block{display:block!important}}@media (min-width:1200px){.visible-lg-inline{display:inline!important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block!important}}@media (max-width:767px){.hidden-xs{display:none!important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none!important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none!important}}@media (min-width:1200px){.hidden-lg{display:none!important}}.visible-print{display:none!important}@media print{.visible-print{display:block!important}table.visible-print{display:table!important}tr.visible-print{display:table-row!important}td.visible-print,th.visible-print{display:table-cell!important}}.visible-print-block{display:none!important}@media print{.visible-print-block{display:block!important}}.visible-print-inline{display:none!important}@media print{.visible-print-inline{display:inline!important}}.visible-print-inline-block{display:none!important}@media print{.visible-print-inline-block{display:inline-block!important}}@media print{.hidden-print{display:none!important}}body,html{height:100%;margin:0}#map{height:100%}.external{background-image:linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cg%20transform%3D%22translate%28-826.429%20-698.791%29%22%3E%3Crect%20width%3D%225.982%22%20height%3D%225.982%22%20x%3D%22826.929%22%20y%3D%22702.309%22%20fill%3D%22%23fff%22%20stroke%3D%22%2306c%22%2F%3E%3Cg%3E%3Cpath%20d%3D%22M831.194%20698.791h5.234v5.391l-1.571%201.545-1.31-1.31-2.725%202.725-2.689-2.689%202.808-2.808-1.311-1.311z%22%20fill%3D%22%2306f%22%2F%3E%3Cpath%20d%3D%22M835.424%20699.795l.022%204.885-1.817-1.817-2.881%202.881-1.228-1.228%202.881-2.881-1.851-1.851z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E);background-position:right center;background-repeat:no-repeat;padding-right:13px}.dataset-spatial-minimap{height:120px}.code-nowrap{word-wrap:normal;white-space:pre}.ac-container{width:auto;margin:10px auto 10px auto;text-align:left;overflow-y:auto;overflow-x:hidden;height:auto}.ac-container label{font-family:BebasNeueRegular,'Arial Narrow',Arial,sans-serif;padding:5px 20px;position:relative;z-index:20;display:block;cursor:pointer;color:#777;text-shadow:1px 1px 1px rgba(255,255,255,.8);line-height:30px;font-size:17px;background:#fff;background:-moz-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-webkit-gradient(linear,left top,left bottom,color-stop(1%,#fff),color-stop(100%,#eaeaea));background:-webkit-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-o-linear-gradient(top,#fff 1%,#eaeaea 100%);background:-ms-linear-gradient(top,#fff 1%,#eaeaea 100%);background:linear-gradient(top,#fff 1%,#eaeaea 100%);filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea', GradientType=0 );box-shadow:0 0 0 1px rgba(155,155,155,.3),1px 0 0 0 rgba(255,255,255,.9) inset,0 2px 2px rgba(0,0,0,.1);box-sizing:content-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.ac-container label:hover{background:#fff}.ac-container input.menu:checked+label,.ac-container input.menu:checked+label:hover{background:#c6e1ec;color:#3d7489;text-shadow:0 1px 1px rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(155,155,155,.3),0 2px 2px rgba(0,0,0,.1)}.ac-container input.menu:checked+label:after,.ac-container label:hover:after{content:'';position:absolute;width:24px;height:24px;right:13px;top:7px;background:transparent url(app/css/styledLayerControl/images/arrow_down.png) no-repeat center center}.ac-container input.menu:checked+label:after{background-image:url(app/css/styledLayerControl/images/arrow_up.png)}.ac-container input.menu{display:none}.ac-container article{background:rgba(255,255,255,.5);margin-top:-1px;overflow:hidden;height:0;position:relative;z-index:10;-webkit-transition:height .3s ease-in-out,box-shadow .6s linear;-moz-transition:height .3s ease-in-out,box-shadow .6s linear;-o-transition:height .3s ease-in-out,box-shadow .6s linear;-ms-transition:height .3s ease-in-out,box-shadow .6s linear;transition:height .3s ease-in-out,box-shadow .6s linear}.ac-container input.menu:checked~article{-webkit-transition:height .5s ease-in-out,box-shadow .1s linear;-moz-transition:height .5s ease-in-out,box-shadow .1s linear;-o-transition:height .5s ease-in-out,box-shadow .1s linear;-ms-transition:height .5s ease-in-out,box-shadow .1s linear;transition:height .5s ease-in-out,box-shadow .1s linear;box-shadow:0 0 0 1px rgba(155,155,155,.3)}.ac-container input.menu:checked~article.ac-large{height:auto;max-height:200px;padding-top:5px;overflow-y:auto}.menu-item-radio{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.menu-item-checkbox{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.bt_delete{position:relative;float:right;background-image:url(app/css/styledLayerControl/images/delete.png);background-color:transparent;background-repeat:no-repeat;background-position:0 0;border:none;cursor:pointer;height:16px;width:16px;vertical-align:middle}.leaflet-control-layers{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:rgba(255,255,255,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}input[type=checkbox].leaflet-control-layers-selector,input[type=radio].leaflet-control-layers-selector{margin:3px 3px 0 5px}.snow{display:none;height:100%;left:0;position:absolute;top:0;width:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}#snow1{background-image:url(http://www.wearewebstars.dk/codepen/img/s1.png);animation:snow1 5s linear infinite}#snow2{background-image:url(http://www.wearewebstars.dk/codepen/img/s2.png);animation:snow2 20s linear infinite}#snow3{background-image:url(http://www.wearewebstars.dk/codepen/img/s3.png);animation:snow3 30s linear infinite}@keyframes snow1{from{background-position:0 0}to{background-position:500px 500px}}@keyframes snow2{from{background-position:0 0}to{background-position:400px 800px}}@keyframes snow3{from{background-position:0 0}to{background-position:-600px 900px}}");
+(function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[a](d.createTextNode(c));})
+(".leaflet-image-layer,.leaflet-layer,.leaflet-map-pane canvas,.leaflet-map-pane svg,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-overlay-pane svg,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-width:none!important}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-drag{-ms-touch-action:none;touch-action:none}.leaflet-tile{-webkit-filter:inherit;filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:15}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:10}.leaflet-tile-pane{z-index:9}.leaflet-overlay-pane{z-index:10}.leaflet-shadow-pane{z-index:11}.leaflet-marker-pane{z-index:12}.leaflet-tooltip-pane{z-index:13}.leaflet-popup-pane{z-index:14}.leaflet-map-pane canvas{z-index:8}.leaflet-map-pane svg{z-index:9}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(jspm_packages/npm/leaflet@1.0.1/dist/#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:15;pointer-events:visiblePainted;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:17;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-tile{will-change:opacity}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;transform-origin:0 0}.leaflet-zoom-anim .leaflet-zoom-animated{will-change:transform;-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1),-webkit-transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline:0}.leaflet-container a{color:#0078a8}.leaflet-container a.leaflet-active{outline:2px solid orange}.leaflet-zoom-box{border:2px dotted #38f;background:hsla(0,0%,100%,.5)}.leaflet-container{font:12px/1.5 Helvetica Neue,Arial,Helvetica,sans-serif}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 18px Lucida Console,Monaco,monospace;text-indent:1px}.leaflet-control-zoom-out{font-size:20px}.leaflet-touch .leaflet-control-zoom-in{font-size:22px}.leaflet-touch .leaflet-control-zoom-out{font-size:24px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(jspm_packages/npm/leaflet@1.0.1/dist/images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(jspm_packages/npm/leaflet@1.0.1/dist/images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers-expanded .leaflet-control-layers-toggle,.leaflet-control-layers .leaflet-control-layers-list{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url(jspm_packages/npm/leaflet@1.0.1/dist/images/marker-icon.png)}.leaflet-container .leaflet-control-attribution{background:#fff;background:hsla(0,0%,100%,.7);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;box-sizing:border-box;background:#fff;background:hsla(0,0%,100%,.5)}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 19px;line-height:1.4}.leaflet-popup-content p{margin:18px 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;-webkit-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 4px 0 0;border:none;text-align:center;width:18px;height:14px;font:16px/14px Tahoma,Verdana,sans-serif;color:#c3c3c3;text-decoration:none;font-weight:700;background:transparent}.leaflet-container a.leaflet-popup-close-button:hover{color:#999}.leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid #ddd;border-top:1px solid #ddd}.leaflet-oldie .leaflet-popup-content-wrapper{zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto;-ms-filter:\"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";filter:progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678,M12=0.70710678,M21=-0.70710678,M22=0.70710678)}.leaflet-oldie .leaflet-popup-tip-container{margin-top:-1px}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}.leaflet-tooltip.leaflet-clickable{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{position:absolute;pointer-events:none;border:6px solid transparent;background:transparent;content:\"\"}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}.leaflet-control-loading:empty{background-image:url(data:image/gif;base64,R0lGODlhEAAQAPQAAP///wAAAPDw8IqKiuDg4EZGRnp6egAAAFhYWCQkJKysrL6+vhQUFJycnAQEBDY2NmhoaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAAFdyAgAgIJIeWoAkRCCMdBkKtIHIngyMKsErPBYbADpkSCwhDmQCBethRB6Vj4kFCkQPG4IlWDgrNRIwnO4UKBXDufzQvDMaoSDBgFb886MiQadgNABAokfCwzBA8LCg0Egl8jAggGAA1kBIA1BAYzlyILczULC2UhACH5BAAKAAEALAAAAAAQABAAAAV2ICACAmlAZTmOREEIyUEQjLKKxPHADhEvqxlgcGgkGI1DYSVAIAWMx+lwSKkICJ0QsHi9RgKBwnVTiRQQgwF4I4UFDQQEwi6/3YSGWRRmjhEETAJfIgMFCnAKM0KDV4EEEAQLiF18TAYNXDaSe3x6mjidN1s3IQAh+QQACgACACwAAAAAEAAQAAAFeCAgAgLZDGU5jgRECEUiCI+yioSDwDJyLKsXoHFQxBSHAoAAFBhqtMJg8DgQBgfrEsJAEAg4YhZIEiwgKtHiMBgtpg3wbUZXGO7kOb1MUKRFMysCChAoggJCIg0GC2aNe4gqQldfL4l/Ag1AXySJgn5LcoE3QXI3IQAh+QQACgADACwAAAAAEAAQAAAFdiAgAgLZNGU5joQhCEjxIssqEo8bC9BRjy9Ag7GILQ4QEoE0gBAEBcOpcBA0DoxSK/e8LRIHn+i1cK0IyKdg0VAoljYIg+GgnRrwVS/8IAkICyosBIQpBAMoKy9dImxPhS+GKkFrkX+TigtLlIyKXUF+NjagNiEAIfkEAAoABAAsAAAAABAAEAAABWwgIAICaRhlOY4EIgjH8R7LKhKHGwsMvb4AAy3WODBIBBKCsYA9TjuhDNDKEVSERezQEL0WrhXucRUQGuik7bFlngzqVW9LMl9XWvLdjFaJtDFqZ1cEZUB0dUgvL3dgP4WJZn4jkomWNpSTIyEAIfkEAAoABQAsAAAAABAAEAAABX4gIAICuSxlOY6CIgiD8RrEKgqGOwxwUrMlAoSwIzAGpJpgoSDAGifDY5kopBYDlEpAQBwevxfBtRIUGi8xwWkDNBCIwmC9Vq0aiQQDQuK+VgQPDXV9hCJjBwcFYU5pLwwHXQcMKSmNLQcIAExlbH8JBwttaX0ABAcNbWVbKyEAIfkEAAoABgAsAAAAABAAEAAABXkgIAICSRBlOY7CIghN8zbEKsKoIjdFzZaEgUBHKChMJtRwcWpAWoWnifm6ESAMhO8lQK0EEAV3rFopIBCEcGwDKAqPh4HUrY4ICHH1dSoTFgcHUiZjBhAJB2AHDykpKAwHAwdzf19KkASIPl9cDgcnDkdtNwiMJCshACH5BAAKAAcALAAAAAAQABAAAAV3ICACAkkQZTmOAiosiyAoxCq+KPxCNVsSMRgBsiClWrLTSWFoIQZHl6pleBh6suxKMIhlvzbAwkBWfFWrBQTxNLq2RG2yhSUkDs2b63AYDAoJXAcFRwADeAkJDX0AQCsEfAQMDAIPBz0rCgcxky0JRWE1AmwpKyEAIfkEAAoACAAsAAAAABAAEAAABXkgIAICKZzkqJ4nQZxLqZKv4NqNLKK2/Q4Ek4lFXChsg5ypJjs1II3gEDUSRInEGYAw6B6zM4JhrDAtEosVkLUtHA7RHaHAGJQEjsODcEg0FBAFVgkQJQ1pAwcDDw8KcFtSInwJAowCCA6RIwqZAgkPNgVpWndjdyohACH5BAAKAAkALAAAAAAQABAAAAV5ICACAimc5KieLEuUKvm2xAKLqDCfC2GaO9eL0LABWTiBYmA06W6kHgvCqEJiAIJiu3gcvgUsscHUERm+kaCxyxa+zRPk0SgJEgfIvbAdIAQLCAYlCj4DBw0IBQsMCjIqBAcPAooCBg9pKgsJLwUFOhCZKyQDA3YqIQAh+QQACgAKACwAAAAAEAAQAAAFdSAgAgIpnOSonmxbqiThCrJKEHFbo8JxDDOZYFFb+A41E4H4OhkOipXwBElYITDAckFEOBgMQ3arkMkUBdxIUGZpEb7kaQBRlASPg0FQQHAbEEMGDSVEAA1QBhAED1E0NgwFAooCDWljaQIQCE5qMHcNhCkjIQAh+QQACgALACwAAAAAEAAQAAAFeSAgAgIpnOSoLgxxvqgKLEcCC65KEAByKK8cSpA4DAiHQ/DkKhGKh4ZCtCyZGo6F6iYYPAqFgYy02xkSaLEMV34tELyRYNEsCQyHlvWkGCzsPgMCEAY7Cg04Uk48LAsDhRA8MVQPEF0GAgqYYwSRlycNcWskCkApIyEAOwAAAAAAAAAAAA==);background-repeat:no-repeat}.leaflet-control-loading,.leaflet-control-zoom a.leaflet-control-loading,.leaflet-control-zoomslider a.leaflet-control-loading{display:none}.leaflet-control-loading.is-loading,.leaflet-control-zoom a.leaflet-control-loading.is-loading,.leaflet-control-zoomslider a.leaflet-control-loading.is-loading{display:block}.leaflet-bar-part-bottom{border-bottom:medium none;border-bottom-left-radius:4px;border-bottom-right-radius:4px}.leaflet-coverage-control{padding:6px 8px;background:hsla(0,0%,100%,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}.leaflet-coverage-control.legend{color:#555}.leaflet-coverage-control.legend .legend-title-container{max-width:120px}.leaflet-coverage-control.legend .legend-title{word-wrap:break-word}.leaflet-coverage-control.discrete-legend .discrete-legend-palette{padding:2px 1px;line-height:18px}.leaflet-coverage-control.discrete-legend .discrete-legend-palette i{float:left;height:18px;margin-right:8px;width:18px}.leaflet-popup-draggable .leaflet-popup-content-wrapper{cursor:move}.jsplumb-connector{z-index:24}.jsplumb-endpoint{z-index:25}.jsplumb-overlay{z-index:26}.main-remapper{position:fixed;width:100%;height:100%;left:0;top:0;z-index:17}.remap-froms,.remap-tos{position:absolute;top:0;left:0;width:250px;height:100%;background-color:rgba(150,220,255,.8);color:#000;text-align:right}.remap-tos{left:auto;right:0;width:250px;overflow:hidden;color:#000;text-align:left}.centrecontent{opacity:.8;height:100%;background:#fff;vertical-align:bottom}.buttonholder,.centrecontent{position:absolute;bottom:0;left:250px;right:250px;text-align:center}.buttonholder{background-color:hsla(0,0%,100%,0)}.cancel-remap-button,.remap-button{font-size:20pt;padding:20px;margin:20px}.map-from,.map-to{margin:2px;border-style:solid;border-width:thin;font-family:sans-serif;background-color:#00d2ff}.map-from{padding-right:10px}.map-to{padding-left:10px}.c3 svg{font:10px sans-serif;-webkit-tap-highlight-color:transparent}.c3 line,.c3 path{fill:none;stroke:#000}.c3 text{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.c3-bars path,.c3-event-rect,.c3-legend-item-tile,.c3-xgrid-focus,.c3-ygrid{shape-rendering:crispEdges}.c3-chart-arc path{stroke:#fff}.c3-chart-arc text{fill:#fff;font-size:13px}.c3-grid line{stroke:#aaa}.c3-grid text{fill:#aaa}.c3-xgrid,.c3-ygrid{stroke-dasharray:3 3}.c3-text.c3-empty{fill:gray;font-size:2em}.c3-line{stroke-width:1px}.c3-circle._expanded_{stroke-width:1px;stroke:#fff}.c3-selected-circle{fill:#fff;stroke-width:2px}.c3-bar{stroke-width:0}.c3-bar._expanded_{fill-opacity:.75}.c3-target.c3-focused{opacity:1}.c3-target.c3-focused path.c3-line,.c3-target.c3-focused path.c3-step{stroke-width:2px}.c3-target.c3-defocused{opacity:.3!important}.c3-region{fill:#4682b4;fill-opacity:.1}.c3-brush .extent{fill-opacity:.1}.c3-legend-item{font-size:12px}.c3-legend-item-hidden{opacity:.15}.c3-legend-background{opacity:.75;fill:#fff;stroke:#d3d3d3;stroke-width:1}.c3-title{font:14px sans-serif}.c3-tooltip-container{z-index:5}.c3-tooltip{border-collapse:collapse;border-spacing:0;background-color:#fff;empty-cells:show;box-shadow:7px 7px 12px -9px #777;opacity:.9}.c3-tooltip tr{border:1px solid #ccc}.c3-tooltip th{background-color:#aaa;font-size:14px;padding:2px 5px;text-align:left;color:#fff}.c3-tooltip td{font-size:13px;padding:3px 6px;background-color:#fff;border-left:1px dotted #999}.c3-tooltip td>span{display:inline-block;width:10px;height:10px;margin-right:6px}.c3-tooltip td.value{text-align:right}.c3-area{stroke-width:0;opacity:.2}.c3-chart-arcs-title{dominant-baseline:middle;font-size:1.3em}.c3-chart-arcs .c3-chart-arcs-background{fill:#e0e0e0;stroke:none}.c3-chart-arcs .c3-chart-arcs-gauge-unit{fill:#000;font-size:16px}.c3-chart-arcs .c3-chart-arcs-gauge-max,.c3-chart-arcs .c3-chart-arcs-gauge-min{fill:#777}.c3-chart-arc .c3-gauge-value{fill:#000}.sidebar{position:absolute;top:0;bottom:0;width:100%;overflow:hidden;z-index:23}.sidebar.collapsed{width:40px}@media (min-width:768px){.sidebar{top:10px;bottom:10px;-webkit-transition:width .5s;transition:width .5s}}@media (min-width:768px) and (max-width:991px){.sidebar{width:305px}}@media (min-width:992px) and (max-width:1199px){.sidebar{width:390px}}@media (min-width:1200px){.sidebar{width:460px}}.sidebar-left{left:0}@media (min-width:768px){.sidebar-left{left:10px}}.sidebar-right{right:0}@media (min-width:768px){.sidebar-right{right:10px}}.sidebar-tabs{top:0;bottom:0;height:100%;background-color:#fff}.sidebar-left .sidebar-tabs{left:0}.sidebar-right .sidebar-tabs{right:0}.sidebar-tabs,.sidebar-tabs>ul{position:absolute;width:40px;margin:0;padding:0}.sidebar-tabs>li,.sidebar-tabs>ul>li{width:100%;height:40px;color:#333;font-size:12pt;overflow:hidden;-webkit-transition:all 80ms;transition:all 80ms}.sidebar-tabs>li:hover,.sidebar-tabs>ul>li:hover{color:#000;background-color:#eee}.sidebar-tabs>li.active,.sidebar-tabs>ul>li.active{color:#fff;background-color:#0074d9}.sidebar-tabs>li.disabled,.sidebar-tabs>ul>li.disabled{color:rgba(51,51,51,.4)}.sidebar-tabs>li.disabled:hover,.sidebar-tabs>ul>li.disabled:hover{background:transparent}.sidebar-tabs>li.disabled>a,.sidebar-tabs>ul>li.disabled>a{cursor:default}.sidebar-tabs>li>a,.sidebar-tabs>ul>li>a{display:block;width:100%;height:100%;line-height:40px;color:inherit;text-decoration:none;text-align:center}.sidebar-tabs>ul+ul{bottom:0}.sidebar-content{position:absolute;top:0;bottom:0;background-color:hsla(0,0%,100%,.95);overflow-x:hidden;overflow-y:auto}.sidebar-left .sidebar-content{left:40px;right:0}.sidebar-right .sidebar-content{left:0;right:40px}.sidebar.collapsed>.sidebar-content{overflow-y:hidden}.sidebar-pane{display:none;left:0;right:0;box-sizing:border-box;padding:10px 20px}.sidebar-pane.active{display:block}@media (min-width:768px) and (max-width:991px){.sidebar-pane{min-width:265px}}@media (min-width:992px) and (max-width:1199px){.sidebar-pane{min-width:350px}}@media (min-width:1200px){.sidebar-pane{min-width:420px}}.sidebar-header{margin:-10px -20px 0;height:40px;padding:0 20px;line-height:40px;font-size:14.4pt;color:#fff;background-color:#0074d9}.sidebar-right .sidebar-header{padding-left:40px}.sidebar-close{position:absolute;top:0;width:40px;height:40px;text-align:center;cursor:pointer}.sidebar-left .sidebar-close{right:0}.sidebar-right .sidebar-close{left:0}.sidebar-left~.sidebar-map{margin-left:40px}@media (min-width:768px){.sidebar-left~.sidebar-map{margin-left:0}}.sidebar-right~.sidebar-map{margin-right:40px}@media (min-width:768px){.sidebar-right~.sidebar-map{margin-right:0}}.sidebar{box-shadow:0 1px 5px rgba(0,0,0,.65)}.sidebar.leaflet-touch{box-shadow:none;border-right:2px solid rgba(0,0,0,.2)}@media (min-width:768px){.sidebar{border-radius:4px}.sidebar.leaflet-touch{border:2px solid rgba(0,0,0,.2)}}@media (min-width:768px){.sidebar-left~.sidebar-map .leaflet-left{-webkit-transition:left .5s;transition:left .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-left~.sidebar-map .leaflet-left{left:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-left~.sidebar-map .leaflet-left{left:400px}}@media (min-width:1200px){.sidebar-left~.sidebar-map .leaflet-left{left:470px}}@media (min-width:768px){.sidebar-left.collapsed~.sidebar-map .leaflet-left{left:50px}}@media (min-width:768px){.sidebar-right~.sidebar-map .leaflet-right{-webkit-transition:right .5s;transition:right .5s}}@media (min-width:768px) and (max-width:991px){.sidebar-right~.sidebar-map .leaflet-right{right:315px}}@media (min-width:992px) and (max-width:1199px){.sidebar-right~.sidebar-map .leaflet-right{right:400px}}@media (min-width:1200px){.sidebar-right~.sidebar-map .leaflet-right{right:470px}}@media (min-width:768px){.sidebar-right.collapsed~.sidebar-map .leaflet-right{right:50px}}\r\n\r\n/*!\n * Bootstrap v3.3.6 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\r\n\r\n/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{box-sizing:content-box;-webkit-appearance:textfield}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}\r\n\r\n/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:transparent!important;box-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:\" (\" attr(href) \")\"}abbr[title]:after{content:\" (\" attr(title) \")\"}a[href^=\"#\"]:after,a[href^=\"javascript:\"]:after{content:\"\"}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}.navbar{display:none}.btn>.caret,.dropup>.btn>.caret{border-top-color:#000!important}.label{border:1px solid #000}.table{border-collapse:collapse!important}.table td,.table th{background-color:#fff!important}.table-bordered td,.table-bordered th{border:1px solid #ddd!important}}@font-face{font-family:Glyphicons Halflings;src:url('jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot');src:url('jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),url('jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff2') format('woff2'),url('jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.woff') format('woff'),url('jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.ttf') format('truetype'),url('jspm_packages/github/twbs/bootstrap@3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg')}.glyphicon{position:relative;top:1px;display:inline-block;font-family:Glyphicons Halflings;font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.glyphicon-asterisk:before{content:\"\\002a\"}.glyphicon-plus:before{content:\"\\002b\"}.glyphicon-eur:before,.glyphicon-euro:before{content:\"\\20ac\"}.glyphicon-minus:before{content:\"\\2212\"}.glyphicon-cloud:before{content:\"\\2601\"}.glyphicon-envelope:before{content:\"\\2709\"}.glyphicon-pencil:before{content:\"\\270f\"}.glyphicon-glass:before{content:\"\\e001\"}.glyphicon-music:before{content:\"\\e002\"}.glyphicon-search:before{content:\"\\e003\"}.glyphicon-heart:before{content:\"\\e005\"}.glyphicon-star:before{content:\"\\e006\"}.glyphicon-star-empty:before{content:\"\\e007\"}.glyphicon-user:before{content:\"\\e008\"}.glyphicon-film:before{content:\"\\e009\"}.glyphicon-th-large:before{content:\"\\e010\"}.glyphicon-th:before{content:\"\\e011\"}.glyphicon-th-list:before{content:\"\\e012\"}.glyphicon-ok:before{content:\"\\e013\"}.glyphicon-remove:before{content:\"\\e014\"}.glyphicon-zoom-in:before{content:\"\\e015\"}.glyphicon-zoom-out:before{content:\"\\e016\"}.glyphicon-off:before{content:\"\\e017\"}.glyphicon-signal:before{content:\"\\e018\"}.glyphicon-cog:before{content:\"\\e019\"}.glyphicon-trash:before{content:\"\\e020\"}.glyphicon-home:before{content:\"\\e021\"}.glyphicon-file:before{content:\"\\e022\"}.glyphicon-time:before{content:\"\\e023\"}.glyphicon-road:before{content:\"\\e024\"}.glyphicon-download-alt:before{content:\"\\e025\"}.glyphicon-download:before{content:\"\\e026\"}.glyphicon-upload:before{content:\"\\e027\"}.glyphicon-inbox:before{content:\"\\e028\"}.glyphicon-play-circle:before{content:\"\\e029\"}.glyphicon-repeat:before{content:\"\\e030\"}.glyphicon-refresh:before{content:\"\\e031\"}.glyphicon-list-alt:before{content:\"\\e032\"}.glyphicon-lock:before{content:\"\\e033\"}.glyphicon-flag:before{content:\"\\e034\"}.glyphicon-headphones:before{content:\"\\e035\"}.glyphicon-volume-off:before{content:\"\\e036\"}.glyphicon-volume-down:before{content:\"\\e037\"}.glyphicon-volume-up:before{content:\"\\e038\"}.glyphicon-qrcode:before{content:\"\\e039\"}.glyphicon-barcode:before{content:\"\\e040\"}.glyphicon-tag:before{content:\"\\e041\"}.glyphicon-tags:before{content:\"\\e042\"}.glyphicon-book:before{content:\"\\e043\"}.glyphicon-bookmark:before{content:\"\\e044\"}.glyphicon-print:before{content:\"\\e045\"}.glyphicon-camera:before{content:\"\\e046\"}.glyphicon-font:before{content:\"\\e047\"}.glyphicon-bold:before{content:\"\\e048\"}.glyphicon-italic:before{content:\"\\e049\"}.glyphicon-text-height:before{content:\"\\e050\"}.glyphicon-text-width:before{content:\"\\e051\"}.glyphicon-align-left:before{content:\"\\e052\"}.glyphicon-align-center:before{content:\"\\e053\"}.glyphicon-align-right:before{content:\"\\e054\"}.glyphicon-align-justify:before{content:\"\\e055\"}.glyphicon-list:before{content:\"\\e056\"}.glyphicon-indent-left:before{content:\"\\e057\"}.glyphicon-indent-right:before{content:\"\\e058\"}.glyphicon-facetime-video:before{content:\"\\e059\"}.glyphicon-picture:before{content:\"\\e060\"}.glyphicon-map-marker:before{content:\"\\e062\"}.glyphicon-adjust:before{content:\"\\e063\"}.glyphicon-tint:before{content:\"\\e064\"}.glyphicon-edit:before{content:\"\\e065\"}.glyphicon-share:before{content:\"\\e066\"}.glyphicon-check:before{content:\"\\e067\"}.glyphicon-move:before{content:\"\\e068\"}.glyphicon-step-backward:before{content:\"\\e069\"}.glyphicon-fast-backward:before{content:\"\\e070\"}.glyphicon-backward:before{content:\"\\e071\"}.glyphicon-play:before{content:\"\\e072\"}.glyphicon-pause:before{content:\"\\e073\"}.glyphicon-stop:before{content:\"\\e074\"}.glyphicon-forward:before{content:\"\\e075\"}.glyphicon-fast-forward:before{content:\"\\e076\"}.glyphicon-step-forward:before{content:\"\\e077\"}.glyphicon-eject:before{content:\"\\e078\"}.glyphicon-chevron-left:before{content:\"\\e079\"}.glyphicon-chevron-right:before{content:\"\\e080\"}.glyphicon-plus-sign:before{content:\"\\e081\"}.glyphicon-minus-sign:before{content:\"\\e082\"}.glyphicon-remove-sign:before{content:\"\\e083\"}.glyphicon-ok-sign:before{content:\"\\e084\"}.glyphicon-question-sign:before{content:\"\\e085\"}.glyphicon-info-sign:before{content:\"\\e086\"}.glyphicon-screenshot:before{content:\"\\e087\"}.glyphicon-remove-circle:before{content:\"\\e088\"}.glyphicon-ok-circle:before{content:\"\\e089\"}.glyphicon-ban-circle:before{content:\"\\e090\"}.glyphicon-arrow-left:before{content:\"\\e091\"}.glyphicon-arrow-right:before{content:\"\\e092\"}.glyphicon-arrow-up:before{content:\"\\e093\"}.glyphicon-arrow-down:before{content:\"\\e094\"}.glyphicon-share-alt:before{content:\"\\e095\"}.glyphicon-resize-full:before{content:\"\\e096\"}.glyphicon-resize-small:before{content:\"\\e097\"}.glyphicon-exclamation-sign:before{content:\"\\e101\"}.glyphicon-gift:before{content:\"\\e102\"}.glyphicon-leaf:before{content:\"\\e103\"}.glyphicon-fire:before{content:\"\\e104\"}.glyphicon-eye-open:before{content:\"\\e105\"}.glyphicon-eye-close:before{content:\"\\e106\"}.glyphicon-warning-sign:before{content:\"\\e107\"}.glyphicon-plane:before{content:\"\\e108\"}.glyphicon-calendar:before{content:\"\\e109\"}.glyphicon-random:before{content:\"\\e110\"}.glyphicon-comment:before{content:\"\\e111\"}.glyphicon-magnet:before{content:\"\\e112\"}.glyphicon-chevron-up:before{content:\"\\e113\"}.glyphicon-chevron-down:before{content:\"\\e114\"}.glyphicon-retweet:before{content:\"\\e115\"}.glyphicon-shopping-cart:before{content:\"\\e116\"}.glyphicon-folder-close:before{content:\"\\e117\"}.glyphicon-folder-open:before{content:\"\\e118\"}.glyphicon-resize-vertical:before{content:\"\\e119\"}.glyphicon-resize-horizontal:before{content:\"\\e120\"}.glyphicon-hdd:before{content:\"\\e121\"}.glyphicon-bullhorn:before{content:\"\\e122\"}.glyphicon-bell:before{content:\"\\e123\"}.glyphicon-certificate:before{content:\"\\e124\"}.glyphicon-thumbs-up:before{content:\"\\e125\"}.glyphicon-thumbs-down:before{content:\"\\e126\"}.glyphicon-hand-right:before{content:\"\\e127\"}.glyphicon-hand-left:before{content:\"\\e128\"}.glyphicon-hand-up:before{content:\"\\e129\"}.glyphicon-hand-down:before{content:\"\\e130\"}.glyphicon-circle-arrow-right:before{content:\"\\e131\"}.glyphicon-circle-arrow-left:before{content:\"\\e132\"}.glyphicon-circle-arrow-up:before{content:\"\\e133\"}.glyphicon-circle-arrow-down:before{content:\"\\e134\"}.glyphicon-globe:before{content:\"\\e135\"}.glyphicon-wrench:before{content:\"\\e136\"}.glyphicon-tasks:before{content:\"\\e137\"}.glyphicon-filter:before{content:\"\\e138\"}.glyphicon-briefcase:before{content:\"\\e139\"}.glyphicon-fullscreen:before{content:\"\\e140\"}.glyphicon-dashboard:before{content:\"\\e141\"}.glyphicon-paperclip:before{content:\"\\e142\"}.glyphicon-heart-empty:before{content:\"\\e143\"}.glyphicon-link:before{content:\"\\e144\"}.glyphicon-phone:before{content:\"\\e145\"}.glyphicon-pushpin:before{content:\"\\e146\"}.glyphicon-usd:before{content:\"\\e148\"}.glyphicon-gbp:before{content:\"\\e149\"}.glyphicon-sort:before{content:\"\\e150\"}.glyphicon-sort-by-alphabet:before{content:\"\\e151\"}.glyphicon-sort-by-alphabet-alt:before{content:\"\\e152\"}.glyphicon-sort-by-order:before{content:\"\\e153\"}.glyphicon-sort-by-order-alt:before{content:\"\\e154\"}.glyphicon-sort-by-attributes:before{content:\"\\e155\"}.glyphicon-sort-by-attributes-alt:before{content:\"\\e156\"}.glyphicon-unchecked:before{content:\"\\e157\"}.glyphicon-expand:before{content:\"\\e158\"}.glyphicon-collapse-down:before{content:\"\\e159\"}.glyphicon-collapse-up:before{content:\"\\e160\"}.glyphicon-log-in:before{content:\"\\e161\"}.glyphicon-flash:before{content:\"\\e162\"}.glyphicon-log-out:before{content:\"\\e163\"}.glyphicon-new-window:before{content:\"\\e164\"}.glyphicon-record:before{content:\"\\e165\"}.glyphicon-save:before{content:\"\\e166\"}.glyphicon-open:before{content:\"\\e167\"}.glyphicon-saved:before{content:\"\\e168\"}.glyphicon-import:before{content:\"\\e169\"}.glyphicon-export:before{content:\"\\e170\"}.glyphicon-send:before{content:\"\\e171\"}.glyphicon-floppy-disk:before{content:\"\\e172\"}.glyphicon-floppy-saved:before{content:\"\\e173\"}.glyphicon-floppy-remove:before{content:\"\\e174\"}.glyphicon-floppy-save:before{content:\"\\e175\"}.glyphicon-floppy-open:before{content:\"\\e176\"}.glyphicon-credit-card:before{content:\"\\e177\"}.glyphicon-transfer:before{content:\"\\e178\"}.glyphicon-cutlery:before{content:\"\\e179\"}.glyphicon-header:before{content:\"\\e180\"}.glyphicon-compressed:before{content:\"\\e181\"}.glyphicon-earphone:before{content:\"\\e182\"}.glyphicon-phone-alt:before{content:\"\\e183\"}.glyphicon-tower:before{content:\"\\e184\"}.glyphicon-stats:before{content:\"\\e185\"}.glyphicon-sd-video:before{content:\"\\e186\"}.glyphicon-hd-video:before{content:\"\\e187\"}.glyphicon-subtitles:before{content:\"\\e188\"}.glyphicon-sound-stereo:before{content:\"\\e189\"}.glyphicon-sound-dolby:before{content:\"\\e190\"}.glyphicon-sound-5-1:before{content:\"\\e191\"}.glyphicon-sound-6-1:before{content:\"\\e192\"}.glyphicon-sound-7-1:before{content:\"\\e193\"}.glyphicon-copyright-mark:before{content:\"\\e194\"}.glyphicon-registration-mark:before{content:\"\\e195\"}.glyphicon-cloud-download:before{content:\"\\e197\"}.glyphicon-cloud-upload:before{content:\"\\e198\"}.glyphicon-tree-conifer:before{content:\"\\e199\"}.glyphicon-tree-deciduous:before{content:\"\\e200\"}.glyphicon-cd:before{content:\"\\e201\"}.glyphicon-save-file:before{content:\"\\e202\"}.glyphicon-open-file:before{content:\"\\e203\"}.glyphicon-level-up:before{content:\"\\e204\"}.glyphicon-copy:before{content:\"\\e205\"}.glyphicon-paste:before{content:\"\\e206\"}.glyphicon-alert:before{content:\"\\e209\"}.glyphicon-equalizer:before{content:\"\\e210\"}.glyphicon-king:before{content:\"\\e211\"}.glyphicon-queen:before{content:\"\\e212\"}.glyphicon-pawn:before{content:\"\\e213\"}.glyphicon-bishop:before{content:\"\\e214\"}.glyphicon-knight:before{content:\"\\e215\"}.glyphicon-baby-formula:before{content:\"\\e216\"}.glyphicon-tent:before{content:\"\\26fa\"}.glyphicon-blackboard:before{content:\"\\e218\"}.glyphicon-bed:before{content:\"\\e219\"}.glyphicon-apple:before{content:\"\\f8ff\"}.glyphicon-erase:before{content:\"\\e221\"}.glyphicon-hourglass:before{content:\"\\231b\"}.glyphicon-lamp:before{content:\"\\e223\"}.glyphicon-duplicate:before{content:\"\\e224\"}.glyphicon-piggy-bank:before{content:\"\\e225\"}.glyphicon-scissors:before{content:\"\\e226\"}.glyphicon-bitcoin:before,.glyphicon-btc:before,.glyphicon-xbt:before{content:\"\\e227\"}.glyphicon-jpy:before,.glyphicon-yen:before{content:\"\\00a5\"}.glyphicon-rub:before,.glyphicon-ruble:before{content:\"\\20bd\"}.glyphicon-scale:before{content:\"\\e230\"}.glyphicon-ice-lolly:before{content:\"\\e231\"}.glyphicon-ice-lolly-tasted:before{content:\"\\e232\"}.glyphicon-education:before{content:\"\\e233\"}.glyphicon-option-horizontal:before{content:\"\\e234\"}.glyphicon-option-vertical:before{content:\"\\e235\"}.glyphicon-menu-hamburger:before{content:\"\\e236\"}.glyphicon-modal-window:before{content:\"\\e237\"}.glyphicon-oil:before{content:\"\\e238\"}.glyphicon-grain:before{content:\"\\e239\"}.glyphicon-sunglasses:before{content:\"\\e240\"}.glyphicon-text-size:before{content:\"\\e241\"}.glyphicon-text-color:before{content:\"\\e242\"}.glyphicon-text-background:before{content:\"\\e243\"}.glyphicon-object-align-top:before{content:\"\\e244\"}.glyphicon-object-align-bottom:before{content:\"\\e245\"}.glyphicon-object-align-horizontal:before{content:\"\\e246\"}.glyphicon-object-align-left:before{content:\"\\e247\"}.glyphicon-object-align-vertical:before{content:\"\\e248\"}.glyphicon-object-align-right:before{content:\"\\e249\"}.glyphicon-triangle-right:before{content:\"\\e250\"}.glyphicon-triangle-left:before{content:\"\\e251\"}.glyphicon-triangle-bottom:before{content:\"\\e252\"}.glyphicon-triangle-top:before{content:\"\\e253\"}.glyphicon-console:before{content:\"\\e254\"}.glyphicon-superscript:before{content:\"\\e255\"}.glyphicon-subscript:before{content:\"\\e256\"}.glyphicon-menu-left:before{content:\"\\e257\"}.glyphicon-menu-right:before{content:\"\\e258\"}.glyphicon-menu-down:before{content:\"\\e259\"}.glyphicon-menu-up:before{content:\"\\e260\"}*,:after,:before{box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}a{color:#337ab7;text-decoration:none}a:focus,a:hover{color:#23527c;text-decoration:underline}a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}figure{margin:0}img{vertical-align:middle}.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail>img,.thumbnail a>img{display:block;max-width:100%;height:auto}.img-rounded{border-radius:6px}.img-thumbnail{display:inline-block;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;transition:all .2s ease-in-out}.img-circle{border-radius:50%}hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}.h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}.h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}.h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}.h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}.lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}.mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}.text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}.text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}.text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}.page-header{padding-bottom:9px;margin:40px 0 20px;border-bottom:1px solid #eee}ol,ul{margin-top:0;margin-bottom:10px}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}.list-inline,.list-unstyled{padding-left:0;list-style:none}.list-inline{margin-left:-5px}.list-inline>li{display:inline-block;padding-right:5px;padding-left:5px}dl{margin-top:0;margin-bottom:20px}dd,dt{line-height:1.42857143}dt{font-weight:700}dd{margin-left:0}@media (min-width:768px){.dl-horizontal dt{float:left;width:160px;overflow:hidden;clear:left;text-align:right;text-overflow:ellipsis;white-space:nowrap}.dl-horizontal dd{margin-left:180px}}abbr[data-original-title],abbr[title]{cursor:help;border-bottom:1px dotted #777}.initialism{font-size:90%;text-transform:uppercase}blockquote{padding:10px 20px;margin:0 0 20px;font-size:17.5px;border-left:5px solid #eee}blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{margin-bottom:0}blockquote .small,blockquote footer,blockquote small{display:block;font-size:80%;line-height:1.42857143;color:#777}blockquote .small:before,blockquote footer:before,blockquote small:before{content:'\\2014 \\00A0'}.blockquote-reverse,blockquote.pull-right{padding-right:15px;padding-left:0;text-align:right;border-right:5px solid #eee;border-left:0}.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{content:''}.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{content:'\\00A0 \\2014'}address{margin-bottom:20px;font-style:normal;line-height:1.42857143}code,kbd,pre,samp{font-family:Menlo,Monaco,Consolas,Courier New,monospace}code{color:#c7254e;background-color:#f9f2f4;border-radius:4px}code,kbd{padding:2px 4px;font-size:90%}kbd{color:#fff;background-color:#333;border-radius:3px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}kbd kbd{padding:0;font-size:100%;font-weight:700;box-shadow:none}pre{display:block;padding:9.5px;margin:0 0 10px;font-size:13px;line-height:1.42857143;color:#333;word-break:break-all;word-wrap:break-word;background-color:#f5f5f5;border:1px solid #ccc;border-radius:4px}pre code{padding:0;font-size:inherit;color:inherit;white-space:pre-wrap;background-color:transparent;border-radius:0}.pre-scrollable{max-height:340px;overflow-y:scroll}.container{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{width:750px}}@media (min-width:992px){.container{width:970px}}@media (min-width:1200px){.container{width:1170px}}.container-fluid{padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{margin-right:-15px;margin-left:-15px}.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12,.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12,.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12,.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{position:relative;min-height:1px;padding-right:15px;padding-left:15px}.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{float:left}.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}.col-xs-pull-12{right:100%}.col-xs-pull-11{right:91.66666667%}.col-xs-pull-10{right:83.33333333%}.col-xs-pull-9{right:75%}.col-xs-pull-8{right:66.66666667%}.col-xs-pull-7{right:58.33333333%}.col-xs-pull-6{right:50%}.col-xs-pull-5{right:41.66666667%}.col-xs-pull-4{right:33.33333333%}.col-xs-pull-3{right:25%}.col-xs-pull-2{right:16.66666667%}.col-xs-pull-1{right:8.33333333%}.col-xs-pull-0{right:auto}.col-xs-push-12{left:100%}.col-xs-push-11{left:91.66666667%}.col-xs-push-10{left:83.33333333%}.col-xs-push-9{left:75%}.col-xs-push-8{left:66.66666667%}.col-xs-push-7{left:58.33333333%}.col-xs-push-6{left:50%}.col-xs-push-5{left:41.66666667%}.col-xs-push-4{left:33.33333333%}.col-xs-push-3{left:25%}.col-xs-push-2{left:16.66666667%}.col-xs-push-1{left:8.33333333%}.col-xs-push-0{left:auto}.col-xs-offset-12{margin-left:100%}.col-xs-offset-11{margin-left:91.66666667%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-0{margin-left:0}@media (min-width:768px){.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12{float:left}.col-sm-12{width:100%}.col-sm-11{width:91.66666667%}.col-sm-10{width:83.33333333%}.col-sm-9{width:75%}.col-sm-8{width:66.66666667%}.col-sm-7{width:58.33333333%}.col-sm-6{width:50%}.col-sm-5{width:41.66666667%}.col-sm-4{width:33.33333333%}.col-sm-3{width:25%}.col-sm-2{width:16.66666667%}.col-sm-1{width:8.33333333%}.col-sm-pull-12{right:100%}.col-sm-pull-11{right:91.66666667%}.col-sm-pull-10{right:83.33333333%}.col-sm-pull-9{right:75%}.col-sm-pull-8{right:66.66666667%}.col-sm-pull-7{right:58.33333333%}.col-sm-pull-6{right:50%}.col-sm-pull-5{right:41.66666667%}.col-sm-pull-4{right:33.33333333%}.col-sm-pull-3{right:25%}.col-sm-pull-2{right:16.66666667%}.col-sm-pull-1{right:8.33333333%}.col-sm-pull-0{right:auto}.col-sm-push-12{left:100%}.col-sm-push-11{left:91.66666667%}.col-sm-push-10{left:83.33333333%}.col-sm-push-9{left:75%}.col-sm-push-8{left:66.66666667%}.col-sm-push-7{left:58.33333333%}.col-sm-push-6{left:50%}.col-sm-push-5{left:41.66666667%}.col-sm-push-4{left:33.33333333%}.col-sm-push-3{left:25%}.col-sm-push-2{left:16.66666667%}.col-sm-push-1{left:8.33333333%}.col-sm-push-0{left:auto}.col-sm-offset-12{margin-left:100%}.col-sm-offset-11{margin-left:91.66666667%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-0{margin-left:0}}@media (min-width:992px){.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12{float:left}.col-md-12{width:100%}.col-md-11{width:91.66666667%}.col-md-10{width:83.33333333%}.col-md-9{width:75%}.col-md-8{width:66.66666667%}.col-md-7{width:58.33333333%}.col-md-6{width:50%}.col-md-5{width:41.66666667%}.col-md-4{width:33.33333333%}.col-md-3{width:25%}.col-md-2{width:16.66666667%}.col-md-1{width:8.33333333%}.col-md-pull-12{right:100%}.col-md-pull-11{right:91.66666667%}.col-md-pull-10{right:83.33333333%}.col-md-pull-9{right:75%}.col-md-pull-8{right:66.66666667%}.col-md-pull-7{right:58.33333333%}.col-md-pull-6{right:50%}.col-md-pull-5{right:41.66666667%}.col-md-pull-4{right:33.33333333%}.col-md-pull-3{right:25%}.col-md-pull-2{right:16.66666667%}.col-md-pull-1{right:8.33333333%}.col-md-pull-0{right:auto}.col-md-push-12{left:100%}.col-md-push-11{left:91.66666667%}.col-md-push-10{left:83.33333333%}.col-md-push-9{left:75%}.col-md-push-8{left:66.66666667%}.col-md-push-7{left:58.33333333%}.col-md-push-6{left:50%}.col-md-push-5{left:41.66666667%}.col-md-push-4{left:33.33333333%}.col-md-push-3{left:25%}.col-md-push-2{left:16.66666667%}.col-md-push-1{left:8.33333333%}.col-md-push-0{left:auto}.col-md-offset-12{margin-left:100%}.col-md-offset-11{margin-left:91.66666667%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-9{margin-left:75%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-6{margin-left:50%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-3{margin-left:25%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-0{margin-left:0}}@media (min-width:1200px){.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12{float:left}.col-lg-12{width:100%}.col-lg-11{width:91.66666667%}.col-lg-10{width:83.33333333%}.col-lg-9{width:75%}.col-lg-8{width:66.66666667%}.col-lg-7{width:58.33333333%}.col-lg-6{width:50%}.col-lg-5{width:41.66666667%}.col-lg-4{width:33.33333333%}.col-lg-3{width:25%}.col-lg-2{width:16.66666667%}.col-lg-1{width:8.33333333%}.col-lg-pull-12{right:100%}.col-lg-pull-11{right:91.66666667%}.col-lg-pull-10{right:83.33333333%}.col-lg-pull-9{right:75%}.col-lg-pull-8{right:66.66666667%}.col-lg-pull-7{right:58.33333333%}.col-lg-pull-6{right:50%}.col-lg-pull-5{right:41.66666667%}.col-lg-pull-4{right:33.33333333%}.col-lg-pull-3{right:25%}.col-lg-pull-2{right:16.66666667%}.col-lg-pull-1{right:8.33333333%}.col-lg-pull-0{right:auto}.col-lg-push-12{left:100%}.col-lg-push-11{left:91.66666667%}.col-lg-push-10{left:83.33333333%}.col-lg-push-9{left:75%}.col-lg-push-8{left:66.66666667%}.col-lg-push-7{left:58.33333333%}.col-lg-push-6{left:50%}.col-lg-push-5{left:41.66666667%}.col-lg-push-4{left:33.33333333%}.col-lg-push-3{left:25%}.col-lg-push-2{left:16.66666667%}.col-lg-push-1{left:8.33333333%}.col-lg-push-0{left:auto}.col-lg-offset-12{margin-left:100%}.col-lg-offset-11{margin-left:91.66666667%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-0{margin-left:0}}table{background-color:transparent}caption{padding-top:8px;padding-bottom:8px;color:#777}caption,th{text-align:left}.table{width:100%;max-width:100%;margin-bottom:20px}.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}.table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}.table>caption+thead>tr:first-child>td,.table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>td,.table>thead:first-child>tr:first-child>th{border-top:0}.table>tbody+tbody{border-top:2px solid #ddd}.table .table{background-color:#fff}.table-condensed>tbody>tr>td,.table-condensed>tbody>tr>th,.table-condensed>tfoot>tr>td,.table-condensed>tfoot>tr>th,.table-condensed>thead>tr>td,.table-condensed>thead>tr>th{padding:5px}.table-bordered,.table-bordered>tbody>tr>td,.table-bordered>tbody>tr>th,.table-bordered>tfoot>tr>td,.table-bordered>tfoot>tr>th,.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border:1px solid #ddd}.table-bordered>thead>tr>td,.table-bordered>thead>tr>th{border-bottom-width:2px}.table-striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}.table-hover>tbody>tr:hover{background-color:#f5f5f5}table col[class*=col-]{position:static;display:table-column;float:none}table td[class*=col-],table th[class*=col-]{position:static;display:table-cell;float:none}.table>tbody>tr.active>td,.table>tbody>tr.active>th,.table>tbody>tr>td.active,.table>tbody>tr>th.active,.table>tfoot>tr.active>td,.table>tfoot>tr.active>th,.table>tfoot>tr>td.active,.table>tfoot>tr>th.active,.table>thead>tr.active>td,.table>thead>tr.active>th,.table>thead>tr>td.active,.table>thead>tr>th.active{background-color:#f5f5f5}.table-hover>tbody>tr.active:hover>td,.table-hover>tbody>tr.active:hover>th,.table-hover>tbody>tr:hover>.active,.table-hover>tbody>tr>td.active:hover,.table-hover>tbody>tr>th.active:hover{background-color:#e8e8e8}.table>tbody>tr.success>td,.table>tbody>tr.success>th,.table>tbody>tr>td.success,.table>tbody>tr>th.success,.table>tfoot>tr.success>td,.table>tfoot>tr.success>th,.table>tfoot>tr>td.success,.table>tfoot>tr>th.success,.table>thead>tr.success>td,.table>thead>tr.success>th,.table>thead>tr>td.success,.table>thead>tr>th.success{background-color:#dff0d8}.table-hover>tbody>tr.success:hover>td,.table-hover>tbody>tr.success:hover>th,.table-hover>tbody>tr:hover>.success,.table-hover>tbody>tr>td.success:hover,.table-hover>tbody>tr>th.success:hover{background-color:#d0e9c6}.table>tbody>tr.info>td,.table>tbody>tr.info>th,.table>tbody>tr>td.info,.table>tbody>tr>th.info,.table>tfoot>tr.info>td,.table>tfoot>tr.info>th,.table>tfoot>tr>td.info,.table>tfoot>tr>th.info,.table>thead>tr.info>td,.table>thead>tr.info>th,.table>thead>tr>td.info,.table>thead>tr>th.info{background-color:#d9edf7}.table-hover>tbody>tr.info:hover>td,.table-hover>tbody>tr.info:hover>th,.table-hover>tbody>tr:hover>.info,.table-hover>tbody>tr>td.info:hover,.table-hover>tbody>tr>th.info:hover{background-color:#c4e3f3}.table>tbody>tr.warning>td,.table>tbody>tr.warning>th,.table>tbody>tr>td.warning,.table>tbody>tr>th.warning,.table>tfoot>tr.warning>td,.table>tfoot>tr.warning>th,.table>tfoot>tr>td.warning,.table>tfoot>tr>th.warning,.table>thead>tr.warning>td,.table>thead>tr.warning>th,.table>thead>tr>td.warning,.table>thead>tr>th.warning{background-color:#fcf8e3}.table-hover>tbody>tr.warning:hover>td,.table-hover>tbody>tr.warning:hover>th,.table-hover>tbody>tr:hover>.warning,.table-hover>tbody>tr>td.warning:hover,.table-hover>tbody>tr>th.warning:hover{background-color:#faf2cc}.table>tbody>tr.danger>td,.table>tbody>tr.danger>th,.table>tbody>tr>td.danger,.table>tbody>tr>th.danger,.table>tfoot>tr.danger>td,.table>tfoot>tr.danger>th,.table>tfoot>tr>td.danger,.table>tfoot>tr>th.danger,.table>thead>tr.danger>td,.table>thead>tr.danger>th,.table>thead>tr>td.danger,.table>thead>tr>th.danger{background-color:#f2dede}.table-hover>tbody>tr.danger:hover>td,.table-hover>tbody>tr.danger:hover>th,.table-hover>tbody>tr:hover>.danger,.table-hover>tbody>tr>td.danger:hover,.table-hover>tbody>tr>th.danger:hover{background-color:#ebcccc}.table-responsive{min-height:.01%;overflow-x:auto}@media screen and (max-width:767px){.table-responsive{width:100%;margin-bottom:15px;overflow-y:hidden;-ms-overflow-style:-ms-autohiding-scrollbar;border:1px solid #ddd}.table-responsive>.table{margin-bottom:0}.table-responsive>.table>tbody>tr>td,.table-responsive>.table>tbody>tr>th,.table-responsive>.table>tfoot>tr>td,.table-responsive>.table>tfoot>tr>th,.table-responsive>.table>thead>tr>td,.table-responsive>.table>thead>tr>th{white-space:nowrap}.table-responsive>.table-bordered{border:0}.table-responsive>.table-bordered>tbody>tr>td:first-child,.table-responsive>.table-bordered>tbody>tr>th:first-child,.table-responsive>.table-bordered>tfoot>tr>td:first-child,.table-responsive>.table-bordered>tfoot>tr>th:first-child,.table-responsive>.table-bordered>thead>tr>td:first-child,.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.table-responsive>.table-bordered>tbody>tr>td:last-child,.table-responsive>.table-bordered>tbody>tr>th:last-child,.table-responsive>.table-bordered>tfoot>tr>td:last-child,.table-responsive>.table-bordered>tfoot>tr>th:last-child,.table-responsive>.table-bordered>thead>tr>td:last-child,.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.table-responsive>.table-bordered>tbody>tr:last-child>td,.table-responsive>.table-bordered>tbody>tr:last-child>th,.table-responsive>.table-bordered>tfoot>tr:last-child>td,.table-responsive>.table-bordered>tfoot>tr:last-child>th{border-bottom:0}}fieldset{min-width:0;margin:0}fieldset,legend{padding:0;border:0}legend{display:block;width:100%;margin-bottom:20px;font-size:21px;line-height:inherit;color:#333;border-bottom:1px solid #e5e5e5}label{display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700}input[type=search]{box-sizing:border-box}input[type=checkbox],input[type=radio]{margin:4px 0 0;margin-top:1px\\9;line-height:normal}input[type=file]{display:block}input[type=range]{display:block;width:100%}select[multiple],select[size]{height:auto}input[type=checkbox]:focus,input[type=file]:focus,input[type=radio]:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}output{padding-top:7px}.form-control,output{display:block;font-size:14px;line-height:1.42857143;color:#555}.form-control{width:100%;height:34px;padding:6px 12px;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;-webkit-transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out}.form-control:focus{border-color:#66afe9;outline:0;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.form-control::-moz-placeholder{color:#999;opacity:1}.form-control:-ms-input-placeholder{color:#999}.form-control::-webkit-input-placeholder{color:#999}.form-control::-ms-expand{background-color:transparent;border:0}.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control{background-color:#eee;opacity:1}.form-control[disabled],fieldset[disabled] .form-control{cursor:not-allowed}textarea.form-control{height:auto}input[type=search]{-webkit-appearance:none}@media screen and (-webkit-min-device-pixel-ratio:0){input[type=date].form-control,input[type=datetime-local].form-control,input[type=month].form-control,input[type=time].form-control{line-height:34px}.input-group-sm input[type=date],.input-group-sm input[type=datetime-local],.input-group-sm input[type=month],.input-group-sm input[type=time],input[type=date].input-sm,input[type=datetime-local].input-sm,input[type=month].input-sm,input[type=time].input-sm{line-height:30px}.input-group-lg input[type=date],.input-group-lg input[type=datetime-local],.input-group-lg input[type=month],.input-group-lg input[type=time],input[type=date].input-lg,input[type=datetime-local].input-lg,input[type=month].input-lg,input[type=time].input-lg{line-height:46px}}.form-group{margin-bottom:15px}.checkbox,.radio{position:relative;display:block;margin-top:10px;margin-bottom:10px}.checkbox label,.radio label{min-height:20px;padding-left:20px;margin-bottom:0;font-weight:400;cursor:pointer}.checkbox-inline input[type=checkbox],.checkbox input[type=checkbox],.radio-inline input[type=radio],.radio input[type=radio]{position:absolute;margin-top:4px\\9;margin-left:-20px}.checkbox+.checkbox,.radio+.radio{margin-top:-5px}.checkbox-inline,.radio-inline{position:relative;display:inline-block;padding-left:20px;margin-bottom:0;font-weight:400;vertical-align:middle;cursor:pointer}.checkbox-inline+.checkbox-inline,.radio-inline+.radio-inline{margin-top:0;margin-left:10px}.checkbox-inline.disabled,.checkbox.disabled label,.radio-inline.disabled,.radio.disabled label,fieldset[disabled] .checkbox-inline,fieldset[disabled] .checkbox label,fieldset[disabled] .radio-inline,fieldset[disabled] .radio label,fieldset[disabled] input[type=checkbox],fieldset[disabled] input[type=radio],input[type=checkbox].disabled,input[type=checkbox][disabled],input[type=radio].disabled,input[type=radio][disabled]{cursor:not-allowed}.form-control-static{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}.form-control-static.input-lg,.form-control-static.input-sm{padding-right:0;padding-left:0}.input-sm{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-sm{height:30px;line-height:30px}select[multiple].input-sm,textarea.input-sm{height:auto}.form-group-sm .form-control{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.form-group-sm select.form-control{height:30px;line-height:30px}.form-group-sm select[multiple].form-control,.form-group-sm textarea.form-control{height:auto}.form-group-sm .form-control-static{height:30px;min-height:32px;padding:6px 10px;font-size:12px;line-height:1.5}.input-lg{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-lg{height:46px;line-height:46px}select[multiple].input-lg,textarea.input-lg{height:auto}.form-group-lg .form-control{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.form-group-lg select.form-control{height:46px;line-height:46px}.form-group-lg select[multiple].form-control,.form-group-lg textarea.form-control{height:auto}.form-group-lg .form-control-static{height:46px;min-height:38px;padding:11px 16px;font-size:18px;line-height:1.3333333}.has-feedback{position:relative}.has-feedback .form-control{padding-right:42.5px}.form-control-feedback{position:absolute;top:0;right:0;z-index:2;display:block;width:34px;height:34px;line-height:34px;text-align:center;pointer-events:none}.form-group-lg .form-control+.form-control-feedback,.input-group-lg+.form-control-feedback,.input-lg+.form-control-feedback{width:46px;height:46px;line-height:46px}.form-group-sm .form-control+.form-control-feedback,.input-group-sm+.form-control-feedback,.input-sm+.form-control-feedback{width:30px;height:30px;line-height:30px}.has-success .checkbox,.has-success .checkbox-inline,.has-success.checkbox-inline label,.has-success.checkbox label,.has-success .control-label,.has-success .help-block,.has-success .radio,.has-success .radio-inline,.has-success.radio-inline label,.has-success.radio label{color:#3c763d}.has-success .form-control{border-color:#3c763d;box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-success .form-control:focus{border-color:#2b542c;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #67b168}.has-success .input-group-addon{color:#3c763d;background-color:#dff0d8;border-color:#3c763d}.has-success .form-control-feedback{color:#3c763d}.has-warning .checkbox,.has-warning .checkbox-inline,.has-warning.checkbox-inline label,.has-warning.checkbox label,.has-warning .control-label,.has-warning .help-block,.has-warning .radio,.has-warning .radio-inline,.has-warning.radio-inline label,.has-warning.radio label{color:#8a6d3b}.has-warning .form-control{border-color:#8a6d3b;box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-warning .form-control:focus{border-color:#66512c;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c0a16b}.has-warning .input-group-addon{color:#8a6d3b;background-color:#fcf8e3;border-color:#8a6d3b}.has-warning .form-control-feedback{color:#8a6d3b}.has-error .checkbox,.has-error .checkbox-inline,.has-error.checkbox-inline label,.has-error.checkbox label,.has-error .control-label,.has-error .help-block,.has-error .radio,.has-error .radio-inline,.has-error.radio-inline label,.has-error.radio label{color:#a94442}.has-error .form-control{border-color:#a94442;box-shadow:inset 0 1px 1px rgba(0,0,0,.075)}.has-error .form-control:focus{border-color:#843534;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483}.has-error .input-group-addon{color:#a94442;background-color:#f2dede;border-color:#a94442}.has-error .form-control-feedback{color:#a94442}.has-feedback label~.form-control-feedback{top:25px}.has-feedback label.sr-only~.form-control-feedback{top:0}.help-block{display:block;margin-top:5px;margin-bottom:10px;color:#737373}@media (min-width:768px){.form-inline .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.form-inline .form-control{display:inline-block;width:auto;vertical-align:middle}.form-inline .form-control-static{display:inline-block}.form-inline .input-group{display:inline-table;vertical-align:middle}.form-inline .input-group .form-control,.form-inline .input-group .input-group-addon,.form-inline .input-group .input-group-btn{width:auto}.form-inline .input-group>.form-control{width:100%}.form-inline .control-label{margin-bottom:0;vertical-align:middle}.form-inline .checkbox,.form-inline .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.form-inline .checkbox label,.form-inline .radio label{padding-left:0}.form-inline .checkbox input[type=checkbox],.form-inline .radio input[type=radio]{position:relative;margin-left:0}.form-inline .has-feedback .form-control-feedback{top:0}}.form-horizontal .checkbox,.form-horizontal .checkbox-inline,.form-horizontal .radio,.form-horizontal .radio-inline{padding-top:7px;margin-top:0;margin-bottom:0}.form-horizontal .checkbox,.form-horizontal .radio{min-height:27px}.form-horizontal .form-group{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.form-horizontal .control-label{padding-top:7px;margin-bottom:0;text-align:right}}.form-horizontal .has-feedback .form-control-feedback{right:15px}@media (min-width:768px){.form-horizontal .form-group-lg .control-label{padding-top:11px;font-size:18px}}@media (min-width:768px){.form-horizontal .form-group-sm .control-label{padding-top:6px;font-size:12px}}.btn{display:inline-block;padding:6px 12px;margin-bottom:0;font-size:14px;font-weight:400;line-height:1.42857143;text-align:center;white-space:nowrap;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-image:none;border:1px solid transparent;border-radius:4px}.btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.btn.focus,.btn:focus,.btn:hover{color:#333;text-decoration:none}.btn.active,.btn:active{background-image:none;outline:0;box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn.disabled,.btn[disabled],fieldset[disabled] .btn{cursor:not-allowed;filter:alpha(opacity=65);box-shadow:none;opacity:.65}a.btn.disabled,fieldset[disabled] a.btn{pointer-events:none}.btn-default{color:#333;background-color:#fff;border-color:#ccc}.btn-default.focus,.btn-default:focus{color:#333;background-color:#e6e6e6;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.btn-default:hover,.open>.dropdown-toggle.btn-default{color:#333;background-color:#e6e6e6;border-color:#adadad}.btn-default.active.focus,.btn-default.active:focus,.btn-default.active:hover,.btn-default:active.focus,.btn-default:active:focus,.btn-default:active:hover,.open>.dropdown-toggle.btn-default.focus,.open>.dropdown-toggle.btn-default:focus,.open>.dropdown-toggle.btn-default:hover{color:#333;background-color:#d4d4d4;border-color:#8c8c8c}.btn-default.active,.btn-default:active,.open>.dropdown-toggle.btn-default{background-image:none}.btn-default.disabled.focus,.btn-default.disabled:focus,.btn-default.disabled:hover,.btn-default[disabled].focus,.btn-default[disabled]:focus,.btn-default[disabled]:hover,fieldset[disabled] .btn-default.focus,fieldset[disabled] .btn-default:focus,fieldset[disabled] .btn-default:hover{background-color:#fff;border-color:#ccc}.btn-default .badge{color:#fff;background-color:#333}.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary.active,.btn-primary:active,.btn-primary:hover,.open>.dropdown-toggle.btn-primary{color:#fff;background-color:#286090;border-color:#204d74}.btn-primary.active.focus,.btn-primary.active:focus,.btn-primary.active:hover,.btn-primary:active.focus,.btn-primary:active:focus,.btn-primary:active:hover,.open>.dropdown-toggle.btn-primary.focus,.open>.dropdown-toggle.btn-primary:focus,.open>.dropdown-toggle.btn-primary:hover{color:#fff;background-color:#204d74;border-color:#122b40}.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary{background-image:none}.btn-primary.disabled.focus,.btn-primary.disabled:focus,.btn-primary.disabled:hover,.btn-primary[disabled].focus,.btn-primary[disabled]:focus,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary.focus,fieldset[disabled] .btn-primary:focus,fieldset[disabled] .btn-primary:hover{background-color:#337ab7;border-color:#2e6da4}.btn-primary .badge{color:#337ab7;background-color:#fff}.btn-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c}.btn-success.focus,.btn-success:focus{color:#fff;background-color:#449d44;border-color:#255625}.btn-success.active,.btn-success:active,.btn-success:hover,.open>.dropdown-toggle.btn-success{color:#fff;background-color:#449d44;border-color:#398439}.btn-success.active.focus,.btn-success.active:focus,.btn-success.active:hover,.btn-success:active.focus,.btn-success:active:focus,.btn-success:active:hover,.open>.dropdown-toggle.btn-success.focus,.open>.dropdown-toggle.btn-success:focus,.open>.dropdown-toggle.btn-success:hover{color:#fff;background-color:#398439;border-color:#255625}.btn-success.active,.btn-success:active,.open>.dropdown-toggle.btn-success{background-image:none}.btn-success.disabled.focus,.btn-success.disabled:focus,.btn-success.disabled:hover,.btn-success[disabled].focus,.btn-success[disabled]:focus,.btn-success[disabled]:hover,fieldset[disabled] .btn-success.focus,fieldset[disabled] .btn-success:focus,fieldset[disabled] .btn-success:hover{background-color:#5cb85c;border-color:#4cae4c}.btn-success .badge{color:#5cb85c;background-color:#fff}.btn-info{color:#fff;background-color:#5bc0de;border-color:#46b8da}.btn-info.focus,.btn-info:focus{color:#fff;background-color:#31b0d5;border-color:#1b6d85}.btn-info.active,.btn-info:active,.btn-info:hover,.open>.dropdown-toggle.btn-info{color:#fff;background-color:#31b0d5;border-color:#269abc}.btn-info.active.focus,.btn-info.active:focus,.btn-info.active:hover,.btn-info:active.focus,.btn-info:active:focus,.btn-info:active:hover,.open>.dropdown-toggle.btn-info.focus,.open>.dropdown-toggle.btn-info:focus,.open>.dropdown-toggle.btn-info:hover{color:#fff;background-color:#269abc;border-color:#1b6d85}.btn-info.active,.btn-info:active,.open>.dropdown-toggle.btn-info{background-image:none}.btn-info.disabled.focus,.btn-info.disabled:focus,.btn-info.disabled:hover,.btn-info[disabled].focus,.btn-info[disabled]:focus,.btn-info[disabled]:hover,fieldset[disabled] .btn-info.focus,fieldset[disabled] .btn-info:focus,fieldset[disabled] .btn-info:hover{background-color:#5bc0de;border-color:#46b8da}.btn-info .badge{color:#5bc0de;background-color:#fff}.btn-warning{color:#fff;background-color:#f0ad4e;border-color:#eea236}.btn-warning.focus,.btn-warning:focus{color:#fff;background-color:#ec971f;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.btn-warning:hover,.open>.dropdown-toggle.btn-warning{color:#fff;background-color:#ec971f;border-color:#d58512}.btn-warning.active.focus,.btn-warning.active:focus,.btn-warning.active:hover,.btn-warning:active.focus,.btn-warning:active:focus,.btn-warning:active:hover,.open>.dropdown-toggle.btn-warning.focus,.open>.dropdown-toggle.btn-warning:focus,.open>.dropdown-toggle.btn-warning:hover{color:#fff;background-color:#d58512;border-color:#985f0d}.btn-warning.active,.btn-warning:active,.open>.dropdown-toggle.btn-warning{background-image:none}.btn-warning.disabled.focus,.btn-warning.disabled:focus,.btn-warning.disabled:hover,.btn-warning[disabled].focus,.btn-warning[disabled]:focus,.btn-warning[disabled]:hover,fieldset[disabled] .btn-warning.focus,fieldset[disabled] .btn-warning:focus,fieldset[disabled] .btn-warning:hover{background-color:#f0ad4e;border-color:#eea236}.btn-warning .badge{color:#f0ad4e;background-color:#fff}.btn-danger{color:#fff;background-color:#d9534f;border-color:#d43f3a}.btn-danger.focus,.btn-danger:focus{color:#fff;background-color:#c9302c;border-color:#761c19}.btn-danger.active,.btn-danger:active,.btn-danger:hover,.open>.dropdown-toggle.btn-danger{color:#fff;background-color:#c9302c;border-color:#ac2925}.btn-danger.active.focus,.btn-danger.active:focus,.btn-danger.active:hover,.btn-danger:active.focus,.btn-danger:active:focus,.btn-danger:active:hover,.open>.dropdown-toggle.btn-danger.focus,.open>.dropdown-toggle.btn-danger:focus,.open>.dropdown-toggle.btn-danger:hover{color:#fff;background-color:#ac2925;border-color:#761c19}.btn-danger.active,.btn-danger:active,.open>.dropdown-toggle.btn-danger{background-image:none}.btn-danger.disabled.focus,.btn-danger.disabled:focus,.btn-danger.disabled:hover,.btn-danger[disabled].focus,.btn-danger[disabled]:focus,.btn-danger[disabled]:hover,fieldset[disabled] .btn-danger.focus,fieldset[disabled] .btn-danger:focus,fieldset[disabled] .btn-danger:hover{background-color:#d9534f;border-color:#d43f3a}.btn-danger .badge{color:#d9534f;background-color:#fff}.btn-link{font-weight:400;color:#337ab7;border-radius:0}.btn-link,.btn-link.active,.btn-link:active,.btn-link[disabled],fieldset[disabled] .btn-link{background-color:transparent;box-shadow:none}.btn-link,.btn-link:active,.btn-link:focus,.btn-link:hover{border-color:transparent}.btn-link:focus,.btn-link:hover{color:#23527c;text-decoration:underline;background-color:transparent}.btn-link[disabled]:focus,.btn-link[disabled]:hover,fieldset[disabled] .btn-link:focus,fieldset[disabled] .btn-link:hover{color:#777;text-decoration:none}.btn-group-lg>.btn,.btn-lg{padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}.btn-group-sm>.btn,.btn-sm{padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}.btn-group-xs>.btn,.btn-xs{padding:1px 5px;font-size:12px;line-height:1.5;border-radius:3px}.btn-block{display:block;width:100%}.btn-block+.btn-block{margin-top:5px}input[type=button].btn-block,input[type=reset].btn-block,input[type=submit].btn-block{width:100%}.fade{opacity:0;-webkit-transition:opacity .15s linear;transition:opacity .15s linear}.fade.in{opacity:1}.collapse{display:none}.collapse.in{display:block}tr.collapse.in{display:table-row}tbody.collapse.in{display:table-row-group}.collapsing{position:relative;height:0;overflow:hidden;-webkit-transition-timing-function:ease;transition-timing-function:ease;-webkit-transition-duration:.35s;transition-duration:.35s;-webkit-transition-property:height,visibility;transition-property:height,visibility}.caret{display:inline-block;width:0;height:0;margin-left:2px;vertical-align:middle;border-top:4px dashed;border-top:4px solid\\9;border-right:4px solid transparent;border-left:4px solid transparent}.dropdown,.dropup{position:relative}.dropdown-toggle:focus{outline:0}.dropdown-menu{position:absolute;top:100%;left:0;z-index:17;display:none;float:left;min-width:160px;padding:5px 0;margin:2px 0 0;font-size:14px;text-align:left;list-style:none;background-color:#fff;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.15);border-radius:4px;box-shadow:0 6px 12px rgba(0,0,0,.175)}.dropdown-menu.pull-right{right:0;left:auto}.dropdown-menu .divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.dropdown-menu>li>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{color:#262626;text-decoration:none;background-color:#f5f5f5}.dropdown-menu>.active>a,.dropdown-menu>.active>a:focus,.dropdown-menu>.active>a:hover{color:#fff;text-decoration:none;background-color:#337ab7;outline:0}.dropdown-menu>.disabled>a,.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{color:#777}.dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{text-decoration:none;cursor:not-allowed;background-color:transparent;background-image:none;filter:progid:DXImageTransform.Microsoft.gradient(enabled = false)}.open>.dropdown-menu{display:block}.open>a{outline:0}.dropdown-menu-right{right:0;left:auto}.dropdown-menu-left{right:auto;left:0}.dropdown-header{display:block;padding:3px 20px;font-size:12px;line-height:1.42857143;color:#777;white-space:nowrap}.dropdown-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:16}.pull-right>.dropdown-menu{right:0;left:auto}.dropup .caret,.navbar-fixed-bottom .dropdown .caret{content:\"\";border-top:0;border-bottom:4px dashed;border-bottom:4px solid\\9}.dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{top:auto;bottom:100%;margin-bottom:2px}@media (min-width:768px){.navbar-right .dropdown-menu{right:0;left:auto}.navbar-right .dropdown-menu-left{right:auto;left:0}}.btn-group,.btn-group-vertical{position:relative;display:inline-block;vertical-align:middle}.btn-group-vertical>.btn,.btn-group>.btn{position:relative;float:left}.btn-group-vertical>.btn.active,.btn-group-vertical>.btn:active,.btn-group-vertical>.btn:focus,.btn-group-vertical>.btn:hover,.btn-group>.btn.active,.btn-group>.btn:active,.btn-group>.btn:focus,.btn-group>.btn:hover{z-index:2}.btn-group .btn+.btn,.btn-group .btn+.btn-group,.btn-group .btn-group+.btn,.btn-group .btn-group+.btn-group{margin-left:-1px}.btn-toolbar{margin-left:-5px}.btn-toolbar .btn,.btn-toolbar .btn-group,.btn-toolbar .input-group{float:left}.btn-toolbar>.btn,.btn-toolbar>.btn-group,.btn-toolbar>.input-group{margin-left:5px}.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle){border-radius:0}.btn-group>.btn:first-child{margin-left:0}.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle){border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn:last-child:not(:first-child),.btn-group>.dropdown-toggle:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}.btn-group>.btn-group{float:left}.btn-group>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-top-right-radius:0;border-bottom-right-radius:0}.btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-bottom-left-radius:0}.btn-group .dropdown-toggle:active,.btn-group.open .dropdown-toggle{outline:0}.btn-group>.btn+.dropdown-toggle{padding-right:8px;padding-left:8px}.btn-group>.btn-lg+.dropdown-toggle{padding-right:12px;padding-left:12px}.btn-group.open .dropdown-toggle{box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.btn-group.open .dropdown-toggle.btn-link{box-shadow:none}.btn .caret{margin-left:0}.btn-lg .caret{border-width:5px 5px 0;border-bottom-width:0}.dropup .btn-lg .caret{border-width:0 5px 5px}.btn-group-vertical>.btn,.btn-group-vertical>.btn-group,.btn-group-vertical>.btn-group>.btn{display:block;float:none;width:100%;max-width:100%}.btn-group-vertical>.btn-group>.btn{float:none}.btn-group-vertical>.btn+.btn,.btn-group-vertical>.btn+.btn-group,.btn-group-vertical>.btn-group+.btn,.btn-group-vertical>.btn-group+.btn-group{margin-top:-1px;margin-left:0}.btn-group-vertical>.btn:not(:first-child):not(:last-child){border-radius:0}.btn-group-vertical>.btn:first-child:not(:last-child){border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn:last-child:not(:first-child){border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}.btn-group-vertical>.btn-group:not(:first-child):not(:last-child)>.btn{border-radius:0}.btn-group-vertical>.btn-group:first-child:not(:last-child)>.btn:last-child,.btn-group-vertical>.btn-group:first-child:not(:last-child)>.dropdown-toggle{border-bottom-right-radius:0;border-bottom-left-radius:0}.btn-group-vertical>.btn-group:last-child:not(:first-child)>.btn:first-child{border-top-left-radius:0;border-top-right-radius:0}.btn-group-justified{display:table;width:100%;table-layout:fixed;border-collapse:separate}.btn-group-justified>.btn,.btn-group-justified>.btn-group{display:table-cell;float:none;width:1%}.btn-group-justified>.btn-group .btn{width:100%}.btn-group-justified>.btn-group .dropdown-menu{left:auto}[data-toggle=buttons]>.btn-group>.btn input[type=checkbox],[data-toggle=buttons]>.btn-group>.btn input[type=radio],[data-toggle=buttons]>.btn input[type=checkbox],[data-toggle=buttons]>.btn input[type=radio]{position:absolute;clip:rect(0,0,0,0);pointer-events:none}.input-group{position:relative;display:table;border-collapse:separate}.input-group[class*=col-]{float:none;padding-right:0;padding-left:0}.input-group .form-control{position:relative;z-index:2;float:left;width:100%;margin-bottom:0}.input-group .form-control:focus{z-index:3}.input-group-lg>.form-control,.input-group-lg>.input-group-addon,.input-group-lg>.input-group-btn>.btn{height:46px;padding:10px 16px;font-size:18px;line-height:1.3333333;border-radius:6px}select.input-group-lg>.form-control,select.input-group-lg>.input-group-addon,select.input-group-lg>.input-group-btn>.btn{height:46px;line-height:46px}select[multiple].input-group-lg>.form-control,select[multiple].input-group-lg>.input-group-addon,select[multiple].input-group-lg>.input-group-btn>.btn,textarea.input-group-lg>.form-control,textarea.input-group-lg>.input-group-addon,textarea.input-group-lg>.input-group-btn>.btn{height:auto}.input-group-sm>.form-control,.input-group-sm>.input-group-addon,.input-group-sm>.input-group-btn>.btn{height:30px;padding:5px 10px;font-size:12px;line-height:1.5;border-radius:3px}select.input-group-sm>.form-control,select.input-group-sm>.input-group-addon,select.input-group-sm>.input-group-btn>.btn{height:30px;line-height:30px}select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.input-group-addon,select[multiple].input-group-sm>.input-group-btn>.btn,textarea.input-group-sm>.form-control,textarea.input-group-sm>.input-group-addon,textarea.input-group-sm>.input-group-btn>.btn{height:auto}.input-group-addon,.input-group-btn,.input-group .form-control{display:table-cell}.input-group-addon:not(:first-child):not(:last-child),.input-group-btn:not(:first-child):not(:last-child),.input-group .form-control:not(:first-child):not(:last-child){border-radius:0}.input-group-addon,.input-group-btn{width:1%;white-space:nowrap;vertical-align:middle}.input-group-addon{padding:6px 12px;font-size:14px;font-weight:400;line-height:1;color:#555;text-align:center;background-color:#eee;border:1px solid #ccc;border-radius:4px}.input-group-addon.input-sm{padding:5px 10px;font-size:12px;border-radius:3px}.input-group-addon.input-lg{padding:10px 16px;font-size:18px;border-radius:6px}.input-group-addon input[type=checkbox],.input-group-addon input[type=radio]{margin-top:0}.input-group-addon:first-child,.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group>.btn,.input-group-btn:first-child>.dropdown-toggle,.input-group-btn:last-child>.btn-group:not(:last-child)>.btn,.input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle),.input-group .form-control:first-child{border-top-right-radius:0;border-bottom-right-radius:0}.input-group-addon:first-child{border-right:0}.input-group-addon:last-child,.input-group-btn:first-child>.btn-group:not(:first-child)>.btn,.input-group-btn:first-child>.btn:not(:first-child),.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group>.btn,.input-group-btn:last-child>.dropdown-toggle,.input-group .form-control:last-child{border-top-left-radius:0;border-bottom-left-radius:0}.input-group-addon:last-child{border-left:0}.input-group-btn{font-size:0;white-space:nowrap}.input-group-btn,.input-group-btn>.btn{position:relative}.input-group-btn>.btn+.btn{margin-left:-1px}.input-group-btn>.btn:active,.input-group-btn>.btn:focus,.input-group-btn>.btn:hover{z-index:2}.input-group-btn:first-child>.btn,.input-group-btn:first-child>.btn-group{margin-right:-1px}.input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{z-index:2;margin-left:-1px}.nav{padding-left:0;margin-bottom:0;list-style:none}.nav>li,.nav>li>a{position:relative;display:block}.nav>li>a{padding:10px 15px}.nav>li>a:focus,.nav>li>a:hover{text-decoration:none;background-color:#eee}.nav>li.disabled>a{color:#777}.nav>li.disabled>a:focus,.nav>li.disabled>a:hover{color:#777;text-decoration:none;cursor:not-allowed;background-color:transparent}.nav .open>a,.nav .open>a:focus,.nav .open>a:hover{background-color:#eee;border-color:#337ab7}.nav .nav-divider{height:1px;margin:9px 0;overflow:hidden;background-color:#e5e5e5}.nav>li>a>img{max-width:none}.nav-tabs{border-bottom:1px solid #ddd}.nav-tabs>li{float:left;margin-bottom:-1px}.nav-tabs>li>a{margin-right:2px;line-height:1.42857143;border:1px solid transparent;border-radius:4px 4px 0 0}.nav-tabs>li>a:hover{border-color:#eee #eee #ddd}.nav-tabs>li.active>a,.nav-tabs>li.active>a:focus,.nav-tabs>li.active>a:hover{color:#555;cursor:default;background-color:#fff;border:1px solid #ddd;border-bottom-color:transparent}.nav-tabs.nav-justified{width:100%;border-bottom:0}.nav-tabs.nav-justified>li{float:none}.nav-tabs.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-tabs.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-tabs.nav-justified>li{display:table-cell;width:1%}.nav-tabs.nav-justified>li>a{margin-bottom:0}}.nav-tabs.nav-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs.nav-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs.nav-justified>.active>a,.nav-tabs.nav-justified>.active>a:focus,.nav-tabs.nav-justified>.active>a:hover{border-bottom-color:#fff}}.nav-pills>li{float:left}.nav-pills>li>a{border-radius:4px}.nav-pills>li+li{margin-left:2px}.nav-pills>li.active>a,.nav-pills>li.active>a:focus,.nav-pills>li.active>a:hover{color:#fff;background-color:#337ab7}.nav-stacked>li{float:none}.nav-stacked>li+li{margin-top:2px;margin-left:0}.nav-justified{width:100%}.nav-justified>li{float:none}.nav-justified>li>a{margin-bottom:5px;text-align:center}.nav-justified>.dropdown .dropdown-menu{top:auto;left:auto}@media (min-width:768px){.nav-justified>li{display:table-cell;width:1%}.nav-justified>li>a{margin-bottom:0}}.nav-tabs-justified{border-bottom:0}.nav-tabs-justified>li>a{margin-right:0;border-radius:4px}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border:1px solid #ddd}@media (min-width:768px){.nav-tabs-justified>li>a{border-bottom:1px solid #ddd;border-radius:4px 4px 0 0}.nav-tabs-justified>.active>a,.nav-tabs-justified>.active>a:focus,.nav-tabs-justified>.active>a:hover{border-bottom-color:#fff}}.tab-content>.tab-pane{display:none}.tab-content>.active{display:block}.nav-tabs .dropdown-menu{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}.navbar{position:relative;min-height:50px;margin-bottom:20px;border:1px solid transparent}@media (min-width:768px){.navbar{border-radius:4px}}@media (min-width:768px){.navbar-header{float:left}}.navbar-collapse{padding-right:15px;padding-left:15px;overflow-x:visible;-webkit-overflow-scrolling:touch;border-top:1px solid transparent;box-shadow:inset 0 1px 0 hsla(0,0%,100%,.1)}.navbar-collapse.in{overflow-y:auto}@media (min-width:768px){.navbar-collapse{width:auto;border-top:0;box-shadow:none}.navbar-collapse.collapse{display:block!important;height:auto!important;padding-bottom:0;overflow:visible!important}.navbar-collapse.in{overflow-y:visible}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse,.navbar-static-top .navbar-collapse{padding-right:0;padding-left:0}}.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:340px}@media (max-device-width:480px) and (orientation:landscape){.navbar-fixed-bottom .navbar-collapse,.navbar-fixed-top .navbar-collapse{max-height:200px}}.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:-15px;margin-left:-15px}@media (min-width:768px){.container-fluid>.navbar-collapse,.container-fluid>.navbar-header,.container>.navbar-collapse,.container>.navbar-header{margin-right:0;margin-left:0}}.navbar-static-top{z-index:17;border-width:0 0 1px}@media (min-width:768px){.navbar-static-top{border-radius:0}}.navbar-fixed-bottom,.navbar-fixed-top{position:fixed;right:0;left:0;z-index:18}@media (min-width:768px){.navbar-fixed-bottom,.navbar-fixed-top{border-radius:0}}.navbar-fixed-top{top:0;border-width:0 0 1px}.navbar-fixed-bottom{bottom:0;margin-bottom:0;border-width:1px 0 0}.navbar-brand{float:left;height:50px;padding:15px;font-size:18px;line-height:20px}.navbar-brand:focus,.navbar-brand:hover{text-decoration:none}.navbar-brand>img{display:block}@media (min-width:768px){.navbar>.container-fluid .navbar-brand,.navbar>.container .navbar-brand{margin-left:-15px}}.navbar-toggle{position:relative;float:right;padding:9px 10px;margin-top:8px;margin-right:15px;margin-bottom:8px;background-color:transparent;background-image:none;border:1px solid transparent;border-radius:4px}.navbar-toggle:focus{outline:0}.navbar-toggle .icon-bar{display:block;width:22px;height:2px;border-radius:1px}.navbar-toggle .icon-bar+.icon-bar{margin-top:4px}@media (min-width:768px){.navbar-toggle{display:none}}.navbar-nav{margin:7.5px -15px}.navbar-nav>li>a{padding-top:10px;padding-bottom:10px;line-height:20px}@media (max-width:767px){.navbar-nav .open .dropdown-menu{position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;box-shadow:none}.navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a{padding:5px 15px 5px 25px}.navbar-nav .open .dropdown-menu>li>a{line-height:20px}.navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover{background-image:none}}@media (min-width:768px){.navbar-nav{float:left;margin:0}.navbar-nav>li{float:left}.navbar-nav>li>a{padding-top:15px;padding-bottom:15px}}.navbar-form{padding:10px 15px;margin:8px -15px;border-top:1px solid transparent;border-bottom:1px solid transparent;box-shadow:inset 0 1px 0 hsla(0,0%,100%,.1),0 1px 0 hsla(0,0%,100%,.1)}@media (min-width:768px){.navbar-form .form-group{display:inline-block;margin-bottom:0;vertical-align:middle}.navbar-form .form-control{display:inline-block;width:auto;vertical-align:middle}.navbar-form .form-control-static{display:inline-block}.navbar-form .input-group{display:inline-table;vertical-align:middle}.navbar-form .input-group .form-control,.navbar-form .input-group .input-group-addon,.navbar-form .input-group .input-group-btn{width:auto}.navbar-form .input-group>.form-control{width:100%}.navbar-form .control-label{margin-bottom:0;vertical-align:middle}.navbar-form .checkbox,.navbar-form .radio{display:inline-block;margin-top:0;margin-bottom:0;vertical-align:middle}.navbar-form .checkbox label,.navbar-form .radio label{padding-left:0}.navbar-form .checkbox input[type=checkbox],.navbar-form .radio input[type=radio]{position:relative;margin-left:0}.navbar-form .has-feedback .form-control-feedback{top:0}}@media (max-width:767px){.navbar-form .form-group{margin-bottom:5px}.navbar-form .form-group:last-child{margin-bottom:0}}@media (min-width:768px){.navbar-form{width:auto;padding-top:0;padding-bottom:0;margin-right:0;margin-left:0;border:0;box-shadow:none}}.navbar-nav>li>.dropdown-menu{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}.navbar-fixed-bottom .navbar-nav>li>.dropdown-menu{margin-bottom:0;border-top-left-radius:4px;border-top-right-radius:4px;border-bottom-right-radius:0;border-bottom-left-radius:0}.navbar-btn{margin-top:8px;margin-bottom:8px}.navbar-btn.btn-sm{margin-top:10px;margin-bottom:10px}.navbar-btn.btn-xs{margin-top:14px;margin-bottom:14px}.navbar-text{margin-top:15px;margin-bottom:15px}@media (min-width:768px){.navbar-text{float:left;margin-right:15px;margin-left:15px}}@media (min-width:768px){.navbar-left{float:left!important}.navbar-right{float:right!important;margin-right:-15px}.navbar-right~.navbar-right{margin-right:0}}.navbar-default{background-color:#f8f8f8;border-color:#e7e7e7}.navbar-default .navbar-brand{color:#777}.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{color:#5e5e5e;background-color:transparent}.navbar-default .navbar-nav>li>a,.navbar-default .navbar-text{color:#777}.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav>.disabled>a,.navbar-default .navbar-nav>.disabled>a:focus,.navbar-default .navbar-nav>.disabled>a:hover{color:#ccc;background-color:transparent}.navbar-default .navbar-toggle{border-color:#ddd}.navbar-default .navbar-toggle:focus,.navbar-default .navbar-toggle:hover{background-color:#ddd}.navbar-default .navbar-toggle .icon-bar{background-color:#888}.navbar-default .navbar-collapse,.navbar-default .navbar-form{border-color:#e7e7e7}.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:focus,.navbar-default .navbar-nav>.open>a:hover{color:#555;background-color:#e7e7e7}@media (max-width:767px){.navbar-default .navbar-nav .open .dropdown-menu>li>a{color:#777}.navbar-default .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover{color:#333;background-color:transparent}.navbar-default .navbar-nav .open .dropdown-menu>.active>a,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.active>a:hover{color:#555;background-color:#e7e7e7}.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-default .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#ccc;background-color:transparent}}.navbar-default .navbar-link{color:#777}.navbar-default .navbar-link:hover{color:#333}.navbar-default .btn-link{color:#777}.navbar-default .btn-link:focus,.navbar-default .btn-link:hover{color:#333}.navbar-default .btn-link[disabled]:focus,.navbar-default .btn-link[disabled]:hover,fieldset[disabled] .navbar-default .btn-link:focus,fieldset[disabled] .navbar-default .btn-link:hover{color:#ccc}.navbar-inverse{background-color:#222;border-color:#080808}.navbar-inverse .navbar-brand{color:#9d9d9d}.navbar-inverse .navbar-brand:focus,.navbar-inverse .navbar-brand:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>li>a,.navbar-inverse .navbar-text{color:#9d9d9d}.navbar-inverse .navbar-nav>li>a:focus,.navbar-inverse .navbar-nav>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:focus,.navbar-inverse .navbar-nav>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav>.disabled>a,.navbar-inverse .navbar-nav>.disabled>a:focus,.navbar-inverse .navbar-nav>.disabled>a:hover{color:#444;background-color:transparent}.navbar-inverse .navbar-toggle{border-color:#333}.navbar-inverse .navbar-toggle:focus,.navbar-inverse .navbar-toggle:hover{background-color:#333}.navbar-inverse .navbar-toggle .icon-bar{background-color:#fff}.navbar-inverse .navbar-collapse,.navbar-inverse .navbar-form{border-color:#101010}.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:focus,.navbar-inverse .navbar-nav>.open>a:hover{color:#fff;background-color:#080808}@media (max-width:767px){.navbar-inverse .navbar-nav .open .dropdown-menu>.dropdown-header{border-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu .divider{background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{color:#9d9d9d}.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover{color:#fff;background-color:transparent}.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a:hover{color:#fff;background-color:#080808}.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:focus,.navbar-inverse .navbar-nav .open .dropdown-menu>.disabled>a:hover{color:#444;background-color:transparent}}.navbar-inverse .navbar-link{color:#9d9d9d}.navbar-inverse .navbar-link:hover{color:#fff}.navbar-inverse .btn-link{color:#9d9d9d}.navbar-inverse .btn-link:focus,.navbar-inverse .btn-link:hover{color:#fff}.navbar-inverse .btn-link[disabled]:focus,.navbar-inverse .btn-link[disabled]:hover,fieldset[disabled] .navbar-inverse .btn-link:focus,fieldset[disabled] .navbar-inverse .btn-link:hover{color:#444}.breadcrumb{padding:8px 15px;margin-bottom:20px;list-style:none;background-color:#f5f5f5;border-radius:4px}.breadcrumb>li{display:inline-block}.breadcrumb>li+li:before{padding:0 5px;color:#ccc;content:\"/\\00a0\"}.breadcrumb>.active{color:#777}.pagination{display:inline-block;padding-left:0;margin:20px 0;border-radius:4px}.pagination>li{display:inline}.pagination>li>a,.pagination>li>span{position:relative;float:left;padding:6px 12px;margin-left:-1px;line-height:1.42857143;color:#337ab7;text-decoration:none;background-color:#fff;border:1px solid #ddd}.pagination>li:first-child>a,.pagination>li:first-child>span{margin-left:0;border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination>li:last-child>a,.pagination>li:last-child>span{border-top-right-radius:4px;border-bottom-right-radius:4px}.pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{z-index:2;color:#23527c;background-color:#eee;border-color:#ddd}.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span,.pagination>.active>span:focus,.pagination>.active>span:hover{z-index:3;color:#fff;cursor:default;background-color:#337ab7;border-color:#337ab7}.pagination>.disabled>a,.pagination>.disabled>a:focus,.pagination>.disabled>a:hover,.pagination>.disabled>span,.pagination>.disabled>span:focus,.pagination>.disabled>span:hover{color:#777;cursor:not-allowed;background-color:#fff;border-color:#ddd}.pagination-lg>li>a,.pagination-lg>li>span{padding:10px 16px;font-size:18px;line-height:1.3333333}.pagination-lg>li:first-child>a,.pagination-lg>li:first-child>span{border-top-left-radius:6px;border-bottom-left-radius:6px}.pagination-lg>li:last-child>a,.pagination-lg>li:last-child>span{border-top-right-radius:6px;border-bottom-right-radius:6px}.pagination-sm>li>a,.pagination-sm>li>span{padding:5px 10px;font-size:12px;line-height:1.5}.pagination-sm>li:first-child>a,.pagination-sm>li:first-child>span{border-top-left-radius:3px;border-bottom-left-radius:3px}.pagination-sm>li:last-child>a,.pagination-sm>li:last-child>span{border-top-right-radius:3px;border-bottom-right-radius:3px}.pager{padding-left:0;margin:20px 0;text-align:center;list-style:none}.pager li{display:inline}.pager li>a,.pager li>span{display:inline-block;padding:5px 14px;background-color:#fff;border:1px solid #ddd;border-radius:15px}.pager li>a:focus,.pager li>a:hover{text-decoration:none;background-color:#eee}.pager .next>a,.pager .next>span{float:right}.pager .previous>a,.pager .previous>span{float:left}.pager .disabled>a,.pager .disabled>a:focus,.pager .disabled>a:hover,.pager .disabled>span{color:#777;cursor:not-allowed;background-color:#fff}.label{display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em}a.label:focus,a.label:hover{color:#fff;text-decoration:none;cursor:pointer}.label:empty{display:none}.btn .label{position:relative;top:-1px}.label-default{background-color:#777}.label-default[href]:focus,.label-default[href]:hover{background-color:#5e5e5e}.label-primary{background-color:#337ab7}.label-primary[href]:focus,.label-primary[href]:hover{background-color:#286090}.label-success{background-color:#5cb85c}.label-success[href]:focus,.label-success[href]:hover{background-color:#449d44}.label-info{background-color:#5bc0de}.label-info[href]:focus,.label-info[href]:hover{background-color:#31b0d5}.label-warning{background-color:#f0ad4e}.label-warning[href]:focus,.label-warning[href]:hover{background-color:#ec971f}.label-danger{background-color:#d9534f}.label-danger[href]:focus,.label-danger[href]:hover{background-color:#c9302c}.badge{display:inline-block;min-width:10px;padding:3px 7px;font-size:12px;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:middle;background-color:#777;border-radius:10px}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}.btn-group-xs>.btn .badge,.btn-xs .badge{top:0;padding:1px 5px}a.badge:focus,a.badge:hover{color:#fff;text-decoration:none;cursor:pointer}.list-group-item.active>.badge,.nav-pills>.active>a>.badge{color:#337ab7;background-color:#fff}.list-group-item>.badge{float:right}.list-group-item>.badge+.badge{margin-right:5px}.nav-pills>li>a>.badge{margin-left:3px}.jumbotron{padding-top:30px;padding-bottom:30px;margin-bottom:30px;background-color:#eee}.jumbotron,.jumbotron .h1,.jumbotron h1{color:inherit}.jumbotron p{margin-bottom:15px;font-size:21px;font-weight:200}.jumbotron>hr{border-top-color:#d5d5d5}.container-fluid .jumbotron,.container .jumbotron{padding-right:15px;padding-left:15px;border-radius:6px}.jumbotron .container{max-width:100%}@media screen and (min-width:768px){.jumbotron{padding-top:48px;padding-bottom:48px}.container-fluid .jumbotron,.container .jumbotron{padding-right:60px;padding-left:60px}.jumbotron .h1,.jumbotron h1{font-size:63px}}.thumbnail{display:block;padding:4px;margin-bottom:20px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:border .2s ease-in-out;transition:border .2s ease-in-out}.thumbnail>img,.thumbnail a>img{margin-right:auto;margin-left:auto}a.thumbnail.active,a.thumbnail:focus,a.thumbnail:hover{border-color:#337ab7}.thumbnail .caption{padding:9px;color:#333}.alert{padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px}.alert h4{margin-top:0;color:inherit}.alert .alert-link{font-weight:700}.alert>p,.alert>ul{margin-bottom:0}.alert>p+p{margin-top:5px}.alert-dismissable,.alert-dismissible{padding-right:35px}.alert-dismissable .close,.alert-dismissible .close{position:relative;top:-2px;right:-21px;color:inherit}.alert-success{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.alert-success hr{border-top-color:#c9e2b3}.alert-success .alert-link{color:#2b542c}.alert-info{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.alert-info hr{border-top-color:#a6e1ec}.alert-info .alert-link{color:#245269}.alert-warning{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.alert-warning hr{border-top-color:#f7e1b5}.alert-warning .alert-link{color:#66512c}.alert-danger{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.alert-danger hr{border-top-color:#e4b9c0}.alert-danger .alert-link{color:#843534}@-webkit-keyframes a{0%{background-position:40px 0}to{background-position:0 0}}@keyframes a{0%{background-position:40px 0}to{background-position:0 0}}.progress{height:20px;margin-bottom:20px;overflow:hidden;background-color:#f5f5f5;border-radius:4px;box-shadow:inset 0 1px 2px rgba(0,0,0,.1)}.progress-bar{float:left;width:0;height:100%;font-size:12px;line-height:20px;color:#fff;text-align:center;background-color:#337ab7;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);-webkit-transition:width .6s ease;transition:width .6s ease}.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent);background-image:linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent);background-size:40px 40px}.progress-bar.active,.progress.active .progress-bar{-webkit-animation:a 2s linear infinite;animation:a 2s linear infinite}.progress-bar-success{background-color:#5cb85c}.progress-striped .progress-bar-success{background-image:-webkit-linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent);background-image:linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent)}.progress-bar-info{background-color:#5bc0de}.progress-striped .progress-bar-info{background-image:-webkit-linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent);background-image:linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent)}.progress-bar-warning{background-color:#f0ad4e}.progress-striped .progress-bar-warning{background-image:-webkit-linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent);background-image:linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent)}.progress-bar-danger{background-color:#d9534f}.progress-striped .progress-bar-danger{background-image:-webkit-linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent);background-image:linear-gradient(45deg,hsla(0,0%,100%,.15) 25%,transparent 0,transparent 50%,hsla(0,0%,100%,.15) 0,hsla(0,0%,100%,.15) 75%,transparent 0,transparent)}.media{margin-top:15px}.media:first-child{margin-top:0}.media,.media-body{overflow:hidden;zoom:1}.media-body{width:10000px}.media-object{display:block}.media-object.img-thumbnail{max-width:none}.media-right,.media>.pull-right{padding-left:10px}.media-left,.media>.pull-left{padding-right:10px}.media-body,.media-left,.media-right{display:table-cell;vertical-align:top}.media-middle{vertical-align:middle}.media-bottom{vertical-align:bottom}.media-heading{margin-top:0;margin-bottom:5px}.media-list{padding-left:0;list-style:none}.list-group{padding-left:0;margin-bottom:20px}.list-group-item{position:relative;display:block;padding:10px 15px;margin-bottom:-1px;background-color:#fff;border:1px solid #ddd}.list-group-item:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.list-group-item:last-child{margin-bottom:0;border-bottom-right-radius:4px;border-bottom-left-radius:4px}a.list-group-item,button.list-group-item{color:#555}a.list-group-item .list-group-item-heading,button.list-group-item .list-group-item-heading{color:#333}a.list-group-item:focus,a.list-group-item:hover,button.list-group-item:focus,button.list-group-item:hover{color:#555;text-decoration:none;background-color:#f5f5f5}button.list-group-item{width:100%;text-align:left}.list-group-item.disabled,.list-group-item.disabled:focus,.list-group-item.disabled:hover{color:#777;cursor:not-allowed;background-color:#eee}.list-group-item.disabled .list-group-item-heading,.list-group-item.disabled:focus .list-group-item-heading,.list-group-item.disabled:hover .list-group-item-heading{color:inherit}.list-group-item.disabled .list-group-item-text,.list-group-item.disabled:focus .list-group-item-text,.list-group-item.disabled:hover .list-group-item-text{color:#777}.list-group-item.active,.list-group-item.active:focus,.list-group-item.active:hover{z-index:2;color:#fff;background-color:#337ab7;border-color:#337ab7}.list-group-item.active .list-group-item-heading,.list-group-item.active .list-group-item-heading>.small,.list-group-item.active .list-group-item-heading>small,.list-group-item.active:focus .list-group-item-heading,.list-group-item.active:focus .list-group-item-heading>.small,.list-group-item.active:focus .list-group-item-heading>small,.list-group-item.active:hover .list-group-item-heading,.list-group-item.active:hover .list-group-item-heading>.small,.list-group-item.active:hover .list-group-item-heading>small{color:inherit}.list-group-item.active .list-group-item-text,.list-group-item.active:focus .list-group-item-text,.list-group-item.active:hover .list-group-item-text{color:#c7ddef}.list-group-item-success{color:#3c763d;background-color:#dff0d8}a.list-group-item-success,button.list-group-item-success{color:#3c763d}a.list-group-item-success .list-group-item-heading,button.list-group-item-success .list-group-item-heading{color:inherit}a.list-group-item-success:focus,a.list-group-item-success:hover,button.list-group-item-success:focus,button.list-group-item-success:hover{color:#3c763d;background-color:#d0e9c6}a.list-group-item-success.active,a.list-group-item-success.active:focus,a.list-group-item-success.active:hover,button.list-group-item-success.active,button.list-group-item-success.active:focus,button.list-group-item-success.active:hover{color:#fff;background-color:#3c763d;border-color:#3c763d}.list-group-item-info{color:#31708f;background-color:#d9edf7}a.list-group-item-info,button.list-group-item-info{color:#31708f}a.list-group-item-info .list-group-item-heading,button.list-group-item-info .list-group-item-heading{color:inherit}a.list-group-item-info:focus,a.list-group-item-info:hover,button.list-group-item-info:focus,button.list-group-item-info:hover{color:#31708f;background-color:#c4e3f3}a.list-group-item-info.active,a.list-group-item-info.active:focus,a.list-group-item-info.active:hover,button.list-group-item-info.active,button.list-group-item-info.active:focus,button.list-group-item-info.active:hover{color:#fff;background-color:#31708f;border-color:#31708f}.list-group-item-warning{color:#8a6d3b;background-color:#fcf8e3}a.list-group-item-warning,button.list-group-item-warning{color:#8a6d3b}a.list-group-item-warning .list-group-item-heading,button.list-group-item-warning .list-group-item-heading{color:inherit}a.list-group-item-warning:focus,a.list-group-item-warning:hover,button.list-group-item-warning:focus,button.list-group-item-warning:hover{color:#8a6d3b;background-color:#faf2cc}a.list-group-item-warning.active,a.list-group-item-warning.active:focus,a.list-group-item-warning.active:hover,button.list-group-item-warning.active,button.list-group-item-warning.active:focus,button.list-group-item-warning.active:hover{color:#fff;background-color:#8a6d3b;border-color:#8a6d3b}.list-group-item-danger{color:#a94442;background-color:#f2dede}a.list-group-item-danger,button.list-group-item-danger{color:#a94442}a.list-group-item-danger .list-group-item-heading,button.list-group-item-danger .list-group-item-heading{color:inherit}a.list-group-item-danger:focus,a.list-group-item-danger:hover,button.list-group-item-danger:focus,button.list-group-item-danger:hover{color:#a94442;background-color:#ebcccc}a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-group-item-danger.active:hover,button.list-group-item-danger.active,button.list-group-item-danger.active:focus,button.list-group-item-danger.active:hover{color:#fff;background-color:#a94442;border-color:#a94442}.list-group-item-heading{margin-top:0;margin-bottom:5px}.list-group-item-text{margin-bottom:0;line-height:1.3}.panel{margin-bottom:20px;background-color:#fff;border:1px solid transparent;border-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.05)}.panel-body{padding:15px}.panel-heading{padding:10px 15px;border-bottom:1px solid transparent;border-top-left-radius:3px;border-top-right-radius:3px}.panel-heading>.dropdown .dropdown-toggle,.panel-title{color:inherit}.panel-title{margin-top:0;margin-bottom:0;font-size:16px}.panel-title>.small,.panel-title>.small>a,.panel-title>a,.panel-title>small,.panel-title>small>a{color:inherit}.panel-footer{padding:10px 15px;background-color:#f5f5f5;border-top:1px solid #ddd;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}.panel>.list-group .list-group-item,.panel>.panel-collapse>.list-group .list-group-item{border-width:1px 0;border-radius:0}.panel>.list-group:first-child .list-group-item:first-child,.panel>.panel-collapse>.list-group:first-child .list-group-item:first-child{border-top:0;border-top-left-radius:3px;border-top-right-radius:3px}.panel>.list-group:last-child .list-group-item:last-child,.panel>.panel-collapse>.list-group:last-child .list-group-item:last-child{border-bottom:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.panel-heading+.panel-collapse>.list-group .list-group-item:first-child{border-top-left-radius:0;border-top-right-radius:0}.list-group+.panel-footer,.panel-heading+.list-group .list-group-item:first-child{border-top-width:0}.panel>.panel-collapse>.table,.panel>.table,.panel>.table-responsive>.table{margin-bottom:0}.panel>.panel-collapse>.table caption,.panel>.table-responsive>.table caption,.panel>.table caption{padding-right:15px;padding-left:15px}.panel>.table-responsive:first-child>.table:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child,.panel>.table:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child,.panel>.table:first-child>thead:first-child>tr:first-child{border-top-left-radius:3px;border-top-right-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:first-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:first-child,.panel>.table:first-child>thead:first-child>tr:first-child td:first-child,.panel>.table:first-child>thead:first-child>tr:first-child th:first-child{border-top-left-radius:3px}.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table-responsive:first-child>.table:first-child>thead:first-child>tr:first-child th:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child td:last-child,.panel>.table:first-child>tbody:first-child>tr:first-child th:last-child,.panel>.table:first-child>thead:first-child>tr:first-child td:last-child,.panel>.table:first-child>thead:first-child>tr:first-child th:last-child{border-top-right-radius:3px}.panel>.table-responsive:last-child>.table:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child,.panel>.table:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:first-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:first-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:first-child{border-bottom-left-radius:3px}.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table-responsive:last-child>.table:last-child>tfoot:last-child>tr:last-child th:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child td:last-child,.panel>.table:last-child>tbody:last-child>tr:last-child th:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child td:last-child,.panel>.table:last-child>tfoot:last-child>tr:last-child th:last-child{border-bottom-right-radius:3px}.panel>.panel-body+.table,.panel>.panel-body+.table-responsive,.panel>.table+.panel-body,.panel>.table-responsive+.panel-body{border-top:1px solid #ddd}.panel>.table>tbody:first-child>tr:first-child td,.panel>.table>tbody:first-child>tr:first-child th{border-top:0}.panel>.table-bordered,.panel>.table-responsive>.table-bordered{border:0}.panel>.table-bordered>tbody>tr>td:first-child,.panel>.table-bordered>tbody>tr>th:first-child,.panel>.table-bordered>tfoot>tr>td:first-child,.panel>.table-bordered>tfoot>tr>th:first-child,.panel>.table-bordered>thead>tr>td:first-child,.panel>.table-bordered>thead>tr>th:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:first-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:first-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:first-child,.panel>.table-responsive>.table-bordered>thead>tr>td:first-child,.panel>.table-responsive>.table-bordered>thead>tr>th:first-child{border-left:0}.panel>.table-bordered>tbody>tr>td:last-child,.panel>.table-bordered>tbody>tr>th:last-child,.panel>.table-bordered>tfoot>tr>td:last-child,.panel>.table-bordered>tfoot>tr>th:last-child,.panel>.table-bordered>thead>tr>td:last-child,.panel>.table-bordered>thead>tr>th:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>td:last-child,.panel>.table-responsive>.table-bordered>tbody>tr>th:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>td:last-child,.panel>.table-responsive>.table-bordered>tfoot>tr>th:last-child,.panel>.table-responsive>.table-bordered>thead>tr>td:last-child,.panel>.table-responsive>.table-bordered>thead>tr>th:last-child{border-right:0}.panel>.table-bordered>tbody>tr:first-child>td,.panel>.table-bordered>tbody>tr:first-child>th,.panel>.table-bordered>tbody>tr:last-child>td,.panel>.table-bordered>tbody>tr:last-child>th,.panel>.table-bordered>tfoot>tr:last-child>td,.panel>.table-bordered>tfoot>tr:last-child>th,.panel>.table-bordered>thead>tr:first-child>td,.panel>.table-bordered>thead>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:first-child>th,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>td,.panel>.table-responsive>.table-bordered>tbody>tr:last-child>th,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>td,.panel>.table-responsive>.table-bordered>tfoot>tr:last-child>th,.panel>.table-responsive>.table-bordered>thead>tr:first-child>td,.panel>.table-responsive>.table-bordered>thead>tr:first-child>th{border-bottom:0}.panel>.table-responsive{margin-bottom:0;border:0}.panel-group{margin-bottom:20px}.panel-group .panel{margin-bottom:0;border-radius:4px}.panel-group .panel+.panel{margin-top:5px}.panel-group .panel-heading{border-bottom:0}.panel-group .panel-heading+.panel-collapse>.list-group,.panel-group .panel-heading+.panel-collapse>.panel-body{border-top:1px solid #ddd}.panel-group .panel-footer{border-top:0}.panel-group .panel-footer+.panel-collapse .panel-body{border-bottom:1px solid #ddd}.panel-default{border-color:#ddd}.panel-default>.panel-heading{color:#333;background-color:#f5f5f5;border-color:#ddd}.panel-default>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ddd}.panel-default>.panel-heading .badge{color:#f5f5f5;background-color:#333}.panel-default>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ddd}.panel-primary{border-color:#337ab7}.panel-primary>.panel-heading{color:#fff;background-color:#337ab7;border-color:#337ab7}.panel-primary>.panel-heading+.panel-collapse>.panel-body{border-top-color:#337ab7}.panel-primary>.panel-heading .badge{color:#337ab7;background-color:#fff}.panel-primary>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#337ab7}.panel-success{border-color:#d6e9c6}.panel-success>.panel-heading{color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6}.panel-success>.panel-heading+.panel-collapse>.panel-body{border-top-color:#d6e9c6}.panel-success>.panel-heading .badge{color:#dff0d8;background-color:#3c763d}.panel-success>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#d6e9c6}.panel-info{border-color:#bce8f1}.panel-info>.panel-heading{color:#31708f;background-color:#d9edf7;border-color:#bce8f1}.panel-info>.panel-heading+.panel-collapse>.panel-body{border-top-color:#bce8f1}.panel-info>.panel-heading .badge{color:#d9edf7;background-color:#31708f}.panel-info>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#bce8f1}.panel-warning{border-color:#faebcc}.panel-warning>.panel-heading{color:#8a6d3b;background-color:#fcf8e3;border-color:#faebcc}.panel-warning>.panel-heading+.panel-collapse>.panel-body{border-top-color:#faebcc}.panel-warning>.panel-heading .badge{color:#fcf8e3;background-color:#8a6d3b}.panel-warning>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#faebcc}.panel-danger{border-color:#ebccd1}.panel-danger>.panel-heading{color:#a94442;background-color:#f2dede;border-color:#ebccd1}.panel-danger>.panel-heading+.panel-collapse>.panel-body{border-top-color:#ebccd1}.panel-danger>.panel-heading .badge{color:#f2dede;background-color:#a94442}.panel-danger>.panel-footer+.panel-collapse>.panel-body{border-bottom-color:#ebccd1}.embed-responsive{position:relative;display:block;height:0;padding:0;overflow:hidden}.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video{position:absolute;top:0;bottom:0;left:0;width:100%;height:100%;border:0}.embed-responsive-16by9{padding-bottom:56.25%}.embed-responsive-4by3{padding-bottom:75%}.well{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,.05)}.well blockquote{border-color:#ddd;border-color:rgba(0,0,0,.15)}.well-lg{padding:24px;border-radius:6px}.well-sm{padding:9px;border-radius:3px}.close{float:right;font-size:21px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;filter:alpha(opacity=20);opacity:.2}.close:focus,.close:hover{color:#000;text-decoration:none;cursor:pointer;filter:alpha(opacity=50);opacity:.5}button.close{-webkit-appearance:none;padding:0;cursor:pointer;background:transparent;border:0}.modal,.modal-open{overflow:hidden}.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:20;display:none;-webkit-overflow-scrolling:touch;outline:0}.modal.fade .modal-dialog{-webkit-transition:-webkit-transform .3s ease-out;transition:-webkit-transform .3s ease-out;transition:transform .3s ease-out;transition:transform .3s ease-out,-webkit-transform .3s ease-out;-webkit-transform:translateY(-25%);transform:translateY(-25%)}.modal.in .modal-dialog{-webkit-transform:translate(0);transform:translate(0)}.modal-open .modal{overflow-x:hidden;overflow-y:auto}.modal-dialog{position:relative;width:auto;margin:10px}.modal-content{position:relative;background-color:#fff;background-clip:padding-box;border:1px solid #999;border:1px solid rgba(0,0,0,.2);border-radius:6px;outline:0;box-shadow:0 3px 9px rgba(0,0,0,.5)}.modal-backdrop{position:fixed;top:0;right:0;bottom:0;left:0;z-index:19;background-color:#000}.modal-backdrop.fade{filter:alpha(opacity=0);opacity:0}.modal-backdrop.in{filter:alpha(opacity=50);opacity:.5}.modal-header{padding:15px;border-bottom:1px solid #e5e5e5}.modal-header .close{margin-top:-2px}.modal-title{margin:0;line-height:1.42857143}.modal-body{position:relative;padding:15px}.modal-footer{padding:15px;text-align:right;border-top:1px solid #e5e5e5}.modal-footer .btn+.btn{margin-bottom:0;margin-left:5px}.modal-footer .btn-group .btn+.btn{margin-left:-1px}.modal-footer .btn-block+.btn-block{margin-left:0}.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:768px){.modal-dialog{width:600px;margin:30px auto}.modal-content{box-shadow:0 5px 15px rgba(0,0,0,.5)}.modal-sm{width:300px}}@media (min-width:992px){.modal-lg{width:900px}}.tooltip{position:absolute;z-index:22;display:block;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto}.tooltip.in{filter:alpha(opacity=90);opacity:.9}.tooltip.top{padding:5px 0;margin-top:-3px}.tooltip.right{padding:0 5px;margin-left:3px}.tooltip.bottom{padding:5px 0;margin-top:3px}.tooltip.left{padding:0 5px;margin-left:-3px}.tooltip-inner{max-width:200px;padding:3px 8px;color:#fff;text-align:center;background-color:#000;border-radius:4px}.tooltip-arrow{position:absolute;width:0;height:0;border-color:transparent;border-style:solid}.tooltip.top .tooltip-arrow{bottom:0;left:50%;margin-left:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-left .tooltip-arrow{right:5px}.tooltip.top-left .tooltip-arrow,.tooltip.top-right .tooltip-arrow{bottom:0;margin-bottom:-5px;border-width:5px 5px 0;border-top-color:#000}.tooltip.top-right .tooltip-arrow{left:5px}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#000}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#000}.tooltip.bottom .tooltip-arrow{top:0;left:50%;margin-left:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-left .tooltip-arrow{top:0;right:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.tooltip.bottom-right .tooltip-arrow{top:0;left:5px;margin-top:-5px;border-width:0 5px 5px;border-bottom-color:#000}.popover{position:absolute;top:0;left:0;z-index:21;display:none;max-width:276px;padding:1px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;background-color:#fff;background-clip:padding-box;border:1px solid #ccc;border:1px solid rgba(0,0,0,.2);border-radius:6px;box-shadow:0 5px 10px rgba(0,0,0,.2);line-break:auto}.popover.top{margin-top:-10px}.popover.right{margin-left:10px}.popover.bottom{margin-top:10px}.popover.left{margin-left:-10px}.popover-title{padding:8px 14px;margin:0;font-size:14px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;border-radius:5px 5px 0 0}.popover-content{padding:9px 14px}.popover>.arrow,.popover>.arrow:after{position:absolute;display:block;width:0;height:0;border-color:transparent;border-style:solid}.popover>.arrow{border-width:11px}.popover>.arrow:after{content:\"\";border-width:10px}.popover.top>.arrow{bottom:-11px;left:50%;margin-left:-11px;border-top-color:#999;border-top-color:rgba(0,0,0,.25);border-bottom-width:0}.popover.top>.arrow:after{bottom:1px;margin-left:-10px;content:\" \";border-top-color:#fff;border-bottom-width:0}.popover.right>.arrow{top:50%;left:-11px;margin-top:-11px;border-right-color:#999;border-right-color:rgba(0,0,0,.25);border-left-width:0}.popover.right>.arrow:after{bottom:-10px;left:1px;content:\" \";border-right-color:#fff;border-left-width:0}.popover.bottom>.arrow{top:-11px;left:50%;margin-left:-11px;border-top-width:0;border-bottom-color:#999;border-bottom-color:rgba(0,0,0,.25)}.popover.bottom>.arrow:after{top:1px;margin-left:-10px;content:\" \";border-top-width:0;border-bottom-color:#fff}.popover.left>.arrow{top:50%;right:-11px;margin-top:-11px;border-right-width:0;border-left-color:#999;border-left-color:rgba(0,0,0,.25)}.popover.left>.arrow:after{right:1px;bottom:-10px;content:\" \";border-right-width:0;border-left-color:#fff}.carousel,.carousel-inner{position:relative}.carousel-inner{width:100%;overflow:hidden}.carousel-inner>.item{position:relative;display:none;-webkit-transition:left .6s ease-in-out;transition:left .6s ease-in-out}.carousel-inner>.item>a>img,.carousel-inner>.item>img{line-height:1}@media (-webkit-transform-3d),all and (transform-3d){.carousel-inner>.item{-webkit-transition:-webkit-transform .6s ease-in-out;transition:-webkit-transform .6s ease-in-out;transition:transform .6s ease-in-out;transition:transform .6s ease-in-out,-webkit-transform .6s ease-in-out;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-perspective:1000px;perspective:1000px}.carousel-inner>.item.active.right,.carousel-inner>.item.next{left:0;-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0)}.carousel-inner>.item.active.left,.carousel-inner>.item.prev{left:0;-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0)}.carousel-inner>.item.active,.carousel-inner>.item.next.left,.carousel-inner>.item.prev.right{left:0;-webkit-transform:translateZ(0);transform:translateZ(0)}}.carousel-inner>.active,.carousel-inner>.next,.carousel-inner>.prev{display:block}.carousel-inner>.active{left:0}.carousel-inner>.next,.carousel-inner>.prev{position:absolute;top:0;width:100%}.carousel-inner>.next{left:100%}.carousel-inner>.prev{left:-100%}.carousel-inner>.next.left,.carousel-inner>.prev.right{left:0}.carousel-inner>.active.left{left:-100%}.carousel-inner>.active.right{left:100%}.carousel-control{position:absolute;top:0;bottom:0;left:0;width:15%;font-size:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);background-color:transparent;filter:alpha(opacity=50);opacity:.5}.carousel-control.left{background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,.0001));background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,.0001)));background-image:linear-gradient(90deg,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001));filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000',endColorstr='#00000000',GradientType=1);background-repeat:repeat-x}.carousel-control.right{right:0;left:auto;background-image:-webkit-linear-gradient(left,rgba(0,0,0,.0001),rgba(0,0,0,.5));background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.0001)),to(rgba(0,0,0,.5)));background-image:linear-gradient(90deg,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5));filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000',endColorstr='#80000000',GradientType=1);background-repeat:repeat-x}.carousel-control:focus,.carousel-control:hover{color:#fff;text-decoration:none;filter:alpha(opacity=90);outline:0;opacity:.9}.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{position:absolute;top:50%;z-index:4;display:inline-block;margin-top:-10px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{left:50%;margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{right:50%;margin-right:-10px}.carousel-control .icon-next,.carousel-control .icon-prev{width:20px;height:20px;font-family:serif;line-height:1}.carousel-control .icon-prev:before{content:'\\2039'}.carousel-control .icon-next:before{content:'\\203a'}.carousel-indicators{position:absolute;bottom:10px;left:50%;z-index:6;width:60%;padding-left:0;margin-left:-30%;text-align:center;list-style:none}.carousel-indicators li{display:inline-block;width:10px;height:10px;margin:1px;text-indent:-999px;cursor:pointer;background-color:#000\\9;background-color:transparent;border:1px solid #fff;border-radius:10px}.carousel-indicators .active{width:12px;height:12px;margin:0;background-color:#fff}.carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:5;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}.carousel-caption .btn{text-shadow:none}@media screen and (min-width:768px){.carousel-control .glyphicon-chevron-left,.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next,.carousel-control .icon-prev{width:30px;height:30px;margin-top:-10px;font-size:30px}.carousel-control .glyphicon-chevron-left,.carousel-control .icon-prev{margin-left:-10px}.carousel-control .glyphicon-chevron-right,.carousel-control .icon-next{margin-right:-10px}.carousel-caption{right:20%;left:20%;padding-bottom:30px}.carousel-indicators{bottom:20px}}.btn-group-vertical>.btn-group:after,.btn-group-vertical>.btn-group:before,.btn-toolbar:after,.btn-toolbar:before,.clearfix:after,.clearfix:before,.container-fluid:after,.container-fluid:before,.container:after,.container:before,.dl-horizontal dd:after,.dl-horizontal dd:before,.form-horizontal .form-group:after,.form-horizontal .form-group:before,.modal-footer:after,.modal-footer:before,.modal-header:after,.modal-header:before,.nav:after,.nav:before,.navbar-collapse:after,.navbar-collapse:before,.navbar-header:after,.navbar-header:before,.navbar:after,.navbar:before,.pager:after,.pager:before,.panel-body:after,.panel-body:before,.row:after,.row:before{display:table;content:\" \"}.btn-group-vertical>.btn-group:after,.btn-toolbar:after,.clearfix:after,.container-fluid:after,.container:after,.dl-horizontal dd:after,.form-horizontal .form-group:after,.modal-footer:after,.modal-header:after,.nav:after,.navbar-collapse:after,.navbar-header:after,.navbar:after,.pager:after,.panel-body:after,.row:after{clear:both}.center-block{display:block;margin-right:auto;margin-left:auto}.pull-right{float:right!important}.pull-left{float:left!important}.hide{display:none!important}.show{display:block!important}.invisible{visibility:hidden}.text-hide{font:0/0 a;color:transparent;text-shadow:none;background-color:transparent;border:0}.hidden{display:none!important}.affix{position:fixed}@-ms-viewport{width:device-width}.visible-lg,.visible-lg-block,.visible-lg-inline,.visible-lg-inline-block,.visible-md,.visible-md-block,.visible-md-inline,.visible-md-inline-block,.visible-sm,.visible-sm-block,.visible-sm-inline,.visible-sm-inline-block,.visible-xs,.visible-xs-block,.visible-xs-inline,.visible-xs-inline-block{display:none!important}@media (max-width:767px){.visible-xs{display:block!important}table.visible-xs{display:table!important}tr.visible-xs{display:table-row!important}td.visible-xs,th.visible-xs{display:table-cell!important}}@media (max-width:767px){.visible-xs-block{display:block!important}}@media (max-width:767px){.visible-xs-inline{display:inline!important}}@media (max-width:767px){.visible-xs-inline-block{display:inline-block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm{display:block!important}table.visible-sm{display:table!important}tr.visible-sm{display:table-row!important}td.visible-sm,th.visible-sm{display:table-cell!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-block{display:block!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline{display:inline!important}}@media (min-width:768px) and (max-width:991px){.visible-sm-inline-block{display:inline-block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md{display:block!important}table.visible-md{display:table!important}tr.visible-md{display:table-row!important}td.visible-md,th.visible-md{display:table-cell!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-block{display:block!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline{display:inline!important}}@media (min-width:992px) and (max-width:1199px){.visible-md-inline-block{display:inline-block!important}}@media (min-width:1200px){.visible-lg{display:block!important}table.visible-lg{display:table!important}tr.visible-lg{display:table-row!important}td.visible-lg,th.visible-lg{display:table-cell!important}}@media (min-width:1200px){.visible-lg-block{display:block!important}}@media (min-width:1200px){.visible-lg-inline{display:inline!important}}@media (min-width:1200px){.visible-lg-inline-block{display:inline-block!important}}@media (max-width:767px){.hidden-xs{display:none!important}}@media (min-width:768px) and (max-width:991px){.hidden-sm{display:none!important}}@media (min-width:992px) and (max-width:1199px){.hidden-md{display:none!important}}@media (min-width:1200px){.hidden-lg{display:none!important}}.visible-print{display:none!important}@media print{.visible-print{display:block!important}table.visible-print{display:table!important}tr.visible-print{display:table-row!important}td.visible-print,th.visible-print{display:table-cell!important}}.visible-print-block{display:none!important}@media print{.visible-print-block{display:block!important}}.visible-print-inline{display:none!important}@media print{.visible-print-inline{display:inline!important}}.visible-print-inline-block{display:none!important}@media print{.visible-print-inline-block{display:inline-block!important}}@media print{.hidden-print{display:none!important}}body,html{margin:0}#map,body,html{height:100%}.external{background-image:-webkit-linear-gradient(transparent,transparent),url(\"data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='UTF-8'?%3E%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cg transform='translate(-826.429 -698.791)'%3E%3Crect width='5.982' height='5.982' x='826.929' y='702.309' fill='%23fff' stroke='%2306c'/%3E%3Cg%3E%3Cpath d='M831.194 698.791h5.234v5.391l-1.571 1.545-1.31-1.31-2.725 2.725-2.689-2.689 2.808-2.808-1.311-1.311z' fill='%2306f'/%3E%3Cpath d='M835.424 699.795l.022 4.885-1.817-1.817-2.881 2.881-1.228-1.228 2.881-2.881-1.851-1.851z' fill='%23fff'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\");background-image:linear-gradient(transparent,transparent),url(\"data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='UTF-8'?%3E%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cg transform='translate(-826.429 -698.791)'%3E%3Crect width='5.982' height='5.982' x='826.929' y='702.309' fill='%23fff' stroke='%2306c'/%3E%3Cg%3E%3Cpath d='M831.194 698.791h5.234v5.391l-1.571 1.545-1.31-1.31-2.725 2.725-2.689-2.689 2.808-2.808-1.311-1.311z' fill='%2306f'/%3E%3Cpath d='M835.424 699.795l.022 4.885-1.817-1.817-2.881 2.881-1.228-1.228 2.881-2.881-1.851-1.851z' fill='%23fff'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\");background-position:100%;background-repeat:no-repeat;padding-right:13px}.dataset-spatial-minimap{height:120px}.code-nowrap{word-wrap:normal;white-space:pre}.ac-container{width:auto;margin:10px auto;text-align:left;overflow-y:auto;overflow-x:hidden;height:auto}.ac-container label{font-family:BebasNeueRegular,Arial Narrow,Arial,sans-serif;padding:5px 20px;position:relative;z-index:7;display:block;cursor:pointer;color:#777;text-shadow:1px 1px 1px hsla(0,0%,100%,.8);line-height:30px;font-size:17px;background:#fff;background:-webkit-gradient(linear,left top,left bottom,color-stop(1%,#fff),color-stop(100%,#eaeaea));background:-webkit-linear-gradient(top,#fff 1%,#eaeaea);background:linear-gradient(top,#fff 1%,#eaeaea);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff',endColorstr='#eaeaea',GradientType=0);box-shadow:0 0 0 1px hsla(0,0%,61%,.3),inset 1px 0 0 0 hsla(0,0%,100%,.9),0 2px 2px rgba(0,0,0,.1);box-sizing:content-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.ac-container label:hover{background:#fff}.ac-container input.menu:checked+label,.ac-container input.menu:checked+label:hover{background:#c6e1ec;color:#3d7489;text-shadow:0 1px 1px hsla(0,0%,100%,.6);box-shadow:0 0 0 1px hsla(0,0%,61%,.3),0 2px 2px rgba(0,0,0,.1)}.ac-container input.menu:checked+label:after,.ac-container label:hover:after{content:'';position:absolute;width:24px;height:24px;right:13px;top:7px;background:transparent url(app/css/styledLayerControl/images/arrow_down.png) no-repeat 50%}.ac-container input.menu:checked+label:after{background-image:url(app/css/styledLayerControl/images/arrow_up.png)}.ac-container input.menu{display:none}.ac-container article{background:hsla(0,0%,100%,.5);margin-top:-1px;overflow:hidden;height:0;position:relative;z-index:5;-webkit-transition:height .3s ease-in-out,box-shadow .6s linear;transition:height .3s ease-in-out,box-shadow .6s linear}.ac-container input.menu:checked~article{-webkit-transition:height .5s ease-in-out,box-shadow .1s linear;transition:height .5s ease-in-out,box-shadow .1s linear;box-shadow:0 0 0 1px hsla(0,0%,61%,.3)}.ac-container input.menu:checked~article.ac-large{height:auto;max-height:200px;padding-top:5px;overflow-y:auto}.menu-item-checkbox,.menu-item-radio{font-family:Ubuntu-Regular,Arial,sans-serif;font-size:13px}.bt_delete{position:relative;float:right;background-image:url(app/css/styledLayerControl/images/delete.png);background-color:transparent;background-repeat:no-repeat;background-position:0 0;border:none;cursor:pointer;height:16px;width:16px;vertical-align:middle}.leaflet-control-layers{padding:6px 8px;font:14px/16px Arial,Helvetica,sans-serif;background:#fff;background:hsla(0,0%,100%,.8);box-shadow:0 0 15px rgba(0,0,0,.2);border-radius:5px}input[type=checkbox].leaflet-control-layers-selector,input[type=radio].leaflet-control-layers-selector{margin:3px 3px 0 5px}.snow{display:none;height:100%;left:0;position:absolute;top:0;width:100%;z-index:1;pointer-events:none;opacity:0;-webkit-transition:opacity 3s;transition:opacity 3s}#snow1{background-image:url('http://www.wearewebstars.dk/codepen/img/s1.png');-webkit-animation:b 5s linear infinite;animation:b 5s linear infinite}#snow2{background-image:url('http://www.wearewebstars.dk/codepen/img/s2.png');-webkit-animation:c 20s linear infinite;animation:c 20s linear infinite}#snow3{background-image:url('http://www.wearewebstars.dk/codepen/img/s3.png');-webkit-animation:d 30s linear infinite;animation:d 30s linear infinite}@-webkit-keyframes b{0%{background-position:0 0}to{background-position:500px 500px}}@keyframes b{0%{background-position:0 0}to{background-position:500px 500px}}@-webkit-keyframes c{0%{background-position:0 0}to{background-position:400px 800px}}@keyframes c{0%{background-position:0 0}to{background-position:400px 800px}}@-webkit-keyframes d{0%{background-position:0 0}to{background-position:-600px 900px}}@keyframes d{0%{background-position:0 0}to{background-position:-600px 900px}}\r\n/*# sourceMappingURL=__.css.map */");
 })
 (function(factory) {
   factory();
