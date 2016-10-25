@@ -117,7 +117,7 @@ export default class GeoCoverageView extends Action {
     
     let map = this.context.map
     let layer = dataLayer(cov, opts)
-      .on('add', e => {
+      .on('afterAdd', e => {
         let covLayer = e.target
         
         // This registers the layer with the sync manager.
@@ -148,7 +148,7 @@ export default class GeoCoverageView extends Action {
     })
     
 
-    // we do that outside of the above 'add' handler since we want to register only once,
+    // we do that outside of the above 'afterAdd' handler since we want to register only once,
     // not every time the layer is added to the map
     layer.on('click', ({coverage}) => {
       let genBy = coverage.ld.wasGeneratedBy
