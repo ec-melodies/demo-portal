@@ -23,7 +23,7 @@ System.config({
     "coverage-rest-client": "github:Reading-eScience-Centre/coverage-rest-client@master",
     "covjson-reader": "npm:covjson-reader@0.16.2",
     "covutils": "npm:covutils@0.6.1",
-    "css": "github:systemjs/plugin-css@0.1.21",
+    "css": "github:systemjs/plugin-css@0.1.32",
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
     "leaflet": "npm:leaflet@0.7.7",
@@ -135,7 +135,7 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:c3@0.4.11": {
-      "css": "github:systemjs/plugin-css@0.1.21",
+      "css": "github:systemjs/plugin-css@0.1.32",
       "d3": "npm:d3@3.5.17"
     },
     "npm:clean-css@3.4.11": {
