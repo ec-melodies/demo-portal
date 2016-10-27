@@ -31,7 +31,9 @@ System.config({
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.18",
     "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.9",
     "minified": "github:timjansen/minified.js@2015.1.1",
+    "proj4": "npm:proj4@2.3.15",
     "qs-hash": "npm:qs-hash@0.0.0",
+    "reproject": "npm:reproject@1.1.1",
     "traceur": "github:jmcriffey/bower-traceur@0.0.93",
     "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93",
     "wellknown": "npm:wellknown@0.5.0",
@@ -275,7 +277,7 @@ System.config({
       "ndarray": "npm:ndarray@1.0.18",
       "point-in-big-polygon": "npm:point-in-big-polygon@2.0.0",
       "topojson": "npm:topojson@1.6.27",
-      "uriproj": "npm:uriproj@0.2.2"
+      "uriproj": "npm:uriproj@0.2.3"
     },
     "npm:create-ecdh@4.0.0": {
       "bn.js": "npm:bn.js@4.11.6",
@@ -554,6 +556,14 @@ System.config({
       "string_decoder": "npm:string_decoder@0.10.31",
       "util-deprecate": "npm:util-deprecate@1.0.2"
     },
+    "npm:reproject@1.1.1": {
+      "concat-stream": "npm:concat-stream@1.5.2",
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "http": "github:jspm/nodelibs-http@1.7.1",
+      "minimist": "npm:minimist@1.2.0",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "proj4": "npm:proj4@2.3.15"
+    },
     "npm:resolve@1.1.7": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "path": "github:jspm/nodelibs-path@0.1.0",
@@ -655,7 +665,7 @@ System.config({
       "rw": "npm:rw@1.3.2",
       "shapefile": "npm:shapefile@0.3.1"
     },
-    "npm:uriproj@0.2.2": {
+    "npm:uriproj@0.2.3": {
       "proj4": "npm:proj4@2.3.15",
       "whatwg-fetch": "npm:whatwg-fetch@1.0.0"
     },

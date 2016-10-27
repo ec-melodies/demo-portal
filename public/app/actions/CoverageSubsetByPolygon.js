@@ -2,7 +2,9 @@ import L from 'leaflet'
 import {$,$$, HTML} from 'minified'
 import Modal from 'bootstrap-native/lib/modal-native.js'
 
-import {maskByPolygon, subsetByBbox} from 'covutils'
+import {maskByPolygon, subsetByBbox, loadProjection, getHorizontalCRSReferenceObject, isEllipsoidalCRS} from 'covutils'
+import proj4 from 'proj4'
+import {reproject} from 'reproject'
 import {COVJSON_GRID} from 'leaflet-coverage'
 
 import {i18n} from '../util.js'
@@ -181,24 +183,35 @@ export default class CoverageSubsetByPolygon extends Action {
     let appendTitle = ' [subsetted by polygon]'
     
     this.fire('loading')
-    let bbox = L.geoJson(feature).getBounds()
-    subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
-      maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
-        let virtualDataset = {
-          title: { en: i18n(this.context.dataset.title) + appendTitle },
-          virtual: true,
-          distributions: [{
-            title: { en: i18n(this.context.distribution.title) + appendTitle },
-            mediaType: 'coveragedata',
-            data: polySubsetCov
-          }]
+    this.cov.loadDomain().then(domain => {
+      loadProjection(domain).then(() => {
+        let crs = getHorizontalCRSReferenceObject(domain).system
+        if (!isEllipsoidalCRS(crs)) {
+          // Projection is stored by covutils/uriproj when calling loadProjection() above
+          let proj = proj4(crs.id)
+          feature = reproject(feature, proj4.WGS84, proj)
         }
-        let workspace = this.context.workspace
-                
-        workspace.addDataset(virtualDataset, this.context.dataset)
-        workspace.requestFocus(virtualDataset)
-        
-        this.fire('load')
+
+        let bbox = L.geoJson(feature).getBounds()
+        subsetByBbox(this.cov, [bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]).then(bboxSubsetCov => {
+          maskByPolygon(bboxSubsetCov, feature.geometry).then(polySubsetCov => {
+            let virtualDataset = {
+              title: { en: i18n(this.context.dataset.title) + appendTitle },
+              virtual: true,
+              distributions: [{
+                title: { en: i18n(this.context.distribution.title) + appendTitle },
+                mediaType: 'coveragedata',
+                data: polySubsetCov
+              }]
+            }
+            let workspace = this.context.workspace
+                    
+            workspace.addDataset(virtualDataset, this.context.dataset)
+            workspace.requestFocus(virtualDataset)
+            
+            this.fire('load')
+          })
+        })
       })
     })
   }

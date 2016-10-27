@@ -34,7 +34,9 @@
       "leaflet-loading": "github:ebrelsford/Leaflet.loading@^0.1.16",
       "leaflet-providers": "github:leaflet-extras/leaflet-providers@^1.1.5",
       "minified": "github:timjansen/minified.js@^2015.1.1",
+      "proj4": "npm:proj4@^2.3.15",
       "qs-hash": "npm:qs-hash@^0.0.0",
+      "reproject": "npm:reproject@^1.1.1",
       "wellknown": "npm:wellknown@^0.5.0"
     },
     "devDependencies": {
