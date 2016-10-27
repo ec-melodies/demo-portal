@@ -27,7 +27,7 @@ System.config({
     "fetch": "github:github/fetch@0.10.1",
     "jsonld": "npm:jsonld@0.4.6",
     "leaflet": "npm:leaflet@1.0.1",
-    "leaflet-coverage": "npm:leaflet-coverage@0.7.0",
+    "leaflet-coverage": "npm:leaflet-coverage@0.7.2",
     "leaflet-loading": "github:ebrelsford/Leaflet.loading@0.1.18",
     "leaflet-providers": "github:leaflet-extras/leaflet-providers@1.1.9",
     "minified": "github:timjansen/minified.js@2015.1.1",
@@ -418,7 +418,7 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
-    "npm:leaflet-coverage@0.7.0": {
+    "npm:leaflet-coverage@0.7.2": {
       "c3": "npm:c3@0.4.11",
       "covutils": "npm:covutils@0.6.1",
       "leaflet": "npm:leaflet@1.0.1",

@@ -30,7 +30,7 @@
       "fetch": "github:github/fetch@^0.10.1",
       "jsonld": "npm:jsonld@^0.4.2",
       "leaflet": "npm:leaflet@^1.0.1",
-      "leaflet-coverage": "npm:leaflet-coverage@^0.7.0",
+      "leaflet-coverage": "npm:leaflet-coverage@^0.7.2",
       "leaflet-loading": "github:ebrelsford/Leaflet.loading@^0.1.16",
       "leaflet-providers": "github:leaflet-extras/leaflet-providers@^1.1.5",
       "minified": "github:timjansen/minified.js@^2015.1.1",

@@ -99,10 +99,9 @@ export default class GeoCoverageView extends Action {
     
     // each parameter becomes a layer
     for (let key of cov.parameters.keys()) {
-      let opts = {keys: [key]}
       let layerName = i18n(cov.parameters.get(key).observedProperty.label)
       let fullLayerName = layerNamePrefix + layerName
-      let layer = this._createLayer(cov, opts)
+      let layer = this._createLayer(cov, {parameter: key})
       map.layerControl.addOverlay(layer, fullLayerName, {groupName: datasetTitle, expanded: true})
       this.layers.push(layer) 
     }
@@ -146,45 +145,49 @@ export default class GeoCoverageView extends Action {
     layer.on('axisChange', () => {
       layer.paletteExtent = 'subset'
     })
-    
 
-    // we do that outside of the above 'afterAdd' handler since we want to register only once,
-    // not every time the layer is added to the map
-    layer.on('click', ({coverage}) => {
-      let genBy = coverage.ld.wasGeneratedBy
-      
-      if (coverage.domainType === COVJSON_VERTICALPROFILE) {
-        new VerticalProfilePlot(coverage).addTo(map)
-      } else if (genBy && genBy.type === ModelObservationComparisonActivity) {
-        let usage = genBy.qualifiedUsage
-        let modelParamKey = usage.model.parameterKey
-        let obsParamKey = usage.observation.parameterKey
-        
-        // display a plot of the input model (subsetting to a point) and observation
-        // TODO we are at JS Coverage Data API abstraction here, how do we know the format of the linked cov?
-        // -> should the media type be included in the prov data?
-        let modelCovUrl = usage.model.entity
-        let obsCovUrl = usage.observation.entity
-        let covJSON = new CovJSON()
-        Promise.all([covJSON.load(modelCovUrl), covJSON.load(obsCovUrl, {eagerload: true})]).then(([modelCov, obsCov]) => {
-          return obsCov.loadDomain().then(obsDomain => {
-            // TODO handle CRS, reproject 
-            let x = obsDomain.axes.get('x').values[0]
-            let y = obsDomain.axes.get('y').values[0]
-            return modelCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true}).then(modelSubset => {
-              new VerticalProfilePlot([obsCov,modelSubset], {
-                keys: [[obsParamKey, modelParamKey]],
-                labels: ['Observation', 'Model']
-              }).addTo(map)
-            })
-          })
-        }).catch(e => {
-          console.log(e)
-          // TODO display error
-        })
+    if (cov.domainType === COVJSON_VERTICALPROFILE) {
+      if (cov.coverages) {
+        layer.bindPopupEach(coverage => new VerticalProfilePlot(coverage))
+      } else {
+        layer.bindPopup(new VerticalProfilePlot(cov))
       }
-      
-    })
+    } else {
+      // can't use bindPopup here as we fetch data asynchronously
+      layer.on('click', ({coverage, latlng}) => {
+        let genBy = coverage.ld.wasGeneratedBy
+        
+        if (genBy && genBy.type === ModelObservationComparisonActivity) {
+          let usage = genBy.qualifiedUsage
+          let modelParamKey = usage.model.parameterKey
+          let obsParamKey = usage.observation.parameterKey
+          
+          // display a plot of the input model (subsetting to a point) and observation
+          // TODO we are at JS Coverage Data API abstraction here, how do we know the format of the linked cov?
+          // -> should the media type be included in the prov data?
+          let modelCovUrl = usage.model.entity
+          let obsCovUrl = usage.observation.entity
+          let covJSON = new CovJSON()
+          Promise.all([covJSON.load(modelCovUrl), covJSON.load(obsCovUrl, {eagerload: true})]).then(([modelCov, obsCov]) => {
+            return obsCov.loadDomain().then(obsDomain => {
+              // TODO handle CRS, reproject 
+              let x = obsDomain.axes.get('x').values[0]
+              let y = obsDomain.axes.get('y').values[0]
+              return modelCov.subsetByValue({x: {start: x, stop: x}, y: {start: y, stop: y}}, {eagerload: true}).then(modelSubset => {
+                new VerticalProfilePlot([obsCov,modelSubset], {
+                  keys: [[obsParamKey, modelParamKey]],
+                  labels: ['Observation', 'Model']
+                }).setLatLng(latlng).addTo(map)
+              })
+            })
+          }).catch(e => {
+            console.log(e)
+            // TODO display error
+          })
+        }
+        
+      })
+    }
 
     return layer
   }

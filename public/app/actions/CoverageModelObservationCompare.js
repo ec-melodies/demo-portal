@@ -1,4 +1,4 @@
-import {indexOfNearest, indicesOfNearest, reprojectCoords, getReferenceObject, stringifyUnit} from 'covutils'
+import {indexOfNearest, indicesOfNearest, reprojectCoords, getProjection, getReferenceObject, stringifyUnit} from 'covutils'
 import {TimeAxis, Dropdown, COVJSON_GRID, COVJSON_POINT, COVJSON_VERTICALPROFILE} from 'leaflet-coverage'
 import ButtonControl from './ButtonControl.js'
 
